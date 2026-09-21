@@ -1,4 +1,5 @@
 .PHONY: up down setup logs sh test docs console reset db-apply db-dry-run db-export \
+	ios-setup ios-open ios-build \
 	infra-apply infra-push infra-deploy infra-release infra-up infra-plan infra-destroy \
 	infra-url infra-ssh infra-logs infra-console infra-seed infra-secrets
 
@@ -34,6 +35,21 @@ db-export:     ## 現在の DB の状態を db/Schemafile に書き出す
 
 reset:         ## DBを作り直して seed
 	docker compose exec api bin/rails db:drop db:create db:apply db:seed
+
+# --- ios (SwiftUI) ------------------------------------------------------------
+IOS_PROJECT = ios/ios.xcodeproj
+
+ios-setup:     ## ios/Info.plist を用意する (clone したら最初にこれ)
+	@test -f ios/Info.plist \
+		&& echo "ios/Info.plist は既にある (API_ENDPOINT を変えるなら直接編集)" \
+		|| (cp ios/Info.plist.example ios/Info.plist && echo "ios/Info.plist を作成した")
+
+ios-open:      ## Xcode で開く
+	open $(IOS_PROJECT)
+
+ios-build:     ## シミュレータ向けにビルドだけ通す (Xcode を開かず確認)
+	xcodebuild -project $(IOS_PROJECT) -scheme ios \
+		-destination 'platform=iOS Simulator,name=iPhone 17' build
 
 # --- infra (AWS Lightsail + API Gateway) --------------------------------------
 TF = ./infra/bin/tf.sh

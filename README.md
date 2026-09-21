@@ -4,8 +4,9 @@
 | --- | --- |
 | [`backend/`](backend/README.md) | Rails 8 (API モード) + PostgreSQL 16 + JWT 認証。詳細は `backend/README.md` |
 | [`infra/`](infra/README.md) | AWS Lightsail + API Gateway (Terraform)。詳細は `infra/README.md` |
+| `ios/` | SwiftUI アプリ (Domain / Data / Core のレイヤ分け + FactoryKit で DI)。規約は `.claude/docs/ios.md` |
 
-フロントエンドを足す場合は `frontend/` として直下に並べ、`compose.yaml` にサービスを追加する。
+Web フロントを足す場合は `frontend/` として直下に並べ、`compose.yaml` にサービスを追加する。
 
 ## 起動
 
@@ -25,6 +26,29 @@ make docs     # OpenAPI定義(swagger.yaml)の再生成
 make db-apply # db/Schemafile を DB に適用 (スキーマ管理は ridgepole)
 make reset    # DB作り直し + seed
 ```
+
+## iOS
+
+```bash
+make ios-setup   # ios/Info.plist を用意する (clone 後に1回。Info.plist は gitignore)
+make ios-open    # Xcode で開く
+make ios-build   # シミュレータ向けにビルドだけ通す
+```
+
+**Debug ビルドの既定は「ダミー」接続**なので、backend を立てなくてもログインから一覧まで動く
+(データは端末内の `ios/ios/Data/Dummy`)。実 API を叩くならログイン画面下の「接続先」を
+`API` に切り替える。URL は `ios/Info.plist` の `API_ENDPOINT`(既定 `http://localhost:3000`、
+デプロイ済みなら `make infra-url` の値)。
+
+| ディレクトリ | 内容 |
+| --- | --- |
+| `ios/ios/App/` | エントリポイントと DI の登録 (`Container+Registrations.swift`) |
+| `ios/ios/Core/` | 設定・接続先・トークン・`AuthSession` |
+| `ios/ios/Domain/` | エンティティと Repository の protocol |
+| `ios/ios/Data/` | `ApiClient`・レコード型・Repository 実装・ダミー実装 |
+| `ios/ios/Feature/` | 画面 |
+
+規約は [.claude/docs/ios.md](.claude/docs/ios.md)。
 
 ## デプロイ手順 (AWS アカウント作成から CI/CD まで)
 
@@ -165,11 +189,13 @@ make infra-destroy   # 作ったものを全部消す (データも消える)
 
 ```
 backend/                          # Rails API
+ios/                              # SwiftUI アプリ
 infra/                            # AWS Lightsail + API Gateway + ECR (Terraform)
 compose.yaml                      # ベース (db + api)
 compose.override.yaml             # ローカル専用 (build とコードのマウント)
 Makefile
 .claude/docs/backend.md           # backend の規約
+.claude/docs/ios.md               # ios の規約
 .github/workflows/ci.yml          # rspec / OpenAPI定義の鮮度チェック / rubocop
 .github/workflows/deploy.yml      # main マージで ECR push -> Lightsail 入れ替え
 ```
