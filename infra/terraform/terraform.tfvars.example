@@ -1,0 +1,25 @@
+# cp terraform.tfvars.example terraform.tfvars して必要なら書き換える。
+# terraform.tfvars は .gitignore 済み。既定値のままでも動く。
+
+project = "hack"
+
+region            = "ap-northeast-1"
+availability_zone = "ap-northeast-1a"
+
+# micro_3_0 = 1GB / small_3_0 = 2GB / medium_3_0 = 4GB
+# Rails + PostgreSQL + ビルドを同居させるので 2GB 以上を推奨
+bundle_id = "small_3_0"
+
+# SSH を自分の IP だけに絞る場合 (推奨)
+# ssh_allowed_cidrs = ["203.0.113.10/32"]
+
+# 値を入れると API Gateway 経由のリクエストだけが通るようになる。
+# 適当な長いランダム文字列を入れる: openssl rand -hex 32
+origin_secret = ""
+
+# CI/CD を使うなら必須。owner/repo 形式。
+# GitHub Actions が ECR に push するための IAM ロール (OIDC) が作られる
+github_repository = ""
+
+# AWS アカウントに GitHub の OIDC プロバイダが既にあるなら false
+create_github_oidc_provider = true

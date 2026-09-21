@@ -1,0 +1,89 @@
+name: Deploy
+
+# main に入ったら CI の完了を待ってデプロイする
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  id-token: write   # OIDC で AWS のロールを引き受けるのに必要
+  contents: read
+
+jobs:
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: AWS の認証 (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: ECR にログイン
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: ビルドして push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          # Lightsail は x86_64
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ secrets.ECR_REPOSITORY_URL }}:${{ github.event.workflow_run.head_sha }}
+            ${{ secrets.ECR_REPOSITORY_URL }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: インスタンスに pull させて入れ替え
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          HOST: ${{ secrets.LIGHTSAIL_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy.pem
+          chmod 600 ~/.ssh/deploy.pem
+          ssh -i ~/.ssh/deploy.pem \
+              -o StrictHostKeyChecking=accept-new \
+              -o UserKnownHostsFile=/dev/null \
+              -o LogLevel=ERROR \
+              "ubuntu@$HOST" 'bash -s' <<'REMOTE'
+          set -euo pipefail
+          cd /opt/app
+          set -a; . infra/.env; set +a
+
+          aws ecr get-login-password --region "$AWS_REGION" \
+            | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+
+          COMPOSE="docker compose -f compose.yaml -f infra/compose.deploy.yaml --env-file infra/.env"
+          $COMPOSE pull api
+          $COMPOSE up -d
+          docker image prune -f >/dev/null
+          REMOTE
+
+      - name: 疎通確認
+        env:
+          URL: ${{ secrets.PUBLIC_URL }}
+        run: |
+          for _ in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$URL/up" || true)
+            [ "$code" = "200" ] && echo "OK" && exit 0
+            sleep 5
+          done
+          echo "デプロイ後に /up が 200 になりませんでした" >&2
+          exit 1

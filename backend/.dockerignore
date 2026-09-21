@@ -1,0 +1,10 @@
+.git
+.gitignore
+log/*
+tmp/*
+!tmp/pids
+!tmp/pids/.keep
+storage/*
+.env
+node_modules
+README.md

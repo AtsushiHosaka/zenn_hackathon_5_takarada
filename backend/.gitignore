@@ -1,0 +1,14 @@
+/.bundle
+
+# 暗号化された credentials の復号鍵。リポジトリに含めない (Rails 既定)
+/config/master.key
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+/tmp/pids/*
+!/tmp/pids/.keep
+/storage/*
+!/storage/.keep
+.env
+.DS_Store

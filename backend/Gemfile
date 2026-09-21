@@ -1,0 +1,45 @@
+source "https://rubygems.org"
+
+gem "rails", "~> 8.0.2"
+gem "pg", "~> 1.5"
+
+# スキーマ管理。マイグレーションではなく db/Schemafile が唯一の正
+gem "ridgepole"
+gem "puma", ">= 5.0"
+
+# json 3.x は Rails 8.0 系の JSON エンコーダと非互換 (quirks_mode 削除) のため固定
+gem "json", "~> 2.7"
+
+# JSON serialization
+gem "jbuilder"
+
+# 認証。identities テーブルの email / パスワードを devise が持ち、
+# JWT の発行・検証・失効は devise-jwt (Warden の Rack ミドルウェア) が担う
+gem "devise"
+gem "devise-jwt"
+gem "bcrypt", "~> 3.1.7"
+
+# CORS (フロントエンドから叩けるように)
+gem "rack-cors"
+
+gem "tzinfo-data", platforms: %i[ windows jruby ]
+gem "bootsnap", require: false
+
+group :development, :test do
+  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+  gem "rspec-rails", "~> 7.1"
+  gem "factory_bot_rails"
+  gem "faker"
+
+  # OpenAPI 仕様書 + E2E(リクエスト)テストの両取り
+  gem "rswag-specs"
+end
+
+group :development do
+  gem "brakeman", require: false
+  gem "rubocop-rails-omakase", require: false
+end
+
+# /api-docs で Swagger UI を配信
+gem "rswag-api"
+gem "rswag-ui"

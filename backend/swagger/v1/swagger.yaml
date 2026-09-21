@@ -1,0 +1,307 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+  description: Rails API
+paths:
+  "/api/v1/signup":
+    post:
+      summary: サインアップしてトークンを受け取る
+      tags:
+      - Auth
+      security: []
+      parameters: []
+      responses:
+        '201':
+          description: 作成に成功。Authorization ヘッダに Bearer トークンが載る
+          headers:
+            Authorization:
+              schema:
+                type: string
+              description: Bearer <JWT>
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/User"
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationErrors"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/SignupInput"
+  "/api/v1/login":
+    post:
+      summary: ログインしてトークンを受け取る
+      tags:
+      - Auth
+      security: []
+      parameters: []
+      responses:
+        '200':
+          description: ログイン成功。Authorization ヘッダに Bearer トークンが載る
+          headers:
+            Authorization:
+              schema:
+                type: string
+              description: Bearer <JWT>
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/User"
+        '401':
+          description: メールアドレスかパスワードが違う
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Unauthorized"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/LoginInput"
+  "/api/v1/logout":
+    delete:
+      summary: ログアウトしてトークンを失効させる
+      tags:
+      - Auth
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: 失効に成功。以降このトークンでは 401 になる
+        '401':
+          description: トークンが無い
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Unauthorized"
+  "/api/v1/me":
+    get:
+      summary: トークンの持ち主を返す
+      tags:
+      - Auth
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: 取得に成功
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/User"
+        '401':
+          description: トークンが不正
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Unauthorized"
+  "/api/v1/users":
+    get:
+      summary: ユーザー一覧を取得する
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: 一覧が返る
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/User"
+        '401':
+          description: トークンが無い
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Unauthorized"
+  "/api/v1/users/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: User ID
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: ユーザーを1件取得する
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: 取得に成功
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/User"
+        '404':
+          description: ユーザーが存在しない
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFound"
+    patch:
+      summary: ユーザーを更新する
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: 更新に成功
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/User"
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationErrors"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/UserInput"
+    delete:
+      summary: ユーザーを削除する
+      tags:
+      - Users
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: 削除に成功
+        '404':
+          description: ユーザーが存在しない
+servers:
+- url: http://localhost:3000
+  description: Local
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: POST /api/v1/login のレスポンスヘッダ Authorization の値をそのまま使う
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Taro Yamada
+        email:
+          type: string
+          format: email
+          example: taro@example.com
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - name
+      - email
+      - created_at
+      - updated_at
+    SignupInput:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Taro Yamada
+            email:
+              type: string
+              format: email
+              example: taro@example.com
+            password:
+              type: string
+              format: password
+              minLength: 8
+              example: password
+          required:
+          - name
+          - email
+          - password
+      required:
+      - user
+    LoginInput:
+      type: object
+      properties:
+        identity:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+              example: user1@example.com
+            password:
+              type: string
+              format: password
+              example: password
+          required:
+          - email
+          - password
+      required:
+      - identity
+    UserInput:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Taro Yamada
+          required:
+          - name
+      required:
+      - user
+    ValidationErrors:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+          example:
+          - Identity email has already been taken
+      required:
+      - errors
+    Unauthorized:
+      type: object
+      properties:
+        error:
+          type: string
+          example: メールアドレスまたはパスワードが違います
+      required:
+      - error
+    NotFound:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Couldn't find User with 'id'=999
+      required:
+      - error
