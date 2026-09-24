@@ -18,7 +18,7 @@ sh:            ## APIコンテナに入る
 console:       ## rails console
 	docker compose exec api bin/rails console
 
-test:          ## E2E(リクエスト)テスト実行
+test:          ## 既存のAPIリクエストテスト実行
 	docker compose exec api bundle exec rspec
 
 docs:          ## specs から OpenAPI(swagger.yaml) を再生成

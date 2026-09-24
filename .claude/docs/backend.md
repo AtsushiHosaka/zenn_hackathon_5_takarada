@@ -2,7 +2,7 @@
 
 Rails 8 (API モード) + RSpec + rswag + ridgepole + devise/devise-jwt。
 
-- **spec 1ファイルが E2E テストと OpenAPI 仕様書を兼ねる**(rswag)
+- **rswag の request spec が API 契約とリクエストテストを兼ねる**。既存の「E2E」表記はこれを指し、iOS から AWS までの通し検証ではない。
 - **`db/Schemafile` が DB スキーマの唯一の正**(ridgepole。マイグレーションは作らない)
 - **認証情報は `identities`、プロフィールは `users`**(devise)
 
@@ -37,7 +37,15 @@ make sh          # コンテナに入る (rubocop や rails g はここで)
 - トークンの発行/失効パスと有効期限は `config/initializers/devise.rb` の `config.jwt`。
   ログイン系を増やしたら `jwt.dispatch_requests` にも足す。
 
-## テストの書き方
+## テスト方針と API 契約
+
+- フロント・backend・infra とも新規テストは原則追加せず、TDD は行わない。追加はユーザーが求めた場合に限る。
+- 既存テストと CI は維持し、変更に関係する検証を実行する。実行できなければ理由を報告する。
+- 例外として、Swagger 生成に必要な最小限の rswag 契約記述は追加・更新する。網羅的なケース追加は行わない。
+- 生成元は `spec/requests/` と `spec/swagger_helper.rb`。`swagger/v1/swagger.yaml` は直接編集せず、`make docs` で生成してコミットする。
+- 生成成功だけで動作確認済みとはしない。API 契約はクライアント連携に使える時点で早めに共有する。
+
+以下は契約記述の例。レスポンス定義はその API で実際に必要なものを選ぶ。
 
 ```ruby
 require "swagger_helper"
@@ -63,7 +71,7 @@ RSpec.describe "Api::V1::Posts", type: :request do
         let(:id) { post_record.id }
         let(:params) { { post: { title: "new" } } }
 
-        run_test! { expect(post_record.reload.title).to eq("new") }
+        run_test!
       end
 
       response "401", "トークンが無い" do
@@ -77,11 +85,11 @@ end
 ```
 
 - **`spec/requests/` の rswag DSL のみ。** 素の `get "/api/v1/posts"` もコントローラスペックも書かない。
-- **`schema` を必ず書く。** `run_test!` がレスポンスを照合するので実装とズレた時点で落ちる。
+- **レスポンスボディがある場合は `schema` を書く。** `run_test!` が定義したスキーマとレスポンスを照合する。
 - **`parameter name: :x` と `let(:x)` は同名。** パスパラメータ `{id}` も `let(:id)` で渡す。
 - `let` はレスポンスブロックの中。データ投入は `before` か `let!`(`let` だけでは作られない)。
 - `run_test!` のブロックには schema で見られないものだけ(値・件数・DB の副作用)。不要なら省く。
-- 網羅する status: 正常系 + `422` + `404` + 認証が要るなら `401` を1本。
+- 正常系と連携に必要なエラー応答を実際の API 契約に合わせて定義する。`422`・`404`・`401` の一律網羅は求めない。
 - summary / description は日本語(Swagger UI にそのまま出る)。
 - `Authorization` は定数と同じ綴り。ブロック内で値が要るときは `send(:Authorization)`。
 
@@ -93,15 +101,11 @@ end
 
 ファクトリは `spec/factories/`。`create(:user)` はログイン可能な `identity` 付きで作られる。
 
-## エンドポイント追加
+## エンドポイント変更時の参照
 
-1. `db/Schemafile` にテーブルを足す → `make db-apply`
-   (モデルが要るなら `bin/rails g model Post --no-fixture`。マイグレーションは生成されない)
-2. `app/controllers/api/v1/posts_controller.rb` を `users_controller.rb` に倣って作る
-   - 例外は rescue せず `ApplicationController` の `rescue_from` に任せる
-   - serializer gem は使わない。private な `serialize_xxx` で組み、日時は `iso8601`
-3. `config/routes.rb` の `namespace :api` / `:v1` 配下に `resources :posts`
-4. `swagger_helper.rb` にスキーマ追加 → spec を書く
-5. `make test` → `make docs` → **生成物もコミット**(CI が `git diff --exit-code swagger/` で検査)
+- DB 変更は `db/Schemafile`。モデル生成が必要なら `bin/rails g model Post --no-fixture` (マイグレーションは生成されない)。
+- コントローラは `users_controller.rb`、ルートは `config/routes.rb` の `namespace :api` / `:v1` を参照する。
+- 共通例外は `ApplicationController` の `rescue_from` に任せる。serializer gem は使わず、private な `serialize_xxx` で組み、日時は `iso8601`。
+- `make test` は既存リクエストテスト、`make docs` は契約の再生成。CI はテストと生成物の差分 (`git diff --exit-code swagger/`) を検査する。作業順序は固定しない。
 
 Lint は `bin/rubocop -f github`(CI と同じ)。自動修正は `bin/rubocop -a`。
