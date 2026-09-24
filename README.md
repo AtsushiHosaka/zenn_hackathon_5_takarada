@@ -8,6 +8,12 @@
 
 Web フロントを足す場合は `frontend/` として直下に並べ、`compose.yaml` にサービスを追加する。
 
+## 開発ルール
+
+仕様のSSOTはGoogle Docsです。fork後に [docs/project.md](docs/project.md) のURL欄を設定してください。
+新規テストは原則追加せず、TDDは行いません。既存CIとSwagger生成用の最小rswag定義は維持します。
+PRは [.github/pull_request_template.md](.github/pull_request_template.md) に従います。
+
 ## 起動
 
 ```bash
@@ -21,7 +27,7 @@ make up       # 起動
 make down     # 停止
 make logs     # ログ追尾
 make sh       # APIコンテナに入る
-make test     # E2Eテスト
+make test     # 既存のAPIリクエストテスト
 make docs     # OpenAPI定義(swagger.yaml)の再生成
 make db-apply # db/Schemafile を DB に適用 (スキーマ管理は ridgepole)
 make reset    # DB作り直し + seed
