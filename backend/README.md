@@ -2,22 +2,22 @@
 
 Ruby 3.3 / Rails 8.0 (API モード) / PostgreSQL 16。
 
-- rswag により、**1つの spec から「E2E(リクエスト)テスト」と「OpenAPI 仕様書」を同時に得られる**
+- rswag により、**request spec からリクエストテストと OpenAPI 仕様書を得られる**。既存の「E2E」表記はこれを指し、iOS から AWS までの通し検証ではない
 - スキーマは ridgepole で管理。**`db/Schemafile` が唯一の正**で、マイグレーションファイルは作らない
 - 認証は devise + devise-jwt。**認証情報は `identities`、プロフィールは `users`** に分かれている
 
 起動方法とエンドポイント一覧はリポジトリ直下の [README.md](../README.md) を参照。
-spec の書き方・スキーマ定義・エンドポイント追加手順は
+API 契約の書き方・スキーマ定義・エンドポイント変更時の参照情報は
 **[.claude/docs/backend.md](../.claude/docs/backend.md)** にまとめてある。
 
-## 開発の流れ
+## 開発と検証の方針
 
-1. テーブルが要るなら `db/Schemafile` を編集し `make db-apply`(差分確認は `make db-dry-run`)
-2. ルーティング / コントローラを書く
-3. `spec/requests/` に rswag の spec を書く(これが仕様書を兼ねる)
-4. `make test` で E2E が通ることを確認
-5. `make docs` で `swagger/v1/swagger.yaml` を更新し、**生成物もコミット**(CI が最新かを検査)
-6. フロント担当には `/api-docs` を共有
+- フロント・backend・infra とも新規テストは原則追加せず、TDD は行わない。追加はユーザーが求めた場合に限る。
+- 既存テストと CI は維持し、変更に関係する検証を実行する。`make test` は既存リクエストテストの実行。
+- Swagger 生成に必要な最小限の rswag 契約記述は例外として追加・更新する。正常系と連携に必要なエラー応答を定義し、網羅的なケース追加は行わない。
+- 生成元は `spec/requests/` と `spec/swagger_helper.rb`。`swagger/v1/swagger.yaml` は直接編集せず、`make docs` で生成して**生成物もコミット**する (CI が最新かを検査)。
+- DB 変更は `db/Schemafile` を編集し `make db-apply` (差分確認は `make db-dry-run`)。作業順序は固定しない。
+- クライアント連携に使える API 契約は早めに `/api-docs` で共有する。生成成功と動作確認は区別し、未実施の検証は報告する。
 
 ## 認証
 
@@ -73,8 +73,8 @@ config/
 spec/
   swagger_helper.rb                # OpenAPI のメタ情報・共通スキーマ定義
   support/auth_helper.rb           # spec 用にトークンを発行する bearer_token_for
-  requests/api/v1/auth_spec.rb     # 認証まわりの仕様書 兼 E2Eテスト
-  requests/api/v1/users_spec.rb
+  requests/api/v1/auth_spec.rb     # 認証まわりの API 契約 兼リクエストテスト
+  requests/api/v1/users_spec.rb    # ユーザー一覧・取得・更新・削除の API 契約 兼リクエストテスト
   factories/users.rb
 swagger/v1/swagger.yaml            # 生成物(コミットする)
 ```
