@@ -3,7 +3,7 @@ module Api
     # GET /api/v1/me : トークンの持ち主を返す
     class MeController < ApplicationController
       def show
-        render json: serialize_user(current_user)
+        render json: UserSerializer.new(current_user)
       end
     end
   end

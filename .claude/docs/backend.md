@@ -85,6 +85,35 @@ end
 - summary / description は日本語(Swagger UI にそのまま出る)。
 - `Authorization` は定数と同じ綴り。ブロック内で値が要るときは `send(:Authorization)`。
 
+## シリアライザ
+
+レスポンスの JSON は **`app/serializers/` の Alba リソースが唯一の組み立て場所**。
+コントローラでハッシュを手で組んだり `as_json` を呼んだりしない。
+
+```ruby
+class PostSerializer
+  include Alba::Resource
+
+  attributes :id, :title
+
+  # 日時は必ず iso8601。素の to_json は小数秒付き ("...T00:00:00.000Z") になる
+  attribute(:created_at) { |post| post.created_at.iso8601 }
+
+  # 関連は has_many / has_one に serializer を指定する
+  has_many :comments, resource: CommentSerializer
+end
+```
+
+```ruby
+render json: PostSerializer.new(post)                 # 単体
+render json: PostSerializer.new(Post.order(id: :asc)) # コレクション (Alba が自動判別)
+```
+
+- **ルートキーは付けない。** 既存のレスポンスは裸のオブジェクト / 裸の配列。
+- **キー変換もしない。** JSON も snake_case (iOS 側の decoder が吸収する)。
+- 出した形は必ず `swagger_helper.rb` の `components.schemas` と一致させる
+  (ズレたら rswag の `schema` 照合で落ちる)。
+
 ## スキーマとファクトリ
 
 レスポンスの形は `spec/swagger_helper.rb` の `components.schemas` に定義し `$ref` で参照する
@@ -97,11 +126,12 @@ end
 
 1. `db/Schemafile` にテーブルを足す → `make db-apply`
    (モデルが要るなら `bin/rails g model Post --no-fixture`。マイグレーションは生成されない)
-2. `app/controllers/api/v1/posts_controller.rb` を `users_controller.rb` に倣って作る
+2. `app/serializers/post_serializer.rb` を `user_serializer.rb` に倣って作る (Alba)
+3. `app/controllers/api/v1/posts_controller.rb` を `users_controller.rb` に倣って作る
    - 例外は rescue せず `ApplicationController` の `rescue_from` に任せる
-   - serializer gem は使わない。private な `serialize_xxx` で組み、日時は `iso8601`
-3. `config/routes.rb` の `namespace :api` / `:v1` 配下に `resources :posts`
-4. `swagger_helper.rb` にスキーマ追加 → spec を書く
-5. `make test` → `make docs` → **生成物もコミット**(CI が `git diff --exit-code swagger/` で検査)
+   - レスポンスは `render json: PostSerializer.new(post)` だけ。コントローラで組まない
+4. `config/routes.rb` の `namespace :api` / `:v1` 配下に `resources :posts`
+5. `swagger_helper.rb` にスキーマ追加 → spec を書く
+6. `make test` → `make docs` → **生成物もコミット**(CI が `git diff --exit-code swagger/` で検査)
 
 Lint は `bin/rubocop -f github`(CI と同じ)。自動修正は `bin/rubocop -a`。

@@ -58,6 +58,8 @@ app/
   models/
     user.rb                        # プロフィール。has_one :identity
     identity.rb                    # devise + devise-jwt
+  serializers/
+    user_serializer.rb             # レスポンスの JSON はここだけで組む (Alba)
   lib/json_failure_app.rb          # 未認証時に JSON の 401 を返す
 lib/
   middleware/origin_guard.rb       # ORIGIN_SECRET があるとき API Gateway 経由のみ許可

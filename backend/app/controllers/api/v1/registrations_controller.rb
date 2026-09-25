@@ -19,7 +19,7 @@ module Api
         if user.save
           # API 専用でセッションを持たないので store: false
           sign_in(:identity, user.identity, store: false)
-          render json: serialize_user(user), status: :created
+          render json: UserSerializer.new(user), status: :created
         else
           render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
         end
