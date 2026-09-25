@@ -10,8 +10,9 @@ gem "puma", ">= 5.0"
 # json 3.x は Rails 8.0 系の JSON エンコーダと非互換 (quirks_mode 削除) のため固定
 gem "json", "~> 2.7"
 
-# JSON serialization
-gem "jbuilder"
+# JSON シリアライザ。実行時依存が無く、素のハッシュを吐くので
+# レスポンスの形は app/serializers/*.rb だけを見ればわかる
+gem "alba"
 
 # 認証。identities テーブルの email / パスワードを devise が持ち、
 # JWT の発行・検証・失効は devise-jwt (Warden の Rack ミドルウェア) が担う

@@ -58,6 +58,8 @@ app/
   models/
     user.rb                        # プロフィール。has_one :identity
     identity.rb                    # devise + devise-jwt
+  serializers/
+    user_serializer.rb             # レスポンスの JSON はここだけで組む (Alba)
   lib/json_failure_app.rb          # 未認証時に JSON の 401 を返す
 lib/
   middleware/origin_guard.rb       # ORIGIN_SECRET があるとき API Gateway 経由のみ許可
@@ -72,7 +74,7 @@ spec/
   swagger_helper.rb                # OpenAPI のメタ情報・共通スキーマ定義
   support/auth_helper.rb           # spec 用にトークンを発行する bearer_token_for
   requests/api/v1/auth_spec.rb     # 認証まわりの API 契約 兼リクエストテスト
-  requests/api/v1/users_spec.rb
+  requests/api/v1/users_spec.rb    # ユーザー一覧・取得・更新・削除の API 契約 兼リクエストテスト
   factories/users.rb
 swagger/v1/swagger.yaml            # 生成物(コミットする)
 ```
