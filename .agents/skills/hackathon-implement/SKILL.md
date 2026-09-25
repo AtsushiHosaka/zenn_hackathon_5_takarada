@@ -9,7 +9,7 @@ description: ハッカソンのSpecに沿って実装し、既存CI・Swagger生
 
 ## 実装の基準
 
-- `docs/project.md` に従ってGoogle Docsを読み、ローカルSpec・コード・領域別規約を確認する。
+- `docs/project.md` に従ってGoogle Docs対応スキルからMCP経由で読み、ローカルSpec・コード・領域別規約を確認する。
 - Docs未設定・取得不能なら提供資料を暫定の根拠とし、未確認を明示する。
 - 新規Specは `specs/<feature>/spec.md`。目的、受け入れ条件、重要な判断と出典を残す。
 - 明示されたユーザーの変更は反映し、Docs未反映の差分として記録する。Docsは勝手に編集しない。

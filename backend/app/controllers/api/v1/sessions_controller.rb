@@ -18,7 +18,7 @@ module Api
 
         # API 専用でセッションを持たないので store: false
         sign_in(:identity, identity, store: false)
-        render json: serialize_user(identity.user)
+        render json: UserSerializer.new(identity.user)
       end
 
       def destroy

@@ -93,6 +93,35 @@ end
 - summary / description は日本語(Swagger UI にそのまま出る)。
 - `Authorization` は定数と同じ綴り。ブロック内で値が要るときは `send(:Authorization)`。
 
+## シリアライザ
+
+レスポンスの JSON は **`app/serializers/` の Alba リソースが唯一の組み立て場所**。
+コントローラでハッシュを手で組んだり `as_json` を呼んだりしない。
+
+```ruby
+class PostSerializer
+  include Alba::Resource
+
+  attributes :id, :title
+
+  # 日時は必ず iso8601。素の to_json は小数秒付き ("...T00:00:00.000Z") になる
+  attribute(:created_at) { |post| post.created_at.iso8601 }
+
+  # 関連は has_many / has_one に serializer を指定する
+  has_many :comments, resource: CommentSerializer
+end
+```
+
+```ruby
+render json: PostSerializer.new(post)                 # 単体
+render json: PostSerializer.new(Post.order(id: :asc)) # コレクション (Alba が自動判別)
+```
+
+- **ルートキーは付けない。** 既存のレスポンスは裸のオブジェクト / 裸の配列。
+- **キー変換もしない。** JSON も snake_case (iOS 側の decoder が吸収する)。
+- 出した形は必ず `swagger_helper.rb` の `components.schemas` と一致させる
+  (ズレたら rswag の `schema` 照合で落ちる)。
+
 ## スキーマとファクトリ
 
 レスポンスの形は `spec/swagger_helper.rb` の `components.schemas` に定義し `$ref` で参照する
@@ -104,8 +133,9 @@ end
 ## エンドポイント変更時の参照
 
 - DB 変更は `db/Schemafile`。モデル生成が必要なら `bin/rails g model Post --no-fixture` (マイグレーションは生成されない)。
+- レスポンスは `app/serializers/user_serializer.rb` に倣って Alba リソースを定義し、`render json: PostSerializer.new(post)` で返す。コントローラでは組み立てない。
 - コントローラは `users_controller.rb`、ルートは `config/routes.rb` の `namespace :api` / `:v1` を参照する。
-- 共通例外は `ApplicationController` の `rescue_from` に任せる。serializer gem は使わず、private な `serialize_xxx` で組み、日時は `iso8601`。
+- 共通例外は `ApplicationController` の `rescue_from` に任せる。日時はシリアライザで `iso8601` にする。
 - `make test` は既存リクエストテスト、`make docs` は契約の再生成。CI はテストと生成物の差分 (`git diff --exit-code swagger/`) を検査する。作業順序は固定しない。
 
 Lint は `bin/rubocop -f github`(CI と同じ)。自動修正は `bin/rubocop -a`。

@@ -8,18 +8,19 @@ module Api
       # GET /api/v1/users
       def index
         users = User.includes(:identity).order(id: :asc)
-        render json: users.map { |user| serialize_user(user) }
+        # コレクションは Alba が自動判別する
+        render json: UserSerializer.new(users)
       end
 
       # GET /api/v1/users/:id
       def show
-        render json: serialize_user(@user)
+        render json: UserSerializer.new(@user)
       end
 
       # PATCH/PUT /api/v1/users/:id
       def update
         if @user.update(user_params)
-          render json: serialize_user(@user)
+          render json: UserSerializer.new(@user)
         else
           render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
         end
