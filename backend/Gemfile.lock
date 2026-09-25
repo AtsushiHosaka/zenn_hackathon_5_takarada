@@ -74,6 +74,7 @@ GEM
       uri (>= 0.13.1)
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
+    alba (4.0.0)
     ast (2.4.3)
     base64 (0.3.0)
     bcrypt (3.1.22)
@@ -131,9 +132,6 @@ GEM
       prism (>= 1.3.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    jbuilder (2.15.1)
-      actionview (>= 7.0.0)
-      activesupport (>= 7.0.0)
     json (2.21.2)
     json-schema (6.2.0)
       addressable (~> 2.8)
@@ -360,6 +358,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  alba
   bcrypt (~> 3.1.7)
   bootsnap
   brakeman
@@ -368,7 +367,6 @@ DEPENDENCIES
   devise-jwt
   factory_bot_rails
   faker
-  jbuilder
   json (~> 2.7)
   pg (~> 1.5)
   puma (>= 5.0)

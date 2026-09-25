@@ -14,16 +14,6 @@ class ApplicationController < ActionController::API
     current_identity&.user
   end
 
-  def serialize_user(user)
-    {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      created_at: user.created_at.iso8601,
-      updated_at: user.updated_at.iso8601
-    }
-  end
-
   def render_not_found(exception)
     render json: { error: exception.message }, status: :not_found
   end
