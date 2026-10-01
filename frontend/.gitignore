@@ -1,0 +1,7 @@
+node_modules/
+dist/
+
+# ローカルの環境変数 (.env.example をコピーして使う)
+.env
+.env.local
+.env.*.local
