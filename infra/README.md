@@ -1,13 +1,13 @@
 # infra (AWS Lightsail + API Gateway)
 
-Lightsail インスタンス 1 台の上で `docker compose`(api + PostgreSQL)を**本番モード**で動かし、
+Lightsail インスタンス 1 台の上で `docker compose`(api + worker + PostgreSQL + Redis)を**本番モード**で動かし、
 その前に API Gateway を置いて HTTPS で公開する。DB もコンテナなので、外部の
 マネージド DB は使わない。
 
 ```
 GitHub (main) ──> Actions ──build/push──> ECR
                                            │ pull
-ブラウザ ──https──> API Gateway ──http──> Lightsail (docker compose: api + db)
+ブラウザ ──https──> API Gateway ──http──> Lightsail (docker compose: api + worker + db + redis)
 ```
 
 アプリはコンテナイメージとして ECR 経由で届く。インスタンスにソースは置かない。

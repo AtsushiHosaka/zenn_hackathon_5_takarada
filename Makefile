@@ -1,4 +1,4 @@
-.PHONY: up down setup logs sh test docs console reset db-apply db-dry-run db-export \
+.PHONY: up down setup logs worker-logs sh test docs console reset db-apply db-dry-run db-export \
 	front-sh front-logs front-lint front-build front-types \
 	ios-setup ios-open ios-build \
 	infra-apply infra-push infra-deploy infra-release infra-up infra-plan infra-destroy \
@@ -12,6 +12,9 @@ down:          ## コンテナ停止
 
 logs:          ## ログ追尾
 	docker compose logs -f api
+
+worker-logs:   ## sidekiq (worker) のログ追尾
+	docker compose logs -f worker
 
 sh:            ## APIコンテナに入る
 	docker compose exec api bash

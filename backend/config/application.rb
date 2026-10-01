@@ -42,6 +42,10 @@ module App
     # ORIGIN_SECRET が設定されているときだけ、API Gateway 経由のリクエストに限定する (infra/ 参照)
     config.middleware.insert_before 0, OriginGuard
 
+    # 非同期処理は Sidekiq (Redis) 経由。test だけ config/environments/test.rb で
+    # :test アダプタに差し替えるので、spec の実行に Redis は要らない
+    config.active_job.queue_adapter = :sidekiq
+
     # スキーマは ridgepole (db/Schemafile) で管理するため、マイグレーションは生成しない
     config.generators do |g|
       g.orm :active_record, migration: false

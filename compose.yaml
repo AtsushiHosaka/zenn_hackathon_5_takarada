@@ -16,6 +16,19 @@ services:
       timeout: 5s
       retries: 10
 
+  # 非同期処理 (sidekiq) のキュー置き場
+  redis:
+    image: redis:7-alpine
+    # 再起動でキューが消えないように追記型で永続化する
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   api:
     # ローカルは compose.override.yaml が build して同じタグを付ける。
     # デプロイ時は ECR のイメージ URI が入る
@@ -30,12 +43,37 @@ services:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       DB_NAME: app
+      REDIS_URL: redis://redis:6379/0
       RAILS_ENV: ${RAILS_ENV:-development}
     ports:
       - "3000:3000"
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ジョブを実行するプロセス。api と同じイメージで sidekiq だけを動かす
+  worker:
+    image: ${API_IMAGE:-hack-api:local}
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: app
+      REDIS_URL: redis://redis:6379/0
+      RAILS_ENV: ${RAILS_ENV:-development}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      # DB の作成とスキーマ適用は api 側のコマンドが担うので先に起こす
+      api:
+        condition: service_started
 
 volumes:
   pg_data:
+  redis_data:
