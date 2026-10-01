@@ -1,4 +1,5 @@
 .PHONY: up down setup logs sh test docs console reset db-apply db-dry-run db-export \
+	front-sh front-logs front-lint front-build front-types \
 	ios-setup ios-open ios-build \
 	infra-apply infra-push infra-deploy infra-release infra-up infra-plan infra-destroy \
 	infra-url infra-ssh infra-logs infra-console infra-seed infra-secrets
@@ -35,6 +36,26 @@ db-export:     ## 現在の DB の状態を db/Schemafile に書き出す
 
 reset:         ## DBを作り直して seed
 	docker compose exec api bin/rails db:drop db:create db:apply db:seed
+
+# --- frontend (React + Vite) --------------------------------------------------
+# `make up` で web も一緒に立つ (http://localhost:5173)。以下はそのコンテナで叩く。
+# ホストに node があるなら frontend/ で npm run dev などを直接使ってもよい。
+
+front-logs:    ## Vite のログ追尾
+	docker compose logs -f web
+
+front-sh:      ## web コンテナに入る
+	docker compose exec web sh
+
+front-lint:    ## eslint + 型チェック
+	docker compose exec web npm run lint
+	docker compose exec web npm run typecheck
+
+front-build:   ## 本番ビルド (frontend/dist に出る)
+	docker compose exec web npm run build
+
+front-types:   ## backend の OpenAPI から TypeScript の型を再生成
+	docker compose exec web npm run types
 
 # --- ios (SwiftUI) ------------------------------------------------------------
 IOS_PROJECT = ios/ios.xcodeproj

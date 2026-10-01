@@ -17,5 +17,30 @@ services:
     tty: true
     stdin_open: true
 
+  # Web フロント (Vite dev server)。**ローカル専用**なので base ではなくここに置く
+  # (デプロイ時は compose.yaml しか読まないため、Lightsail 側に web は入らない)
+  web:
+    build:
+      context: ./frontend
+      target: dev
+    image: hack-web:local
+    environment:
+      # 「接続先: API」に切り替えたときに叩く先。ブラウザから見た URL を渡す
+      VITE_API_ENDPOINT: ${VITE_API_ENDPOINT:-http://localhost:3000}
+      # 未指定なら dev はダミー接続で立ち上がる (ログイン画面の「接続先」で切り替え)
+      VITE_CONNECTION: ${VITE_CONNECTION:-}
+    ports:
+      - "5173:5173"
+    volumes:
+      # コードをマウントして HMR を効かせる
+      - ./frontend:/app
+      # node_modules はイメージ側を使う (ホストの OS/arch と混ざらないように)
+      - node_modules_data:/app/node_modules
+      # `npm run types` が読む OpenAPI 定義 (frontend からは ../backend/swagger)
+      - ./backend/swagger:/backend/swagger:ro
+    tty: true
+    stdin_open: true
+
 volumes:
   bundle_data:
+  node_modules_data:

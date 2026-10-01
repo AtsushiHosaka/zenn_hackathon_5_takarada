@@ -3,10 +3,11 @@
 | ディレクトリ | 内容 |
 | --- | --- |
 | [`backend/`](backend/README.md) | Rails 8 (API モード) + PostgreSQL 16 + JWT 認証。詳細は `backend/README.md` |
+| [`frontend/`](frontend/README.md) | React 19 + Vite + Tailwind の SPA (Domain / Data / Core のレイヤ分け)。規約は `.claude/docs/frontend.md` |
 | [`infra/`](infra/README.md) | AWS Lightsail + API Gateway (Terraform)。詳細は `infra/README.md` |
 | `ios/` | SwiftUI アプリ (Domain / Data / Core のレイヤ分け + FactoryKit で DI)。規約は `.claude/docs/ios.md` |
 
-Web フロントを足す場合は `frontend/` として直下に並べ、`compose.yaml` にサービスを追加する。
+`frontend/` と `ios/` は**同じレイヤ分け・同じダミー接続の仕組み**にしてある。
 
 ## 開発ルール
 
@@ -20,18 +21,48 @@ PRは [.github/pull_request_template.md](.github/pull_request_template.md) に�
 docker compose up --build
 ```
 
-これだけで DB の作成 + スキーマ適用 + seed まで走る。
+これだけで DB の作成 + スキーマ適用 + seed + Web フロントの起動まで走る。
+
+| | URL |
+| --- | --- |
+| Web フロント | http://localhost:5173 |
+| API | http://localhost:3000 |
 
 ```bash
-make up       # 起動
+make up       # 起動 (api + db + web)
 make down     # 停止
-make logs     # ログ追尾
+make logs     # APIのログ追尾
 make sh       # APIコンテナに入る
 make test     # 既存のAPIリクエストテスト
 make docs     # OpenAPI定義(swagger.yaml)の再生成
 make db-apply # db/Schemafile を DB に適用 (スキーマ管理は ridgepole)
 make reset    # DB作り直し + seed
 ```
+
+## Web フロント
+
+```bash
+make front-logs   # Vite のログ
+make front-lint   # eslint + 型チェック
+make front-build  # 本番ビルド (frontend/dist)
+make front-types  # backend の OpenAPI から TypeScript の型を再生成
+```
+
+**dev の既定は「ダミー」接続**なので、backend を立てなくてもログインから一覧まで動く
+(データはブラウザのメモリ上の `frontend/src/data/dummy`)。実 API を叩くならログイン画面 /
+ヘッダの「接続先」を `API` に切り替える。URL は `VITE_API_ENDPOINT`
+(既定 `http://localhost:3000`、デプロイ済みなら `make infra-url` の値)。
+
+| ディレクトリ | 内容 |
+| --- | --- |
+| `frontend/src/app/` | Provider の組み立てと DI の登録 (`container.ts`) |
+| `frontend/src/core/` | 設定・接続先・トークン・DI の受け口・ログイン状態 |
+| `frontend/src/domain/` | エンティティと Repository の型 |
+| `frontend/src/data/` | `apiClient`・レコード型・Repository 実装・ダミー実装・生成した型 |
+| `frontend/src/feature/` | 画面 |
+
+規約は [.claude/docs/frontend.md](.claude/docs/frontend.md)。
+`infra/` のデプロイは API だけなので、web の公開先は別に用意する(同ドキュメント参照)。
 
 ## iOS
 
@@ -195,13 +226,15 @@ make infra-destroy   # 作ったものを全部消す (データも消える)
 
 ```
 backend/                          # Rails API
+frontend/                         # React + Vite の SPA
 ios/                              # SwiftUI アプリ
 infra/                            # AWS Lightsail + API Gateway + ECR (Terraform)
-compose.yaml                      # ベース (db + api)
-compose.override.yaml             # ローカル専用 (build とコードのマウント)
+compose.yaml                      # ベース (db + api)。デプロイ時もこれを使う
+compose.override.yaml             # ローカル専用 (build・コードのマウント・web)
 Makefile
 .claude/docs/backend.md           # backend の規約
+.claude/docs/frontend.md          # frontend の規約
 .claude/docs/ios.md               # ios の規約
-.github/workflows/ci.yml          # rspec / OpenAPI定義の鮮度チェック / rubocop
+.github/workflows/ci.yml          # rspec / OpenAPI定義の鮮度チェック / rubocop / frontend
 .github/workflows/deploy.yml      # main マージで ECR push -> Lightsail 入れ替え
 ```
