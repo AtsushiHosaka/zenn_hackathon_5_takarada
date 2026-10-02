@@ -29,9 +29,10 @@ docker compose up --build
 | API | http://localhost:3000 |
 
 ```bash
-make up       # 起動 (api + db + web)
+make up       # 起動 (api + worker + db + redis + web)
 make down     # 停止
 make logs     # APIのログ追尾
+make worker-logs # 非同期処理(sidekiq)のログ追尾
 make sh       # APIコンテナに入る
 make test     # 既存のAPIリクエストテスト
 make docs     # OpenAPI定義(swagger.yaml)の再生成
@@ -229,7 +230,7 @@ backend/                          # Rails API
 frontend/                         # React + Vite の SPA
 ios/                              # SwiftUI アプリ
 infra/                            # AWS Lightsail + API Gateway + ECR (Terraform)
-compose.yaml                      # ベース (db + api)。デプロイ時もこれを使う
+compose.yaml                      # ベース (db + redis + api + worker)。デプロイ時もこれを使う
 compose.override.yaml             # ローカル専用 (build・コードのマウント・web)
 Makefile
 .claude/docs/backend.md           # backend の規約

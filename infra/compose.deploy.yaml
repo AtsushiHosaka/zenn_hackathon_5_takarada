@@ -15,5 +15,18 @@ services:
       RAILS_LOG_LEVEL: ${RAILS_LOG_LEVEL:-info}
     restart: unless-stopped
 
+  # ジョブ実行プロセス。api と同じイメージ・同じ環境変数で動かす
+  worker:
+    image: ${API_IMAGE:?API_IMAGE が必要です。make infra-apply を先に実行してください}
+    environment:
+      RAILS_ENV: production
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:?SECRET_KEY_BASE が必要です}
+      DEVISE_JWT_SECRET_KEY: ${DEVISE_JWT_SECRET_KEY:-}
+      RAILS_LOG_LEVEL: ${RAILS_LOG_LEVEL:-info}
+    restart: unless-stopped
+
   db:
+    restart: unless-stopped
+
+  redis:
     restart: unless-stopped
