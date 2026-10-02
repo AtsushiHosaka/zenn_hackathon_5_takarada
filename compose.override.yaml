@@ -17,6 +17,14 @@ services:
     tty: true
     stdin_open: true
 
+  # worker も api と同じイメージ・同じマウントで動かす (編集が即反映される)
+  worker:
+    build: ./backend
+    image: hack-api:local
+    volumes:
+      - ./backend:/app
+      - bundle_data:/usr/local/bundle
+
   # Web フロント (Vite dev server)。**ローカル専用**なので base ではなくここに置く
   # (デプロイ時は compose.yaml しか読まないため、Lightsail 側に web は入らない)
   web:

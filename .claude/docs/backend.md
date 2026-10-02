@@ -1,6 +1,6 @@
 # backend/ の規約
 
-Rails 8 (API モード) + RSpec + rswag + ridgepole + devise/devise-jwt。
+Rails 8 (API モード) + RSpec + rswag + ridgepole + devise/devise-jwt + ActiveJob/Sidekiq。
 
 - **rswag の request spec が API 契約とリクエストテストを兼ねる**。既存の「E2E」表記はこれを指し、iOS から AWS までの通し検証ではない。
 - **`db/Schemafile` が DB スキーマの唯一の正**(ridgepole。マイグレーションは作らない)
@@ -15,6 +15,7 @@ make test        # rspec
 make docs        # swagger/v1/swagger.yaml を再生成
 make db-apply    # db/Schemafile を DB に適用 (差分確認は make db-dry-run)
 make sh          # コンテナに入る (rubocop や rails g はここで)
+make worker-logs # 非同期処理 (sidekiq) のログ
 ```
 
 1ファイル/1行だけ: `docker compose exec api bundle exec rspec spec/requests/api/v1/users_spec.rb:42`
@@ -36,6 +37,43 @@ make sh          # コンテナに入る (rubocop や rails g はここで)
 - ログイン中のユーザーは `current_user`。`sign_in` には必ず `store: false`(セッションが無いため)。
 - トークンの発行/失効パスと有効期限は `config/initializers/devise.rb` の `config.jwt`。
   ログイン系を増やしたら `jwt.dispatch_requests` にも足す。
+
+## 非同期処理 (ActiveJob + Sidekiq)
+
+キューは Redis。`api` と同じイメージの **`worker` コンテナ** が `bundle exec sidekiq` を動かす
+(ローカルもデプロイ先も同じ `compose.yaml` なので、`make up` / `make infra-deploy` で勝手に立つ)。
+
+```ruby
+class ThumbnailJob < ApplicationJob
+  queue_as :default
+
+  def perform(user_id)          # 引数は id を渡す。AR オブジェクトは渡さない
+    user = User.find(user_id)
+    ...
+  end
+end
+```
+
+```ruby
+ThumbnailJob.perform_later(user.id)   # コントローラやモデルから積む
+```
+
+- **ジョブは `app/jobs/` に置き `ApplicationJob` を継承する。** `Sidekiq::Job` を直接 include しない
+  (アダプタは `config/application.rb` の `config.active_job.queue_adapter = :sidekiq` で一括設定)。
+- **引数は JSON になるものだけ。** レコードは id を渡して `perform` 側で引き直す
+  (積んだ時点と実行時点で DB の状態が違う前提で書く)。
+- **`worker` はコード変更を自動で読み込まない。** ジョブを直したら `docker compose restart worker`。
+- 失敗すると Sidekiq が既定で最大 25 回リトライする。回数や捨て方を変えるなら
+  ジョブ側で ActiveJob の `retry_on` / `discard_on` を書く。
+- キューを増やすときは `queue_as` と `config/sidekiq.yml` の `:queues:` の**両方**に足す
+  (片方だけだと積まれたまま誰も拾わない)。
+- 接続先は `REDIS_URL` (compose が渡す)。読むのは `config/initializers/sidekiq.rb` だけ。
+
+### テストでの扱い
+
+test 環境だけ `:test` アダプタなので、**spec の実行に Redis は要らない**
+(`config/environments/test.rb`)。ジョブは積まれるだけで実行されない。
+確認が必要なら `have_enqueued_job` / `perform_enqueued_jobs` を使う。
 
 ## テスト方針と API 契約
 

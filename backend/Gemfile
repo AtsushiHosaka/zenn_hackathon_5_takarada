@@ -23,6 +23,9 @@ gem "bcrypt", "~> 3.1.7"
 # CORS (フロントエンドから叩けるように)
 gem "rack-cors"
 
+# 非同期処理。ActiveJob のバックエンドは Sidekiq (キューは Redis)
+gem "sidekiq"
+
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false
 

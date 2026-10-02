@@ -1,0 +1,6 @@
+# sidekiq プロセスの設定 (worker コンテナが `-C config/sidekiq.yml` で読む)。
+# ジョブ側の設定ではないので、キューを増やすときは ApplicationJob の
+# `queue_as` / 各ジョブの `queue_as` と両方に足す。
+:concurrency: 5
+:queues:
+  - default

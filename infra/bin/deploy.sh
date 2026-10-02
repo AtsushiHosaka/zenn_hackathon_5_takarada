@@ -39,7 +39,7 @@ aws ecr get-login-password --region "$AWS_REGION" \
   | docker login --username AWS --password-stdin "$ECR_REGISTRY"
 
 COMPOSE="docker compose -f compose.yaml -f infra/compose.deploy.yaml --env-file infra/.env"
-$COMPOSE pull api
+$COMPOSE pull api worker   # 同じイメージなので 2 回目はキャッシュが効く
 $COMPOSE up -d
 docker image prune -f >/dev/null
 REMOTE
