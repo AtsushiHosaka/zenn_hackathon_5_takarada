@@ -285,6 +285,7 @@ RSpec.configure do |config|
                   prompt: { type: :string, example: "紫色の推し活ルームにしたい" },
                   budget: { type: :integer, description: "買い足しの予算 (円)", example: 30_000 },
                   kept_object_ids: { type: :array, items: { type: :string }, description: "活かす家具の id。空なら全部活かす", example: %w[bed-1 desk-1 shelf-1] },
+                  base_coordination_id: { type: :integer, nullable: true, description: "追加の指示 (チャット) で作り直すときの前回のコーデ (同じ部屋・生成済み)。指示に関係ない商品は前回のものを残す", example: 12 },
                   edited_objects: { type: :array, maxItems: 100, items: { "$ref" => "#/components/schemas/FurnitureEdit" }, description: "家具の最新配置と、手動で調整した商品の配置。同じ商品が再採用される場合に引き継ぐ。省略すると解析時の配置を使う", example: [] }
                 },
                 required: %w[prompt budget]
@@ -325,10 +326,11 @@ RSpec.configure do |config|
               items: { type: :array, items: { "$ref" => "#/components/schemas/CoordinationItem" }, description: "購入リンク一覧。after_scene の suggested と marker で対応する" },
               total_price: { type: :integer, nullable: true, example: 26_840 },
               planned_by: { type: :string, nullable: true, enum: [ nil, "gemini", "mock" ], description: "gemini: 要望文から AI が商品を選んだ / mock: キーワードでテーマを決めたモック。生成が終わると入る", example: "gemini" },
+              base_coordination_id: { type: :integer, nullable: true, description: "追加の指示で作り直したときの前回のコーデ", example: nil },
               error_message: { type: :string, nullable: true, example: nil },
               created_at: { type: :string, format: "date-time" }
             },
-            required: %w[id room_id status prompt budget kept_object_ids title comment before_scene after_scene items total_price planned_by error_message created_at]
+            required: %w[id room_id status prompt budget kept_object_ids title comment before_scene after_scene items total_price planned_by base_coordination_id error_message created_at]
           }
         }
       }
