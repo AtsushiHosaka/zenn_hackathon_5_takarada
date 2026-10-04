@@ -11,7 +11,7 @@ function AuthHero({ signup }: { signup: boolean }) {
   return <section className="reference-auth-hero">
     <div className="reference-auth-brand">
       <ReferenceSvg page={page} index={0} />
-      <span>Room Coordinator</span><span className="reference-auth-ai">AI</span>
+      <span>へやいろ</span><span className="reference-auth-ai">AI</span>
     </div>
     <div className={`reference-auth-illustration${signup ? ' reference-auth-illustration-signup' : ''}`}>
       <ReferenceSvg page={page} index={1} />

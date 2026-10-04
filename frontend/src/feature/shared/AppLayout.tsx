@@ -11,7 +11,7 @@ export default function AppLayout() {
       <header className="border-b border-[#E4E1EC] bg-white">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-4 px-4 py-3">
           <Link to="/rooms" className="font-semibold">
-            Room Coordinator
+            へやいろ
           </Link>
           <div className="ml-auto flex items-center gap-4">
             <ConnectionSwitch />

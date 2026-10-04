@@ -1,6 +1,6 @@
 # frontend
 
-AIルームコーディネーターのPC向けWebフロントです。1440×900をデザインの基準とし、PCウィンドウの幅・高さに合わせて表示を調整します。React 19 + TypeScript + Vite + Tailwind CSS v4 + TanStack Query + React Routerを使います。
+「へやいろ」のPC向けWebフロントです。1440×900をデザインの基準とし、PCウィンドウの幅・高さに合わせて表示を調整します。React 19 + TypeScript + Vite + Tailwind CSS v4 + TanStack Query + React Routerを使います。
 
 ```bash
 # リポジトリ直下で (backend ごと立つ)

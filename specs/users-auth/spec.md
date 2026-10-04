@@ -2,6 +2,8 @@
 
 2026年10月4日の依頼に従い、新規ブランチ`codex/users-auth`でWebフロントを実装する。ユーザーが「API範囲のフロントの画面」「機能は他の人が担当」と確定したため、backendとAPI契約は変更しない。
 
+2026年10月4日の追加指示で、プロダクト名を「へやいろ」に変更する。Webのタイトル、ヘッダー、AIの表示名、READMEとPRの確認画像に反映する。保存済みデータとの互換性を保つため、内部の保存キーは維持する。この判断はGoogle Docsへ未反映である。
+
 ## 根拠と範囲
 
 `docs/project.md`のGoogle Docs URLは未設定のため、Docsは確認できていない。[GCP公開Swagger](https://zenn-hackathon-api-262220651661.asia-northeast1.run.app/api-docs/index.html)と`/api-docs/v1/swagger.yaml`を2026年10月4日に取得し、ローカルOpenAPIと認証・ユーザーAPIのパスおよび応答形式を照合した。作業中の再取得では部屋・商品提案の契約が公開Swaggerに追加されていた。今回の認証・ユーザー契約は維持されている。部屋APIの実動作は未確認である。
