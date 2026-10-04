@@ -410,3 +410,24 @@ LEDの直線部材はそのまま既存の部屋全周の寸法へ縮めると�
 - 植物・オブジェ・ディフューザーの一部は、形を指定寸法へ合わせるため最大約12%伸縮させている。
 - 植物・ガーランドライト・カウンターテーブルなど一部は、`tint`ではなく葉・発光部・木材を色替えの対象にしている。素材名は台帳の`materials`で確認できる。
 - 追加分は商品IDとの対応を持たない。GCSへは2026-10-05にアップロードし、公開URLでの取得とハッシュ一致を確認済み。DBへの反映はマージ後のデプロイで行う。
+
+## 形・用途のバリエーションを増やす追加71モデル (2026-10-05)
+
+IKEAの各カテゴリにつき1〜2種だった形を増やし、推し活・韓国風・一人暮らしで置かれやすい家電や趣味の物も加える。
+
+| 分類 | モデル |
+| --- | --- |
+| 収納・リビング | コーナーラック（`shelf_corner`）、すき間収納ワゴン（`shelf_gap`）、オープンクローゼット（`wardrobe_open`）、ローチェスト（`chest_low`）、マガジンラック（`magazine_rack`）、コートハンガースタンド（`coat_stand`）、傘立て（`umbrella_stand`）、ウォールシェルフ（1枚）（`shelf_floating`）、収納ベンチ（`storage_bench`）、おもちゃ収納ラック（`toy_storage`）、キッチンカウンター（間仕切り収納）（`kitchen_counter`）、ミラー付き収納（`mirror_cabinet`）、障子風パーテーション（`shoji_screen`）、机上ラック（`desk_shelf`） |
+| ソファ・チェア・テーブル | 木枠ソファ（`sofa_wood_frame`）、チェスターフィールドソファ（`sofa_chesterfield`）、もこもこソファ（クラウドソファ）（`sofa_cloud`）、Yチェア風チェア（`chair_wishbone`）、ウィンザーチェア（`chair_windsor`）、ラタンチェア（`chair_rattan`）、キューブ型スツール（`pouf_square`）、布張りベンチ（`bench_upholstered`）、楕円ローテーブル（`table_low_oval`）、ネストテーブル（2点）（`table_nesting`）、6人掛けダイニングテーブル（`table_dining_6`）、折り畳みローテーブル（`table_folding_low`）、ガラスローテーブル（`table_glass_low`）、2人用ダイニングセット（`dining_set_2`） |
+| 寝室・布もの | ヘッドボード付きダブルベッド（`bed_headboard_double`）、天蓋付きベッド（`bed_canopy`）、デイベッド（`daybed`）、キッズベッド（`bed_kids`）、布団一式（敷布団・掛け布団・枕）（`futon_set`）、ベビーベッド（`crib`）、チェック柄ラグ（`rug_checker`）、楕円ラグ（`rug_oval`）、タッセル付きカーテン（まとめた状態）（`curtain_tieback`）、丸クッション（`cushion_round`）、抱き枕（`body_pillow`）、ドレッサースツール（`vanity_stool`）、スリッパ（`slippers`） |
+| 家電・照明 | 炊飯器（`rice_cooker`）、電気ケトル（`kettle`）、オーブントースター（`toaster`）、コーヒーメーカー（`coffee_maker`）、縦型洗濯機（`washing_machine`）、水切りラック（`dish_rack`）、オイルヒーター（`heater`）、デスクトップPC（`desktop_pc`）、キーボードとマウス（`keyboard_mouse`）、プロジェクター（`projector`）、レトロラジオ（`radio`）、和紙フロアランプ（`lamp_paper`）、ブラケットライト（`lamp_wall`）、ネオンサイン（ハート）（`neon_sign`） |
+| 植物・雑貨・推し活・趣味 | パキラ（`plant_pachira`）、ドラセナ（`plant_dracaena`）、多肉植物の寄せ植え（`plant_succulents`）、ドライフラワー（花瓶）（`dried_flowers`）、テラリウム（`terrarium`）、水槽（`aquarium`）、うさぎのぬいぐるみ（`plush_bunny`）、アクリルスタンド（`acrylic_stand`）、缶バッジディスプレイ（`badge_display`）、うちわ（スタンド付き）（`uchiwa_stand`）、フォトガーランド（`photo_garland`）、六角形ウォールシェルフ（`wall_shelf_hex`）、レコードプレーヤー（`record_player`）、ギター（スタンド付き）（`guitar`）、スーツケース（`suitcase`）、ヨガマット（丸めた状態）（`yoga_mat`） |
+
+### バリエーション追加71モデルの制作結果
+
+71モデルを`models_ext2_*.py`の5ファイルに分けて作成し、台帳へ追記した（台帳は計259モデル、形状は231種）。既存188モデルのGLBと台帳の行、商品との対応表は変更していない。
+
+- three.jsのGLTFLoaderで全259ファイルを読み込み、寸法・底面中心の原点・UVが台帳どおりであることを確認した。追加分は最大9,304三角形（チェスターフィールドソファ）、最大361,292バイト、合計9,964,160バイト。
+- ローカルのAPIコンテナで259モデルの台帳を取り込めることをトランザクション内で確認し、ロールバックした。
+- パキラ・ドラセナは既存の植物と同じく、枝葉を指定寸法へ合わせるため伸縮させている（最大約30%）。
+- 一部は`tint`以外が色替えの対象になる（植物は葉、ネオンサインは発光部、ガラスローテーブルは木枠）。素材名は台帳の`materials`で確認できる。
