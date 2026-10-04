@@ -1,0 +1,11 @@
+.account-page{color:#1d1b26;display:flex;flex-direction:column;gap:24px;font-family:'Zen Kaku Gothic New','Hiragino Sans',sans-serif}
+.account-back{align-self:flex-start;color:#5a2fc0;font-size:14px;text-decoration:underline}
+.account-heading h1{margin:0 0 8px;font-size:28px;font-weight:700}.account-heading p,.account-card p{margin:0;line-height:1.8}
+.account-heading p{color:#5a5768}.account-card{display:flex;flex-direction:column;align-items:flex-start;gap:20px;padding:28px;border:1px solid #e4e1ec;border-radius:18px;background:white}
+.account-card h2{margin:0;font-size:19px;font-weight:700}.account-field{display:flex;flex-direction:column;gap:8px;width:100%;font-size:14px;font-weight:700}
+.account-field input{width:100%;min-width:0;height:50px;border:1px solid #dcd8e4;border-radius:12px;padding:0 16px;font-size:16px;font-weight:400;background:white;color:#1d1b26}.account-field input:read-only{background:#f5f4f8;color:#5a5768}
+.account-field small{font-weight:400;color:#6e6a7c}.account-page button{border-radius:12px;padding:12px 18px;font-size:14px;font-weight:700;cursor:pointer}.account-page button:disabled{opacity:.5;cursor:default}
+.account-primary{border:0;background:#6a3cd6;color:white}.account-secondary{border:1px solid #dcd8e4;background:white;color:#5a5768}.account-delete{border:1px solid #efc9cf;background:#fff5f5;color:#b42339}
+.account-danger{border-color:#efc9cf}.account-danger>p{font-size:14px;color:#5a5768}.account-confirmation{display:flex;flex-direction:column;gap:16px;width:100%}.account-actions{display:flex;flex-wrap:wrap;gap:12px}.account-success{color:#13734a}.account-error{color:#b42339}
+.account-page :is(input,button,a):focus-visible{outline:2px solid #6a3cd6;outline-offset:3px}
+@media(max-width:540px){.account-card{padding:20px}.account-heading h1{font-size:24px}}

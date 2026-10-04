@@ -34,7 +34,9 @@ services:
     image: hack-web:local
     environment:
       # 「接続先: API」に切り替えたときに叩く先。ブラウザから見た URL を渡す
-      VITE_API_ENDPOINT: ${VITE_API_ENDPOINT:-http://localhost:3000}
+      VITE_API_ENDPOINT: ${VITE_API_ENDPOINT:-}
+      # 同一オリジン /api の中継先。Web のサーバー専用設定。
+      API_UPSTREAM_ORIGIN: ${API_UPSTREAM_ORIGIN:-https://zenn-hackathon-api-262220651661.asia-northeast1.run.app}
       # 未指定なら dev はダミー接続で立ち上がる (ログイン画面の「接続先」で切り替え)
       VITE_CONNECTION: ${VITE_CONNECTION:-}
     ports:

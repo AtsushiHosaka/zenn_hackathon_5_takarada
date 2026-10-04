@@ -20,6 +20,7 @@ RUN npm run build
 
 # 配信。SPA なので存在しないパスは index.html に落とす
 FROM nginx:1.27-alpine AS runtime
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+ENV API_UPSTREAM_ORIGIN=https://zenn-hackathon-api-262220651661.asia-northeast1.run.app
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80

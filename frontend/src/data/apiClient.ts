@@ -25,10 +25,10 @@ export function createApiClient(baseUrl: string, tokenStore: TokenStore): ApiCli
     const isMultipart = body instanceof FormData;
     if (body !== undefined && !isMultipart) headers.set("Content-Type", "application/json");
 
+    const requestToken = requiresAuth ? tokenStore.load() : null;
     if (requiresAuth) {
-      const token = tokenStore.load();
-      if (!token) throw new DomainError("ログインが必要です", 401);
-      headers.set("Authorization", token);
+      if (!requestToken) throw new DomainError("ログインが必要です", 401);
+      headers.set("Authorization", requestToken);
     }
 
     const requestSignal = signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs);
@@ -44,7 +44,11 @@ export function createApiClient(baseUrl: string, tokenStore: TokenStore): ApiCli
       throw requestInterruption(error, requestSignal) ?? new DomainError(`サーバーに接続できません (${baseUrl})`);
     }
 
-    if (!response.ok) throw new DomainError(await errorMessage(response, requestSignal), response.status);
+    if (!response.ok) {
+      // 公開ログインの認証失敗や、以前のトークンへの遅い 401 は現在のログインを消さない。
+      if (response.status === 401 && requiresAuth && requestToken !== null) tokenStore.clear(requestToken);
+      throw new DomainError(await errorMessage(response, requestSignal), response.status);
+    }
     return { response, signal: requestSignal };
   }
 
@@ -66,8 +70,7 @@ export function createApiClient(baseUrl: string, tokenStore: TokenStore): ApiCli
 
     async sendReceivingToken<T>(path: string, options: RequestOptions = {}) {
       const { response, signal } = await call(path, options);
-      // CORS でヘッダを読めるのは backend が Authorization を expose しているから
-      // (backend/config/initializers/cors.rb)
+      // 同一オリジンならそのまま読める。直接接続では API 側の CORS expose が必要。
       const token = response.headers.get("Authorization");
       if (!token) throw new DomainError("トークンを受け取れませんでした");
       return { data: await decode<T>(response, signal), token };
