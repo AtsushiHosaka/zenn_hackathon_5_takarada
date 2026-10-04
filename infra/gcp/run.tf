@@ -133,10 +133,15 @@ resource "google_cloud_run_v2_service" "api" {
   }
 
   # イメージの差し替えは make infra-release (gcloud run deploy) の担当。
-  # terraform はインフラの形だけを見て、動いているタグには触らない
+  # terraform はインフラの形だけを見て、動いているタグには触らない。
+  #
+  # サービスレベルの scaling は使っていない (台数は template[0].scaling で決める) が、
+  # gcloud run services update のあとプロバイダが空の値をゼロとして読み戻すため、
+  # 除外しないと make infra-plan が毎回 no-op の差分を出し続ける
   lifecycle {
     ignore_changes = [
       template[0].containers[0].image,
+      scaling,
       client,
       client_version,
     ]
@@ -194,9 +199,11 @@ resource "google_cloud_run_v2_service" "web" {
     }
   }
 
+  # 除外する理由は api 側と同じ
   lifecycle {
     ignore_changes = [
       template[0].containers[0].image,
+      scaling,
       client,
       client_version,
     ]
