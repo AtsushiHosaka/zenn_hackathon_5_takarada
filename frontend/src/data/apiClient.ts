@@ -8,6 +8,8 @@ type RequestOptions = {
   body?: unknown;
   // 公開エンドポイント (signup / login) は false
   requiresAuth?: boolean;
+  signal?: AbortSignal;
+  timeoutMs?: number;
 };
 
 export type ApiClient = {
@@ -17,10 +19,11 @@ export type ApiClient = {
 };
 
 export function createApiClient(baseUrl: string, tokenStore: TokenStore): ApiClient {
-  async function call(path: string, options: RequestOptions): Promise<Response> {
-    const { method = "GET", body, requiresAuth = true } = options;
+  async function call(path: string, options: RequestOptions): Promise<{ response: Response; signal: AbortSignal }> {
+    const { method = "GET", body, requiresAuth = true, signal, timeoutMs = 30_000 } = options;
     const headers = new Headers({ Accept: "application/json" });
-    if (body !== undefined) headers.set("Content-Type", "application/json");
+    const isMultipart = body instanceof FormData;
+    if (body !== undefined && !isMultipart) headers.set("Content-Type", "application/json");
 
     if (requiresAuth) {
       const token = tokenStore.load();
@@ -28,49 +31,52 @@ export function createApiClient(baseUrl: string, tokenStore: TokenStore): ApiCli
       headers.set("Authorization", token);
     }
 
+    const requestSignal = signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs);
     let response: Response;
     try {
-      response = await fetch(new URL(path, baseUrl), {
+      response = await fetch(new URL(path, `${baseUrl.replace(/\/$/, "")}/`), {
         method,
         headers,
-        body: body === undefined ? undefined : JSON.stringify(body),
+        body: body === undefined ? undefined : isMultipart ? body : JSON.stringify(body),
+        signal: requestSignal,
       });
-    } catch {
-      throw new DomainError(`サーバーに接続できません (${baseUrl})`);
+    } catch (error) {
+      throw requestInterruption(error, requestSignal) ?? new DomainError(`サーバーに接続できません (${baseUrl})`);
     }
 
-    if (!response.ok) throw new DomainError(await errorMessage(response), response.status);
-    return response;
+    if (!response.ok) throw new DomainError(await errorMessage(response, requestSignal), response.status);
+    return { response, signal: requestSignal };
   }
 
-  async function decode<T>(response: Response): Promise<T> {
+  async function decode<T>(response: Response, signal: AbortSignal): Promise<T> {
     // 204 No Content (logout / delete)
     if (response.status === 204) return undefined as T;
     try {
       return (await response.json()) as T;
-    } catch {
-      throw new DomainError("レスポンスを解釈できませんでした");
+    } catch (error) {
+      throw requestInterruption(error, signal) ?? new DomainError("レスポンスを解釈できませんでした");
     }
   }
 
   return {
     async send<T>(path: string, options: RequestOptions = {}) {
-      return decode<T>(await call(path, options));
+      const { response, signal } = await call(path, options);
+      return decode<T>(response, signal);
     },
 
     async sendReceivingToken<T>(path: string, options: RequestOptions = {}) {
-      const response = await call(path, options);
+      const { response, signal } = await call(path, options);
       // CORS でヘッダを読めるのは backend が Authorization を expose しているから
       // (backend/config/initializers/cors.rb)
       const token = response.headers.get("Authorization");
       if (!token) throw new DomainError("トークンを受け取れませんでした");
-      return { data: await decode<T>(response), token };
+      return { data: await decode<T>(response, signal), token };
     },
   };
 }
 
 // backend のエラー形は 2 種類: { error: "..." } と { errors: ["...", ...] }
-async function errorMessage(response: Response): Promise<string> {
+async function errorMessage(response: Response, signal: AbortSignal): Promise<string> {
   try {
     const body: unknown = await response.json();
     if (body && typeof body === "object") {
@@ -78,8 +84,16 @@ async function errorMessage(response: Response): Promise<string> {
       if (typeof error === "string") return error;
       if (Array.isArray(errors)) return errors.join("\n");
     }
-  } catch {
+  } catch (error) {
+    const interrupted = requestInterruption(error, signal);
+    if (interrupted) throw interrupted;
     // JSON でない (502 など) ならステータスだけ返す
   }
   return `リクエストが失敗しました (${response.status})`;
+}
+
+function requestInterruption(error: unknown, signal: AbortSignal): DomainError | undefined {
+  if ((signal.reason instanceof DOMException && signal.reason.name === "TimeoutError") || (error instanceof DOMException && error.name === "TimeoutError")) return new DomainError("サーバーの応答が時間内にありませんでした。少し待ってから再度お試しください");
+  if (signal.aborted || (error instanceof DOMException && error.name === "AbortError")) return new DomainError("操作をキャンセルしました");
+  return undefined;
 }

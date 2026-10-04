@@ -4,7 +4,7 @@ import { appConfig } from "./config";
 export const connections = ["dummy", "api"] as const;
 export type Connection = (typeof connections)[number];
 
-const STORAGE_KEY = "hack.connection";
+const STORAGE_KEY = "hack.connection.dev";
 
 function isConnection(value: string | null): value is Connection {
   return value !== null && (connections as readonly string[]).includes(value);
@@ -15,12 +15,14 @@ function fallback(): Connection {
 }
 
 export function loadConnection(): Connection {
+  if (!appConfig.isDevelopment) return "api";
   const stored = localStorage.getItem(STORAGE_KEY);
   return isConnection(stored) ? stored : fallback();
 }
 
 // 切り替えたらリロードする。アプリ全体 (DI・トークン・キャッシュ) を作り直すのが一番安い。
 export function saveConnection(connection: Connection): void {
+  if (!appConfig.isDevelopment) return;
   localStorage.setItem(STORAGE_KEY, connection);
   location.reload();
 }
