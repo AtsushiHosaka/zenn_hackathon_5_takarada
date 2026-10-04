@@ -194,6 +194,107 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 部屋を登録して解析を始める
+         * @description 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。現在の解析は AI 未接続のモック (畳数と部屋の形から部屋を作る)
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["RoomInput"];
+                };
+            };
+            responses: {
+                /** @description 登録に成功 (status: analyzing) */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Room"];
+                    };
+                };
+                /** @description 畳数が範囲外 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ValidationErrors"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rooms/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        /** 部屋と解析結果 (シーン) を取得する */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 解析済みの部屋 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Room"];
+                    };
+                };
+                /** @description 部屋が無い */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFound"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users": {
         parameters: {
             query?: never;
@@ -424,6 +525,157 @@ export interface components {
         NotFound: {
             /** @example Couldn't find User with 'id'=999 */
             error: string;
+        };
+        /** @description メートル。w: 幅 (ローカル x), h: 高さ, d: 奥行き (ローカル z) */
+        Size: {
+            /** @example 0.97 */
+            w: number;
+            /** @example 0.45 */
+            h: number;
+            /** @example 1.95 */
+            d: number;
+        };
+        /** @description 物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き */
+        Position: {
+            /** @example 0.51 */
+            x: number;
+            /** @example 0 */
+            y: number;
+            /** @example 1 */
+            z: number;
+        };
+        Window: {
+            /** @example window-1 */
+            id: string;
+            /**
+             * @example south
+             * @enum {string}
+             */
+            wall: "north" | "south" | "east" | "west";
+            /**
+             * @description 壁に沿った窓の中心位置 (north/south は x、east/west は z)
+             * @example 1.35
+             */
+            center: number;
+            /** @example 1.2 */
+            width: number;
+            /**
+             * @description 床から窓の下端までの高さ
+             * @example 0.9
+             */
+            bottom: number;
+            /** @example 1.1 */
+            height: number;
+        };
+        RoomShape: {
+            /**
+             * @description 東西方向 (x) の長さ
+             * @example 2.7
+             */
+            width: number;
+            /**
+             * @description 南北方向 (z) の長さ
+             * @example 3.6
+             */
+            depth: number;
+            /** @example 2.4 */
+            height: number;
+            /** @example #f4f1ec */
+            wall_color: string;
+            /** @example #c8a97e */
+            floor_color: string;
+            windows: components["schemas"]["Window"][];
+        };
+        SceneObject: {
+            /** @example bed-1 */
+            id: string;
+            /**
+             * @description existing: 今ある家具, suggested: AI の追加提案
+             * @example existing
+             * @enum {string}
+             */
+            source: "existing" | "suggested";
+            /** @example bed */
+            category: string;
+            /** @example ベッド */
+            label: string;
+            size: components["schemas"]["Size"];
+            position: components["schemas"]["Position"];
+            /**
+             * @description 度数。正面 (ローカル +z) が 0: 南, 90: 東, 180: 北, 270: 西 を向く (three.js の rotation.y と同じ)
+             * @example 0
+             * @enum {integer}
+             */
+            rotation_y: 0 | 90 | 180 | 270;
+            /** @example #f2f0eb */
+            color: string;
+            /**
+             * @description GLB の URL。null なら category と size から箱などで代わりに描く
+             * @example null
+             */
+            model_url: string | null;
+            /**
+             * @description suggested の置き場所の枠
+             * @example null
+             * @enum {string|null}
+             */
+            slot: null | "bed_cover" | "curtain" | "rug" | "wall_decor" | "light" | "display" | "cushion" | "desk_top";
+            /**
+             * @description 付けた先の家具・窓の id
+             * @example null
+             */
+            attach_to: string | null;
+            /**
+             * @description suggested の商品 id (Coordination.items と対応)
+             * @example null
+             */
+            item_id: number | null;
+            /**
+             * @description suggested の番号マーカー (Coordination.items と対応)
+             * @example null
+             */
+            marker: number | null;
+        };
+        Scene: {
+            room: components["schemas"]["RoomShape"];
+            objects: components["schemas"]["SceneObject"][];
+        };
+        RoomInput: {
+            room: {
+                /**
+                 * @description 部屋の広さ (畳)
+                 * @example 6
+                 */
+                tatami: number;
+                /**
+                 * @description 部屋の形。square: 正方形に近い (1:1.15), standard: やや縦長 (3:4), long: 細長い (1:2)
+                 * @example standard
+                 * @enum {string}
+                 */
+                shape: "square" | "standard" | "long";
+            };
+        };
+        Room: {
+            /** @example 1 */
+            id: number;
+            /** @example 6 */
+            tatami: number;
+            /**
+             * @example standard
+             * @enum {string}
+             */
+            shape: "square" | "standard" | "long";
+            /**
+             * @example ready
+             * @enum {string}
+             */
+            status: "analyzing" | "ready" | "failed";
+            /** @description status が ready になると入る */
+            scene: components["schemas"]["Scene"] | null;
+            /** @example null */
+            error_message: string | null;
+            /** Format: date-time */
+            created_at: string;
         };
     };
     responses: never;

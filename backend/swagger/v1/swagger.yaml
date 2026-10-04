@@ -101,6 +101,58 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Unauthorized"
+  "/api/v1/rooms":
+    post:
+      summary: 部屋を登録して解析を始める
+      tags:
+      - Rooms
+      description: 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。現在の解析は
+        AI 未接続のモック (畳数と部屋の形から部屋を作る)
+      security: []
+      parameters: []
+      responses:
+        '201':
+          description: '登録に成功 (status: analyzing)'
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Room"
+        '422':
+          description: 畳数が範囲外
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationErrors"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RoomInput"
+  "/api/v1/rooms/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: 部屋と解析結果 (シーン) を取得する
+      tags:
+      - Rooms
+      security: []
+      responses:
+        '200':
+          description: 解析済みの部屋
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Room"
+        '404':
+          description: 部屋が無い
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFound"
   "/api/v1/users":
     get:
       summary: ユーザー一覧を取得する
@@ -305,3 +357,269 @@ components:
           example: Couldn't find User with 'id'=999
       required:
       - error
+    Size:
+      type: object
+      description: 'メートル。w: 幅 (ローカル x), h: 高さ, d: 奥行き (ローカル z)'
+      properties:
+        w:
+          type: number
+          example: 0.97
+        h:
+          type: number
+          example: 0.45
+        d:
+          type: number
+          example: 1.95
+      required:
+      - w
+      - h
+      - d
+    Position:
+      type: object
+      description: 物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き
+      properties:
+        x:
+          type: number
+          example: 0.51
+        "y":
+          type: number
+          example: 0.0
+        z:
+          type: number
+          example: 1.0
+      required:
+      - x
+      - "y"
+      - z
+    Window:
+      type: object
+      properties:
+        id:
+          type: string
+          example: window-1
+        wall:
+          type: string
+          enum:
+          - north
+          - south
+          - east
+          - west
+          example: south
+        center:
+          type: number
+          description: 壁に沿った窓の中心位置 (north/south は x、east/west は z)
+          example: 1.35
+        width:
+          type: number
+          example: 1.2
+        bottom:
+          type: number
+          description: 床から窓の下端までの高さ
+          example: 0.9
+        height:
+          type: number
+          example: 1.1
+      required:
+      - id
+      - wall
+      - center
+      - width
+      - bottom
+      - height
+    RoomShape:
+      type: object
+      properties:
+        width:
+          type: number
+          description: 東西方向 (x) の長さ
+          example: 2.7
+        depth:
+          type: number
+          description: 南北方向 (z) の長さ
+          example: 3.6
+        height:
+          type: number
+          example: 2.4
+        wall_color:
+          type: string
+          example: "#f4f1ec"
+        floor_color:
+          type: string
+          example: "#c8a97e"
+        windows:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Window"
+      required:
+      - width
+      - depth
+      - height
+      - wall_color
+      - floor_color
+      - windows
+    SceneObject:
+      type: object
+      properties:
+        id:
+          type: string
+          example: bed-1
+        source:
+          type: string
+          enum:
+          - existing
+          - suggested
+          description: 'existing: 今ある家具, suggested: AI の追加提案'
+          example: existing
+        category:
+          type: string
+          example: bed
+        label:
+          type: string
+          example: ベッド
+        size:
+          "$ref": "#/components/schemas/Size"
+        position:
+          "$ref": "#/components/schemas/Position"
+        rotation_y:
+          type: integer
+          enum:
+          - 0
+          - 90
+          - 180
+          - 270
+          description: '度数。正面 (ローカル +z) が 0: 南, 90: 東, 180: 北, 270: 西 を向く (three.js
+            の rotation.y と同じ)'
+          example: 0
+        color:
+          type: string
+          example: "#f2f0eb"
+        model_url:
+          type: string
+          nullable: true
+          description: GLB の URL。null なら category と size から箱などで代わりに描く
+          example:
+        slot:
+          type: string
+          nullable: true
+          enum:
+          -
+          - bed_cover
+          - curtain
+          - rug
+          - wall_decor
+          - light
+          - display
+          - cushion
+          - desk_top
+          description: suggested の置き場所の枠
+          example:
+        attach_to:
+          type: string
+          nullable: true
+          description: 付けた先の家具・窓の id
+          example:
+        item_id:
+          type: integer
+          nullable: true
+          description: suggested の商品 id (Coordination.items と対応)
+          example:
+        marker:
+          type: integer
+          nullable: true
+          description: suggested の番号マーカー (Coordination.items と対応)
+          example:
+      required:
+      - id
+      - source
+      - category
+      - label
+      - size
+      - position
+      - rotation_y
+      - color
+      - model_url
+      - slot
+      - attach_to
+      - item_id
+      - marker
+    Scene:
+      type: object
+      properties:
+        room:
+          "$ref": "#/components/schemas/RoomShape"
+        objects:
+          type: array
+          items:
+            "$ref": "#/components/schemas/SceneObject"
+      required:
+      - room
+      - objects
+    RoomInput:
+      type: object
+      properties:
+        room:
+          type: object
+          properties:
+            tatami:
+              type: number
+              minimum: 3
+              maximum: 30
+              description: 部屋の広さ (畳)
+              example: 6
+            shape:
+              type: string
+              enum:
+              - square
+              - standard
+              - long
+              description: '部屋の形。square: 正方形に近い (1:1.15), standard: やや縦長 (3:4), long:
+                細長い (1:2)'
+              example: standard
+          required:
+          - tatami
+          - shape
+      required:
+      - room
+    Room:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        tatami:
+          type: number
+          example: 6.0
+        shape:
+          type: string
+          enum:
+          - square
+          - standard
+          - long
+          example: standard
+        status:
+          type: string
+          enum:
+          - analyzing
+          - ready
+          - failed
+          example: ready
+        scene:
+          allOf:
+          - "$ref": "#/components/schemas/Scene"
+          nullable: true
+          description: status が ready になると入る
+        error_message:
+          type: string
+          nullable: true
+          example:
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - tatami
+      - shape
+      - status
+      - scene
+      - error_message
+      - created_at
