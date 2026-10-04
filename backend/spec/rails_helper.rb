@@ -1,6 +1,8 @@
 require "spec_helper"
 # コンテナ内は RAILS_ENV=development なので、テスト時は強制的に test に切り替える
 ENV["RAILS_ENV"] = "test"
+# 写真の置き場。test は Storage::LocalClient なので tmp/storage に落ちる
+ENV["UPLOADS_BUCKET"] ||= "test-uploads"
 require_relative "../config/environment"
 
 abort("The Rails environment is running in production mode!") if Rails.env.production?

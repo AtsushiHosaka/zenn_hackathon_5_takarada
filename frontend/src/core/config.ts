@@ -17,6 +17,8 @@ export const appConfig = {
     jobPath: import.meta.env.VITE_ROOM_JOB_PATH || (roomContract !== "legacy" ? "/api/v1/rooms/{id}" : ""),
     coordinationPath: import.meta.env.VITE_ROOM_COORDINATION_PATH || "/api/v1/rooms/{id}/coordinations",
     coordinationJobPath: import.meta.env.VITE_ROOM_COORDINATION_JOB_PATH || "/api/v1/coordinations/{id}",
+    // 写真のアップロード先を発行する。空なら写真を送らずに解析する
+    uploadsPath: import.meta.env.VITE_ROOM_UPLOADS_PATH || (roomContract !== "legacy" ? "/api/v1/uploads" : ""),
     requiresAuth: import.meta.env.VITE_ROOM_REQUIRES_AUTH ? import.meta.env.VITE_ROOM_REQUIRES_AUTH !== "false" : roomContract === "legacy",
     photoField: import.meta.env.VITE_ROOM_PHOTO_FIELD || "photos[]",
     promptField: import.meta.env.VITE_ROOM_PROMPT_FIELD || "prompt",

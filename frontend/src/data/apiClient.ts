@@ -16,6 +16,8 @@ export type ApiClient = {
   send<T>(path: string, options?: RequestOptions): Promise<T>;
   // ログイン系はトークンがレスポンスヘッダで返るのでこちら
   sendReceivingToken<T>(path: string, options?: RequestOptions): Promise<{ data: T; token: string }>;
+  // 署名付きURLへ直接PUTする (部屋写真はAPIを経由せずGCSへ送る)
+  sendToSignedUrl(url: string, file: File, signal?: AbortSignal): Promise<void>;
 };
 
 export function createApiClient(baseUrl: string, tokenStore: TokenStore): ApiClient {
@@ -66,6 +68,19 @@ export function createApiClient(baseUrl: string, tokenStore: TokenStore): ApiCli
     async send<T>(path: string, options: RequestOptions = {}) {
       const { response, signal } = await call(path, options);
       return decode<T>(response, signal);
+    },
+
+    // baseUrlもAuthorizationも付けない。署名したContent-Type以外のヘッダを足すと
+    // 署名と食い違ってGCSが403を返す (Content-Lengthはブラウザが本体から付ける)
+    async sendToSignedUrl(url: string, file: File, signal?: AbortSignal) {
+      const requestSignal = signal ? AbortSignal.any([signal, AbortSignal.timeout(120_000)]) : AbortSignal.timeout(120_000);
+      let response: Response;
+      try {
+        response = await fetch(url, { method: "PUT", headers: { "Content-Type": file.type }, body: file, signal: requestSignal });
+      } catch (error) {
+        throw requestInterruption(error, requestSignal) ?? new DomainError("写真を送信できませんでした");
+      }
+      if (!response.ok) throw new DomainError(`写真の送信に失敗しました (${response.status})`, response.status);
     },
 
     async sendReceivingToken<T>(path: string, options: RequestOptions = {}) {
