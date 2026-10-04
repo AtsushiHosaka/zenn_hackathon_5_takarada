@@ -53,7 +53,7 @@ export default function RoomListPage() {
       <div className="room-list-heading">
         <div className="room-list-intro">
           <h1>マイルーム<span>{rooms.length}</span></h1>
-          <p>写真とひとことで、部屋をコーディネート。</p>
+          <p>部屋の情報と希望から、コーディネートを3Dで確認。</p>
         </div>
         <div className="room-list-actions">
           <div className="room-list-search">
@@ -68,7 +68,7 @@ export default function RoomListPage() {
         <Link to="/rooms/new" className="room-list-new-card">
           <span className="room-list-new-icon"><ReferenceSvg page={2} index={4} /></span>
           <span className="room-list-new-title">新しいルームを作る</span>
-          <span className="room-list-new-description">部屋の写真3〜4枚と、どんな部屋にしたいかを送るだけ。</span>
+          <span className="room-list-new-description">部屋の情報と、どんな部屋にしたいかを入力します。</span>
         </Link>
         {filtered.map(room => <Link key={room.id} to={`/rooms/${encodeURIComponent(room.id)}`} className="room-list-card" aria-label={`${room.title}${room.id.startsWith('sample-') ? '（サンプル）' : ''}`}>
           <div className={`room-list-scene${room.generating ? ' room-list-generating' : ''}`}>

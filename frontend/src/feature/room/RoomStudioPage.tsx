@@ -198,6 +198,7 @@ export default function RoomStudioPage() {
                   <span>{item.name}</span>
                 </label>)}</div>
                 <p className="rc-setting-note">現在は、家具をすべて外した提案には対応していません。1点以上選んでください。</p>
+                {!analyzed&&<p className="rc-setting-note">追加の提案には解析時の配置と色を使います。手動で編集した配置と色は引き継ぎません。</p>}
               </fieldset>}
               {canCoordinate&&analyzed&&<form className="rc-coordinate-form" onSubmit={coordinate}>
                 <label className="rc-setting" htmlFor="coordinate-request">どんな部屋にしたいか<textarea id="coordinate-request" rows={3} value={prompt} maxLength={500} onChange={event=>setPrompt(event.target.value)} required/></label>

@@ -102,7 +102,7 @@ VITE_API_ENDPOINT=http://127.0.0.1:13000
 VITE_CONNECTION=api
 ```
 
-PR #5の統合前のローカルでは、既存APIテスト23件・RuboCop・Swagger再生成・型生成、フロントのlint・ビルドが成功しています。PC画面でも6畳・標準・紫・3万円の提案が8点・28,840円になることを確認しました。実際の商品画面のスクリーンショットは`output/screenshots/frontend-mock-api-pc.jpg`です。統合後の検証結果は別途記録します。
+PR #5を#6へマージした後、既存APIテスト23件・RuboCop・Swagger再生成・型生成、フロントのlint・ビルドが成功しました。PC画面では6畳・標準でデスクを外すと紫・3万円の提案が7点27,360円になりました。再読み込みで家具選択を復元し、2万円への追加指示で6点19,380円になることを確認しました。3D編集・保存・復元・CSV・オフライン作成も確認済みです。統合後の記録は`specs/room-coordinator/spec.md`、確認画像は`output/screenshots/pr6-integration-pc.png`です。GitHub Actionsは実行履歴がなく、CI成功とは扱いません。
 
 `legacy`は未提供の写真APIを接続するための提案形式です。JPEG・PNG・WebPの写真3〜4枚（1枚10MB以内）をmultipartで送る処理と、独自の同期・非同期応答の変換を残しています。mainの正式APIへ写真は送りません。写真解析とAIコーディネートは今後の実装対象です。
 
