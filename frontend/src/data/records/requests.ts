@@ -4,3 +4,5 @@ import type { components } from "../generated/api";
 export type SignupInput = components["schemas"]["SignupInput"];
 export type LoginInput = components["schemas"]["LoginInput"];
 export type UserInput = components["schemas"]["UserInput"];
+export type RoomInputRecord = components["schemas"]["RoomInput"];
+export type CoordinationInputRecord = components["schemas"]["CoordinationInput"];
