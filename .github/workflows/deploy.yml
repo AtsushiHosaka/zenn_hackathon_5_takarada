@@ -71,7 +71,7 @@ jobs:
             | docker login --username AWS --password-stdin "$ECR_REGISTRY"
 
           COMPOSE="docker compose -f compose.yaml -f infra/compose.deploy.yaml --env-file infra/.env"
-          $COMPOSE pull api
+          $COMPOSE pull api worker
           $COMPOSE up -d
           docker image prune -f >/dev/null
           REMOTE

@@ -66,3 +66,8 @@ output "region" {
   description = "AWS リージョン"
   value       = var.region
 }
+
+output "console_signin_url" {
+  description = "IAM ユーザーがログインするコンソールの URL"
+  value       = "https://${data.aws_caller_identity.current.account_id}.signin.aws.amazon.com/console"
+}

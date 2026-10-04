@@ -23,7 +23,18 @@ resource "aws_lightsail_instance" "api" {
     set -eux
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -qq
-    apt-get install -y ca-certificates curl awscli
+    apt-get install -y ca-certificates curl unzip
+
+    # AWS CLI。Ubuntu 24.04 には awscli の deb が無いので公式インストーラを使う
+    case "$(dpkg --print-architecture)" in
+      arm64) aws_zip=awscli-exe-linux-aarch64.zip ;;
+      *)     aws_zip=awscli-exe-linux-x86_64.zip ;;
+    esac
+    curl -fsSL "https://awscli.amazonaws.com/$aws_zip" -o /tmp/awscliv2.zip
+    unzip -q /tmp/awscliv2.zip -d /tmp
+    /tmp/aws/install
+    rm -rf /tmp/aws /tmp/awscliv2.zip
+
     install -m 0755 -d /etc/apt/keyrings
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
     chmod a+r /etc/apt/keyrings/docker.asc
