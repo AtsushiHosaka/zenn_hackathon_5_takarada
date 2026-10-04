@@ -155,12 +155,15 @@ export function toAnalysisRoomRecord(value: unknown): AnalysisRoomRecord {
   if (!Number.isFinite(Date.parse(createdAt))) invalid("Room.created_at");
   const scene = record.scene === null ? null : analysisScene(record.scene);
   if (record.status === "ready" && !scene) invalid("Room.scene");
+  // 解析方法 (gemini: 写真を AI で解析 / mock: モック) は古い API では返らない
+  const analyzedBy = record.analyzed_by === "gemini" || record.analyzed_by === "mock" ? record.analyzed_by : null;
   return {
     id: record.id,
     tatami,
     shape: record.shape,
     status: record.status,
     scene,
+    analyzed_by: analyzedBy,
     error_message: nullableText(record.error_message, "Room.error_message"),
     created_at: createdAt,
   };

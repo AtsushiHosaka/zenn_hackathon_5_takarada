@@ -739,6 +739,15 @@ components:
           - "$ref": "#/components/schemas/Scene"
           nullable: true
           description: status が ready になると入る
+        analyzed_by:
+          type: string
+          nullable: true
+          enum:
+          -
+          - gemini
+          - mock
+          description: 'gemini: 写真を AI で解析した / mock: 写真か API キーが無く、決まった家具を置いたモック。解析が終わると入る'
+          example: gemini
         error_message:
           type: string
           nullable: true
@@ -752,6 +761,7 @@ components:
       - shape
       - status
       - scene
+      - analyzed_by
       - error_message
       - created_at
     CoordinationInput:
