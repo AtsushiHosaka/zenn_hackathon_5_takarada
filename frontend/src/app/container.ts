@@ -7,8 +7,14 @@ import type { Repositories } from "../core/repositories";
 import { createApiClient } from "../data/apiClient";
 import { createApiAuthRepository } from "../data/repositories/apiAuthRepository";
 import { createApiUserRepository } from "../data/repositories/apiUserRepository";
+import { createApiRoomRepository } from "../data/repositories/apiRoomRepository";
+import { createApiCoordinationRepository } from "../data/repositories/apiCoordinationRepository";
 import { createDummyAuthRepository } from "../data/dummy/dummyAuthRepository";
 import { createDummyUserRepository } from "../data/dummy/dummyUserRepository";
+import {
+  createDummyCoordinationRepository,
+  createDummyRoomRepository,
+} from "../data/dummy/dummyCoordinationRepositories";
 
 export function createRepositories(connection: Connection): Repositories {
   const tokenStore = createTokenStore(connection);
@@ -18,6 +24,8 @@ export function createRepositories(connection: Connection): Repositories {
       tokenStore,
       auth: createDummyAuthRepository(tokenStore),
       users: createDummyUserRepository(tokenStore),
+      rooms: createDummyRoomRepository(),
+      coordinations: createDummyCoordinationRepository(),
     };
   }
 
@@ -26,5 +34,7 @@ export function createRepositories(connection: Connection): Repositories {
     tokenStore,
     auth: createApiAuthRepository(api),
     users: createApiUserRepository(api),
+    rooms: createApiRoomRepository(api),
+    coordinations: createApiCoordinationRepository(api),
   };
 }

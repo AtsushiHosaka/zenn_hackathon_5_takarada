@@ -85,6 +85,7 @@ InteriorLinks.client.search(prompt:, theme:, slots:, max_price:)
 | 部屋の解析 (`RoomAnalyzer`) | **モック**: 畳数と部屋の形から寸法を決め、固定の家具 (ベッド・デスク・本棚・南の窓) を置く。写真は受け取らない |
 | 商品の選定 (`CoordinationPlanner`) | **モック**: キーワードでテーマ (推し活パープル / ボタニカル / 韓国) を決める |
 | インテリアリンク取得 (`InteriorLinks`) | **モック** (`InteriorLinks::MockClient` + `config/interior_links_mock.yml`、38 点)。価格はダミー、URL は EC の検索結果ページ |
+| Web の画面 (`/coordinate`) | **つなぎ込み確認用の最小画面**: 畳数・部屋の形 → 活かす家具 → 要望・予算 → 3D (箱) と購入リンク。ダミー接続でも動く。見た目の作り込み (design.png) は未着手 |
 | 写真のアップロード・S3・3D モデル (GLB) | 未実装 |
 
 ## 残作業

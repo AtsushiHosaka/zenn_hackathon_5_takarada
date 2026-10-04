@@ -4,6 +4,7 @@ import { loadConnection } from "../core/connection";
 import { RepositoriesContext } from "../core/repositories";
 import { createRepositories } from "./container";
 import LoginPage from "../feature/auth/LoginPage";
+import CoordinationPage from "../feature/coordination/CoordinationPage";
 import UserDetailPage from "../feature/users/UserDetailPage";
 import UsersPage from "../feature/users/UsersPage";
 import AppLayout from "../feature/shared/AppLayout";
@@ -29,6 +30,8 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            {/* コーデ提案はデモ用にログイン不要 */}
+            <Route path="/coordinate" element={<CoordinationPage />} />
             <Route
               element={
                 <RequireAuth>
