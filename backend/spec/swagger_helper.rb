@@ -205,6 +205,58 @@ RSpec.configure do |config|
               created_at: { type: :string, format: "date-time" }
             },
             required: %w[id tatami shape status scene error_message created_at]
+          },
+          CoordinationInput: {
+            type: :object,
+            properties: {
+              coordination: {
+                type: :object,
+                properties: {
+                  prompt: { type: :string, example: "紫色の推し活ルームにしたい" },
+                  budget: { type: :integer, description: "買い足しの予算 (円)", example: 30_000 },
+                  kept_object_ids: { type: :array, items: { type: :string }, description: "活かす家具の id。空なら全部活かす", example: %w[bed-1 desk-1 shelf-1] }
+                },
+                required: %w[prompt budget]
+              }
+            },
+            required: %w[coordination]
+          },
+          CoordinationItem: {
+            type: :object,
+            properties: {
+              marker: { type: :integer, example: 1 },
+              item_id: { type: :integer, example: 101 },
+              slot: { type: :string, example: "bed_cover" },
+              category: { type: :string, example: "bed_cover" },
+              name: { type: :string, example: "ラベンダー 布団カバー3点セット シングル" },
+              price: { type: :integer, example: 4980 },
+              shop: { type: :string, enum: %w[amazon rakuten], example: "rakuten" },
+              url: { type: :string, example: "https://search.rakuten.co.jp/search/mall/..." },
+              image_url: { type: :string, nullable: true, example: nil },
+              color: { type: :string, example: "#b9a3e3" },
+              placement_note: { type: :string, example: "ベッドに掛ける" }
+            },
+            required: %w[marker item_id slot category name price shop url image_url color placement_note]
+          },
+          Coordination: {
+            type: :object,
+            properties: {
+              id: { type: :integer, example: 1 },
+              room_id: { type: :integer, example: 1 },
+              status: { type: :string, enum: %w[pending processing done failed], example: "done" },
+              prompt: { type: :string, example: "紫色の推し活ルームにしたい" },
+              budget: { type: :integer, example: 30_000 },
+              kept_object_ids: { type: :array, items: { type: :string }, example: %w[bed-1 desk-1 shelf-1] },
+              title: { type: :string, nullable: true, example: "ラベンダーの推し活ルーム" },
+              comment: { type: :string, nullable: true, example: "ラベンダー 布団カバー3点セット シングル (ベッドに掛ける) などを追加しました。今のベッドとデスクと本棚はそのまま活かしています。" },
+              before_scene: { allOf: [ { "$ref" => "#/components/schemas/Scene" } ], nullable: true },
+              after_scene: { allOf: [ { "$ref" => "#/components/schemas/Scene" } ], nullable: true, description: "status が done になると入る" },
+              items: { type: :array, items: { "$ref" => "#/components/schemas/CoordinationItem" }, description: "購入リンク一覧。after_scene の suggested と marker で対応する" },
+              total_price: { type: :integer, nullable: true, example: 26_840 },
+              error_message: { type: :string, nullable: true, example: nil },
+              created_at: { type: :string, format: "date-time" }
+            },
+            required: %w[id room_id status prompt budget kept_object_ids title comment before_scene after_scene items total_price error_message created_at]
           }
         }
       }
