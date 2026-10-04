@@ -23,10 +23,13 @@ class FurnitureModelImporter
         model.update!(attributes)
         [ model.key, model ]
       end
-      bindings.each do |attributes|
+      retained_binding_ids = bindings.map do |attributes|
         binding = FurnitureModelBinding.find_or_initialize_by(kind: attributes.fetch("kind"), reference: attributes.fetch("reference"))
         binding.update!(furniture_model: imported.fetch(attributes.fetch("model_id")))
+        binding.id
       end
+      # 対応表はmanifestを正とする。用途が外れたモデル本体の履歴は残す。
+      FurnitureModelBinding.where.not(id: retained_binding_ids).delete_all
     end
 
     { models: models.length, bindings: bindings.length }

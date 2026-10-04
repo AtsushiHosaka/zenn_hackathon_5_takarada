@@ -17,7 +17,8 @@
    0.8,
    0.85
   ],
-  "bytes": 116284
+  "bytes": 116284,
+  "sha256": "07ec4f49f99696c8f9663efcecd5f4537407c40a33abdf89943ab3e2cba14bd3"
  },
  {
   "name": "sofa_2seat",
@@ -37,7 +38,8 @@
    0.8,
    0.85
   ],
-  "bytes": 167088
+  "bytes": 167088,
+  "sha256": "0791e83c7980240fceced228952fcf8f3f9b63339854ec74cbb082b61784874e"
  },
  {
   "name": "sofa_2seat__w130",
@@ -57,7 +59,8 @@
    0.8,
    0.85
   ],
-  "bytes": 167640
+  "bytes": 167640,
+  "sha256": "0316c8d97e526f20dcd7129ae7d9f554e7f65a367f29a5f57a0681913576b69c"
  },
  {
   "name": "sofa_2seat__w170",
@@ -77,7 +80,8 @@
    0.8,
    0.85
   ],
-  "bytes": 167128
+  "bytes": 167128,
+  "sha256": "e9312ece328fbfc743b75bec5d6c10745495680c7cb42a2de441fe26d7676de2"
  },
  {
   "name": "sofa_3seat",
@@ -97,7 +101,8 @@
    0.82,
    0.9
   ],
-  "bytes": 218920
+  "bytes": 218920,
+  "sha256": "9537f77bf4edaaef47d72751e9bbe6c18c6d2de93ecb0de13e6a3a0a58d9158a"
  },
  {
   "name": "sofa_low",
@@ -117,7 +122,8 @@
    0.55,
    0.85
   ],
-  "bytes": 159728
+  "bytes": 159728,
+  "sha256": "cf14f3bebcf2ef0bc3a9de7dc1d43879d149b85d3857b95e0df2273126164435"
  },
  {
   "name": "sofa_l_left",
@@ -137,7 +143,8 @@
    0.82,
    1.55
   ],
-  "bytes": 225268
+  "bytes": 225268,
+  "sha256": "f847d706f9531d1f5071ca68537f74e430c6cddc10a3497f878cd545b26d867b"
  },
  {
   "name": "sofa_l_left__s",
@@ -157,7 +164,8 @@
    0.82,
    1.4
   ],
-  "bytes": 226808
+  "bytes": 226808,
+  "sha256": "55c90eb56a93e24a24a3e2f1165727acb7f01159c6f85e802980280ab0ded5cc"
  },
  {
   "name": "sofa_l_left__l",
@@ -177,7 +185,8 @@
    0.82,
    1.8
   ],
-  "bytes": 226040
+  "bytes": 226040,
+  "sha256": "39f6a642f7bd86e8c673065029e99fb85c132c2eea3514caa1b09632b085e154"
  },
  {
   "name": "sofa_l_right",
@@ -197,7 +206,8 @@
    0.82,
    1.55
   ],
-  "bytes": 225272
+  "bytes": 225272,
+  "sha256": "4800b5790304006333c0c8ad02d6d060942a3ea5c5822c500170e7635d8bd5e6"
  },
  {
   "name": "sofa_l_right__s",
@@ -217,7 +227,8 @@
    0.82,
    1.4
   ],
-  "bytes": 226812
+  "bytes": 226812,
+  "sha256": "785294478a5044242ca2eae0b240f942976a10ff127dd026409c3ed7738b3691"
  },
  {
   "name": "sofa_l_right__l",
@@ -237,7 +248,8 @@
    0.82,
    1.8
   ],
-  "bytes": 226040
+  "bytes": 226040,
+  "sha256": "e26642601375d42e5aae7591a72d6ae11d7604f04db687da418fd5130a4a761a"
  },
  {
   "name": "sofa_bed_open",
@@ -258,7 +270,8 @@
    0.4,
    1.9
   ],
-  "bytes": 99740
+  "bytes": 99740,
+  "sha256": "8615804b25f907414304fef35fd8b531f7444faef818a7448c3a363f40bc4e92"
  },
  {
   "name": "chair_dining",
@@ -278,7 +291,8 @@
    0.8,
    0.5
   ],
-  "bytes": 72592
+  "bytes": 72592,
+  "sha256": "fa3e660276162bb8300be88c8066bd9b51538f6b3ff5e4c2c8d341ff44e57ca1"
  },
  {
   "name": "chair_office",
@@ -299,7 +313,8 @@
    1.1,
    0.5
   ],
-  "bytes": 106940
+  "bytes": 106940,
+  "sha256": "f7e9100ed72f5029914bac6dc65c5d4767926fcf755e86ba93e46e20b0d46604"
  },
  {
   "name": "stool_round",
@@ -319,7 +334,8 @@
    0.45,
    0.35
   ],
-  "bytes": 44100
+  "bytes": 44100,
+  "sha256": "54bb873ee02e86c940ba11f1556a71a7e66afeb0c4359e25c891357125c1f0db"
  },
  {
   "name": "bed_single",
@@ -340,7 +356,8 @@
    0.45,
    1.95
   ],
-  "bytes": 70540
+  "bytes": 70540,
+  "sha256": "da0f7f15fd82c7341aa53ef49a9a520c42293ec5d0ba91d581de4339c1f32031"
  },
  {
   "name": "bed_semidouble",
@@ -361,7 +378,8 @@
    0.45,
    1.95
   ],
-  "bytes": 70448
+  "bytes": 70448,
+  "sha256": "2c2cb119746fde1fdadc00762338232f7b680e1b6c287ef2e269362789544ca0"
  },
  {
   "name": "bed_double",
@@ -382,7 +400,8 @@
    0.45,
    1.95
   ],
-  "bytes": 82348
+  "bytes": 82348,
+  "sha256": "eeb845691502522dbd1bf7cbf3fc1606dfa43947ab73e0c366a332efc5c9a407"
  },
  {
   "name": "bed_loft",
@@ -403,7 +422,8 @@
    1.8,
    2.05
   ],
-  "bytes": 160376
+  "bytes": 160376,
+  "sha256": "b0782c373e5a5928ef280c2b0093a5f4e1d80e7dbe6748b71343e9f663d6c119"
  },
  {
   "name": "futon_floor",
@@ -423,7 +443,8 @@
    0.08,
    2.0
   ],
-  "bytes": 51124
+  "bytes": 51124,
+  "sha256": "ebcdebf2a9b7a31e0788e5b5800970edc0d680971609187f43f4adea002cacf2"
  },
  {
   "name": "table_low_rect",
@@ -442,7 +463,8 @@
    0.38,
    0.5
   ],
-  "bytes": 40504
+  "bytes": 40504,
+  "sha256": "86bf66290a8e3b5026794eb8d532c4f9d9f75b27d69154feba8969ee4cd09408"
  },
  {
   "name": "table_low_rect__w075",
@@ -461,7 +483,8 @@
    0.38,
    0.5
   ],
-  "bytes": 40488
+  "bytes": 40488,
+  "sha256": "cd7fc70d7b78fdba135b941599f8ceec03f1ead3e5acdbefc5aa178198b0dbf4"
  },
  {
   "name": "table_low_rect__w110",
@@ -480,7 +503,8 @@
    0.38,
    0.5
   ],
-  "bytes": 40576
+  "bytes": 40576,
+  "sha256": "c018781a482b2d13dad821a73577fda5e4a4ac53e8fe82dcd0c42142ed8ed9f0"
  },
  {
   "name": "table_low_round",
@@ -500,7 +524,8 @@
    0.38,
    0.7
   ],
-  "bytes": 35484
+  "bytes": 35484,
+  "sha256": "82f7adf4917fb13f968d52e9672ffced73ccd399c0d7262127b28690bfbb9227"
  },
  {
   "name": "table_dining_rect",
@@ -519,7 +544,8 @@
    0.72,
    0.75
   ],
-  "bytes": 32856
+  "bytes": 32856,
+  "sha256": "c088c3220d4aea184ecbc61e40bfd58819c7c3a77aa2205c88c785609f2b5cd8"
  },
  {
   "name": "table_dining_round",
@@ -538,7 +564,8 @@
    0.72,
    0.9
   ],
-  "bytes": 48880
+  "bytes": 48880,
+  "sha256": "49a382ed2659d96aa833a274f38dfa96b8be528760889e8270a1cd1f91a5e1ec"
  },
  {
   "name": "desk_wood",
@@ -557,7 +584,8 @@
    0.72,
    0.5
   ],
-  "bytes": 28096
+  "bytes": 28096,
+  "sha256": "b19f113a1727277cc4d1261880730a833d7b2e6c6259764d77aa15587259553f"
  },
  {
   "name": "desk_wood__w080",
@@ -576,7 +604,8 @@
    0.72,
    0.5
   ],
-  "bytes": 28168
+  "bytes": 28168,
+  "sha256": "07fee5e6bd3cc4a397af732e801a6065633b4def7f6c3a1b39279ae6c378f892"
  },
  {
   "name": "desk_wood__w120",
@@ -595,7 +624,8 @@
    0.72,
    0.5
   ],
-  "bytes": 28008
+  "bytes": 28008,
+  "sha256": "35f8d39c23efdf4f647d6745acb5fe418742d6df5f558af76d459c47cd498e6e"
  },
  {
   "name": "desk_wide",
@@ -615,7 +645,8 @@
    0.72,
    0.6
   ],
-  "bytes": 47984
+  "bytes": 47984,
+  "sha256": "548404db7b8d4dadfee3df8ecdd576ebf2e4f910b1345e3829eaae29ae6c10dd"
  },
  {
   "name": "desk_l_left",
@@ -635,7 +666,8 @@
    0.72,
    1.2
   ],
-  "bytes": 34380
+  "bytes": 34380,
+  "sha256": "30abeda7dee4a5245f295c57c86983c99ff8be422d4de271dc45657b21211fb3"
  },
  {
   "name": "desk_fold",
@@ -655,7 +687,8 @@
    0.7,
    0.45
   ],
-  "bytes": 45800
+  "bytes": 45800,
+  "sha256": "314902925cdcd17422a473f44de399eb56352b64742ae27525b4e31a36421ee2"
  },
  {
   "name": "side_table",
@@ -674,7 +707,8 @@
    0.5,
    0.4
   ],
-  "bytes": 47892
+  "bytes": 47892,
+  "sha256": "e806678f318c45ab12c5072291d51776add2bd8cfb9c84504682b53595a4094d"
  },
  {
   "name": "bookshelf",
@@ -693,7 +727,8 @@
    1.8,
    0.3
   ],
-  "bytes": 33492
+  "bytes": 33492,
+  "sha256": "6c203164f840d876f51632203227aabe9a5b57c9cc52657579b735fac0152978"
  },
  {
   "name": "bookshelf__w060",
@@ -712,7 +747,8 @@
    1.8,
    0.3
   ],
-  "bytes": 33244
+  "bytes": 33244,
+  "sha256": "ecc4ec349fc657519a2cd9c8681f7672f5f88aef07a58baf32d1c76e875101c8"
  },
  {
   "name": "bookshelf__w100",
@@ -731,7 +767,8 @@
    1.8,
    0.3
   ],
-  "bytes": 33376
+  "bytes": 33376,
+  "sha256": "c42f325fdebb55aafe5e72700352403414840199b906fc2f905247d575910351"
  },
  {
   "name": "shelf_low",
@@ -750,7 +787,8 @@
    0.9,
    0.3
   ],
-  "bytes": 25760
+  "bytes": 25760,
+  "sha256": "6068c6ce784604687e524d6d4b748dbb4e53dfdb316b639104d89863fc997d32"
  },
  {
   "name": "shelf_cube",
@@ -769,7 +807,8 @@
    0.8,
    0.35
   ],
-  "bytes": 24888
+  "bytes": 24888,
+  "sha256": "3ad0908f876d2822d20a9e72369d4679d6d62997756482bd528c940c83e6d1f0"
  },
  {
   "name": "wardrobe",
@@ -790,7 +829,8 @@
    1.8,
    0.55
   ],
-  "bytes": 40288
+  "bytes": 40288,
+  "sha256": "9fe787f137e29a22129a92f806c73fd14a5f05517b41269cf3802b0ccdadec57"
  },
  {
   "name": "chest_drawers",
@@ -810,7 +850,8 @@
    0.85,
    0.4
   ],
-  "bytes": 97024
+  "bytes": 97024,
+  "sha256": "6190585809d03db0421a55994e2dc9bec0d6e795ac2743268ec66966e697e3b3"
  },
  {
   "name": "tv_stand",
@@ -830,7 +871,8 @@
    0.4,
    0.35
   ],
-  "bytes": 62640
+  "bytes": 62640,
+  "sha256": "5aaaaacc8352f8506b319ebc293e196dcef9a8c6d796b4dd8f010cb65ed1cb02"
  },
  {
   "name": "wall_shelf",
@@ -849,7 +891,8 @@
    0.5,
    0.12
   ],
-  "bytes": 42192
+  "bytes": 42192,
+  "sha256": "3832e644ce1d99d59f46fd7fb8e62b281e448d7590c8c0ead4340625a5499bf3"
  },
  {
   "name": "display_case",
@@ -870,7 +913,8 @@
    1.2,
    0.3
   ],
-  "bytes": 40428
+  "bytes": 40428,
+  "sha256": "4245c5665440637c242e8f26f73fb084c8db294d51919e90f63ad23c0a94b611"
  },
  {
   "name": "acrylic_stand_case",
@@ -889,7 +933,8 @@
    0.15,
    0.15
   ],
-  "bytes": 42648
+  "bytes": 42648,
+  "sha256": "e34e7c24ce2d4f2ce3db18e5ee6047560ba4e94d3df09dab445e34a54bd1a6d5"
  },
  {
   "name": "display_rack_open",
@@ -908,7 +953,8 @@
    0.9,
    0.25
   ],
-  "bytes": 38164
+  "bytes": 38164,
+  "sha256": "974fd6e3fce6e7fa66e8c69d72bfb5d402ca33bc2cfcf0b475c4c0e8d5b5e649"
  },
  {
   "name": "display_stand_floor",
@@ -927,7 +973,8 @@
    1.0,
    0.6
   ],
-  "bytes": 36332
+  "bytes": 36332,
+  "sha256": "bcc92158cedd16708487fa65744bc9e22880f21e043aadb9b2420b9644f3fa6f"
  },
  {
   "name": "bed_cover",
@@ -946,7 +993,8 @@
    0.04,
    2.0
   ],
-  "bytes": 66968
+  "bytes": 66968,
+  "sha256": "2956ab8924c55d2d7544ac0225bf0f556bf17f06c9b118f7761c4d1685b44544"
  },
  {
   "name": "bed_cover__101",
@@ -965,7 +1013,8 @@
    0.04,
    2.0
   ],
-  "bytes": 66976
+  "bytes": 66976,
+  "sha256": "39812e8d3238c3d7a1ed3913fc64e924582553cea79afbf98f00d527aec0c7a0"
  },
  {
   "name": "bed_cover__201",
@@ -984,7 +1033,8 @@
    0.04,
    2.0
   ],
-  "bytes": 66976
+  "bytes": 66976,
+  "sha256": "ab4dffd69bf3aee75ab2a6823735fea9e623192a2f7a2cf60a7e2372f4a99d74"
  },
  {
   "name": "bed_cover__301",
@@ -1003,7 +1053,8 @@
    0.04,
    2.0
   ],
-  "bytes": 66976
+  "bytes": 66976,
+  "sha256": "caf32e2de88a465bb713db2df54574a99a0b148d4b388589e4e02f3578fee83f"
  },
  {
   "name": "curtain_pair",
@@ -1022,7 +1073,8 @@
    2.0,
    0.04
   ],
-  "bytes": 211784
+  "bytes": 211784,
+  "sha256": "46bf56fe5169ae52921876dd16a2264bac1d4dcab68ac2ae368708b077c149bc"
  },
  {
   "name": "curtain_pair__102",
@@ -1041,7 +1093,8 @@
    2.0,
    0.04
   ],
-  "bytes": 211796
+  "bytes": 211796,
+  "sha256": "664bcaea2aa1219373f635c9bdd69c667a5eb7f66247faa09abc9847e8352b3a"
  },
  {
   "name": "curtain_pair__202",
@@ -1060,7 +1113,8 @@
    2.0,
    0.04
   ],
-  "bytes": 211792
+  "bytes": 211792,
+  "sha256": "7fc9fd820ccdbefd04ff1bafd623e9f93672f8791443f94700f610382a4b0a5f"
  },
  {
   "name": "curtain_sheer",
@@ -1079,7 +1133,8 @@
    2.0,
    0.04
   ],
-  "bytes": 329840
+  "bytes": 329840,
+  "sha256": "16d2f74a37099164f380a6c4d10c2df7c39a9617fd8f58a0ef87d78c1680c766"
  },
  {
   "name": "curtain_sheer__115",
@@ -1098,7 +1153,8 @@
    2.0,
    0.04
   ],
-  "bytes": 221360
+  "bytes": 221360,
+  "sha256": "3cdddfe9c33862868c19884dac586a5141f552f558b42b738f4becefdea01c3e"
  },
  {
   "name": "curtain_sheer__302",
@@ -1117,7 +1173,8 @@
    2.0,
    0.04
   ],
-  "bytes": 329852
+  "bytes": 329852,
+  "sha256": "35ffa83199768abb605fd39fe4e2612d292415cea895611a36272210ba9e0755"
  },
  {
   "name": "curtain_sheer__901",
@@ -1136,7 +1193,8 @@
    2.0,
    0.03
   ],
-  "bytes": 201308
+  "bytes": 201308,
+  "sha256": "604c3ce055ada3d685f17fe42a435ca122b167c54fd9a4efc1e2a46c87fe8546"
  },
  {
   "name": "rug_rect",
@@ -1156,7 +1214,8 @@
    0.03,
    2.0
   ],
-  "bytes": 19520
+  "bytes": 19520,
+  "sha256": "04123c210ac57254e2111f28ea8c7301ed4c4e4748d0b6e9c975b30d5a24d844"
  },
  {
   "name": "rug_rect__103",
@@ -1176,7 +1235,8 @@
    0.03,
    2.0
   ],
-  "bytes": 19528
+  "bytes": 19528,
+  "sha256": "7a044bdb7fefcfd7fc5d03ad9cfe650c5ca27aada729529858ef253e92b3ff3d"
  },
  {
   "name": "rug_rect__203",
@@ -1196,7 +1256,8 @@
    0.02,
    1.9
   ],
-  "bytes": 19664
+  "bytes": 19664,
+  "sha256": "3e7a83b11b02b368891ee12c277a82be11f081ede488b730308c77795d036bf2"
  },
  {
   "name": "rug_round",
@@ -1216,7 +1277,8 @@
    0.02,
    1.0
   ],
-  "bytes": 47488
+  "bytes": 47488,
+  "sha256": "04e238522ef8f1a9795b76fa3532c450e1712a8cf696e44cb12e63cfa68f1898"
  },
  {
   "name": "rug_round__111",
@@ -1236,7 +1298,8 @@
    0.02,
    1.0
   ],
-  "bytes": 47500
+  "bytes": 47500,
+  "sha256": "78f9c5726101290e7b043b3f09121575347740cbd93da06f85062be80e469ba0"
  },
  {
   "name": "rug_round__211",
@@ -1256,7 +1319,8 @@
    0.02,
    1.2
   ],
-  "bytes": 47564
+  "bytes": 47564,
+  "sha256": "a81c688a6b1c33ce33df07f786c9ef1e5f1970c7b18539df63c93550e0bbf5b2"
  },
  {
   "name": "rug_round__311",
@@ -1276,7 +1340,8 @@
    0.03,
    1.0
   ],
-  "bytes": 52216
+  "bytes": 52216,
+  "sha256": "a0a78bf2658365ed8e38c7fdad6b3c35b0f762a2656e2aa8f8913d9fcda74185"
  },
  {
   "name": "rug_wave",
@@ -1295,7 +1360,8 @@
    0.02,
    1.85
   ],
-  "bytes": 111484
+  "bytes": 111484,
+  "sha256": "0860ad3a91ec5fe9a71354d85571bb5288017a13a36e68bc44bf7ffc7c44576f"
  },
  {
   "name": "cushion",
@@ -1314,7 +1380,8 @@
    0.15,
    0.45
   ],
-  "bytes": 35024
+  "bytes": 35024,
+  "sha256": "2319c20835d8664d12ff3f370eefb30de8425be9554e4101773fd199fca63818"
  },
  {
   "name": "cushion__107",
@@ -1333,7 +1400,8 @@
    0.15,
    0.45
   ],
-  "bytes": 35036
+  "bytes": 35036,
+  "sha256": "b706239c3bb65c7951e2eec0ace1c8929a43e38b38704922c2b6109df3b29773"
  },
  {
   "name": "cushion__207",
@@ -1352,7 +1420,8 @@
    0.15,
    0.45
   ],
-  "bytes": 35032
+  "bytes": 35032,
+  "sha256": "8a4643c5c22962ad6e2ad0c074edb27ec42a38c5ce0830cb7ae0ce3997014a9d"
  },
  {
   "name": "cushion__307",
@@ -1371,7 +1440,8 @@
    0.15,
    0.45
   ],
-  "bytes": 35032
+  "bytes": 35032,
+  "sha256": "395059e50b229a640deacf6b903c38c91641e74ea72ef62dedeee837e54d3a3f"
  },
  {
   "name": "tapestry",
@@ -1391,7 +1461,8 @@
    0.9,
    0.01
   ],
-  "bytes": 42524
+  "bytes": 42524,
+  "sha256": "f4b1e4e82d6d863aa72cab2d39a648055c7945021eb2989a25b46c3c1803ec2d"
  },
  {
   "name": "floor_lamp",
@@ -1412,7 +1483,8 @@
    1.4,
    0.25
   ],
-  "bytes": 43376
+  "bytes": 43376,
+  "sha256": "862d0026b8598fbdc250c7344ce677578c76db49e3cb0b8b7ec016acb1076763"
  },
  {
   "name": "floor_lamp_slim",
@@ -1432,7 +1504,8 @@
    1.2,
    0.2
   ],
-  "bytes": 29592
+  "bytes": 29592,
+  "sha256": "87f3f1a3eab417205ff0703e26ae993d23bd41e6b4132f77866540063a27b54b"
  },
  {
   "name": "floor_lamp_rattan",
@@ -1453,7 +1526,8 @@
    1.3,
    0.35
   ],
-  "bytes": 143424
+  "bytes": 143424,
+  "sha256": "d7cb3bfed2994b694c0cae38c408cea509d0eccb921dc9667b39262bd58afac1"
  },
  {
   "name": "floor_lamp_tripod",
@@ -1475,7 +1549,8 @@
    1.4,
    0.45
   ],
-  "bytes": 39860
+  "bytes": 39860,
+  "sha256": "44deabfe4f469811b5016506fdf1ddbc72b1c626cec6e89b32c47ea376cdc35a"
  },
  {
   "name": "floor_lamp_ball",
@@ -1495,7 +1570,8 @@
    1.3,
    0.3
   ],
-  "bytes": 66804
+  "bytes": 66804,
+  "sha256": "a5d38f1c274c9771417064c34344f27e60029bb338910470176abc8ff768a934"
  },
  {
   "name": "floor_lamp_pleated",
@@ -1516,7 +1592,8 @@
    1.4,
    0.3
   ],
-  "bytes": 48912
+  "bytes": 48912,
+  "sha256": "1a7bdaf98da885ee3b2771066d23368821f385c502ba8ec5d7e90ff00a06bef5"
  },
  {
   "name": "desk_lamp_clip",
@@ -1537,7 +1614,8 @@
    0.35,
    0.15
   ],
-  "bytes": 62036
+  "bytes": 62036,
+  "sha256": "dba69bb1cae9bac166aeb17f88d845226f470685427923b42bcac7bc022c448a"
  },
  {
   "name": "led_strip_segment",
@@ -1557,7 +1635,8 @@
    0.01,
    0.01
   ],
-  "bytes": 9792
+  "bytes": 9792,
+  "sha256": "1e1c7a4694462fd1b68248d8273799d38d64d79ffd38d124c0664b0cf8f49b51"
  },
  {
   "name": "candle",
@@ -1577,7 +1656,8 @@
    0.12,
    0.1
   ],
-  "bytes": 20008
+  "bytes": 20008,
+  "sha256": "d2b927db8413c62de7f30c0e9e9506f91d00138901a74c11903ed788e0f2dc49"
  },
  {
   "name": "plant_monstera",
@@ -1599,7 +1679,8 @@
    1.2,
    0.6
   ],
-  "bytes": 223116
+  "bytes": 223116,
+  "sha256": "93dfc27541f6638ecc260b4e0e68d181b9d673a4aa97db2d9ffca671d6a0f653"
  },
  {
   "name": "plant_eucalyptus",
@@ -1621,7 +1702,8 @@
    0.9,
    0.4
   ],
-  "bytes": 220736
+  "bytes": 220736,
+  "sha256": "c78854b502bc8208f4f3d25aa97de0b96b2d03b4074e66cd7e22126041f06c7c"
  },
  {
   "name": "small_plant",
@@ -1643,7 +1725,8 @@
    0.25,
    0.15
   ],
-  "bytes": 60572
+  "bytes": 60572,
+  "sha256": "34af9fa953b5a8e52ec5cd817d858c1bcca72bd675df81c608f10212f8b29c2d"
  },
  {
   "name": "wall_planter",
@@ -1665,7 +1748,8 @@
    0.6,
    0.15
   ],
-  "bytes": 307084
+  "bytes": 307084,
+  "sha256": "b94619f233747dd7fb71be7d605f7ee4a6101b7e5c626aaf2783233ba4a04b4f"
  },
  {
   "name": "wall_mirror",
@@ -1685,7 +1769,8 @@
    0.6,
    0.03
   ],
-  "bytes": 91392
+  "bytes": 91392,
+  "sha256": "6fadaa1067ee8bd4dc0c65a568cb5b62fdb7a1818fc0266d89d9cadf64eecaee"
  },
  {
   "name": "wall_art",
@@ -1706,7 +1791,8 @@
    0.4,
    0.02
   ],
-  "bytes": 35916
+  "bytes": 35916,
+  "sha256": "5a9aadcc9ae25be83cabf5fe9f32e6158339828632b16b79fca8043ed98ef180"
  },
  {
   "name": "monitor",
@@ -1726,6 +1812,7 @@
    0.4,
    0.18
   ],
-  "bytes": 18024
+  "bytes": 18024,
+  "sha256": "f750dd9554830e56758266e5c5630164e1164684df76e6d75ddf437a6842eb55"
  }
 ]
