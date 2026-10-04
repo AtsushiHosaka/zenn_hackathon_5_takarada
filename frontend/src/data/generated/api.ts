@@ -854,6 +854,12 @@ export interface components {
             status: "analyzing" | "ready" | "failed";
             /** @description status が ready になると入る */
             scene: components["schemas"]["Scene"] | null;
+            /**
+             * @description gemini: 写真を AI で解析した / mock: 写真か API キーが無く、決まった家具を置いたモック。解析が終わると入る
+             * @example gemini
+             * @enum {string|null}
+             */
+            analyzed_by: null | "gemini" | "mock";
             /** @example null */
             error_message: string | null;
             /** Format: date-time */
