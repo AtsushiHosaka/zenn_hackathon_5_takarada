@@ -33,7 +33,7 @@ gem "google-apis-iamcredentials_v1", "~> 0.20"
 gem "sidekiq"
 
 # 部屋の写真を縮小してから Gemini に送る (libvips を使う。Dockerfile で入れる)
-gem "ruby-vips", "~> 2.2"
+gem "ruby-vips", "~> 2.2", require: false # 使うとき (RoomAnalyzer::Gemini) に読み込む。libvips の無い CI でも起動できるように
 
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false
