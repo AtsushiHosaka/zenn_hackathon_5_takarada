@@ -1,0 +1,52 @@
+# インテリアリンク取得のモックデータ (InteriorLinks::MockClient)。本物の EC 連携ができたら不要になる。
+# 価格はダミー。url は MockClient が shop + query から EC の検索結果ページを組み立てる。
+#
+# themes: どのテーマで候補に出すか (oshi_purple / botanical / korean)
+# slot  : 置き場所の枠 (bed_cover / curtain / rug / wall_decor / light / display / cushion / desk_top)
+# size  : メートル (w: 幅, h: 高さ, d: 奥行き)。省略した商品はカテゴリの標準寸法で補う (InteriorLinks::Item)
+# 同じテーマ・枠の中では上にあるものほどおすすめ (予算に入らなければ次の候補が使われる)
+
+# --- 推し活パープル ---
+- { id: 101, themes: [oshi_purple], slot: bed_cover, category: bed_cover, name: ラベンダー 布団カバー3点セット シングル, price: 4980, shop: rakuten, query: ラベンダー 布団カバー シングル, color: "#b9a3e3", size: { w: 1.0, h: 0.04, d: 2.0 } }
+- { id: 102, themes: [oshi_purple], slot: curtain, category: curtain, name: パープル 遮光カーテン 2枚組, price: 3980, shop: amazon, query: パープル 遮光カーテン, color: "#8e6cc8", size: { w: 1.6, h: 2.0, d: 0.04 } }
+- { id: 115, themes: [oshi_purple], slot: curtain, category: curtain, name: ラベンダー レースカーテン, price: 1980, shop: rakuten, query: ラベンダー レースカーテン, color: "#d9cdf0" }
+- { id: 103, themes: [oshi_purple], slot: rug, category: rug, name: ラベンダー シャギーラグ 140×200, price: 5980, shop: rakuten, query: ラベンダー シャギーラグ 140×200, color: "#c9b6e4", size: { w: 1.4, h: 0.03, d: 2.0 } }
+- { id: 111, themes: [oshi_purple], slot: rug, category: rug, name: ラベンダー ラウンドラグ 直径100, price: 2980, shop: amazon, query: ラベンダー ラウンドラグ 100, color: "#cbb8ea", size: { w: 1.0, h: 0.02, d: 1.0 } }
+- { id: 104, themes: [oshi_purple], slot: wall_decor, category: wall_shelf, name: 推し活 ウォールシェルフ 3段 (祭壇用), price: 2980, shop: amazon, query: 推し活 ウォールシェルフ 祭壇, color: "#ffffff", size: { w: 0.6, h: 0.5, d: 0.12 } }
+- { id: 114, themes: [oshi_purple], slot: wall_decor, category: tapestry, name: 推し色 タペストリー (無地ラベンダー), price: 1980, shop: rakuten, query: タペストリー ラベンダー 無地, color: "#c3aee8", size: { w: 0.6, h: 0.9, d: 0.01 } }
+- { id: 105, themes: [oshi_purple], slot: light, category: floor_lamp, name: フロアライト 調光・カラー切替, price: 6980, shop: amazon, query: フロアライト カラー切替 RGB, color: "#a77ee0", size: { w: 0.25, h: 1.4, d: 0.25 } }
+- { id: 112, themes: [oshi_purple], slot: light, category: floor_lamp, name: LED スタンドライト スリム (パープル), price: 3480, shop: rakuten, query: LED スタンドライト スリム RGB, color: "#9b7ad6", size: { w: 0.2, h: 1.2, d: 0.2 } }
+- { id: 106, themes: [oshi_purple], slot: display, category: display_case, name: ガラスコレクションケース (アクスタ用), price: 8980, shop: rakuten, query: コレクションケース アクスタ ガラス, color: "#d9ccf0", size: { w: 0.4, h: 1.2, d: 0.3 } }
+- { id: 113, themes: [oshi_purple], slot: display, category: display_case, name: アクリル コレクションラック 3段, price: 3980, shop: amazon, query: アクリル コレクションラック 3段, color: "#e6def5", size: { w: 0.35, h: 0.9, d: 0.25 } }
+- { id: 107, themes: [oshi_purple], slot: cushion, category: cushion, name: 推しカラー クッション 2個セット, price: 1980, shop: amazon, query: 推しカラー クッション 紫, color: "#7b4fc4", size: { w: 0.45, h: 0.15, d: 0.45 } }
+- { id: 108, themes: [oshi_purple], slot: desk_top, category: acrylic_stand_case, name: アクスタ 収納ケース ひな壇, price: 1480, shop: amazon, query: アクスタ ひな壇 ケース, color: "#e8e0f5", size: { w: 0.3, h: 0.15, d: 0.15 } }
+
+# --- ボタニカル ---
+- { id: 201, themes: [botanical], slot: bed_cover, category: bed_cover, name: リネン調 布団カバー セージグリーン シングル, price: 5480, shop: rakuten, query: セージグリーン 布団カバー シングル, color: "#9cae8c", size: { w: 1.0, h: 0.04, d: 2.0 } }
+- { id: 202, themes: [botanical], slot: curtain, category: curtain, name: リーフ柄 カーテン 2枚組, price: 4480, shop: amazon, query: リーフ柄 カーテン, color: "#c8d6b4", size: { w: 1.6, h: 2.0, d: 0.04 } }
+- { id: 203, themes: [botanical], slot: rug, category: rug, name: ジュート風 ラグ 130×190, price: 4980, shop: rakuten, query: ジュート ラグ 130×190, color: "#cdb58a", size: { w: 1.3, h: 0.02, d: 1.9 } }
+- { id: 211, themes: [botanical], slot: rug, category: rug, name: グリーン 円形ラグ 直径120, price: 3480, shop: amazon, query: グリーン ラウンドラグ 120, color: "#9fb48d", size: { w: 1.2, h: 0.02, d: 1.2 } }
+- { id: 204, themes: [botanical], slot: wall_decor, category: wall_planter, name: 壁掛け フェイクグリーン ハンギング, price: 2480, shop: amazon, query: フェイクグリーン 壁掛け, color: "#5f8a4f", size: { w: 0.5, h: 0.6, d: 0.15 } }
+- { id: 214, themes: [botanical], slot: wall_decor, category: wall_art, name: ボタニカル アートポスター 2枚組, price: 1980, shop: amazon, query: ボタニカル ポスター, color: "#e8eadc", size: { w: 0.5, h: 0.4, d: 0.02 } }
+- { id: 205, themes: [botanical], slot: light, category: floor_lamp, name: ラタン フロアランプ, price: 7980, shop: rakuten, query: ラタン フロアランプ, color: "#c49a5e", size: { w: 0.35, h: 1.3, d: 0.35 } }
+- { id: 212, themes: [botanical], slot: light, category: floor_lamp, name: 木製 三脚フロアライト, price: 4980, shop: amazon, query: 三脚 フロアライト 木製, color: "#b08960", size: { w: 0.45, h: 1.4, d: 0.45 } }
+- { id: 206, themes: [botanical], slot: display, category: plant, name: フェイクグリーン 観葉植物 120cm (モンステラ), price: 6980, shop: amazon, query: フェイクグリーン モンステラ 120cm, color: "#3f7a3a", size: { w: 0.6, h: 1.2, d: 0.6 } }
+- { id: 213, themes: [botanical], slot: display, category: plant, name: フェイクグリーン ユーカリ 90cm, price: 3980, shop: rakuten, query: フェイクグリーン ユーカリ 90cm, color: "#7d9c7a", size: { w: 0.4, h: 0.9, d: 0.4 } }
+- { id: 207, themes: [botanical], slot: cushion, category: cushion, name: ボタニカル柄 クッションカバー 2枚, price: 1780, shop: amazon, query: ボタニカル クッションカバー, color: "#7c9a6a", size: { w: 0.45, h: 0.15, d: 0.45 } }
+- { id: 208, themes: [botanical], slot: desk_top, category: small_plant, name: 卓上 ミニ観葉植物 (フェイク), price: 980, shop: rakuten, query: 卓上 フェイクグリーン ミニ, color: "#4f8a45", size: { w: 0.15, h: 0.25, d: 0.15 } }
+
+# --- 韓国風 ---
+- { id: 301, themes: [korean], slot: bed_cover, category: bed_cover, name: ワッフル 布団カバー アイボリー シングル, price: 5980, shop: rakuten, query: ワッフル 布団カバー アイボリー シングル, color: "#efe6d8", size: { w: 1.0, h: 0.04, d: 2.0 } }
+- { id: 302, themes: [korean], slot: curtain, category: curtain, name: シアー カーテン ベージュ 2枚組, price: 3480, shop: amazon, query: シアーカーテン ベージュ, color: "#e6d9c4", size: { w: 1.6, h: 2.0, d: 0.04 } }
+- { id: 303, themes: [korean], slot: rug, category: rug, name: ウェーブ ラグ くすみベージュ 130×185, price: 5480, shop: rakuten, query: ウェーブ ラグ ベージュ 韓国, color: "#d8c3a5", size: { w: 1.3, h: 0.02, d: 1.85 } }
+- { id: 311, themes: [korean], slot: rug, category: rug, name: ふわふわ ラウンドラグ アイボリー 直径100, price: 2480, shop: amazon, query: ラウンドラグ アイボリー ふわふわ, color: "#f2ece2", size: { w: 1.0, h: 0.03, d: 1.0 } }
+- { id: 304, themes: [korean], slot: wall_decor, category: wall_mirror, name: ウェーブミラー 壁掛け, price: 3980, shop: amazon, query: ウェーブミラー 壁掛け, color: "#e9e4dc", size: { w: 0.4, h: 0.6, d: 0.03 } }
+- { id: 305, themes: [korean], slot: light, category: floor_lamp, name: ボール型 フロアライト, price: 5980, shop: rakuten, query: ボール フロアライト 韓国インテリア, color: "#f6efe3", size: { w: 0.3, h: 1.3, d: 0.3 } }
+- { id: 312, themes: [korean], slot: light, category: floor_lamp, name: プリーツ フロアランプ, price: 4480, shop: amazon, query: プリーツ フロアランプ, color: "#efe3cf" }
+- { id: 306, themes: [korean], slot: display, category: side_table, name: ラウンド サイドテーブル アイボリー, price: 3980, shop: amazon, query: サイドテーブル アイボリー 韓国インテリア, color: "#eee6d6", size: { w: 0.4, h: 0.5, d: 0.4 } }
+- { id: 307, themes: [korean], slot: cushion, category: cushion, name: ブークレ クッション 2個セット, price: 2480, shop: amazon, query: ブークレ クッション, color: "#f1ebe1", size: { w: 0.45, h: 0.15, d: 0.45 } }
+- { id: 308, themes: [korean], slot: desk_top, category: candle, name: キャンドル 2個セット, price: 1280, shop: rakuten, query: キャンドル 韓国インテリア, color: "#f3e7d3", size: { w: 0.1, h: 0.12, d: 0.1 } }
+
+# --- 複数テーマで使えるもの ---
+- { id: 901, themes: [botanical, korean], slot: curtain, category: curtain, name: ホワイト シアーカーテン 2枚組, price: 1980, shop: amazon, query: ホワイト シアーカーテン, color: "#f5f3ee", size: { w: 1.0, h: 2.0, d: 0.03 } }
+- { id: 902, themes: [oshi_purple, botanical, korean], slot: desk_top, category: desk_lamp, name: クリップライト 3色調光, price: 1780, shop: amazon, query: クリップライト 調光, color: "#f0f0f0", size: { w: 0.15, h: 0.35, d: 0.15 } }
