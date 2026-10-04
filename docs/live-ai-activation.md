@@ -1,48 +1,48 @@
-# 本番AIの最小設定と確認
+# 既存Gemini設定の経路と互換性
 
-2026-10-04の安全なCloud Run設定確認では、API revision `zenn-hackathon-api-00011-hlx` がtraffic100%。`GEMINI_API_KEY` / `GEMINI_MODEL` / `GEMINI_THINKING_LEVEL` はいずれも未設定。統合PR #18の実公開接続と3Dは確認済みだが、実AI生成は未確認で、現状はmockが選ばれる。
+2026-10-04、本人はチームメンバーの既存Geminiキーを使う意図を明示した。新しいキー入力・Secret・IAMの提案は取り下げ、既存設定の所在と実行時の状態を先に確認する。Cloud Run revisionのenv名にキーがないことだけで、チームのキーや実行時のキーが存在しないとは扱わない。
 
-根拠は本人の「既存backend/infraを確認して接続・検証・公開」依頼とlive設定metadata。Google Docs URLは `docs/project.md` が空欄のため未確認・未反映。
+根拠は本人の訂正、PR #14 / #15の実AI検証記録と既存ソース。Google Docs URLは `docs/project.md` が空欄のため未確認・未反映。
 
-## 本人が承認する最小範囲
+## ソースで確認できた設定経路
 
-この変更のbackendがCI・deployを通り、Room ownerによるallowlist判定が動くrevisionになってからキー参照を有効にする。PR #18時点のbackendにはこのallowlistがないため、環境変数だけを先に追加しない。
+- [PR #14](https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/pull/14) はチームの `backend/.env` をapiとworkerへ渡し、写真解析が `analyzed_by=gemini` となった検証を記録している。[PR #15](https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/pull/15) も同じ既存設定で実AI家具提案を検証している。両PRには、その時点の本番キーは未設定でmockという記録もある。ローカル実AIの成功と本番への設定継承を区別する。
+- `compose.override.yaml` は `backend/.env` をapiとworkerへ注入する。Railsのdotenv loaderはなく、GeminiClientは `ENV["GEMINI_API_KEY"]` だけを読む。Rails Credentials、別名キー、Vertex/ADCへのフォールバックは実装されていない。ADCはGCS/signBlobで使われる。
+- 通常のCI buildは `backend/.dockerignore` で `.env` を除外し、DockerfileにもGeminiのENV/ARGや起動時のenv読込はない。GitHub deployは既存Cloud Runのimageを更新する。これは標準のソース経路の確認であり、稼働imageの内容や実行時envを確認したことにはならない。
+- Webは同一オリジン `/api` をserver側の `API_UPSTREAM_ORIGIN` へ中継する。2026-10-04に認証済みownerがCloud Run API v2のservice metadataで、numeric `zenn-hackathon-api-262220651661.asia-northeast1.run.app` とhash `zenn-hackathon-api-55ceumihtq-an.a.run.app` の両URLが同じサービスのurlsに含まれることを確認した。別名へのJWT送信は行っていない。
 
-- 同じGCP project `zenn-hackathon-takarada` に既にあるGeminiキーのSecret IDと固定versionを指定する。キーの値はチャット・Git・Terraformへ渡さない。既存Secretがなければ、本人が安全なSecret Manager入力画面で値を登録する。新規キー作成・Secret作成の費用と権限は別途具体確認する。
-- 指定Secret1つに対する既存APIサービスアカウントの `roles/secretmanager.secretAccessor`。liveのSA名・指定Secret/version・既存IAMは現時点で未確認なので、実行直前にmetadataで確定し、具体的な対象を本人へ提示する。既存許可はこの設定で管理・削除しない。許可がなく今回の新規付与が承認された場合だけ `gemini_grant_secret_access=true` で追加する。Terraform定義上このSAは既存DBタスクとも共有しているため、IAMの読み取り能力も共有されるが、キーのenv参照はAPIにだけ追加する。新しいSA・project全体のrole・公開IAMは追加しない。
-- 既存APIだけにSecret参照env `GEMINI_API_KEY`、モデル `GEMINI_MODEL=gemini-3.1-flash-lite` を追加し、新revisionのhealthを確認する。thinking levelは既定値を維持、必要な場合だけ明示設定する。Web・DB・Miniへキーを渡さない。
-- 実AIを使える部屋ownerを、管理下の使い捨て検証アカウント1件のIDへ限定する。`gemini_allowed_user_ids` が空なら全員mock、指定ID以外もmock。本番でallowlist envが未設定でもmockを選び、キー追加だけで一般AIを有効にしない。判定に使うIDはサーバー側のRoom ownerで、requestの任意IDは使わない。
-- 検証は合成room画像1枚の写真解析1操作と、短い希望文からのcoordination1操作。ユーザー写真は使わない。内部retry最大3attempt/操作なので最大6HTTPモデルcall、各操作の総期限90秒。これは管理下の検証操作の上限で、アプリ全体の金額制限・操作回数quotaではない。検証者が操作を2回に限定し、試験終了後にallowlistとキー参照を戻す。モデル追加比較や多件数生成をしない。
-- 既定モデルでの試験予算上限案は税込USD3。既存free/paid tier、税、残予算、実モデルを本人と確認してから実行する。tierを新規有料へ変更したり、支払い情報を追加したりする操作はこの設定に含めない。
-- 一般ユーザー向け実AIは別の承認範囲。`gemini_allow_all_users=true` を明示設定するまで有効にしない。これは継続費用を伴い、今回のUSD3検証予算では上限を保証しない。現アプリには利用者別quotaや総課金上限はない。
+## allowlist未指定時の互換性修正
 
-## 秘密値を扱わないTerraform設定
+PR #15はキーがありtest以外なら実AIを使う。PR #19で追加したallowlistは、未指定のproductionでもmockに切り替えていた。本人が求めていない既存キーの無効化を避けるため、allowlistが明示された場合だけ制限する。
 
-`gemini_api_key_secret_id` が空の既定状態では、Gemini envも権限も追加しない。指定時は既存Secretを参照するだけで、Secret本体やversion/payloadは作らず、値をTerraform stateへ持ち込まない。
+| キー / 環境 | GEMINI_ALLOWED_USER_IDS | 判定 |
+| --- | --- | --- |
+| キーあり、test以外 | 未指定 | PR #15と同じ既存キー判定で実AI |
+| キーあり、test以外 | 明示した空文字 | 全ownerがmock |
+| キーあり、test以外 | owner IDのリスト | 一致するserver側Room ownerだけ実AI |
+| キーあり、test以外 | 明示した `*` | 既存の明示的wildcard動作を維持 |
+| キーなし、またはtest | 任意 | mock |
 
-```hcl
-# 例。実際に存在・有効性を確認したID/versionへ置き換える。
-gemini_api_key_secret_id      = "existing-gemini-api-key"
-gemini_api_key_secret_version = "1"
-gemini_model                  = "gemini-3.1-flash-lite"
-gemini_allowed_user_ids       = [123] # 作成した使い捨てownerの実ID
-gemini_allow_all_users        = false
-# gemini_grant_secret_access  = true  # 新規grantが必要・承認済みの場合だけ
-# gemini_thinking_level       = "low" # 本人が明示選択した場合だけ
+リクエストの任意user IDで判定しない。ownerによるアクセス分離、生成期限90秒と既存の最大3attemptは維持する。この修正は環境変数の設定や `*` の有効化を含まない。
+
+## 実行時の読み取り確認
+
+既存APIとDB jobのimmutable image、command、args、env参照、volume/startup設定を秘密値なしで比較する。imageが一致してもjobとAPIのenvやcommandが異なる場合、jobで得た結果をAPIの証明として扱わない。
+
+既存jobの実行だけをoverrideして使う場合、Rails runnerの出力は次の3つのbooleanに限定する。DB query、モデル呼出、キーの値・長さ・末尾・hashは出力しない。
+
+```ruby
+puts JSON.generate(
+  "key_present" => ENV["GEMINI_API_KEY"].present?,
+  "allowed_present" => ENV.key?("GEMINI_ALLOWED_USER_IDS"),
+  "production" => Rails.env.production?
+)
 ```
 
-承認前はapplyしない。既存state/認証を持つowner環境で、まず既存Secretの名前・有効version・IAMだけをreadする（payloadへaccessしない）。既存IAM memberをこの設定へimportせず保持し、planは今回新設する指定Secretの読み取りmember（必要な場合だけ）とAPI env以外に影響しないことを確認する。既存imageの巻戻しやDB/他Secret/バケットIAM変更が含まれる場合はそのplanを実行しない。
+API runtimeに対応する結果が `key_present=true, allowed_present=false, production=true` なら、PR #19の未指定時mock条件に該当する。それ以外では、env名の不在だけから原因を断定しない。MiniにはGCP認証がないため、この実行は既存認証owner側で行う。repoの `task.sh` はjob定義を更新するため読み取り確認には使わない。
 
-通常GitHub deployはimage更新だけで、これらのTerraform変数をapplyしない。設定PRをマージしただけでは本番AIが有効になったとは扱わない。APIのinline生成にキーを渡すため、DBタスクのenvやworkerを新設する必要はない。別環境でworkerを使用する場合はそのworkerにも同じ承認済み参照を明示する必要がある。
+## 適用と残確認
 
-## 費用の根拠
+修正はdraft PRで独立レビューと既存CIを通し、runtime確認と合わせて適用を判断する。現時点ではmerge/deployしない。7例の既存RSpecによる回帰テストは、親から必要性が合意された未指定production判定と、明示制限・test・キーなしの条件を確認し、実Geminiを呼ばない。
 
-[公式料金](https://ai.google.dev/gemini-api/docs/pricing)のstandard Gemini 3.1 Flash-Liteはtext/image入力$0.25 / 100万token、thinking込み出力$1.50 / 100万token。[公式モデル上限](https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite)は入力1,048,576、出力65,536 token。[Interactions API対応モデル一覧](https://ai.google.dev/gemini-api/docs/interactions-overview)にこのモデルが含まれる。料金・対応は2026-10-04に確認。
-
-6attemptがすべてtoken上限を使う保守的なtoken料金計算は `6 × (1,048,576 × $0.25 + 65,536 × $1.50) / 1,000,000 = $2.162688`。短文と合成画像1枚の実利用はこれより少ない見込みだが、請求額を断定しない。liveモデルが異なる場合は再計算し、同じ上限を使い回さない。画像生成・検索grounding等の別サービスは呼ばない。
-
-## 成功とロールバック
-
-API health200、指定revision/traffic/env参照を確認後、使い捨て所有者アカウントで写真signed PUT→room `ready` / `analyzed_by=gemini`→coordination `done` / `planned_by=gemini` を確認する。GCSモデルURL、予算内item合計、既存家具の編集位置を維持していること、他owner404も確認し、検証アカウントと写真をcleanupする。mock・failed・timeoutでは実AI成功としない。
-
-緊急停止はまず直前のキーなしAPI revisionへtrafficを戻し、API healthとmock表示を確認する。traffic復帰だけでは新revisionの設定・IAMは残るため、その後 `gemini_api_key_secret_id` とallowlistを空へ戻したplanを確認して設定を戻す。今回新設したgrantだけを削除し、元からあるgrantとSecret payloadは保持する。公開domain/DNS/TLS/GCS CORSは別の承認済み変更範囲として扱い、この設定に含めない。
+新しいSecret、キー入力、IAM grant、envの追加、一般利用の `*` 変更は行わない。合成画像解析1回と家具提案1回・最大US$3という限定試験の承認は、これらの新設定や無制限の生成を許可するものではない。実AI試験は既存キー経路と実モデルを確認してから既存の上限内で判断する。
