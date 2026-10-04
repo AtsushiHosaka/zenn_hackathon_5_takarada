@@ -13,8 +13,8 @@ class CoordinationPlanner
   SLOT_PRIORITY = InteriorLinks::SLOTS
 
   # kept_objects: 活かす家具 (Scene の object)。部屋の雰囲気に合わせて選ぶのに使う
-  def self.call(prompt:, budget:, room:, kept_objects:)
-    planner = GeminiClient.configured? ? Gemini : Mock
+  def self.call(prompt:, budget:, room:, kept_objects:, user_id: nil)
+    planner = GeminiClient.configured?(user_id:) ? Gemini : Mock
     planner.new(prompt:, budget:, room:, kept_objects:).plan
   end
 end

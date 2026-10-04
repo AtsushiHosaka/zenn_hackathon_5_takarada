@@ -52,3 +52,14 @@ resource "google_secret_manager_secret_iam_member" "api" {
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.api.email}"
 }
+
+# 既存Secretへの参照だけを管理する。Geminiキーの値・Secret本体・versionは作らず、
+# 指定された1つのSecretにだけ既存APIアカウントの読み取りを許可する。
+resource "google_secret_manager_secret_iam_member" "gemini_api" {
+  count = var.gemini_api_key_secret_id != "" && var.gemini_grant_secret_access ? 1 : 0
+
+  project   = var.project_id
+  secret_id = var.gemini_api_key_secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.api.email}"
+}

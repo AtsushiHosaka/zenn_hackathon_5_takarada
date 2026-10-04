@@ -86,12 +86,12 @@ Serverless VPC コネクタと常時稼働の worker も要るので、月 ¥8,0
 同期実行している。ローカルの `compose.yaml` は今も redis と worker を立てるので、
 開発側は本物の非同期で動く。
 
-今のジョブ (`AnalyzeRoomJob` / `GenerateCoordinationJob`) は外部呼び出しの無い
-純粋な計算でミリ秒で終わるので、これで困らない。`status` をポーリングする API 契約も
-壊れない (即 `ready` / `done` になるだけ)。
+`AnalyzeRoomJob` / `GenerateCoordinationJob` はキー未設定ならmock、設定時はGeminiを呼ぶ。
+Geminiは再試行込み90秒、Web nginxは115秒、ブラウザは120秒の期限を持つ。
+`status` をポーリングするAPI契約は維持しているが、本番inlineではPOST自体が処理を待つ。
 
-**`RoomAnalyzer` / `CoordinationBuilder` を LLM に差し替えるときは要再検討。**
-リクエストが待たされて Cloud Run のタイムアウト (300s) に当たる。移行先の候補:
+**長い生成や同時利用が増えたときは要再検討。**
+現在の期限内に終わらない処理を増やす場合の移行先の候補:
 
 - **Cloud Tasks** … ゼロスケールのまま本当の非同期になり、タスクの実行時間は最大 30 分。
   月 100 万タスクまで無料。`perform_later` を Cloud Tasks への enqueue に替え、
@@ -102,6 +102,14 @@ Serverless VPC コネクタと常時稼働の worker も要るので、月 ¥8,0
 **秘密の値。** `SECRET_KEY_BASE` / JWT 鍵 / DB パスワードは terraform が生成して
 Secret Manager に入れ、Cloud Run が環境変数として読む。`terraform.tfstate` には
 平文で入るのでコミットしない (`.gitignore` 済み)。
+
+**Geminiキー。** 既定では本番へ渡さない。`gemini_api_key_secret_id` と固定versionを指定した場合だけ、
+同じproject内の既存SecretをAPI envで参照する。今回新規に読み取りを付与するときだけ
+`gemini_grant_secret_access=true` を指定し、既存grantは管理・削除しない。
+`gemini_allowed_user_ids` の検証ownerだけ実AIを使え、空なら全員mock。
+一般利用のAIは別途承認して `gemini_allow_all_users=true` を指定する。キーの値はTerraformへ入力せず、
+WebやDBタスクのenvへ渡さない。モデル・費用・本人の最終確認は
+[本番AIの最小設定](../../docs/live-ai-activation.md)を参照。
 
 ## お金
 

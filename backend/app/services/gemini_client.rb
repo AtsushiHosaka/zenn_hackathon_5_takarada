@@ -19,8 +19,15 @@ class GeminiClient
   Response = Data.define(:json, :model, :thinking_level, :usage, :elapsed)
 
   # テストでは本物の Gemini を呼ばない (手元の backend/.env にキーがあってもモックで動かす)
-  def self.configured?
-    ENV["GEMINI_API_KEY"].present? && !Rails.env.test?
+  # Secretを限定検証するときは、サーバーが持つ部屋のowner IDだけで判定する。
+  # 未設定は本番mock・従来のローカル動作、空は全員mock、*は一般利用の明示許可。
+  def self.configured?(user_id: nil)
+    return false unless ENV["GEMINI_API_KEY"].present? && !Rails.env.test?
+
+    allowed = ENV["GEMINI_ALLOWED_USER_IDS"]
+    return !Rails.env.production? if allowed.nil?
+
+    allowed == "*" || (user_id.present? && allowed.split(",").map(&:strip).include?(user_id.to_s))
   end
 
   def initialize(api_key: ENV.fetch("GEMINI_API_KEY"), model: ENV["GEMINI_MODEL"].presence || DEFAULT_MODEL,
