@@ -27,7 +27,6 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
     demo: createDemoRoom,
     async analyze(input, signal) {
       if (config.contract === "legacy") throw new DomainError("この接続先では畳数による部屋解析を利用できません");
-      if (config.contract === "coordination") validateCoordinationInput(input);
       const design = await createApiRoomRepository(api, { ...config, contract: "analysis" }, baseUrl).generate(input, signal);
       return { ...design, prompt: input.prompt.trim() || undefined, budget: input.budget, keptObjectIds: design.items.filter(item => item.existing).map(item => item.id) };
     },
@@ -37,7 +36,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
         coordination: config.contract !== "analysis",
         input: config.contract === "legacy" ? "photos" : "dimensions",
         photos: config.contract === "legacy" || Boolean(config.uploadsPath),
-        message: config.generationPath ? config.contract === "analysis" ? "畳数と部屋の形から、APIの解析モックで部屋を作成します。写真・希望文の解析や商品提案は行いません。" : config.contract === "coordination" ? "部屋解析と商品提案のAPIモックを使います。写真解析とAI生成は未接続で、商品価格は参考値です。" : "設定された生成APIへ写真を送信します。" : unavailableMessage,
+        message: config.generationPath ? config.contract === "analysis" ? "畳数と部屋の形から、APIの解析モックで部屋を作成します。写真・希望文の解析や商品提案は行いません。" : config.contract === "coordination" ? "写真を付けると、AI (Gemini) が部屋の色・窓・家具を読み取ります。希望文に合う商品もAIが選びます。サーバーにAPIキーが無いときはモックで動きます。商品価格は参考値です。" : "設定された生成APIへ写真を送信します。" : unavailableMessage,
       };
     },
     async generate(input, signal) {
@@ -139,7 +138,7 @@ function dimensionRequest(input: GenerateRoomInput): components["schemas"]["Room
 }
 
 // 写真はAPIを通さずGCSへ直接送り、得たkeyだけをPOST /roomsに渡す。
-// 写真は任意 (backendのphoto_keysも任意で、解析は今も畳数と部屋の形から作るモック)
+// 写真は任意 (backend の photo_keys も任意。写真があれば Gemini で解析し、無ければ畳数と部屋の形から作るモック)
 async function withPhotoKeys(api: ApiClient, config: RoomApiConfig, body: components["schemas"]["RoomInput"], photos: File[], signal: AbortSignal): Promise<components["schemas"]["RoomInput"]> {
   if (!config.uploadsPath || photos.length === 0) return body;
 

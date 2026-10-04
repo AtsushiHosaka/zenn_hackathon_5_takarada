@@ -118,6 +118,36 @@ RSpec.configure do |config|
             },
             required: %w[w h d]
           },
+          FurnitureModelBinding: {
+            type: :object,
+            properties: {
+              kind: { type: :string, enum: %w[existing product], example: "existing" },
+              reference: { type: :string, description: "既存家具の object ID または商品の ID", example: "bed-1" }
+            },
+            required: %w[kind reference]
+          },
+          FurnitureModel: {
+            type: :object,
+            properties: {
+              id: { type: :string, description: "安定 ID。GLB ファイル名から拡張子を除いた値", example: "bed_single" },
+              name: { type: :string, example: "シングルベッド" },
+              category: { type: :string, example: "bed" },
+              shape: { type: :string, example: "bed_single" },
+              variant: { type: :string, nullable: true, example: nil },
+              format: { type: :string, enum: %w[glb], example: "glb" },
+              object_key: { type: :string, description: "公開ベース URL からの相対 GCS オブジェクトパス", example: "furniture/bed_single.glb" },
+              size: { "$ref" => "#/components/schemas/Size" },
+              unit: { type: :string, enum: %w[meter], example: "meter" },
+              axes: { type: :string, enum: [ "+Y up, +Z front, origin bottom center" ], example: "+Y up, +Z front, origin bottom center" },
+              triangle_count: { type: :integer, minimum: 0, example: 1200 },
+              byte_size: { type: :integer, minimum: 1, example: 48000 },
+              sha256: { type: :string, pattern: "^[0-9a-f]{64}$", example: "a" * 64 },
+              materials: { type: :array, items: { type: :string }, example: [ "wood", "fabric" ] },
+              model_url: { type: :string, nullable: true, description: "GCS の公開 GLB URL。ベース URL が未設定なら null", example: nil },
+              bindings: { type: :array, items: { "$ref" => "#/components/schemas/FurnitureModelBinding" } }
+            },
+            required: %w[id name category shape variant format object_key size unit axes triangle_count byte_size sha256 materials model_url bindings]
+          },
           Position: {
             type: :object,
             description: "物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き",
@@ -200,8 +230,8 @@ RSpec.configure do |config|
           Upload: {
             type: :object,
             properties: {
-              key: { type: :string, description: "POST /api/v1/rooms の photo_keys に渡す", example: "photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg" },
-              upload_url: { type: :string, description: "この URL へ写真を PUT する。Content-Type だけを付け、他のヘッダは足さない (署名と食い違うと 403)", example: "https://storage.googleapis.com/example-uploads/photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256" }
+              key: { type: :string, description: "POST /api/v1/rooms の photo_keys に渡す", example: "photos/users/1/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg" },
+              upload_url: { type: :string, description: "この URL へ写真を PUT する。Content-Type だけを付け、他のヘッダは足さない (署名と食い違うと 403)", example: "https://storage.googleapis.com/example-uploads/photos/users/1/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256" }
             },
             required: %w[key upload_url]
           },
@@ -294,10 +324,11 @@ RSpec.configure do |config|
               after_scene: { allOf: [ { "$ref" => "#/components/schemas/Scene" } ], nullable: true, description: "status が done になると入る" },
               items: { type: :array, items: { "$ref" => "#/components/schemas/CoordinationItem" }, description: "購入リンク一覧。after_scene の suggested と marker で対応する" },
               total_price: { type: :integer, nullable: true, example: 26_840 },
+              planned_by: { type: :string, nullable: true, enum: [ nil, "gemini", "mock" ], description: "gemini: 要望文から AI が商品を選んだ / mock: キーワードでテーマを決めたモック。生成が終わると入る", example: "gemini" },
               error_message: { type: :string, nullable: true, example: nil },
               created_at: { type: :string, format: "date-time" }
             },
-            required: %w[id room_id status prompt budget kept_object_ids title comment before_scene after_scene items total_price error_message created_at]
+            required: %w[id room_id status prompt budget kept_object_ids title comment before_scene after_scene items total_price planned_by error_message created_at]
           }
         }
       }

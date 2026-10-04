@@ -25,6 +25,8 @@ end
 
 # 部屋。写真の解析結果 (シーン) を jsonb で持つ。形は swagger の Scene
 create_table "rooms", force: :cascade do |t|
+  # Legacy anonymous rooms remain unassigned and are not exposed by authenticated APIs.
+  t.references "user", null: true, foreign_key: true
   t.decimal "tatami", precision: 4, scale: 1, null: false
   t.string "shape", null: false, default: "standard" # 既存行の補完用。API では必須 (Room モデル参照)
   t.string "status", null: false, default: "analyzing"
@@ -51,7 +53,47 @@ create_table "coordinations", force: :cascade do |t|
   t.jsonb "after_scene"
   t.jsonb "items", null: false, default: []
   t.integer "total_price"
+  t.string "planned_by" # gemini: 要望文から AI が商品を選んだ / mock: キーワードでテーマを決めたモック
+  t.jsonb "analysis" # 精度の確認用: Gemini の回答・モデル・時間・トークン数・採用した商品 (API には出さない)
   t.text "error_message"
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
+end
+
+# GLB 本体は GCS に置き、DB には検索・描画に必要なメタデータを持つ
+create_table "furniture_models", force: :cascade do |t|
+  t.string "key", null: false
+  t.string "name", null: false
+  t.string "category", null: false
+  t.string "shape", null: false
+  t.string "variant"
+  t.string "format", null: false, default: "glb"
+  t.string "object_key", null: false
+  t.decimal "width", precision: 10, scale: 6, null: false
+  t.decimal "height", precision: 10, scale: 6, null: false
+  t.decimal "depth", precision: 10, scale: 6, null: false
+  t.integer "triangle_count", null: false
+  t.bigint "byte_size", null: false
+  t.string "sha256", null: false
+  t.jsonb "materials", null: false, default: []
+  t.boolean "enabled", null: false, default: true
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+
+  t.index [ "key" ], unique: true
+  t.check_constraint "width > 0::numeric AND width < 10000::numeric AND height > 0::numeric AND height < 10000::numeric AND depth > 0::numeric AND depth < 10000::numeric", name: "furniture_models_positive_dimensions"
+  t.check_constraint "triangle_count >= 0 AND byte_size > 0", name: "furniture_models_valid_counts"
+  t.check_constraint "format::text = 'glb'::text", name: "furniture_models_glb_format"
+end
+
+# 認識済み家具 ID / 商品 ID とモデルを明示的に対応させる
+create_table "furniture_model_bindings", force: :cascade do |t|
+  t.references "furniture_model", null: false, foreign_key: true
+  t.string "kind", null: false
+  t.string "reference", null: false
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+
+  t.index [ "kind", "reference" ], unique: true
+  t.check_constraint "kind::text = ANY (ARRAY['existing'::character varying::text, 'product'::character varying::text])", name: "furniture_model_bindings_valid_kind"
 end

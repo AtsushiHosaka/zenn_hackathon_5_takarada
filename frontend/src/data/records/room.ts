@@ -40,6 +40,8 @@ export function toCoordinationRecord(value: unknown): CoordinationRecord {
     after_scene: record.after_scene === null ? null : analysisScene(record.after_scene),
     items: record.items.map(coordinationItem),
     total_price: totalPrice,
+    // 商品の選び方 (gemini: 要望文から AI が選んだ / mock: モック) は古い API では返らない
+    planned_by: record.planned_by === "gemini" || record.planned_by === "mock" ? record.planned_by : null,
     error_message: nullableText(record.error_message, "Coordination.error_message"),
     created_at: createdAt,
   };
@@ -66,7 +68,8 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     kind: "coordination",
     id: `api-coordination-${record.id}`,
     title: record.title,
-    description: `${record.comment} 写真解析とAI生成は未接続のモックです。商品価格は参考値です。`,
+    description: record.planned_by === "gemini" ? `${record.comment} 商品価格は参考値です。` : `${record.comment} 希望文の解析とAI生成は行っていないモックです。商品価格は参考値です。`,
+    ...(record.planned_by ? { generatedBy: record.planned_by } : {}),
     style: record.title === "ラベンダーの推し活ルーム" ? "oshi" : record.title === "グリーンが映えるボタニカルルーム" ? "botanical" : "natural",
     ...after,
     items: after.items.map(item => {
@@ -108,6 +111,7 @@ function sceneSnapshot(scene: components["schemas"]["Scene"], baseUrl: string): 
       size: [item.size.w, item.size.h, item.size.d],
       rotation: item.rotation_y,
       marker: item.marker ?? undefined,
+      productId: item.item_id === null ? undefined : String(item.item_id),
       modelUrl: url(item.model_url, baseUrl),
     })),
   };
@@ -178,7 +182,10 @@ export function toAnalyzedRoomDesign(value: unknown, baseUrl: string): RoomDesig
     kind: "analysis",
     id: `api-room-${record.id}`,
     title: `${record.tatami}畳の部屋`,
-    description: "畳数と形から作成した部屋の解析モックです。写真や希望文の解析は行っていません。",
+    description: record.analyzed_by === "gemini"
+      ? "写真をAI (Gemini) で解析し、家具の種類・色・おおよその位置を読み取りました。部屋の寸法は畳数と形から作っています。"
+      : "畳数と形から作成した部屋の解析モックです。写真の解析は行っていません。",
+    ...(record.analyzed_by ? { generatedBy: record.analyzed_by } : {}),
     style: "natural",
     wallColor: room.wall_color,
     room: { width: room.width, depth: room.depth, height: room.height, floorColor: room.floor_color, windows: room.windows },
@@ -193,6 +200,7 @@ export function toAnalyzedRoomDesign(value: unknown, baseUrl: string): RoomDesig
       position: [item.position.x - room.width / 2, item.position.y + item.size.h / 2, item.position.z - room.depth / 2],
       size: [item.size.w, item.size.h, item.size.d],
       rotation: item.rotation_y,
+      productId: item.item_id === null ? undefined : String(item.item_id),
       modelUrl: url(item.model_url, baseUrl),
     })),
   };

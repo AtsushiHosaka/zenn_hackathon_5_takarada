@@ -207,7 +207,7 @@ export interface paths {
         put?: never;
         /**
          * コーデ提案の生成を始める
-         * @description 生成は非同期。GET /api/v1/coordinations/{id} で status が done / failed になるまでポーリングする。現在の商品選定は AI 未接続のモック (キーワードでテーマを判定) で、商品候補はインテリアリンク取得のモック (InteriorLinks::MockClient)
+         * @description 生成は非同期。GET /api/v1/coordinations/{id} で status が done / failed になるまでポーリングする。Geminiの設定がある場合は要望文からAIで商品を選び、無い場合はキーワード判定のモック。商品候補はInteriorLinks::MockClientの参考データ。本人の部屋・提案だけ扱う
          */
         post: {
             parameters: {
@@ -231,6 +231,24 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["Coordination"];
+                    };
+                };
+                /** @description ログインが必要 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Unauthorized"];
+                    };
+                };
+                /** @description 本人の部屋ではない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFound"];
                     };
                 };
                 /** @description 部屋の解析が終わっていない、または入力が不正 */
@@ -280,6 +298,105 @@ export interface paths {
                         "application/json": components["schemas"]["Coordination"];
                     };
                 };
+                /** @description 本人のコーデではない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFound"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/furniture_models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 利用できる 3D 家具モデルを一覧で取得する
+         * @description 寸法はメートル。GCS の公開ベース URL が未設定の場合、model_url は null。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description モデル一覧 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FurnitureModel"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/furniture_models/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description モデルの安定 ID (GLB ファイル名から拡張子を除いた値) */
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** 3D 家具モデルのメタデータを取得する */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description モデルの安定 ID (GLB ファイル名から拡張子を除いた値) */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description モデルのメタデータ */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FurnitureModel"];
+                    };
+                };
+                /** @description モデルが無い、または無効 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFound"];
+                    };
+                };
             };
         };
         put?: never;
@@ -301,7 +418,7 @@ export interface paths {
         put?: never;
         /**
          * 部屋を登録して解析を始める
-         * @description 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。現在の解析は AI 未接続のモック (畳数と部屋の形から部屋を作る)
+         * @description 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ
          */
         post: {
             parameters: {
@@ -323,6 +440,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["Room"];
+                    };
+                };
+                /** @description ログインが必要 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Unauthorized"];
                     };
                 };
                 /** @description 畳数が範囲外 */
@@ -372,7 +498,7 @@ export interface paths {
                         "application/json": components["schemas"]["Room"];
                     };
                 };
-                /** @description 部屋が無い */
+                /** @description 部屋が無い、または本人の部屋ではない */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -429,6 +555,15 @@ export interface paths {
                         "application/json": components["schemas"]["Upload"][];
                     };
                 };
+                /** @description ログインが必要 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Unauthorized"];
+                    };
+                };
                 /** @description 対応していない形式 */
                 422: {
                     headers: {
@@ -453,7 +588,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ユーザー一覧を取得する */
+        /** 本人のプロフィールを一覧形式で取得する */
         get: {
             parameters: {
                 query?: never;
@@ -501,7 +636,7 @@ export interface paths {
             };
             cookie?: never;
         };
-        /** ユーザーを1件取得する */
+        /** 本人のプロフィールを取得する */
         get: {
             parameters: {
                 query?: never;
@@ -523,7 +658,7 @@ export interface paths {
                         "application/json": components["schemas"]["User"];
                     };
                 };
-                /** @description ユーザーが存在しない */
+                /** @description ユーザーが存在しない、または他のユーザー */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -556,7 +691,7 @@ export interface paths {
                     };
                     content?: never;
                 };
-                /** @description ユーザーが存在しない */
+                /** @description ユーザーが存在しない、または他のユーザー */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -591,6 +726,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["User"];
+                    };
+                };
+                /** @description 本人のプロフィールではない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFound"];
                     };
                 };
                 /** @description バリデーションエラー */
@@ -685,6 +829,73 @@ export interface components {
             h: number;
             /** @example 1.95 */
             d: number;
+        };
+        FurnitureModelBinding: {
+            /**
+             * @example existing
+             * @enum {string}
+             */
+            kind: "existing" | "product";
+            /**
+             * @description 既存家具の object ID または商品の ID
+             * @example bed-1
+             */
+            reference: string;
+        };
+        FurnitureModel: {
+            /**
+             * @description 安定 ID。GLB ファイル名から拡張子を除いた値
+             * @example bed_single
+             */
+            id: string;
+            /** @example シングルベッド */
+            name: string;
+            /** @example bed */
+            category: string;
+            /** @example bed_single */
+            shape: string;
+            /** @example null */
+            variant: string | null;
+            /**
+             * @example glb
+             * @enum {string}
+             */
+            format: "glb";
+            /**
+             * @description 公開ベース URL からの相対 GCS オブジェクトパス
+             * @example furniture/bed_single.glb
+             */
+            object_key: string;
+            size: components["schemas"]["Size"];
+            /**
+             * @example meter
+             * @enum {string}
+             */
+            unit: "meter";
+            /**
+             * @example +Y up, +Z front, origin bottom center
+             * @enum {string}
+             */
+            axes: "+Y up, +Z front, origin bottom center";
+            /** @example 1200 */
+            triangle_count: number;
+            /** @example 48000 */
+            byte_size: number;
+            /** @example aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa */
+            sha256: string;
+            /**
+             * @example [
+             *       "wood",
+             *       "fabric"
+             *     ]
+             */
+            materials: string[];
+            /**
+             * @description GCS の公開 GLB URL。ベース URL が未設定なら null
+             * @example null
+             */
+            model_url: string | null;
+            bindings: components["schemas"]["FurnitureModelBinding"][];
         };
         /** @description 物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き */
         Position: {
@@ -807,12 +1018,12 @@ export interface components {
         Upload: {
             /**
              * @description POST /api/v1/rooms の photo_keys に渡す
-             * @example photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg
+             * @example photos/users/1/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg
              */
             key: string;
             /**
              * @description この URL へ写真を PUT する。Content-Type だけを付け、他のヘッダは足さない (署名と食い違うと 403)
-             * @example https://storage.googleapis.com/example-uploads/photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256
+             * @example https://storage.googleapis.com/example-uploads/photos/users/1/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256
              */
             upload_url: string;
         };
@@ -963,6 +1174,12 @@ export interface components {
             items: components["schemas"]["CoordinationItem"][];
             /** @example 26840 */
             total_price: number | null;
+            /**
+             * @description gemini: 要望文から AI が商品を選んだ / mock: キーワードでテーマを決めたモック。生成が終わると入る
+             * @example gemini
+             * @enum {string|null}
+             */
+            planned_by: null | "gemini" | "mock";
             /** @example null */
             error_message: string | null;
             /** Format: date-time */

@@ -2,10 +2,12 @@ require "net/http"
 
 # 署名付き URL が Cloud Run の鍵なしサービスアカウントで通るかを確かめる。
 # ローカルは LocalClient に落ちるので、本番の経路を見るには Cloud Run で流す:
+#   VERIFY_USER_ID=<検証用ユーザーID> を Cloud Run ジョブへ明示してから実行する。
 #   make infra-task T=storage:verify
 namespace :storage do
   desc "署名付き URL で PUT -> 実物を確認 -> 後片付け"
   task verify: :environment do
+    user = User.find(ENV.fetch("VERIFY_USER_ID"))
     client = Storage.client
     puts "client               #{client.class}"
     puts "MODELS_BUCKET        #{ENV['MODELS_BUCKET'].inspect}"
@@ -13,7 +15,7 @@ namespace :storage do
     puts "STORAGE_SIGNER_EMAIL #{ENV['STORAGE_SIGNER_EMAIL'].inspect}"
 
     body = "verify-#{Time.now.utc.iso8601}"
-    upload = RoomPhoto.issue([ { content_type: "image/jpeg", size: body.bytesize } ]).first
+    upload = RoomPhoto.issue([ { content_type: "image/jpeg", size: body.bytesize } ], user: user).first
     asset = RoomPhoto.asset(upload.key)
     puts "\nasset #{asset.uri}"
     puts "署名OK  #{upload.upload_url[0, 110]}..."

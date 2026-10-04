@@ -78,7 +78,7 @@ jobs:
         run: |
           gcloud run jobs update "${{ secrets.GCP_TASK_JOB }}" \
             --image "${{ secrets.GCP_API_IMAGE_REPO }}:$SHA" \
-            --args db:apply \
+            --args db:apply,furniture_models:import \
             --region "${{ secrets.GCP_REGION }}" \
             --project "${{ secrets.GCP_PROJECT_ID }}" --quiet
           gcloud run jobs execute "${{ secrets.GCP_TASK_JOB }}" \

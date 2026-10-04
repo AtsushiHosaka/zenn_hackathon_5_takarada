@@ -48,9 +48,9 @@ function PhotoPreview({ file }: { file: File }) {
 
 export default function RoomGenerating({ prompt, photos, sample, dimensions = false, coordination = true, onCancel }: RoomGeneratingProps) {
   const steps = dimensions ? [
-    { title: sample ? '部屋のモックを準備しています' : '部屋の解析結果を待っています', detail: '畳数と部屋の形から、実寸のシーンを作ります', state: 'active' },
-    ...(coordination ? [{ title: '希望と予算に合わせた提案を受信', detail: '商品選定はモックです', state: 'pending' }] : []),
-    { title: '家具と窓を3Dプレビューに表示', detail: '写真の解析は行いません', state: 'pending' },
+    { title: sample ? '部屋のモックを準備しています' : '部屋の解析結果を待っています', detail: sample ? '畳数と部屋の形から、実寸のシーンを作ります' : '写真があればAIが家具を読み取り、畳数と形から実寸のシーンを作ります', state: 'active' },
+    ...(coordination ? [{ title: '希望と予算に合わせた提案を受信', detail: sample ? '商品選定はモックです' : 'AIが希望文に合う商品を選びます', state: 'pending' }] : []),
+    { title: '家具と窓を3Dプレビューに表示', detail: sample ? '写真の解析は行いません' : '家具の位置はおおよそです', state: 'pending' },
   ] : sample ? sampleSteps : apiSteps;
   return <>
     <section aria-label="チャット" className="room-generating-chat">

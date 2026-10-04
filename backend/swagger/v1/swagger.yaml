@@ -113,8 +113,9 @@ paths:
       tags:
       - Coordinations
       description: 生成は非同期。GET /api/v1/coordinations/{id} で status が done / failed
-        になるまでポーリングする。現在の商品選定は AI 未接続のモック (キーワードでテーマを判定) で、商品候補はインテリアリンク取得のモック (InteriorLinks::MockClient)
-      security: []
+        になるまでポーリングする。Geminiの設定がある場合は要望文からAIで商品を選び、無い場合はキーワード判定のモック。商品候補はInteriorLinks::MockClientの参考データ。本人の部屋・提案だけ扱う
+      security:
+      - bearerAuth: []
       parameters: []
       responses:
         '201':
@@ -123,6 +124,18 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Coordination"
+        '401':
+          description: ログインが必要
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Unauthorized"
+        '404':
+          description: 本人の部屋ではない
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFound"
         '422':
           description: 部屋の解析が終わっていない、または入力が不正
           content:
@@ -145,7 +158,8 @@ paths:
       summary: コーデ提案 (配置後のシーンと購入リンク) を取得する
       tags:
       - Coordinations
-      security: []
+      security:
+      - bearerAuth: []
       responses:
         '200':
           description: 生成済みのコーデ
@@ -153,14 +167,63 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Coordination"
+        '404':
+          description: 本人のコーデではない
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFound"
+  "/api/v1/furniture_models":
+    get:
+      summary: 利用できる 3D 家具モデルを一覧で取得する
+      tags:
+      - FurnitureModels
+      description: 寸法はメートル。GCS の公開ベース URL が未設定の場合、model_url は null。
+      security: []
+      responses:
+        '200':
+          description: モデル一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/FurnitureModel"
+  "/api/v1/furniture_models/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: モデルの安定 ID (GLB ファイル名から拡張子を除いた値)
+      schema:
+        type: string
+    get:
+      summary: 3D 家具モデルのメタデータを取得する
+      tags:
+      - FurnitureModels
+      security: []
+      responses:
+        '200':
+          description: モデルのメタデータ
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/FurnitureModel"
+        '404':
+          description: モデルが無い、または無効
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFound"
   "/api/v1/rooms":
     post:
       summary: 部屋を登録して解析を始める
       tags:
       - Rooms
-      description: 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。現在の解析は
-        AI 未接続のモック (畳数と部屋の形から部屋を作る)
-      security: []
+      description: 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と
+        Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ
+      security:
+      - bearerAuth: []
       parameters: []
       responses:
         '201':
@@ -169,6 +232,12 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Room"
+        '401':
+          description: ログインが必要
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Unauthorized"
         '422':
           description: 畳数が範囲外
           content:
@@ -191,7 +260,8 @@ paths:
       summary: 部屋と解析結果 (シーン) を取得する
       tags:
       - Rooms
-      security: []
+      security:
+      - bearerAuth: []
       responses:
         '200':
           description: 解析済みの部屋
@@ -200,7 +270,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/Room"
         '404':
-          description: 部屋が無い
+          description: 部屋が無い、または本人の部屋ではない
           content:
             application/json:
               schema:
@@ -215,7 +285,8 @@ paths:
         PUT には Content-Type だけを付ける (署名と食い違うヘッダがあると GCS が 403 を返す)。
         size も署名に含まれるため、実際に送る大きさと一致させる。
         アップロード後、key を POST /api/v1/rooms の photo_keys に渡す。
-      security: []
+      security:
+      - bearerAuth: []
       parameters: []
       responses:
         '201':
@@ -226,6 +297,12 @@ paths:
                 type: array
                 items:
                   "$ref": "#/components/schemas/Upload"
+        '401':
+          description: ログインが必要
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Unauthorized"
         '422':
           description: 対応していない形式
           content:
@@ -239,7 +316,7 @@ paths:
               "$ref": "#/components/schemas/UploadInput"
   "/api/v1/users":
     get:
-      summary: ユーザー一覧を取得する
+      summary: 本人のプロフィールを一覧形式で取得する
       tags:
       - Users
       security:
@@ -268,7 +345,7 @@ paths:
       schema:
         type: integer
     get:
-      summary: ユーザーを1件取得する
+      summary: 本人のプロフィールを取得する
       tags:
       - Users
       security:
@@ -281,7 +358,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/User"
         '404':
-          description: ユーザーが存在しない
+          description: ユーザーが存在しない、または他のユーザー
           content:
             application/json:
               schema:
@@ -300,6 +377,12 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/User"
+        '404':
+          description: 本人のプロフィールではない
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFound"
         '422':
           description: バリデーションエラー
           content:
@@ -321,7 +404,7 @@ paths:
         '204':
           description: 削除に成功
         '404':
-          description: ユーザーが存在しない
+          description: ユーザーが存在しない、または他のユーザー
 servers:
 - url: http://localhost:3000
   description: Local
@@ -458,6 +541,108 @@ components:
       - w
       - h
       - d
+    FurnitureModelBinding:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum:
+          - existing
+          - product
+          example: existing
+        reference:
+          type: string
+          description: 既存家具の object ID または商品の ID
+          example: bed-1
+      required:
+      - kind
+      - reference
+    FurnitureModel:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 安定 ID。GLB ファイル名から拡張子を除いた値
+          example: bed_single
+        name:
+          type: string
+          example: シングルベッド
+        category:
+          type: string
+          example: bed
+        shape:
+          type: string
+          example: bed_single
+        variant:
+          type: string
+          nullable: true
+          example:
+        format:
+          type: string
+          enum:
+          - glb
+          example: glb
+        object_key:
+          type: string
+          description: 公開ベース URL からの相対 GCS オブジェクトパス
+          example: furniture/bed_single.glb
+        size:
+          "$ref": "#/components/schemas/Size"
+        unit:
+          type: string
+          enum:
+          - meter
+          example: meter
+        axes:
+          type: string
+          enum:
+          - "+Y up, +Z front, origin bottom center"
+          example: "+Y up, +Z front, origin bottom center"
+        triangle_count:
+          type: integer
+          minimum: 0
+          example: 1200
+        byte_size:
+          type: integer
+          minimum: 1
+          example: 48000
+        sha256:
+          type: string
+          pattern: "^[0-9a-f]{64}$"
+          example: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        materials:
+          type: array
+          items:
+            type: string
+          example:
+          - wood
+          - fabric
+        model_url:
+          type: string
+          nullable: true
+          description: GCS の公開 GLB URL。ベース URL が未設定なら null
+          example:
+        bindings:
+          type: array
+          items:
+            "$ref": "#/components/schemas/FurnitureModelBinding"
+      required:
+      - id
+      - name
+      - category
+      - shape
+      - variant
+      - format
+      - object_key
+      - size
+      - unit
+      - axes
+      - triangle_count
+      - byte_size
+      - sha256
+      - materials
+      - model_url
+      - bindings
     Position:
       type: object
       description: 物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き
@@ -668,12 +853,12 @@ components:
         key:
           type: string
           description: POST /api/v1/rooms の photo_keys に渡す
-          example: photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg
+          example: photos/users/1/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg
         upload_url:
           type: string
           description: この URL へ写真を PUT する。Content-Type だけを付け、他のヘッダは足さない (署名と食い違うと
             403)
-          example: https://storage.googleapis.com/example-uploads/photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256
+          example: https://storage.googleapis.com/example-uploads/photos/users/1/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256
       required:
       - key
       - upload_url
@@ -933,6 +1118,15 @@ components:
           type: integer
           nullable: true
           example: 26840
+        planned_by:
+          type: string
+          nullable: true
+          enum:
+          -
+          - gemini
+          - mock
+          description: 'gemini: 要望文から AI が商品を選んだ / mock: キーワードでテーマを決めたモック。生成が終わると入る'
+          example: gemini
         error_message:
           type: string
           nullable: true
@@ -953,5 +1147,6 @@ components:
       - after_scene
       - items
       - total_price
+      - planned_by
       - error_message
       - created_at

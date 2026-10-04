@@ -2,6 +2,7 @@ import { Component, Fragment, lazy, Suspense, useRef, useState, type ReactNode }
 import type { RoomDesign, RoomItem } from '../../domain/room';
 import ReferenceSvg from './ReferenceSvg';
 import { categoryOf } from './itemCategory';
+import { useFurnitureModelsForDesign } from './furnitureModels';
 const RoomViewer = lazy(() => import('./RoomViewer'));
 const points = [[38.45,13.9],[24.38,40.73],[39.54,67.71],[40.62,22.44],[46.39,59.02],[73.09,40.49],[51.08,68.05],[41.34,43.17]];
 const money = (value: number) => `¥${value.toLocaleString('ja-JP')}`;
@@ -17,6 +18,7 @@ type Props = {
   referenceLayout:boolean; editing:boolean; view:'perspective'|'top'|'front'; dimensions:boolean;
 };
 export default function RoomScene({design, panel, before, filter, selectedId, onSelect, onBefore, onOpenPanel, onMoveItem, children, referenceLayout, editing, view, dimensions}:Props) {
+  const viewerDesign = useFurnitureModelsForDesign(design);
   const [moved,setMoved] = useState(false);
   const [command,setCommand] = useState<{sequence:number;action:'left'|'right'|'in'|'out'}>();
   const [resetKey,setResetKey] = useState(0);
@@ -34,7 +36,7 @@ export default function RoomScene({design, panel, before, filter, selectedId, on
   return <section className="rc-stage" aria-label="3Dプレビュー">
     <div className={`rc-scene-stage${panel?' has-panel':''}`}>
       <div className="rc-scene" onPointerDown={event=>{start.current={x:event.clientX,y:event.clientY};}} onPointerMove={event=>{if(start.current&&Math.hypot(event.clientX-start.current.x,event.clientY-start.current.y)>8){setMoved(true);start.current=null;}}} onPointerUp={()=>{start.current=null;}} onPointerCancel={()=>{start.current=null;}} onWheel={()=>setMoved(true)}>
-        <ViewerBoundary><Suspense fallback={<div className="viewer-fallback">3Dを読み込んでいます…</div>}><RoomViewer design={design} selectedItemId={selectedId} onSelectItem={onSelect} onMoveItem={onMoveItem} editing={editing} view={view} resetKey={resetKey} before={before} command={command} dimensions={dimensions}/></Suspense></ViewerBoundary>
+        <ViewerBoundary><Suspense fallback={<div className="viewer-fallback">3Dを読み込んでいます…</div>}><RoomViewer design={viewerDesign} selectedItemId={selectedId} onSelectItem={onSelect} onMoveItem={onMoveItem} editing={editing} view={view} resetKey={resetKey} before={before} command={command} dimensions={dimensions}/></Suspense></ViewerBoundary>
         {pins && additions.map(item=>{const p=points[Number(item.id)-1];if(!p)return null;return <Fragment key={item.id}><button type="button" aria-label={`${item.id}. ${item.name}`} aria-pressed={selectedId===item.id} className="rc-pin" style={{left:`${p[0]}%`,top:`${p[1]}%`,opacity:filter==='all'||categoryOf(item)===filter?1:.3}} onClick={()=>onSelect(item.id)}><span>{item.id}</span></button>{selectedId===item.id&&<span className="rc-pin-tooltip" style={{left:`${p[0]}%`,top:`${p[1]}%`,...(item.id==='6'?{transform:'translate(calc(-100% - 22px), -50%)'}:{})}}>{item.name}<span className="rc-money">{money(item.price??0)}</span></span>}</Fragment>;})}
       </div>
     </div>
