@@ -11,7 +11,7 @@ module InteriorLinks
     }.freeze
 
     def search(theme:, slots:, max_price:, **)
-      rows.select { |row| row["themes"].include?(theme) && slots.include?(row["slot"]) && row["price"] <= max_price }
+      rows.select { |row| (theme.nil? || row["themes"].include?(theme)) && slots.include?(row["slot"]) && row["price"] <= max_price }
           .map { |row| to_item(row) }
           .group_by(&:slot)
     end
