@@ -115,7 +115,8 @@ InteriorLinks.client.search(prompt:, theme:, slots:, max_price:)
 | 商品の選定 (`CoordinationPlanner`) | **モック**: キーワードでテーマ (推し活パープル / ボタニカル / 韓国) を決める |
 | インテリアリンク取得 (`InteriorLinks`) | **モック** (`InteriorLinks::MockClient` + `config/interior_links_mock.yml`、38 点)。価格はダミー、URL は EC の検索結果ページ |
 | Webの画面 (`/rooms/new`・`/rooms/:id`) | PR #6の画面・3D編集を基準に統合。畳数・部屋の形 → 活かす家具 → 要望・予算 → 3Dと購入リンク。通信と応答変換は共通の `RoomRepository` に一本化。`/coordinate` は `/rooms/new` へ移動 |
-| 写真の本番保存先 (GCS)・3D モデル (GLB) | 未実装。Cloud Run ではコンテナ間でディスクを共有できないので、本番では GCS が必要 |
+| 本番 (Cloud Run) での写真と Gemini | 本番はジョブが `:inline` (PR #7) なので、写真を受け取ったリクエストの中で解析まで終わり、ローカルのディスクで動く (写真はコンテナが止まると消える)。`POST /rooms` は Gemini の応答を待ってから返る。**本番の `GEMINI_API_KEY` (Secret Manager) は未設定**なので本番はモックで動く |
+| 写真の GCS 保存・3D モデル (GLB) | 未実装。ジョブを別のコンテナ (Cloud Tasks・worker) で動かすようにしたら GCS が必要 |
 
 2026年10月4日の依頼により、PR #5をPR #6へ取り込んでからPR #6をmainへマージする。Webの詳細は `specs/room-coordinator/spec.md` を参照する。活かす家具は解析Sceneの家具IDで送信し、選択と予算を結果へ保存する。空配列はAPI上「全家具を活かす」を意味するため、家具がある場合は1点以上の選択を必須とする。この統合判断はGoogle Docsへ未反映。
 
