@@ -32,6 +32,8 @@ export type RoomItem = {
   // Y軸まわりの回転角度。単位は度、0以上360未満。
   rotation?: number;
   modelUrl?: string;
+  // APIのitem_id。画面内のidやmarkerから商品IDを推定しない。
+  productId?: string;
   marker?: number;
 };
 
@@ -58,6 +60,9 @@ export type RoomDesign = {
   keptObjectIds?: string[];
   // 手動で編集した家具。選択から外した既存家具の変更も次の提案まで保持する。
   editedItems?: RoomItem[];
+  // API の結果を AI (Gemini) が作ったか。部屋の解析は analyzed_by、コーデは planned_by から入る。
+  // 古い保存データや古い API には無いので、無ければ従来どおりモックとして表示する
+  generatedBy?: "gemini" | "mock";
 };
 
 // ブラウザに保存されたデータも、復元時には信頼しない。
@@ -76,6 +81,7 @@ export function isRoomDesign(value: unknown): value is RoomDesign {
   if (value.budget !== undefined && (typeof value.budget !== "number" || !Number.isSafeInteger(value.budget) || value.budget <= 0)) return false;
   if (value.before !== undefined && !isRoomSnapshot(value.before)) return false;
   if (value.editedItems !== undefined && (!Array.isArray(value.editedItems) || !value.editedItems.every(isRoomItem) || new Set(value.editedItems.map(item => item.id)).size !== value.editedItems.length)) return false;
+  if (value.generatedBy !== undefined && value.generatedBy !== "gemini" && value.generatedBy !== "mock") return false;
   if (value.keptObjectIds !== undefined && (!Array.isArray(value.keptObjectIds) || !value.keptObjectIds.every(nonemptyString) || new Set(value.keptObjectIds).size !== value.keptObjectIds.length)) return false;
   if (!optionalHttpUrl(value.modelUrl) || !Array.isArray(value.items) || !value.items.every(isRoomItem)) return false;
   if (value.keptObjectIds !== undefined) {
@@ -125,6 +131,7 @@ export function isRoomItem(value: unknown): value is RoomItem {
   if (value.price !== undefined && (typeof value.price !== "number" || !Number.isFinite(value.price) || value.price < 0)) return false;
   if (value.marker !== undefined && (typeof value.marker !== "number" || !Number.isSafeInteger(value.marker) || value.marker <= 0)) return false;
   if (value.shop !== undefined && !nonemptyString(value.shop)) return false;
+  if (value.productId !== undefined && (typeof value.productId !== "string" || !/^[1-9]\d*$/.test(value.productId))) return false;
   return optionalHttpUrl(value.productUrl) && optionalHttpUrl(value.modelUrl) && optionalHttpUrl(value.imageUrl);
 }
 

@@ -14,8 +14,8 @@ class ApplicationController < ActionController::API
     current_identity&.user
   end
 
-  def render_not_found(exception)
-    render json: { error: exception.message }, status: :not_found
+  def render_not_found(_exception)
+    render json: { error: "見つかりません" }, status: :not_found
   end
 
   def render_bad_request(exception)

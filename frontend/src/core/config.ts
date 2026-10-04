@@ -19,7 +19,7 @@ export const appConfig = {
     coordinationJobPath: import.meta.env.VITE_ROOM_COORDINATION_JOB_PATH || "/api/v1/coordinations/{id}",
     // 写真のアップロード先を発行する。空なら写真を送らずに解析する
     uploadsPath: import.meta.env.VITE_ROOM_UPLOADS_PATH || (roomContract !== "legacy" ? "/api/v1/uploads" : ""),
-    requiresAuth: import.meta.env.VITE_ROOM_REQUIRES_AUTH ? import.meta.env.VITE_ROOM_REQUIRES_AUTH !== "false" : roomContract === "legacy",
+    requiresAuth: roomContract !== "legacy" || import.meta.env.VITE_ROOM_REQUIRES_AUTH !== "false",
     photoField: import.meta.env.VITE_ROOM_PHOTO_FIELD || "photos[]",
     promptField: import.meta.env.VITE_ROOM_PROMPT_FIELD || "prompt",
     styleField: import.meta.env.VITE_ROOM_STYLE_FIELD || "style",

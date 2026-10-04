@@ -9,6 +9,7 @@ import AppLayout from "../feature/shared/AppLayout";
 import RequireAuth from "../feature/shared/RequireAuth";
 import RoomListPage from '../feature/room/RoomListPage';
 import RoomStudioPage from "../feature/room/RoomStudioPage";
+import { useRoomPlanScope } from "../feature/room/plans";
 
 // 接続先はアプリ起動時に 1 回決まる (切り替えるとリロードが走る)
 const repositories = createRepositories(loadConnection());
@@ -25,7 +26,10 @@ const queryClient = new QueryClient({
 
 function RoomStudioRoute() {
   const { id } = useParams();
-  return <RoomStudioPage key={id} />;
+  const scope = useRoomPlanScope();
+  const page = <RoomStudioPage key={`${scope}:${id}`} />;
+  return loadConnection() === "dummy" || ["sample-oshi", "sample-botanical", "sample-natural", "sample-game"].includes(id ?? "")
+    ? page : <RequireAuth>{page}</RequireAuth>;
 }
 
 export default function App() {

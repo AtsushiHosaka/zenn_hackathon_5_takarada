@@ -7,7 +7,7 @@ module Api
 
       # GET /api/v1/users
       def index
-        users = User.includes(:identity).order(id: :asc)
+        users = User.where(id: current_user.id).includes(:identity)
         # コレクションは Alba が自動判別する
         render json: UserSerializer.new(users)
       end
@@ -35,7 +35,7 @@ module Api
       private
 
       def set_user
-        @user = User.find(params[:id])
+        @user = User.where(id: current_user.id).find(params[:id])
       end
 
       def user_params

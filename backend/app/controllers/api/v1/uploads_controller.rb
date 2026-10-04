@@ -3,7 +3,7 @@ module Api
     # 部屋写真の置き場を決めて署名付き URL を発行する。中身はここを通らず
     # ブラウザから GCS へ直接送られる。規則は RoomPhoto が持つ。
     class UploadsController < ApplicationController
-      skip_before_action :authenticate_identity!
+      skip_before_action :authenticate_identity!, only: :update
 
       # POST /api/v1/uploads
       def create
@@ -11,7 +11,7 @@ module Api
         errors = validate(requested)
         return render json: { errors: errors }, status: :unprocessable_entity if errors.any?
 
-        render json: UploadSerializer.new(RoomPhoto.issue(requested)), status: :created
+        render json: UploadSerializer.new(RoomPhoto.issue(requested, user: current_user)), status: :created
       end
 
       # PUT /api/v1/uploads/*key
@@ -20,7 +20,16 @@ module Api
         return head :not_found unless Rails.env.local?
         return head :bad_request unless params[:key].match?(RoomPhoto::KEY)
 
-        Storage.client.store(RoomPhoto.asset(params[:key]), request.body.read)
+        return head :forbidden unless params[:token].is_a?(String)
+
+        upload = Rails.application.message_verifier(:local_upload).verified(params[:token], purpose: :room_photo)
+        return head :forbidden unless upload && upload["key"] == params[:key]
+        return head :unprocessable_entity unless request.content_type == upload["content_type"]
+
+        bytes = request.body.read(upload["size"] + 1).to_s
+        return head :unprocessable_entity unless bytes.bytesize == upload["size"]
+
+        Storage.client.store(RoomPhoto.asset(params[:key]), bytes)
         head :ok
       end
 
