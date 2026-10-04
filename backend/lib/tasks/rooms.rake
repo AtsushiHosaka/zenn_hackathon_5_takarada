@@ -9,7 +9,7 @@ namespace :rooms do
   task :reanalyze, [ :id, :thinking_level, :model ] => :environment do |_, args|
     room = Room.find(args.fetch(:id))
     abort "部屋 ##{room.id} には写真がありません" if room.photo_keys.empty?
-    abort "GEMINI_API_KEY が設定されていません (backend/.env)" unless GeminiClient.configured?
+    abort "Geminiキーが未設定、または部屋の所有者がAI利用を許可されていません" unless GeminiClient.configured?(user_id: room.user_id)
 
     options = { thinking_level: args[:thinking_level].presence, model: args[:model].presence }.compact
     result = RoomAnalyzer.new(room, gemini: options).call
