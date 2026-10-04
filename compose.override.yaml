@@ -26,7 +26,7 @@ services:
       - bundle_data:/usr/local/bundle
 
   # Web フロント (Vite dev server)。**ローカル専用**なので base ではなくここに置く
-  # (デプロイ時は compose.yaml しか読まないため、Lightsail 側に web は入らない)
+  # (本番の web は nginx イメージを Cloud Run に載せる。infra/gcp/README.md 参照)
   web:
     build:
       context: ./frontend
