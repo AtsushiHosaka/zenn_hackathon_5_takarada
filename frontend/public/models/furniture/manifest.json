@@ -1,0 +1,1516 @@
+{
+ "unit": "meter",
+ "axes": "+Y up, +Z front, origin bottom center",
+ "models": [
+  {
+   "id": "acrylic_stand_case",
+   "url": "/models/furniture/acrylic_stand_case.glb",
+   "category": "acrylic_stand_case",
+   "shape": "acrylic_stand_case",
+   "variant": null,
+   "size": [
+    0.3,
+    0.15,
+    0.15
+   ],
+   "triangles": 1196,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "bed_cover",
+   "url": "/models/furniture/bed_cover.glb",
+   "category": "bed_cover",
+   "shape": "bed_cover",
+   "variant": null,
+   "size": [
+    1.0,
+    0.04,
+    2.0
+   ],
+   "triangles": 2348,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "bed_cover__101",
+   "url": "/models/furniture/bed_cover__101.glb",
+   "category": "bed_cover",
+   "shape": "bed_cover",
+   "variant": "101",
+   "size": [
+    1.0,
+    0.04,
+    2.0
+   ],
+   "triangles": 2348,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "bed_cover__201",
+   "url": "/models/furniture/bed_cover__201.glb",
+   "category": "bed_cover",
+   "shape": "bed_cover",
+   "variant": "201",
+   "size": [
+    1.0,
+    0.04,
+    2.0
+   ],
+   "triangles": 2348,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "bed_cover__301",
+   "url": "/models/furniture/bed_cover__301.glb",
+   "category": "bed_cover",
+   "shape": "bed_cover",
+   "variant": "301",
+   "size": [
+    1.0,
+    0.04,
+    2.0
+   ],
+   "triangles": 2348,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "bed_double",
+   "url": "/models/furniture/bed_double.glb",
+   "category": "bed",
+   "shape": "bed_double",
+   "variant": null,
+   "size": [
+    1.4,
+    0.45,
+    1.95
+   ],
+   "triangles": 2368,
+   "materials": [
+    "wood",
+    "mattress_side",
+    "tint"
+   ]
+  },
+  {
+   "id": "bed_loft",
+   "url": "/models/furniture/bed_loft.glb",
+   "category": "bed",
+   "shape": "bed_loft",
+   "variant": null,
+   "size": [
+    1.05,
+    1.8,
+    2.05
+   ],
+   "triangles": 3904,
+   "materials": [
+    "metal",
+    "mattress_side",
+    "tint"
+   ]
+  },
+  {
+   "id": "bed_semidouble",
+   "url": "/models/furniture/bed_semidouble.glb",
+   "category": "bed",
+   "shape": "bed_semidouble",
+   "variant": null,
+   "size": [
+    1.2,
+    0.45,
+    1.95
+   ],
+   "triangles": 2032,
+   "materials": [
+    "wood",
+    "mattress_side",
+    "tint"
+   ]
+  },
+  {
+   "id": "bed_single",
+   "url": "/models/furniture/bed_single.glb",
+   "category": "bed",
+   "shape": "bed_single",
+   "variant": null,
+   "size": [
+    0.97,
+    0.45,
+    1.95
+   ],
+   "triangles": 2032,
+   "materials": [
+    "wood",
+    "mattress_side",
+    "tint"
+   ]
+  },
+  {
+   "id": "bookshelf",
+   "url": "/models/furniture/bookshelf.glb",
+   "category": "shelf",
+   "shape": "bookshelf",
+   "variant": null,
+   "size": [
+    0.8,
+    1.8,
+    0.3
+   ],
+   "triangles": 888,
+   "materials": [
+    "wood"
+   ]
+  },
+  {
+   "id": "bookshelf__w060",
+   "url": "/models/furniture/bookshelf__w060.glb",
+   "category": "shelf",
+   "shape": "bookshelf",
+   "variant": "w060",
+   "size": [
+    0.6,
+    1.8,
+    0.3
+   ],
+   "triangles": 888,
+   "materials": [
+    "wood"
+   ]
+  },
+  {
+   "id": "bookshelf__w100",
+   "url": "/models/furniture/bookshelf__w100.glb",
+   "category": "shelf",
+   "shape": "bookshelf",
+   "variant": "w100",
+   "size": [
+    1.0,
+    1.8,
+    0.3
+   ],
+   "triangles": 888,
+   "materials": [
+    "wood"
+   ]
+  },
+  {
+   "id": "candle",
+   "url": "/models/furniture/candle.glb",
+   "category": "candle",
+   "shape": "candle",
+   "variant": null,
+   "size": [
+    0.1,
+    0.12,
+    0.1
+   ],
+   "triangles": 508,
+   "materials": [
+    "tint",
+    "wick"
+   ]
+  },
+  {
+   "id": "chair_dining",
+   "url": "/models/furniture/chair_dining.glb",
+   "category": "chair",
+   "shape": "chair_dining",
+   "variant": null,
+   "size": [
+    0.45,
+    0.8,
+    0.5
+   ],
+   "triangles": 1844,
+   "materials": [
+    "wood",
+    "tint"
+   ]
+  },
+  {
+   "id": "chair_office",
+   "url": "/models/furniture/chair_office.glb",
+   "category": "chair",
+   "shape": "chair_office",
+   "variant": null,
+   "size": [
+    0.5,
+    1.1,
+    0.5
+   ],
+   "triangles": 2572,
+   "materials": [
+    "plastic",
+    "metal",
+    "tint"
+   ]
+  },
+  {
+   "id": "chest_drawers",
+   "url": "/models/furniture/chest_drawers.glb",
+   "category": "storage",
+   "shape": "chest_drawers",
+   "variant": null,
+   "size": [
+    0.8,
+    0.85,
+    0.4
+   ],
+   "triangles": 2028,
+   "materials": [
+    "wood",
+    "knob"
+   ]
+  },
+  {
+   "id": "curtain_pair",
+   "url": "/models/furniture/curtain_pair.glb",
+   "category": "curtain",
+   "shape": "curtain_pair",
+   "variant": null,
+   "size": [
+    1.6,
+    2.0,
+    0.04
+   ],
+   "triangles": 6592,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "curtain_pair__102",
+   "url": "/models/furniture/curtain_pair__102.glb",
+   "category": "curtain",
+   "shape": "curtain_pair",
+   "variant": "102",
+   "size": [
+    1.6,
+    2.0,
+    0.04
+   ],
+   "triangles": 6592,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "curtain_pair__202",
+   "url": "/models/furniture/curtain_pair__202.glb",
+   "category": "curtain",
+   "shape": "curtain_pair",
+   "variant": "202",
+   "size": [
+    1.6,
+    2.0,
+    0.04
+   ],
+   "triangles": 6592,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "curtain_sheer",
+   "url": "/models/furniture/curtain_sheer.glb",
+   "category": "curtain",
+   "shape": "curtain_sheer",
+   "variant": null,
+   "size": [
+    1.6,
+    2.0,
+    0.04
+   ],
+   "triangles": 8384,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "curtain_sheer__115",
+   "url": "/models/furniture/curtain_sheer__115.glb",
+   "category": "curtain",
+   "shape": "curtain_sheer",
+   "variant": "115",
+   "size": [
+    1.0,
+    2.0,
+    0.04
+   ],
+   "triangles": 5696,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "curtain_sheer__302",
+   "url": "/models/furniture/curtain_sheer__302.glb",
+   "category": "curtain",
+   "shape": "curtain_sheer",
+   "variant": "302",
+   "size": [
+    1.6,
+    2.0,
+    0.04
+   ],
+   "triangles": 8384,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "curtain_sheer__901",
+   "url": "/models/furniture/curtain_sheer__901.glb",
+   "category": "curtain",
+   "shape": "curtain_sheer",
+   "variant": "901",
+   "size": [
+    1.0,
+    2.0,
+    0.03
+   ],
+   "triangles": 5696,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "cushion",
+   "url": "/models/furniture/cushion.glb",
+   "category": "cushion",
+   "shape": "cushion",
+   "variant": null,
+   "size": [
+    0.45,
+    0.15,
+    0.45
+   ],
+   "triangles": 1196,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "cushion__107",
+   "url": "/models/furniture/cushion__107.glb",
+   "category": "cushion",
+   "shape": "cushion",
+   "variant": "107",
+   "size": [
+    0.45,
+    0.15,
+    0.45
+   ],
+   "triangles": 1196,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "cushion__207",
+   "url": "/models/furniture/cushion__207.glb",
+   "category": "cushion",
+   "shape": "cushion",
+   "variant": "207",
+   "size": [
+    0.45,
+    0.15,
+    0.45
+   ],
+   "triangles": 1196,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "cushion__307",
+   "url": "/models/furniture/cushion__307.glb",
+   "category": "cushion",
+   "shape": "cushion",
+   "variant": "307",
+   "size": [
+    0.45,
+    0.15,
+    0.45
+   ],
+   "triangles": 1196,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "desk_fold",
+   "url": "/models/furniture/desk_fold.glb",
+   "category": "desk",
+   "shape": "desk_fold",
+   "variant": null,
+   "size": [
+    0.8,
+    0.7,
+    0.45
+   ],
+   "triangles": 1032,
+   "materials": [
+    "wood",
+    "metal"
+   ]
+  },
+  {
+   "id": "desk_l_left",
+   "url": "/models/furniture/desk_l_left.glb",
+   "category": "desk",
+   "shape": "desk_l_left",
+   "variant": null,
+   "size": [
+    1.4,
+    0.72,
+    1.2
+   ],
+   "triangles": 920,
+   "materials": [
+    "wood",
+    "metal"
+   ]
+  },
+  {
+   "id": "desk_lamp_clip",
+   "url": "/models/furniture/desk_lamp_clip.glb",
+   "category": "desk_lamp",
+   "shape": "desk_lamp_clip",
+   "variant": null,
+   "size": [
+    0.15,
+    0.35,
+    0.15
+   ],
+   "triangles": 1196,
+   "materials": [
+    "tint",
+    "joint",
+    "light"
+   ]
+  },
+  {
+   "id": "desk_wide",
+   "url": "/models/furniture/desk_wide.glb",
+   "category": "desk",
+   "shape": "desk_wide",
+   "variant": null,
+   "size": [
+    1.4,
+    0.72,
+    0.6
+   ],
+   "triangles": 1304,
+   "materials": [
+    "wood",
+    "metal"
+   ]
+  },
+  {
+   "id": "desk_wood",
+   "url": "/models/furniture/desk_wood.glb",
+   "category": "desk",
+   "shape": "desk_wood",
+   "variant": null,
+   "size": [
+    1.0,
+    0.72,
+    0.5
+   ],
+   "triangles": 704,
+   "materials": [
+    "wood"
+   ]
+  },
+  {
+   "id": "desk_wood__w080",
+   "url": "/models/furniture/desk_wood__w080.glb",
+   "category": "desk",
+   "shape": "desk_wood",
+   "variant": "w080",
+   "size": [
+    0.8,
+    0.72,
+    0.5
+   ],
+   "triangles": 704,
+   "materials": [
+    "wood"
+   ]
+  },
+  {
+   "id": "desk_wood__w120",
+   "url": "/models/furniture/desk_wood__w120.glb",
+   "category": "desk",
+   "shape": "desk_wood",
+   "variant": "w120",
+   "size": [
+    1.2,
+    0.72,
+    0.5
+   ],
+   "triangles": 704,
+   "materials": [
+    "wood"
+   ]
+  },
+  {
+   "id": "display_case",
+   "url": "/models/furniture/display_case.glb",
+   "category": "display_case",
+   "shape": "display_case",
+   "variant": null,
+   "size": [
+    0.4,
+    1.2,
+    0.3
+   ],
+   "triangles": 840,
+   "materials": [
+    "tint",
+    "glass",
+    "metal"
+   ]
+  },
+  {
+   "id": "display_rack_open",
+   "url": "/models/furniture/display_rack_open.glb",
+   "category": "display_case",
+   "shape": "display_rack_open",
+   "variant": null,
+   "size": [
+    0.35,
+    0.9,
+    0.25
+   ],
+   "triangles": 932,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "display_stand_floor",
+   "url": "/models/furniture/display_stand_floor.glb",
+   "category": "display_stand",
+   "shape": "display_stand_floor",
+   "variant": null,
+   "size": [
+    0.65,
+    1.0,
+    0.6
+   ],
+   "triangles": 812,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "floor_lamp",
+   "url": "/models/furniture/floor_lamp.glb",
+   "category": "floor_lamp",
+   "shape": "floor_lamp",
+   "variant": null,
+   "size": [
+    0.25,
+    1.4,
+    0.25
+   ],
+   "triangles": 1108,
+   "materials": [
+    "metal",
+    "tint",
+    "light"
+   ]
+  },
+  {
+   "id": "floor_lamp_ball",
+   "url": "/models/furniture/floor_lamp_ball.glb",
+   "category": "floor_lamp",
+   "shape": "floor_lamp_ball",
+   "variant": null,
+   "size": [
+    0.3,
+    1.3,
+    0.3
+   ],
+   "triangles": 2276,
+   "materials": [
+    "metal",
+    "tint"
+   ]
+  },
+  {
+   "id": "floor_lamp_pleated",
+   "url": "/models/furniture/floor_lamp_pleated.glb",
+   "category": "floor_lamp",
+   "shape": "floor_lamp_pleated",
+   "variant": null,
+   "size": [
+    0.3,
+    1.4,
+    0.3
+   ],
+   "triangles": 1128,
+   "materials": [
+    "metal",
+    "tint",
+    "light"
+   ]
+  },
+  {
+   "id": "floor_lamp_rattan",
+   "url": "/models/furniture/floor_lamp_rattan.glb",
+   "category": "floor_lamp",
+   "shape": "floor_lamp_rattan",
+   "variant": null,
+   "size": [
+    0.35,
+    1.3,
+    0.35
+   ],
+   "triangles": 4056,
+   "materials": [
+    "wood",
+    "tint",
+    "light"
+   ]
+  },
+  {
+   "id": "floor_lamp_slim",
+   "url": "/models/furniture/floor_lamp_slim.glb",
+   "category": "floor_lamp",
+   "shape": "floor_lamp_slim",
+   "variant": null,
+   "size": [
+    0.2,
+    1.2,
+    0.2
+   ],
+   "triangles": 692,
+   "materials": [
+    "metal",
+    "light"
+   ]
+  },
+  {
+   "id": "floor_lamp_tripod",
+   "url": "/models/furniture/floor_lamp_tripod.glb",
+   "category": "floor_lamp",
+   "shape": "floor_lamp_tripod",
+   "variant": null,
+   "size": [
+    0.45,
+    1.4,
+    0.45
+   ],
+   "triangles": 876,
+   "materials": [
+    "wood",
+    "metal",
+    "tint",
+    "light"
+   ]
+  },
+  {
+   "id": "futon_floor",
+   "url": "/models/furniture/futon_floor.glb",
+   "category": "bed",
+   "shape": "futon_floor",
+   "variant": null,
+   "size": [
+    1.0,
+    0.08,
+    2.0
+   ],
+   "triangles": 1772,
+   "materials": [
+    "tint",
+    "seam"
+   ]
+  },
+  {
+   "id": "led_strip_segment",
+   "url": "/models/furniture/led_strip_segment.glb",
+   "category": "led",
+   "shape": "led_strip_segment",
+   "variant": null,
+   "size": [
+    1.0,
+    0.01,
+    0.01
+   ],
+   "triangles": 216,
+   "materials": [
+    "base",
+    "light"
+   ]
+  },
+  {
+   "id": "monitor",
+   "url": "/models/furniture/monitor.glb",
+   "category": "monitor",
+   "shape": "monitor",
+   "variant": null,
+   "size": [
+    0.55,
+    0.4,
+    0.18
+   ],
+   "triangles": 444,
+   "materials": [
+    "tint",
+    "screen"
+   ]
+  },
+  {
+   "id": "plant_eucalyptus",
+   "url": "/models/furniture/plant_eucalyptus.glb",
+   "category": "plant",
+   "shape": "plant_eucalyptus",
+   "variant": null,
+   "size": [
+    0.4,
+    0.9,
+    0.4
+   ],
+   "triangles": 4044,
+   "materials": [
+    "pot",
+    "soil",
+    "stem",
+    "leaf"
+   ]
+  },
+  {
+   "id": "plant_monstera",
+   "url": "/models/furniture/plant_monstera.glb",
+   "category": "plant",
+   "shape": "plant_monstera",
+   "variant": null,
+   "size": [
+    0.6,
+    1.2,
+    0.6
+   ],
+   "triangles": 4536,
+   "materials": [
+    "pot",
+    "soil",
+    "stem",
+    "leaf"
+   ]
+  },
+  {
+   "id": "rug_rect",
+   "url": "/models/furniture/rug_rect.glb",
+   "category": "rug",
+   "shape": "rug_rect",
+   "variant": null,
+   "size": [
+    1.4,
+    0.03,
+    2.0
+   ],
+   "triangles": 472,
+   "materials": [
+    "trim",
+    "tint"
+   ]
+  },
+  {
+   "id": "rug_rect__103",
+   "url": "/models/furniture/rug_rect__103.glb",
+   "category": "rug",
+   "shape": "rug_rect",
+   "variant": "103",
+   "size": [
+    1.4,
+    0.03,
+    2.0
+   ],
+   "triangles": 472,
+   "materials": [
+    "trim",
+    "tint"
+   ]
+  },
+  {
+   "id": "rug_rect__203",
+   "url": "/models/furniture/rug_rect__203.glb",
+   "category": "rug",
+   "shape": "rug_rect",
+   "variant": "203",
+   "size": [
+    1.3,
+    0.02,
+    1.9
+   ],
+   "triangles": 472,
+   "materials": [
+    "trim",
+    "tint"
+   ]
+  },
+  {
+   "id": "rug_round",
+   "url": "/models/furniture/rug_round.glb",
+   "category": "rug",
+   "shape": "rug_round",
+   "variant": null,
+   "size": [
+    1.0,
+    0.02,
+    1.0
+   ],
+   "triangles": 1528,
+   "materials": [
+    "trim",
+    "tint"
+   ]
+  },
+  {
+   "id": "rug_round__111",
+   "url": "/models/furniture/rug_round__111.glb",
+   "category": "rug",
+   "shape": "rug_round",
+   "variant": "111",
+   "size": [
+    1.0,
+    0.02,
+    1.0
+   ],
+   "triangles": 1528,
+   "materials": [
+    "trim",
+    "tint"
+   ]
+  },
+  {
+   "id": "rug_round__211",
+   "url": "/models/furniture/rug_round__211.glb",
+   "category": "rug",
+   "shape": "rug_round",
+   "variant": "211",
+   "size": [
+    1.2,
+    0.02,
+    1.2
+   ],
+   "triangles": 1528,
+   "materials": [
+    "trim",
+    "tint"
+   ]
+  },
+  {
+   "id": "rug_round__311",
+   "url": "/models/furniture/rug_round__311.glb",
+   "category": "rug",
+   "shape": "rug_round",
+   "variant": "311",
+   "size": [
+    1.0,
+    0.03,
+    1.0
+   ],
+   "triangles": 1528,
+   "materials": [
+    "trim",
+    "tint"
+   ]
+  },
+  {
+   "id": "rug_wave",
+   "url": "/models/furniture/rug_wave.glb",
+   "category": "rug",
+   "shape": "rug_wave",
+   "variant": null,
+   "size": [
+    1.3,
+    0.02,
+    1.85
+   ],
+   "triangles": 2880,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "shelf_cube",
+   "url": "/models/furniture/shelf_cube.glb",
+   "category": "shelf",
+   "shape": "shelf_cube",
+   "variant": null,
+   "size": [
+    0.8,
+    0.8,
+    0.35
+   ],
+   "triangles": 660,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "shelf_low",
+   "url": "/models/furniture/shelf_low.glb",
+   "category": "shelf",
+   "shape": "shelf_low",
+   "variant": null,
+   "size": [
+    0.9,
+    0.9,
+    0.3
+   ],
+   "triangles": 672,
+   "materials": [
+    "wood"
+   ]
+  },
+  {
+   "id": "side_table",
+   "url": "/models/furniture/side_table.glb",
+   "category": "side_table",
+   "shape": "side_table",
+   "variant": null,
+   "size": [
+    0.4,
+    0.5,
+    0.4
+   ],
+   "triangles": 1322,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "small_plant",
+   "url": "/models/furniture/small_plant.glb",
+   "category": "small_plant",
+   "shape": "small_plant",
+   "variant": null,
+   "size": [
+    0.15,
+    0.25,
+    0.15
+   ],
+   "triangles": 1216,
+   "materials": [
+    "pot",
+    "soil",
+    "stem",
+    "leaf"
+   ]
+  },
+  {
+   "id": "sofa_1seat",
+   "url": "/models/furniture/sofa_1seat.glb",
+   "category": "sofa",
+   "shape": "sofa_1seat",
+   "variant": null,
+   "size": [
+    0.85,
+    0.8,
+    0.85
+   ],
+   "triangles": 3168,
+   "materials": [
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "sofa_2seat",
+   "url": "/models/furniture/sofa_2seat.glb",
+   "category": "sofa",
+   "shape": "sofa_2seat",
+   "variant": null,
+   "size": [
+    1.5,
+    0.8,
+    0.85
+   ],
+   "triangles": 4696,
+   "materials": [
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "sofa_2seat__w130",
+   "url": "/models/furniture/sofa_2seat__w130.glb",
+   "category": "sofa",
+   "shape": "sofa_2seat",
+   "variant": "w130",
+   "size": [
+    1.3,
+    0.8,
+    0.85
+   ],
+   "triangles": 4696,
+   "materials": [
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "sofa_2seat__w170",
+   "url": "/models/furniture/sofa_2seat__w170.glb",
+   "category": "sofa",
+   "shape": "sofa_2seat",
+   "variant": "w170",
+   "size": [
+    1.7,
+    0.8,
+    0.85
+   ],
+   "triangles": 4696,
+   "materials": [
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "sofa_3seat",
+   "url": "/models/furniture/sofa_3seat.glb",
+   "category": "sofa",
+   "shape": "sofa_3seat",
+   "variant": null,
+   "size": [
+    2.1,
+    0.82,
+    0.9
+   ],
+   "triangles": 6268,
+   "materials": [
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "sofa_bed_open",
+   "url": "/models/furniture/sofa_bed_open.glb",
+   "category": "sofa",
+   "shape": "sofa_bed_open",
+   "variant": null,
+   "size": [
+    1.4,
+    0.4,
+    1.9
+   ],
+   "triangles": 2664,
+   "materials": [
+    "fabric_base",
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "sofa_l_left",
+   "url": "/models/furniture/sofa_l_left.glb",
+   "category": "sofa",
+   "shape": "sofa_l_left",
+   "variant": null,
+   "size": [
+    2.4,
+    0.82,
+    1.55
+   ],
+   "triangles": 6420,
+   "materials": [
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "sofa_l_left__l",
+   "url": "/models/furniture/sofa_l_left__l.glb",
+   "category": "sofa",
+   "shape": "sofa_l_left",
+   "variant": "l",
+   "size": [
+    2.8,
+    0.82,
+    1.8
+   ],
+   "triangles": 6420,
+   "materials": [
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "sofa_l_left__s",
+   "url": "/models/furniture/sofa_l_left__s.glb",
+   "category": "sofa",
+   "shape": "sofa_l_left",
+   "variant": "s",
+   "size": [
+    2.1,
+    0.82,
+    1.4
+   ],
+   "triangles": 6420,
+   "materials": [
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "sofa_l_right",
+   "url": "/models/furniture/sofa_l_right.glb",
+   "category": "sofa",
+   "shape": "sofa_l_right",
+   "variant": null,
+   "size": [
+    2.4,
+    0.82,
+    1.55
+   ],
+   "triangles": 6420,
+   "materials": [
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "sofa_l_right__l",
+   "url": "/models/furniture/sofa_l_right__l.glb",
+   "category": "sofa",
+   "shape": "sofa_l_right",
+   "variant": "l",
+   "size": [
+    2.8,
+    0.82,
+    1.8
+   ],
+   "triangles": 6420,
+   "materials": [
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "sofa_l_right__s",
+   "url": "/models/furniture/sofa_l_right__s.glb",
+   "category": "sofa",
+   "shape": "sofa_l_right",
+   "variant": "s",
+   "size": [
+    2.1,
+    0.82,
+    1.4
+   ],
+   "triangles": 6420,
+   "materials": [
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "sofa_low",
+   "url": "/models/furniture/sofa_low.glb",
+   "category": "sofa",
+   "shape": "sofa_low",
+   "variant": null,
+   "size": [
+    1.6,
+    0.55,
+    0.85
+   ],
+   "triangles": 4628,
+   "materials": [
+    "tint",
+    "plinth"
+   ]
+  },
+  {
+   "id": "stool_round",
+   "url": "/models/furniture/stool_round.glb",
+   "category": "chair",
+   "shape": "stool_round",
+   "variant": null,
+   "size": [
+    0.35,
+    0.45,
+    0.35
+   ],
+   "triangles": 1016,
+   "materials": [
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "table_dining_rect",
+   "url": "/models/furniture/table_dining_rect.glb",
+   "category": "table",
+   "shape": "table_dining_rect",
+   "variant": null,
+   "size": [
+    1.2,
+    0.72,
+    0.75
+   ],
+   "triangles": 812,
+   "materials": [
+    "wood"
+   ]
+  },
+  {
+   "id": "table_dining_round",
+   "url": "/models/furniture/table_dining_round.glb",
+   "category": "table",
+   "shape": "table_dining_round",
+   "variant": null,
+   "size": [
+    0.9,
+    0.72,
+    0.9
+   ],
+   "triangles": 1428,
+   "materials": [
+    "wood"
+   ]
+  },
+  {
+   "id": "table_low_rect",
+   "url": "/models/furniture/table_low_rect.glb",
+   "category": "table",
+   "shape": "table_low_rect",
+   "variant": null,
+   "size": [
+    0.9,
+    0.38,
+    0.5
+   ],
+   "triangles": 972,
+   "materials": [
+    "wood"
+   ]
+  },
+  {
+   "id": "table_low_rect__w075",
+   "url": "/models/furniture/table_low_rect__w075.glb",
+   "category": "table",
+   "shape": "table_low_rect",
+   "variant": "w075",
+   "size": [
+    0.75,
+    0.38,
+    0.5
+   ],
+   "triangles": 972,
+   "materials": [
+    "wood"
+   ]
+  },
+  {
+   "id": "table_low_rect__w110",
+   "url": "/models/furniture/table_low_rect__w110.glb",
+   "category": "table",
+   "shape": "table_low_rect",
+   "variant": "w110",
+   "size": [
+    1.1,
+    0.38,
+    0.5
+   ],
+   "triangles": 972,
+   "materials": [
+    "wood"
+   ]
+  },
+  {
+   "id": "table_low_round",
+   "url": "/models/furniture/table_low_round.glb",
+   "category": "table",
+   "shape": "table_low_round",
+   "variant": null,
+   "size": [
+    0.7,
+    0.38,
+    0.7
+   ],
+   "triangles": 796,
+   "materials": [
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "tapestry",
+   "url": "/models/furniture/tapestry.glb",
+   "category": "tapestry",
+   "shape": "tapestry",
+   "variant": null,
+   "size": [
+    0.6,
+    0.9,
+    0.01
+   ],
+   "triangles": 1520,
+   "materials": [
+    "tint",
+    "wood"
+   ]
+  },
+  {
+   "id": "tv_stand",
+   "url": "/models/furniture/tv_stand.glb",
+   "category": "storage",
+   "shape": "tv_stand",
+   "variant": null,
+   "size": [
+    1.2,
+    0.4,
+    0.35
+   ],
+   "triangles": 1376,
+   "materials": [
+    "wood",
+    "wood_dark"
+   ]
+  },
+  {
+   "id": "wall_art",
+   "url": "/models/furniture/wall_art.glb",
+   "category": "wall_art",
+   "shape": "wall_art",
+   "variant": null,
+   "size": [
+    0.5,
+    0.4,
+    0.02
+   ],
+   "triangles": 800,
+   "materials": [
+    "wood",
+    "tint",
+    "print"
+   ]
+  },
+  {
+   "id": "wall_mirror",
+   "url": "/models/furniture/wall_mirror.glb",
+   "category": "wall_mirror",
+   "shape": "wall_mirror",
+   "variant": null,
+   "size": [
+    0.4,
+    0.6,
+    0.03
+   ],
+   "triangles": 2304,
+   "materials": [
+    "tint",
+    "mirror"
+   ]
+  },
+  {
+   "id": "wall_planter",
+   "url": "/models/furniture/wall_planter.glb",
+   "category": "wall_planter",
+   "shape": "wall_planter",
+   "variant": null,
+   "size": [
+    0.5,
+    0.6,
+    0.15
+   ],
+   "triangles": 5588,
+   "materials": [
+    "pot",
+    "soil",
+    "stem",
+    "leaf"
+   ]
+  },
+  {
+   "id": "wall_shelf",
+   "url": "/models/furniture/wall_shelf.glb",
+   "category": "wall_shelf",
+   "shape": "wall_shelf",
+   "variant": null,
+   "size": [
+    0.6,
+    0.5,
+    0.12
+   ],
+   "triangles": 1188,
+   "materials": [
+    "tint"
+   ]
+  },
+  {
+   "id": "wardrobe",
+   "url": "/models/furniture/wardrobe.glb",
+   "category": "storage",
+   "shape": "wardrobe",
+   "variant": null,
+   "size": [
+    0.8,
+    1.8,
+    0.55
+   ],
+   "triangles": 824,
+   "materials": [
+    "tint",
+    "metal",
+    "wood"
+   ]
+  }
+ ],
+ "products": {
+  "bed-1": "bed_single",
+  "desk-1": "desk_wood",
+  "shelf-1": "bookshelf",
+  "101": "bed_cover__101",
+  "201": "bed_cover__201",
+  "301": "bed_cover__301",
+  "102": "curtain_pair__102",
+  "202": "curtain_pair__202",
+  "115": "curtain_sheer__115",
+  "302": "curtain_sheer__302",
+  "901": "curtain_sheer__901",
+  "103": "rug_rect__103",
+  "203": "rug_rect__203",
+  "303": "rug_wave",
+  "111": "rug_round__111",
+  "211": "rug_round__211",
+  "311": "rug_round__311",
+  "107": "cushion__107",
+  "207": "cushion__207",
+  "307": "cushion__307",
+  "104": "wall_shelf",
+  "114": "tapestry",
+  "105": "floor_lamp",
+  "112": "floor_lamp_slim",
+  "205": "floor_lamp_rattan",
+  "212": "floor_lamp_tripod",
+  "305": "floor_lamp_ball",
+  "312": "floor_lamp_pleated",
+  "106": "display_case",
+  "113": "display_rack_open",
+  "108": "acrylic_stand_case",
+  "204": "wall_planter",
+  "214": "wall_art",
+  "206": "plant_monstera",
+  "213": "plant_eucalyptus",
+  "208": "small_plant",
+  "304": "wall_mirror",
+  "306": "side_table",
+  "308": "candle",
+  "902": "desk_lamp_clip"
+ }
+}
