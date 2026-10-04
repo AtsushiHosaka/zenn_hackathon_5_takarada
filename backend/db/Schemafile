@@ -30,6 +30,7 @@ create_table "rooms", force: :cascade do |t|
   t.string "status", null: false, default: "analyzing"
   t.jsonb "scene"
   t.string "analyzed_by" # gemini: 写真を AI で解析 / mock: 畳数と部屋の形から作ったモック
+  t.jsonb "analysis" # 精度の確認用: 解析の生の回答・モデル・時間・トークン数・家具の置き方 (API には出さない)
   t.text "error_message"
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false

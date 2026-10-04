@@ -325,7 +325,8 @@ Devise.setup do |config|
   # トークンの検証は Warden の Rack ミドルウェアが行う。コントローラ側は
   # ApplicationController の `before_action :authenticate_identity!` を通すだけでよい。
   config.jwt do |jwt|
-    jwt.secret = ENV.fetch("DEVISE_JWT_SECRET_KEY") { Rails.application.secret_key_base }
+    # 空文字 (backend/.env に「DEVISE_JWT_SECRET_KEY=」とだけ書いた場合など) も未設定と同じに扱う
+    jwt.secret = ENV["DEVISE_JWT_SECRET_KEY"].presence || Rails.application.secret_key_base
 
     # ここに一致したリクエストのレスポンスに Authorization: Bearer <token> が載る
     jwt.dispatch_requests = [

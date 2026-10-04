@@ -56,6 +56,7 @@ class RoomAnalyzer
 
       家具について:
       - category は決められた種類から最も近いものを選ぶ。小物・家電・ラグ・カーテン・照明は含めない。
+      - 床に置かれた家具だけを答える。壁に取り付けた棚 (浮いている棚)・飾り・ポスター・ドア・窓は家具に含めない。
       - 壁に背を付けて置かれているものは、その壁を wall にする。部屋の中央に置かれたものは none にする。
       - width_m は壁に沿った幅、depth_m は壁から手前への奥行き、height_m は高さを、見た目からおおよそのメートルで答える。
       - 同じ家具が複数の写真に写っていても 1 つとして数える。
@@ -63,12 +64,25 @@ class RoomAnalyzer
       写っていないものを推測で足さないこと。
     TEXT
 
-    def initialize(room)
+    def initialize(room, client: GeminiClient.new)
       @room = room
+      @client = client
     end
 
     def observe
-      GeminiClient.new.generate_json(prompt: PROMPT, schema: SCHEMA, images: @room.photos.map { |photo| shrink(photo) })
+      images = @room.photos.map { |photo| shrink(photo) }
+      @response = @client.generate_json(prompt: PROMPT, schema: SCHEMA, images:)
+      @image_bytes = images.sum { |image| image[:data].bytesize }
+      @response.json
+    end
+
+    # 精度・速度・費用の確認用
+    def meta
+      return {} unless @response
+
+      { "analyzer" => "gemini", "model" => @response.model, "thinking_level" => @response.thinking_level,
+        "elapsed_s" => @response.elapsed, "usage" => @response.usage,
+        "photos" => @room.photos.size, "image_bytes" => @image_bytes }
     end
 
     private

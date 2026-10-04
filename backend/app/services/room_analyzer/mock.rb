@@ -3,6 +3,10 @@ class RoomAnalyzer
   class Mock
     def initialize(_room); end
 
+    def meta
+      { "analyzer" => "mock" }
+    end
+
     def observe
       {
         "wall_color" => "#f4f1ec",

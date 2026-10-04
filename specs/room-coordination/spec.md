@@ -104,6 +104,25 @@ InteriorLinks.client.search(prompt:, theme:, slots:, max_price:)
 - 商品の選び方 (`CoordinationBuilder`): 優先度の高い枠から各枠の最安値で予算内にできるだけ多く埋め、
   余った予算で優先度の高い枠からおすすめ順の上位へ格上げする。置き場所が無ければ同じ枠のより安い候補で試す
 
+## 写真の解析の精度を確かめる
+
+解析のたびに `rooms.analysis` (API には出さない) へ、Gemini の生の回答・モデル・考える量・時間・トークン数と、
+`RoomLayout` が家具をどう置いたか (指定どおり / ずらした / 別の壁 / 床へ / 捨てた) を保存する。
+
+```bash
+# 解析結果を表示する (生の回答と置いた結果を並べる)
+docker compose exec api bin/rails 'rooms:report[51]'
+# 保存してある写真で解析し直して比べる (考える量・モデルを変えられる。SAVE=1 で部屋に保存)
+docker compose exec worker bin/rails 'rooms:reanalyze[51,low]'
+docker compose exec worker bin/rails 'rooms:reanalyze[51,,gemini-3.1-flash-lite]'
+```
+
+2026-10-04 の試行 (部屋 51・写真 2 枚): `gemini-3.8-flash` は既定の考える量で約 100 秒かかり、その後は混雑 (503) で
+解析できないことが続いた。`gemini-3.1-flash-lite` は約 3 秒・有料枠でも約 0.5 円で、家具の種類・色・壁の位置関係は
+写真とおおむね合っていた。`gemini-2.5-flash` は新規ユーザーには提供終了 (404)。写真 2 枚では東西の向きの解釈が
+回答ごとに揺れるので、3〜4 枚で撮ることを案内する。
+この結果から、既定のモデルを `gemini-3.1-flash-lite` にした (2026-10-04 決定)。
+
 ## 実装状況
 
 | 部分 | 状態 |
@@ -111,7 +130,7 @@ InteriorLinks.client.search(prompt:, theme:, slots:, max_price:)
 | API・DB・非同期ジョブ・Swagger 契約 | 実装済み |
 | 枠ごとの配置計算 (`SlotLayout`)・予算内に収める処理 (`CoordinationBuilder`) | 実装済み |
 | 写真のアップロード | **実装済み**: `POST /rooms` で 4 枚まで受け取り (JPEG・PNG・WebP を中身で判定、1 枚 10MB まで)、ActiveStorage でローカルのディスク (`backend/storage/`) に保存 |
-| 部屋の解析 (`RoomAnalyzer`) | 写真と `GEMINI_API_KEY` があれば **Gemini** (`gemini-3.8-flash`、Interactions API、写真は長辺 1536px に縮小)、無ければ**モック**。どちらも「どの壁沿いのどのあたりか」だけを返し、座標は `RoomLayout` が計算する。結果の `analyzed_by` で区別できる。**実際のキーでの動作は未確認** |
+| 部屋の解析 (`RoomAnalyzer`) | 写真と `GEMINI_API_KEY` があれば **Gemini** (既定 `gemini-3.1-flash-lite`、Interactions API、写真は長辺 1536px に縮小)、無ければ**モック**。どちらも「どの壁沿いのどのあたりか」だけを返し、座標は `RoomLayout` が計算する。結果の `analyzed_by` で区別できる。**実際のキーでの動作は未確認** |
 | 商品の選定 (`CoordinationPlanner`) | **モック**: キーワードでテーマ (推し活パープル / ボタニカル / 韓国) を決める |
 | インテリアリンク取得 (`InteriorLinks`) | **モック** (`InteriorLinks::MockClient` + `config/interior_links_mock.yml`、38 点)。価格はダミー、URL は EC の検索結果ページ |
 | Webの画面 (`/rooms/new`・`/rooms/:id`) | PR #6の画面・3D編集を基準に統合。畳数・部屋の形 → 活かす家具 → 要望・予算 → 3Dと購入リンク。通信と応答変換は共通の `RoomRepository` に一本化。`/coordinate` は `/rooms/new` へ移動 |

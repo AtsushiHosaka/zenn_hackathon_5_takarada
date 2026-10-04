@@ -42,12 +42,20 @@ class RoomLayout
   WALLS = ROTATIONS.keys.freeze
   MARGIN = 0.02
   STEP = 0.05
+  # 置く順番を選ぶときの減点 (ずらした分は距離 m を足す)
+  PENALTY = { "other_wall" => 2, "floor" => 4, "dropped" => 10 }.freeze
+
+  # 家具ごとの置き方の記録 (精度の確認用。rooms.analysis に保存する)
+  #   result: wall (希望どおり壁沿い) / shifted (同じ壁沿いでずらした) / floor (壁沿いに置けず床へ) /
+  #           center (壁に付いていない家具) / dropped (置けなかった) / ignored (対象外の種類)
+  attr_reader :log
 
   def initialize(width:, depth:, height:)
     @width = width
     @depth = depth
     @height = height
     @placed = []
+    @log = []
   end
 
   def build(observation)
@@ -77,21 +85,77 @@ class RoomLayout
   end
 
   def furniture(list)
-    items = Array(list).select { |f| CATEGORIES.include?(f["category"]) }.first(12)
-    counts = Hash.new(0)
-    # 大きい家具から置く (後から置くものほど空いた場所へずらされる)
-    items.sort_by { |f| -size_of(f).values_at("w", "d").reduce(:*) }.filter_map do |item|
-      counts[item["category"]] += 1
-      place(item, "#{item['category']}-#{counts[item['category']]}")
+    list = Array(list)
+    list.reject { |f| CATEGORIES.include?(f["category"]) }.each do |item|
+      @log << { "category" => item["category"], "label" => item["label"], "result" => "ignored" }
     end
+    # 高さ 30cm 未満の棚は、壁に取り付けた棚を床置きの家具と取り違えたものとして扱わない
+    wall_mounted, list = list.partition { |f| f["category"] == "shelf" && f["height_m"].to_f.between?(0.01, 0.3) }
+    wall_mounted.each { |item| @log << { "category" => item["category"], "label" => item["label"], "result" => "ignored" } }
+    items = list.select { |f| CATEGORIES.include?(f["category"]) }.first(12)
+    # id は回答の順に振る (置く順番を変えても同じ家具は同じ id)
+    counts = Hash.new(0)
+    ids = items.map { |item| "#{item['category']}-#{counts[item['category']] += 1}" }
+
+    # 置く順番で結果が変わる (同じ角を 2 つの家具が取り合うなど) ので、何通りか試して
+    # 一番指定どおりに置けた並べ方を採る
+    @items_for_order = items
+    best = placement_orders(items.each_index.to_a).map { |order| try_order(items, ids, order) }.min_by { |trial| trial[:score] }
+    return [] unless best
+
+    @placed.concat(best[:placed])
+    @log.concat(best[:log])
+    best[:objects]
+  end
+
+  # 6 点以下なら全通り、それより多ければ代表的な順番だけ
+  def placement_orders(indexes)
+    return indexes.permutation.to_a if indexes.size <= 6
+
+    by_area = ->(i) { -size_of_index(i) }
+    [
+      indexes.sort_by { |i| [ edge?(@items_for_order[i]) ? 0 : 1, by_area.call(i) ] },
+      indexes.sort_by { |i| by_area.call(i) },
+      indexes.sort_by { |i| [ edge?(@items_for_order[i]) ? 0 : 1, -by_area.call(i) ] }
+    ]
+  end
+
+  def size_of_index(index)
+    size_of(@items_for_order[index]).values_at("w", "d").reduce(:*)
+  end
+
+  def try_order(items, ids, order)
+    saved_placed = @placed.dup
+    saved_log = @log.dup
+    @log = []
+    placed_by_index = {}
+    order.each { |index| placed_by_index[index] = place(items[index], ids[index]) }
+    log = @log
+    placed = @placed - saved_placed
+    { score: log.sum { |entry| PENALTY.fetch(entry["result"], 0) + entry["shift_m"].to_f },
+      objects: items.each_index.filter_map { |index| placed_by_index[index] }, placed:, log: }
+  ensure
+    @placed = saved_placed
+    @log = saved_log
+  end
+
+  def edge?(item)
+    WALLS.include?(item["wall"]) && %w[start end].include?(item["position"])
   end
 
   def place(item, id)
     size = size_of(item)
     wall = WALLS.include?(item["wall"]) ? item["wall"] : nil
-    position = wall ? place_on_wall(wall, item["position"], size) : nil
+    position, used_wall = wall ? place_on_any_wall(wall, item["position"], size) : nil
+    on_wall = !position.nil?
     position ||= place_on_floor(size)
-    return unless position
+    entry = { "id" => id, "category" => item["category"], "label" => item["label"],
+              "requested" => item.slice("wall", "position"), "size" => size }
+    unless position
+      @log << entry.merge("result" => "dropped")
+      return
+    end
+    @log << entry.merge(placement_result(wall, used_wall, on_wall, item["position"], size, position))
 
     x, z, rotation = position
     footprint = rect(x, z, size, rotation)
@@ -111,6 +175,30 @@ class RoomLayout
       "item_id" => nil,
       "marker" => nil
     }
+  end
+
+  # 指定の壁に入らなければ、隣の壁 (元の壁に近い端)、向かいの壁の順に試す。部屋の中央へ回すのは最後
+  def place_on_any_wall(wall, position, size)
+    candidates = [ [ wall, position ] ] + adjacent_walls(wall).map { |other| [ other, end_near(other, wall) ] } + [ [ opposite(wall), position ] ]
+    candidates.each do |candidate_wall, candidate_position|
+      placed = place_on_wall(candidate_wall, candidate_position, size)
+      return [ placed, candidate_wall ] if placed
+    end
+    nil
+  end
+
+  def adjacent_walls(wall)
+    %w[north south].include?(wall) ? %w[west east] : %w[north south]
+  end
+
+  def opposite(wall)
+    { "north" => "south", "south" => "north", "east" => "west", "west" => "east" }.fetch(wall)
+  end
+
+  # 隣の壁で、元の壁に近い側の端 (start は north/south の壁なら西、east/west の壁なら北)
+  def end_near(other, original)
+    near_start = %w[north south].include?(other) ? original == "west" : original == "north"
+    near_start ? "start" : "end"
   end
 
   # 壁を背にして置く。希望の位置が埋まっていれば、同じ壁に沿って近い空きへずらす
@@ -136,6 +224,15 @@ class RoomLayout
     spot = xs.product(zs).select { |x, z| free?(rect(x, z, size, 0)) }
              .min_by { |x, z| Math.hypot(x - @width / 2, z - @depth / 2) }
     spot && [ *spot, 0 ]
+  end
+
+  def placement_result(wall, used_wall, on_wall, requested_position, size, (x, z, _))
+    return { "result" => wall ? "floor" : "center", "placed" => { "x" => x.round(2), "z" => z.round(2) } } unless on_wall
+    return { "result" => "other_wall", "wall" => used_wall, "placed" => { "x" => x.round(2), "z" => z.round(2) } } if used_wall != wall
+
+    along = %w[north south].include?(wall) ? x : z
+    shift = (along - along_for(requested_position, wall_length(wall), size["w"])).abs.round(2)
+    { "result" => shift < 0.05 ? "wall" : "shifted", "shift_m" => shift, "placed" => { "x" => x.round(2), "z" => z.round(2) } }
   end
 
   def along_for(position, length, span)

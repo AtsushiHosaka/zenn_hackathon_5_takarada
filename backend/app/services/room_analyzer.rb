@@ -14,21 +14,28 @@ class RoomAnalyzer
   TATAMI_AREA = 1.62 # 1 畳あたりの面積 (m2)
   ROOM_HEIGHT = 2.4
 
-  Result = Data.define(:scene, :analyzed_by)
+  # analysis: 精度の確認用の記録 (rooms.analysis)。observation (解析の生の回答)・meta (モデル・時間・トークン数)・
+  #           layout (家具ごとの置き方) を持つ。API のレスポンスには出さない
+  Result = Data.define(:scene, :analyzed_by, :analysis)
 
   def self.call(room)
     new(room).call
   end
 
-  def initialize(room)
+  # gemini: Gemini で解析するときの設定 (GeminiClient.new の引数)。確認用に、モデルや考える量を変えて解析し直すのに使う
+  def initialize(room, gemini: {})
     @room = room
+    @gemini_options = gemini
   end
 
   def call
-    analyzer, analyzed_by = gemini? ? [ Gemini, "gemini" ] : [ Mock, "mock" ]
+    analyzer, analyzed_by = gemini? ? [ Gemini.new(@room, client: GeminiClient.new(**@gemini_options)), "gemini" ] : [ Mock.new(@room), "mock" ]
+    observation = analyzer.observe
     width, depth = dimensions
-    scene = RoomLayout.new(width:, depth:, height: ROOM_HEIGHT).build(analyzer.new(@room).observe)
-    Result.new(scene:, analyzed_by:)
+    layout = RoomLayout.new(width:, depth:, height: ROOM_HEIGHT)
+    scene = layout.build(observation)
+    analysis = { "observation" => observation, "meta" => analyzer.meta, "layout" => layout.log, "analyzed_at" => Time.current.iso8601 }
+    Result.new(scene:, analyzed_by:, analysis:)
   end
 
   private

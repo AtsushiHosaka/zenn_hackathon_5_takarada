@@ -5,7 +5,7 @@ class AnalyzeRoomJob < ApplicationJob
   def perform(room_id)
     room = Room.find(room_id)
     result = RoomAnalyzer.call(room)
-    room.update!(scene: result.scene, analyzed_by: result.analyzed_by, status: "ready")
+    room.update!(scene: result.scene, analyzed_by: result.analyzed_by, analysis: result.analysis, status: "ready")
   rescue StandardError => e
     # 再試行しても結果が変わらないので、失敗として記録して終える
     room&.update!(status: "failed", error_message: e.message)
