@@ -11,7 +11,7 @@ module Storage
 
     # 署名付き PUT では x-goog-content-length-range が使えない (POST policy 専用) ため、
     # Content-Type と Content-Length を署名ヘッダに入れて型と大きさを固定する
-    def upload_url(asset, content_type:, size:, expires: UPLOAD_URL_TTL)
+    def upload_url(asset, content_type:, size:, expires:)
       storage.signed_url(
         asset.bucket, asset.key,
         method: "PUT",

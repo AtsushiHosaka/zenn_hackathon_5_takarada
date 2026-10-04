@@ -37,7 +37,7 @@ module Storage
 
     # key の拡張子から引き直せるので脇にメタ情報を置かない
     def content_type_for(asset)
-      PHOTO_EXTENSIONS.invert[File.extname(asset.key).delete_prefix(".")]
+      RoomPhoto::CONTENT_TYPES.invert[File.extname(asset.key).delete_prefix(".")]
     end
   end
 end

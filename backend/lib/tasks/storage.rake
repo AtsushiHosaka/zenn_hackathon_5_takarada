@@ -1,6 +1,6 @@
 require "net/http"
 
-# 署名付き URL が Cloud Run の鍵なしサービスアカウントで実際に通るかを確かめる。
+# 署名付き URL が Cloud Run の鍵なしサービスアカウントで通るかを確かめる。
 # ローカルは LocalClient に落ちるので、本番の経路を見るには Cloud Run で流す:
 #   make infra-task T=storage:verify
 namespace :storage do
@@ -13,42 +13,36 @@ namespace :storage do
     puts "STORAGE_SIGNER_EMAIL #{ENV['STORAGE_SIGNER_EMAIL'].inspect}"
 
     body = "verify-#{Time.now.utc.iso8601}"
-    content_type = "image/jpeg"
-    asset = Storage.photo(Storage.photo_keys([ content_type ]).first)
+    upload = RoomPhoto.issue([ { content_type: "image/jpeg", size: body.bytesize } ]).first
+    asset = RoomPhoto.asset(upload.key)
     puts "\nasset #{asset.uri}"
+    puts "署名OK  #{upload.upload_url[0, 110]}..."
 
-    url = client.upload_url(asset, content_type: content_type, size: body.bytesize)
-    puts "署名OK  #{url[0, 120]}..."
-
-    uri = URI(url)
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    # 署名したヘッダと完全に一致させる。余計なヘッダを足すと 403 になる
-    response = http.request(Net::HTTP::Put.new(uri).tap do |request|
-      request["Content-Type"] = content_type
-      request.body = body
-    end)
-    puts "PUT     #{response.code} #{response.message}"
-    abort "PUT が失敗しました:\n#{response.body}" unless response.is_a?(Net::HTTPSuccess)
+    puts "PUT     #{put(upload.upload_url, body)} (200 なら署名が通っている)"
 
     meta = client.metadata(asset)
     abort "アップロードしたのに見つかりません" unless meta
     puts "実物    #{meta.size} bytes / #{meta.content_type}"
     abort "大きさが合いません" unless meta.size == body.bytesize
 
-    # 上限超過を弾けるか (署名した size と違う中身は通らないはず)
-    short = client.upload_url(asset, content_type: content_type, size: body.bytesize + 999)
-    bad = URI(short)
-    mismatch = Net::HTTP.start(bad.host, bad.port, use_ssl: true) do |session|
-      session.request(Net::HTTP::Put.new(bad).tap do |request|
-        request["Content-Type"] = content_type
-        request.body = body
-      end)
-    end
-    puts "size不一致 #{mismatch.code} (403 なら Content-Length の署名が効いている)"
+    # 署名した size と違う中身は通らないはず (Content-Length の署名が効いているか)
+    mismatch = client.upload_url(asset, content_type: "image/jpeg", size: body.bytesize + 999, expires: RoomPhoto::URL_TTL)
+    puts "size不一致 #{put(mismatch, body)} (403 なら上限が強制できている)"
 
     client.delete(asset)
     puts "後片付け #{client.metadata(asset).inspect}"
     puts "\nOK"
+  end
+
+  # 署名したヘッダと完全に一致させる。余計なヘッダを足すと 403 になる
+  def put(url, body)
+    uri = URI(url)
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |session|
+      request = Net::HTTP::Put.new(uri)
+      request["Content-Type"] = "image/jpeg"
+      request.body = body
+      session.request(request)
+    end
+    "#{response.code} #{response.message}"
   end
 end
