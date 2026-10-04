@@ -13,15 +13,30 @@ url=$($TF output -raw public_url | tr -d '\r')
 SSH_OPTS=(-i "$key" -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR)
 remote="ubuntu@$ip"
 
+ready=
 printf 'インスタンスの準備を待っています'
 for _ in $(seq 1 60); do
   if ssh "${SSH_OPTS[@]}" -o ConnectTimeout=5 "$remote" 'test -f /opt/app/.provisioned' 2>/dev/null; then
+    ready=1
     echo " 完了"
     break
   fi
   printf '.'
   sleep 5
 done
+
+# 待たずに進むと mkdir /opt/app が Permission denied になって原因が分かりにくいので止める
+if [ -z "$ready" ]; then
+  cat >&2 <<MSG
+ タイムアウト
+
+インスタンスの初期化 (user_data) が 5 分以内に終わりませんでした。
+/opt/app/.provisioned が出来ていないので中断します。ログを確認してください:
+
+  ssh -i $key ubuntu@$ip 'sudo tail -50 /var/log/cloud-init-output.log'
+MSG
+  exit 1
+fi
 
 echo "設定を転送しています..."
 ssh "${SSH_OPTS[@]}" "$remote" 'mkdir -p /opt/app/infra'
