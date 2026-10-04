@@ -11,3 +11,6 @@ ios/**/.swiftpm/
 ios/build/
 ios/DerivedData/
 *.xcworkspace/xcuserdata/
+
+# Local design comparisons and browser screenshots
+output/

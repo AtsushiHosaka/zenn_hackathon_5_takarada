@@ -85,7 +85,10 @@ InteriorLinks.client.search(prompt:, theme:, slots:, max_price:)
 | 部屋の解析 (`RoomAnalyzer`) | **モック**: 畳数と部屋の形から寸法を決め、固定の家具 (ベッド・デスク・本棚・南の窓) を置く。写真は受け取らない |
 | 商品の選定 (`CoordinationPlanner`) | **モック**: キーワードでテーマ (推し活パープル / ボタニカル / 韓国) を決める |
 | インテリアリンク取得 (`InteriorLinks`) | **モック** (`InteriorLinks::MockClient` + `config/interior_links_mock.yml`、38 点)。価格はダミー、URL は EC の検索結果ページ |
+| Webの画面 (`/rooms/new`・`/rooms/:id`) | PR #6の画面・3D編集を基準に統合。畳数・部屋の形 → 活かす家具 → 要望・予算 → 3Dと購入リンク。通信と応答変換は共通の `RoomRepository` に一本化。`/coordinate` は `/rooms/new` へ移動 |
 | 写真のアップロード・S3・3D モデル (GLB) | 未実装 |
+
+2026年10月4日の依頼により、PR #5をPR #6へ取り込んでからPR #6をmainへマージする。Webの詳細は `specs/room-coordinator/spec.md` を参照する。活かす家具は解析Sceneの家具IDで送信し、選択と予算を結果へ保存する。空配列はAPI上「全家具を活かす」を意味するため、家具がある場合は1点以上の選択を必須とする。この統合判断はGoogle Docsへ未反映。
 
 ## 残作業
 
