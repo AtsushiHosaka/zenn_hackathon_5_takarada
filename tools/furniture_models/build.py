@@ -10,7 +10,12 @@ sys.path.insert(0, HERE)
 import lib  # noqa: E402
 
 MODULES = ["models_seating", "models_beds", "models_tables", "models_storage",
-           "models_textiles", "models_lights", "models_plants", "models_decor"]
+           "models_textiles", "models_lights", "models_plants", "models_decor",
+           "models_ext_storage", "models_ext_seating", "models_ext_bedroom", "models_ext_appliances",
+           "models_ext_goods"]
+# 並行して作業するときは、読み込むモジュールと書き出し記録を分けられる
+if os.environ.get("FURNITURE_MODULES"):
+    MODULES = os.environ["FURNITURE_MODULES"].split(",")
 for name in MODULES:
     if os.path.exists(os.path.join(HERE, name + ".py")):
         importlib.import_module(name)
@@ -20,7 +25,7 @@ out_dir = os.path.abspath(argv[0]) if argv else os.path.join(HERE, "..", "..", "
 only = set(argv[1:])
 os.makedirs(out_dir, exist_ok=True)
 
-report_path = os.path.join(HERE, "build_report.json")
+report_path = os.environ.get("FURNITURE_BUILD_REPORT") or os.path.join(HERE, "build_report.json")
 # 一部だけ再生成する場合も、ほかのモデルのカタログ情報を残す。
 previous = json.load(open(report_path)) if only and os.path.exists(report_path) else []
 report = {item["file"]: item for item in previous}

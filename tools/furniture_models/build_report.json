@@ -20,6 +20,70 @@
   "sha256": "e34e7c24ce2d4f2ce3db18e5ee6047560ba4e94d3df09dab445e34a54bd1a6d5"
  },
  {
+  "name": "air_purifier",
+  "tris": 3204,
+  "actual": [
+   0.30000001192092896,
+   0.5500000210688487,
+   0.2990000247955322
+  ],
+  "materials": [
+   "tint",
+   "grille",
+   "light"
+  ],
+  "sha256": "258e875889ff423bc3850d21059477313ce4fe802a7aaca0363e3c3b0d8ce478",
+  "file": "air_purifier.glb",
+  "target": [
+   0.3,
+   0.55,
+   0.3
+  ],
+  "bytes": 140524
+ },
+ {
+  "name": "armchair_wing",
+  "tris": 4412,
+  "actual": [
+   0.800000011920929,
+   1.0000000270306053,
+   0.8450000584125519
+  ],
+  "materials": [
+   "wood",
+   "tint"
+  ],
+  "sha256": "77b50ca16679e0eefdf9d6d44f134cb31b3ba4f6692ae81f6b348d23232fed28",
+  "file": "armchair_wing.glb",
+  "target": [
+   0.8,
+   1.0,
+   0.85
+  ],
+  "bytes": 158984
+ },
+ {
+  "name": "balcony_set",
+  "tris": 2824,
+  "actual": [
+   1.189943552017212,
+   0.806876536924392,
+   0.5799999833106995
+  ],
+  "materials": [
+   "tint",
+   "wood"
+  ],
+  "sha256": "4f36e3ee58961aead3dd09739b83bb24ab60c05166f8979ac7c865f5a7bbe741",
+  "file": "balcony_set.glb",
+  "target": [
+   1.2,
+   0.8,
+   0.6
+  ],
+  "bytes": 131756
+ },
+ {
   "name": "beanbag",
   "tris": 504,
   "actual": [
@@ -38,6 +102,28 @@
    0.65
   ],
   "bytes": 15188
+ },
+ {
+  "name": "bed_bunk",
+  "tris": 5756,
+  "actual": [
+   1.0,
+   1.600000217945066,
+   2.03000009059906
+  ],
+  "materials": [
+   "wood",
+   "mattress_side",
+   "tint"
+  ],
+  "sha256": "802756d05829d7cdbbf36cce8459f86b3f02847eb0dbecc0e95514b13bc5b570",
+  "file": "bed_bunk.glb",
+  "target": [
+   1.0,
+   1.6,
+   2.05
+  ],
+  "bytes": 223284
  },
  {
   "name": "bed_cover",
@@ -208,6 +294,52 @@
   "sha256": "da0f7f15fd82c7341aa53ef49a9a520c42293ec5d0ba91d581de4339c1f32031"
  },
  {
+  "name": "bed_slatted",
+  "tris": 4396,
+  "actual": [
+   1.0,
+   0.28500006663676913,
+   1.9644443988800049
+  ],
+  "materials": [
+   "wood_dark",
+   "wood",
+   "mattress_side",
+   "tint"
+  ],
+  "sha256": "4df336071c742007eb7c02c33ea71b398e5d091c19c53a6db72cf5c084b2f0f6",
+  "file": "bed_slatted.glb",
+  "target": [
+   1.0,
+   0.3,
+   2.0
+  ],
+  "bytes": 175804
+ },
+ {
+  "name": "bed_storage",
+  "tris": 1804,
+  "actual": [
+   1.0069999694824219,
+   0.46000008127562353,
+   2.0
+  ],
+  "materials": [
+   "handle",
+   "wood",
+   "mattress_side",
+   "tint"
+  ],
+  "sha256": "728093f221f62d3af81061ea2a7e3b9a37565b8754f8982696b4c51d9b1b900c",
+  "file": "bed_storage.glb",
+  "target": [
+   1.0,
+   0.45,
+   2.0
+  ],
+  "bytes": 68364
+ },
+ {
   "name": "bench_wood",
   "tris": 368,
   "actual": [
@@ -246,6 +378,74 @@
    0.35
   ],
   "bytes": 76920
+ },
+ {
+  "name": "blind_roller",
+  "tris": 1080,
+  "actual": [
+   1.0,
+   1.7999999532116058,
+   0.08000000193715096
+  ],
+  "materials": [
+   "frame",
+   "tint",
+   "cord"
+  ],
+  "sha256": "0292a0d10f85cf9fe52345ce4fb844dc1c437f0efeee110816c51b46bf3cacf7",
+  "file": "blind_roller.glb",
+  "target": [
+   1.0,
+   1.8,
+   0.08
+  ],
+  "bytes": 39012
+ },
+ {
+  "name": "books_row",
+  "tris": 4536,
+  "actual": [
+   0.3920000195503235,
+   0.25026989679889367,
+   0.1894853711128235
+  ],
+  "materials": [
+   "tint",
+   "paper",
+   "book2",
+   "book3"
+  ],
+  "sha256": "20d7cb5f4c61f9f73d4e0d09f9b9d6e069cbba2bb3d4602ef9a5bd22b5842feb",
+  "file": "books_row.glb",
+  "target": [
+   0.4,
+   0.25,
+   0.2
+  ],
+  "bytes": 196664
+ },
+ {
+  "name": "books_stack",
+  "tris": 1680,
+  "actual": [
+   0.24844259023666382,
+   0.15000001088528148,
+   0.1822020411491394
+  ],
+  "materials": [
+   "tint",
+   "paper",
+   "book2",
+   "book3"
+  ],
+  "sha256": "c83232e0943a6e7575c7c79ac9b3b6edc486d55a6a9778e04c0f768c9c923608",
+  "file": "books_stack.glb",
+  "target": [
+   0.25,
+   0.15,
+   0.18
+  ],
+  "bytes": 75556
  },
  {
   "name": "bookshelf",
@@ -308,6 +508,28 @@
   "sha256": "c42f325fdebb55aafe5e72700352403414840199b906fc2f905247d575910351"
  },
  {
+  "name": "cabinet_glass",
+  "tris": 1984,
+  "actual": [
+   0.800000011920929,
+   1.1999999435740047,
+   0.42200005054473877
+  ],
+  "materials": [
+   "tint",
+   "knob",
+   "glass"
+  ],
+  "sha256": "1494434eeecb0992ec11aed32c6a3c7b6aae737ab9b038bd04766316f4c948e1",
+  "file": "cabinet_glass.glb",
+  "target": [
+   0.8,
+   1.2,
+   0.4
+  ],
+  "bytes": 88496
+ },
+ {
   "name": "candle",
   "tris": 508,
   "actual": [
@@ -329,6 +551,50 @@
   "sha256": "d2b927db8413c62de7f30c0e9e9506f91d00138901a74c11903ed788e0f2dc49"
  },
  {
+  "name": "cat_tower",
+  "tris": 6788,
+  "actual": [
+   0.550000011920929,
+   1.399999992239195,
+   0.44999998807907104
+  ],
+  "materials": [
+   "tint",
+   "cushion",
+   "sisal"
+  ],
+  "sha256": "c1ac7ee00b013d2c406a9be5f5c1a2fd73e17c0b415f0712f7f227888e569da5",
+  "file": "cat_tower.glb",
+  "target": [
+   0.55,
+   1.4,
+   0.45
+  ],
+  "bytes": 298576
+ },
+ {
+  "name": "ceiling_light",
+  "tris": 2678,
+  "actual": [
+   0.5,
+   0.12000000476837158,
+   0.5
+  ],
+  "materials": [
+   "light",
+   "tint",
+   "plastic"
+  ],
+  "sha256": "59acad32a11f9c045a899669d7a39d69d73e3c717d3880c56dd808cbbffe37ff",
+  "file": "ceiling_light.glb",
+  "target": [
+   0.5,
+   0.12,
+   0.5
+  ],
+  "bytes": 87304
+ },
+ {
   "name": "chair_dining",
   "tris": 1844,
   "actual": [
@@ -348,6 +614,51 @@
   ],
   "bytes": 72592,
   "sha256": "fa3e660276162bb8300be88c8066bd9b51538f6b3ff5e4c2c8d341ff44e57ca1"
+ },
+ {
+  "name": "chair_folding",
+  "tris": 680,
+  "actual": [
+   0.4404338002204895,
+   0.805384885519743,
+   0.4929804354906082
+  ],
+  "materials": [
+   "metal",
+   "plastic",
+   "tint"
+  ],
+  "sha256": "c02a840a56c64278382782404b89acdbd4e36c3ee0c124a9cd32f205f537f215",
+  "file": "chair_folding.glb",
+  "target": [
+   0.45,
+   0.8,
+   0.48
+  ],
+  "bytes": 39828
+ },
+ {
+  "name": "chair_gaming",
+  "tris": 7468,
+  "actual": [
+   0.6649999618530273,
+   1.2964743548021218,
+   0.6380495727062225
+  ],
+  "materials": [
+   "plastic",
+   "metal",
+   "tint",
+   "accent"
+  ],
+  "sha256": "86b82713de6dc3dc2c402c5db1f6f4b0f8f04ef643ade9913e8fd0859a179ca8",
+  "file": "chair_gaming.glb",
+  "target": [
+   0.65,
+   1.3,
+   0.65
+  ],
+  "bytes": 284108
  },
  {
   "name": "chair_lounge",
@@ -393,6 +704,49 @@
   "sha256": "f7e9100ed72f5029914bac6dc65c5d4767926fcf755e86ba93e46e20b0d46604"
  },
  {
+  "name": "chair_shell",
+  "tris": 2128,
+  "actual": [
+   0.4755975306034088,
+   0.8014078275300562,
+   0.5027617514133453
+  ],
+  "materials": [
+   "tint",
+   "metal",
+   "wood"
+  ],
+  "sha256": "957dc30cb46e61d62f5f0c69967f823476e4678acab3440b29cd1fbf8831b4c5",
+  "file": "chair_shell.glb",
+  "target": [
+   0.47,
+   0.8,
+   0.52
+  ],
+  "bytes": 68864
+ },
+ {
+  "name": "chaise_longue",
+  "tris": 2844,
+  "actual": [
+   0.6500000059604645,
+   0.7554872577277969,
+   1.5400000214576721
+  ],
+  "materials": [
+   "wood",
+   "tint"
+  ],
+  "sha256": "34cee4865abf28856919441ce52b64747504f759dbf86d3bc73ef9653cb382fa",
+  "file": "chaise_longue.glb",
+  "target": [
+   0.65,
+   0.8,
+   1.55
+  ],
+  "bytes": 102620
+ },
+ {
   "name": "chest_drawers",
   "tris": 2028,
   "actual": [
@@ -414,6 +768,27 @@
   "sha256": "6190585809d03db0421a55994e2dc9bec0d6e795ac2743268ec66966e697e3b3"
  },
  {
+  "name": "chest_tall",
+  "tris": 1956,
+  "actual": [
+   0.5,
+   1.2000000617263256,
+   0.42200008034706116
+  ],
+  "materials": [
+   "knob",
+   "tint"
+  ],
+  "sha256": "7d6490a9782bec0abc98a50f89a8e59fa789ee14ffa73e1426e76cd574dfee55",
+  "file": "chest_tall.glb",
+  "target": [
+   0.5,
+   1.2,
+   0.4
+  ],
+  "bytes": 89136
+ },
+ {
   "name": "console_table",
   "tris": 1088,
   "actual": [
@@ -433,6 +808,28 @@
    0.3
   ],
   "bytes": 39932
+ },
+ {
+  "name": "cupboard",
+  "tris": 2956,
+  "actual": [
+   0.800000011920929,
+   1.800000087531128,
+   0.450000062584877
+  ],
+  "materials": [
+   "wood",
+   "tint",
+   "glass"
+  ],
+  "sha256": "5f724aa42634b63e54794f91c11ef50f6d87a199ee2bb818dba24550c2c92e29",
+  "file": "cupboard.glb",
+  "target": [
+   0.8,
+   1.8,
+   0.45
+  ],
+  "bytes": 110952
  },
  {
   "name": "curtain_pair",
@@ -697,6 +1094,28 @@
   "sha256": "30abeda7dee4a5245f295c57c86983c99ff8be422d4de271dc45657b21211fb3"
  },
  {
+  "name": "desk_lamp_arm",
+  "tris": 1784,
+  "actual": [
+   0.20000000298023224,
+   0.48200004192161927,
+   0.3961935490369797
+  ],
+  "materials": [
+   "tint",
+   "joint",
+   "light"
+  ],
+  "sha256": "a5175e47e69c10a08ec3546b320c6c6e23bb12d840142714885e985e6e7412b9",
+  "file": "desk_lamp_arm.glb",
+  "target": [
+   0.2,
+   0.5,
+   0.4
+  ],
+  "bytes": 76980
+ },
+ {
   "name": "desk_lamp_clip",
   "tris": 1196,
   "actual": [
@@ -717,6 +1136,28 @@
   ],
   "bytes": 62036,
   "sha256": "dba69bb1cae9bac166aeb17f88d845226f470685427923b42bcac7bc022c448a"
+ },
+ {
+  "name": "desk_standing",
+  "tris": 2384,
+  "actual": [
+   1.2000000476837158,
+   0.7500000240083349,
+   0.699999988079071
+  ],
+  "materials": [
+   "tint",
+   "metal",
+   "plastic"
+  ],
+  "sha256": "64153cc76ab29b4c7a292058ba38db9ae4ed4ccbff31e7c395b41b03a2519589",
+  "file": "desk_standing.glb",
+  "target": [
+   1.2,
+   0.75,
+   0.7
+  ],
+  "bytes": 86468
  },
  {
   "name": "desk_wide",
@@ -885,6 +1326,135 @@
   "bytes": 55928
  },
  {
+  "name": "drying_rack",
+  "tris": 1180,
+  "actual": [
+   0.8980000019073486,
+   1.1049031794536859,
+   0.550000011920929
+  ],
+  "materials": [
+   "tint",
+   "rail"
+  ],
+  "sha256": "53b2e51630c43f608b9d0e6b2e3f0b89eec751ae6d3fd732532b11676c5211c0",
+  "file": "drying_rack.glb",
+  "target": [
+   0.9,
+   1.1,
+   0.55
+  ],
+  "bytes": 64148
+ },
+ {
+  "name": "duvet_set",
+  "tris": 4740,
+  "actual": [
+   1.0,
+   0.14981733709464606,
+   1.9997551441192627
+  ],
+  "materials": [
+   "tint",
+   "pillow"
+  ],
+  "sha256": "0e34c9fd649824247571c8cac8dab6772166873c91b07dd71f8263a5e439dbd3",
+  "file": "duvet_set.glb",
+  "target": [
+   1.0,
+   0.15,
+   2.0
+  ],
+  "bytes": 142228
+ },
+ {
+  "name": "fairy_lights",
+  "tris": 4296,
+  "actual": [
+   1.5019999742507935,
+   0.30024997889995575,
+   0.050000015646219254
+  ],
+  "materials": [
+   "cord",
+   "light"
+  ],
+  "sha256": "aeaa16d02f95f47f8c58f53fb5031e8f9950925e625f27799234432312e1aab4",
+  "file": "fairy_lights.glb",
+  "target": [
+   1.5,
+   0.3,
+   0.05
+  ],
+  "bytes": 173076
+ },
+ {
+  "name": "fan",
+  "tris": 6488,
+  "actual": [
+   0.3499999940395355,
+   0.8970000310140005,
+   0.36299994587898254
+  ],
+  "materials": [
+   "tint",
+   "grille",
+   "blade"
+  ],
+  "sha256": "9c756e8975d2a1032d8865972336c7c867ef11186b034b97a98c96c869a09099",
+  "file": "fan.glb",
+  "target": [
+   0.35,
+   0.9,
+   0.35
+  ],
+  "bytes": 336108
+ },
+ {
+  "name": "figurine",
+  "tris": 3640,
+  "actual": [
+   0.1159999631345272,
+   0.24982639402151108,
+   0.11599999666213989
+  ],
+  "materials": [
+   "stone",
+   "tint",
+   "stone2"
+  ],
+  "sha256": "b9dd6c2bfac40fab002e679abb542a349a4f4e498cbe4711ddf3a864bc7a6682",
+  "file": "figurine.glb",
+  "target": [
+   0.12,
+   0.25,
+   0.12
+  ],
+  "bytes": 100388
+ },
+ {
+  "name": "file_wagon",
+  "tris": 1504,
+  "actual": [
+   0.4000000059604645,
+   0.5999999785818142,
+   0.5160000026226044
+  ],
+  "materials": [
+   "tint",
+   "wood",
+   "wheel"
+  ],
+  "sha256": "327f6c231c60d6ca9a7c296e343406b2b4ff2851c06ad7118b8febe746a3b969",
+  "file": "file_wagon.glb",
+  "target": [
+   0.4,
+   0.6,
+   0.5
+  ],
+  "bytes": 66196
+ },
+ {
   "name": "floor_chair",
   "tris": 1744,
   "actual": [
@@ -926,6 +1496,29 @@
   ],
   "bytes": 43376,
   "sha256": "862d0026b8598fbdc250c7344ce677578c76db49e3cb0b8b7ec016acb1076763"
+ },
+ {
+  "name": "floor_lamp_arc",
+  "tris": 4492,
+  "actual": [
+   1.112000048160553,
+   1.895977872028336,
+   0.37400001287460327
+  ],
+  "materials": [
+   "stone",
+   "metal",
+   "tint",
+   "light"
+  ],
+  "sha256": "722817b4f75ace2da1eaa1883245c1ac7d545b14d375d85db7acd652da3f7d2c",
+  "file": "floor_lamp_arc.glb",
+  "target": [
+   1.1,
+   1.9,
+   0.35
+  ],
+  "bytes": 178764
  },
  {
   "name": "floor_lamp_ball",
@@ -1037,6 +1630,28 @@
   "sha256": "44deabfe4f469811b5016506fdf1ddbc72b1c626cec6e89b32c47ea376cdc35a"
  },
  {
+  "name": "fridge",
+  "tris": 996,
+  "actual": [
+   0.47999998927116394,
+   1.0980000668299343,
+   0.5530000627040863
+  ],
+  "materials": [
+   "tint",
+   "seal",
+   "plastic"
+  ],
+  "sha256": "bde3116e09b5e96f90c6e0cf6e6db57b0f802d7ff35c3f9abf75c16582ffd761",
+  "file": "fridge.glb",
+  "target": [
+   0.48,
+   1.1,
+   0.55
+  ],
+  "bytes": 45152
+ },
+ {
   "name": "futon_floor",
   "tris": 1772,
   "actual": [
@@ -1077,6 +1692,115 @@
    0.45
   ],
   "bytes": 27592
+ },
+ {
+  "name": "headboard",
+  "tris": 876,
+  "actual": [
+   1.0199999809265137,
+   0.8999999832549452,
+   0.21000000089406967
+  ],
+  "materials": [
+   "tint",
+   "inner"
+  ],
+  "sha256": "9b98886f6a3155c0f2259e3bee23788a936b973fcaee648b28e7e3e8e7f53d8b",
+  "file": "headboard.glb",
+  "target": [
+   1.0,
+   0.9,
+   0.2
+  ],
+  "bytes": 38852
+ },
+ {
+  "name": "high_chair",
+  "tris": 2864,
+  "actual": [
+   0.5472328662872314,
+   0.888824095018208,
+   0.5780419111251831
+  ],
+  "materials": [
+   "wood",
+   "tint",
+   "plastic"
+  ],
+  "sha256": "aee4bb4918d60e1a54f2ddd8dad3bac22d13de2a9d23ec64fbc1f7702f7761e1",
+  "file": "high_chair.glb",
+  "target": [
+   0.55,
+   0.9,
+   0.6
+  ],
+  "bytes": 115908
+ },
+ {
+  "name": "humidifier",
+  "tris": 1270,
+  "actual": [
+   0.20000000298023224,
+   0.3000000190177312,
+   0.2055000141263008
+  ],
+  "materials": [
+   "tint",
+   "tank",
+   "plastic",
+   "light"
+  ],
+  "sha256": "4c266862523b1529d636174bb2825ec95e8e802e654a8890844af5ec50812f16",
+  "file": "humidifier.glb",
+  "target": [
+   0.2,
+   0.3,
+   0.2
+  ],
+  "bytes": 55380
+ },
+ {
+  "name": "kids_chair",
+  "tris": 1008,
+  "actual": [
+   0.30000001192092896,
+   0.5407047072658315,
+   0.303937703371048
+  ],
+  "materials": [
+   "tint",
+   "wood"
+  ],
+  "sha256": "bde90706bb49ea082230f5a1ec9471e71197239c0051682477051ba2084f0ea2",
+  "file": "kids_chair.glb",
+  "target": [
+   0.3,
+   0.55,
+   0.3
+  ],
+  "bytes": 45836
+ },
+ {
+  "name": "kids_table",
+  "tris": 1992,
+  "actual": [
+   0.6000000238418579,
+   0.4510000350419432,
+   0.6000000238418579
+  ],
+  "materials": [
+   "tint",
+   "edge",
+   "wood"
+  ],
+  "sha256": "6b9ae82b715dedeca7ca21ca962272e6aba55c2465be9ac4cdee6e854cadb193",
+  "file": "kids_table.glb",
+  "target": [
+   0.6,
+   0.45,
+   0.6
+  ],
+  "bytes": 77772
  },
  {
   "name": "kotatsu",
@@ -1120,6 +1844,70 @@
   "bytes": 46120
  },
  {
+  "name": "lamp_lantern",
+  "tris": 2256,
+  "actual": [
+   0.18000000715255737,
+   0.2990000014105316,
+   0.18000000715255737
+  ],
+  "materials": [
+   "tint",
+   "light"
+  ],
+  "sha256": "5e0d20adcf801394315cb07f8673c841aedb6305053428df558fcab97b70e16b",
+  "file": "lamp_lantern.glb",
+  "target": [
+   0.18,
+   0.3,
+   0.18
+  ],
+  "bytes": 108908
+ },
+ {
+  "name": "laptop",
+  "tris": 540,
+  "actual": [
+   0.33000001311302185,
+   0.21151294588035796,
+   0.24840743839740753
+  ],
+  "materials": [
+   "tint",
+   "keys",
+   "screen"
+  ],
+  "sha256": "b8046b843ee47a2f11de01e52db09f4ed59133e47daa89929f6fff072b3f4141",
+  "file": "laptop.glb",
+  "target": [
+   0.33,
+   0.22,
+   0.24
+  ],
+  "bytes": 28212
+ },
+ {
+  "name": "laundry_basket",
+  "tris": 7648,
+  "actual": [
+   0.4480000138282776,
+   0.546445201769834,
+   0.34844446182250977
+  ],
+  "materials": [
+   "tint",
+   "weave"
+  ],
+  "sha256": "2b2598dcbd7a054b410524fbcf60feb42a11fc334f56acb85c1fa3154a5a47d0",
+  "file": "laundry_basket.glb",
+  "target": [
+   0.45,
+   0.55,
+   0.35
+  ],
+  "bytes": 256292
+ },
+ {
   "name": "led_strip_segment",
   "tris": 216,
   "actual": [
@@ -1139,6 +1927,74 @@
   ],
   "bytes": 9792,
   "sha256": "1e1c7a4694462fd1b68248d8273799d38d64d79ffd38d124c0664b0cf8f49b51"
+ },
+ {
+  "name": "mattress_floor",
+  "tris": 2072,
+  "actual": [
+   0.9679999947547913,
+   0.1889643776230514,
+   1.9479999542236328
+  ],
+  "materials": [
+   "mattress_side",
+   "tint",
+   "piping"
+  ],
+  "sha256": "6c54c3b3dac12ffccaad49e39eb0f901f9516f0fdcff29279354345a28a3e003",
+  "file": "mattress_floor.glb",
+  "target": [
+   0.97,
+   0.2,
+   1.95
+  ],
+  "bytes": 75184
+ },
+ {
+  "name": "memo_board",
+  "tris": 1204,
+  "actual": [
+   0.6000000238418579,
+   0.4500000184853766,
+   0.02000003308057785
+  ],
+  "materials": [
+   "wood",
+   "tint",
+   "paper",
+   "pin"
+  ],
+  "sha256": "c908789937f9fefe436c9a3901ba5d2a340c22c5e73a33b8cdb3d9d62685ba3d",
+  "file": "memo_board.glb",
+  "target": [
+   0.6,
+   0.45,
+   0.02
+  ],
+  "bytes": 57360
+ },
+ {
+  "name": "microwave",
+  "tris": 1416,
+  "actual": [
+   0.44999998807907104,
+   0.2699999922638723,
+   0.36000001430511475
+  ],
+  "materials": [
+   "tint",
+   "plastic",
+   "screen",
+   "light"
+  ],
+  "sha256": "aebd9b925be02fbc02e11ea3fc2ff96bba2c29def4a539c7dd581c97ec3a78a1",
+  "file": "microwave.glb",
+  "target": [
+   0.45,
+   0.27,
+   0.35
+  ],
+  "bytes": 64952
  },
  {
   "name": "mirror_arch",
@@ -1225,6 +2081,27 @@
   "bytes": 47952
  },
  {
+  "name": "oshiire_case",
+  "tris": 3708,
+  "actual": [
+   0.44999998807907104,
+   0.7000000082370121,
+   0.5580000877380371
+  ],
+  "materials": [
+   "tint",
+   "body"
+  ],
+  "sha256": "c2dd56a68e399e9092ff1e0f23d8912967e8f00afcde2a55052187eae79915ad",
+  "file": "oshiire_case.glb",
+  "target": [
+   0.45,
+   0.7,
+   0.55
+  ],
+  "bytes": 160392
+ },
+ {
   "name": "ottoman_round",
   "tris": 1020,
   "actual": [
@@ -1289,6 +2166,27 @@
   "bytes": 109056
  },
  {
+  "name": "pet_bed",
+  "tris": 2144,
+  "actual": [
+   0.6000000238418579,
+   0.19500000543042617,
+   0.5
+  ],
+  "materials": [
+   "tint",
+   "cushion"
+  ],
+  "sha256": "f6f8a165e1980564c7d37a86cd3f52712aa62b2317f671c7da8d8741fc325aa5",
+  "file": "pet_bed.glb",
+  "target": [
+   0.6,
+   0.2,
+   0.5
+  ],
+  "bytes": 66796
+ },
+ {
   "name": "photo_frame",
   "tris": 476,
   "actual": [
@@ -1308,6 +2206,72 @@
    0.08
   ],
   "bytes": 23060
+ },
+ {
+  "name": "photo_wall",
+  "tris": 2024,
+  "actual": [
+   0.8999999761581421,
+   0.34999999464351866,
+   0.020000025629997253
+  ],
+  "materials": [
+   "wood",
+   "paper",
+   "tint",
+   "print"
+  ],
+  "sha256": "be9f9632767ec33af5523eba79a58fe31e590895854db448289feb7ed5412717",
+  "file": "photo_wall.glb",
+  "target": [
+   0.9,
+   0.35,
+   0.02
+  ],
+  "bytes": 80408
+ },
+ {
+  "name": "pillow",
+  "tris": 1196,
+  "actual": [
+   0.5992653369903564,
+   0.11973760864930227,
+   0.3995102047920227
+  ],
+  "materials": [
+   "tint"
+  ],
+  "sha256": "9ada947865986963ef78becd5f02960bb0070ddc159fa96b07655a17a4defd3d",
+  "file": "pillow.glb",
+  "target": [
+   0.6,
+   0.12,
+   0.4
+  ],
+  "bytes": 37072
+ },
+ {
+  "name": "plant_cactus",
+  "tris": 1980,
+  "actual": [
+   0.1394999995827675,
+   0.29400000330998255,
+   0.13199999928474426
+  ],
+  "materials": [
+   "pot",
+   "soil",
+   "leaf",
+   "flower"
+  ],
+  "sha256": "72494c5ec9f22613de8785aa71bca68b681f726d9fc0459a6fce3617e894a928",
+  "file": "plant_cactus.glb",
+  "target": [
+   0.15,
+   0.3,
+   0.15
+  ],
+  "bytes": 89272
  },
  {
   "name": "plant_eucalyptus",
@@ -1402,6 +2366,52 @@
   "bytes": 669384
  },
  {
+  "name": "plant_pothos_hanging",
+  "tris": 7384,
+  "actual": [
+   0.40549755096435547,
+   0.7219317406415939,
+   0.3902745842933655
+  ],
+  "materials": [
+   "pot",
+   "soil",
+   "cord",
+   "leaf"
+  ],
+  "sha256": "c5c379d142deb77d5a778bfa8ce1298f4b79306d5f36a8fc2bc76fe08b245543",
+  "file": "plant_pothos_hanging.glb",
+  "target": [
+   0.4,
+   0.7,
+   0.4
+  ],
+  "bytes": 386452
+ },
+ {
+  "name": "plant_snake",
+  "tris": 2508,
+  "actual": [
+   0.33325253427028656,
+   0.6730107140738508,
+   0.3517606258392334
+  ],
+  "materials": [
+   "pot",
+   "soil",
+   "leaf_edge",
+   "leaf"
+  ],
+  "sha256": "f3df79c73b63c7cf47e6b955ba337596fc10e09260810f4f4a22c5c58deec28a",
+  "file": "plant_snake.glb",
+  "target": [
+   0.35,
+   0.7,
+   0.35
+  ],
+  "bytes": 100048
+ },
+ {
   "name": "plant_stand",
   "tris": 1060,
   "actual": [
@@ -1442,6 +2452,94 @@
    0.25
   ],
   "bytes": 135304
+ },
+ {
+  "name": "poster",
+  "tris": 736,
+  "actual": [
+   0.5,
+   0.6999999886830541,
+   0.020000052638351917
+  ],
+  "materials": [
+   "wood",
+   "tint",
+   "print2",
+   "print"
+  ],
+  "sha256": "1fe836e14f4062d1a85814b3688d098eedcd5a169961e9a5fe1c189e15813fe3",
+  "file": "poster.glb",
+  "target": [
+   0.5,
+   0.7,
+   0.02
+  ],
+  "bytes": 32924
+ },
+ {
+  "name": "range_rack",
+  "tris": 1764,
+  "actual": [
+   0.6000000238418579,
+   1.2000000624813056,
+   0.40800006687641144
+  ],
+  "materials": [
+   "tint",
+   "wood",
+   "metal"
+  ],
+  "sha256": "5b28083872f5d45f3a0a0a3ccc32c912205aefdd937b5093315c0da76c6d036b",
+  "file": "range_rack.glb",
+  "target": [
+   0.6,
+   1.2,
+   0.4
+  ],
+  "bytes": 77428
+ },
+ {
+  "name": "reed_diffuser",
+  "tris": 748,
+  "actual": [
+   0.07800000160932541,
+   0.24655115861093524,
+   0.08007586002349854
+  ],
+  "materials": [
+   "tint",
+   "wood",
+   "reed"
+  ],
+  "sha256": "24d477c74f36b284c378350b1d4546744b52938324089ca047a0cbc44bd382ed",
+  "file": "reed_diffuser.glb",
+  "target": [
+   0.08,
+   0.25,
+   0.08
+  ],
+  "bytes": 35932
+ },
+ {
+  "name": "rocking_chair",
+  "tris": 3348,
+  "actual": [
+   0.6499999761581421,
+   0.9347649216651917,
+   0.9088050723075867
+  ],
+  "materials": [
+   "wood",
+   "tint"
+  ],
+  "sha256": "dd5b98f5976e8f831ee94cff1f8c2fe86a74869a66510b362d6d9ce982a45d07",
+  "file": "rocking_chair.glb",
+  "target": [
+   0.65,
+   0.95,
+   0.9
+  ],
+  "bytes": 134196
  },
  {
   "name": "room_divider",
@@ -1612,6 +2710,28 @@
   "sha256": "a0a78bf2658365ed8e38c7fdad6b3c35b0f762a2656e2aa8f8913d9fcda74185"
  },
  {
+  "name": "rug_runner",
+  "tris": 1068,
+  "actual": [
+   0.6000000238418579,
+   0.019000128804457006,
+   1.8000000715255737
+  ],
+  "materials": [
+   "stripe",
+   "tint",
+   "fringe"
+  ],
+  "sha256": "6b6a7eed1673ce503afe0b29b76aacb9d9fa2661c7cf0dfb6e09a67f370b35a1",
+  "file": "rug_runner.glb",
+  "target": [
+   0.6,
+   0.02,
+   1.8
+  ],
+  "bytes": 71672
+ },
+ {
   "name": "rug_wave",
   "tris": 2880,
   "actual": [
@@ -1630,6 +2750,27 @@
   ],
   "bytes": 111484,
   "sha256": "0860ad3a91ec5fe9a71354d85571bb5288017a13a36e68bc44bf7ffc7c44576f"
+ },
+ {
+  "name": "seat_cushion",
+  "tris": 2556,
+  "actual": [
+   0.5497962832450867,
+   0.0672367277147714,
+   0.5897814631462097
+  ],
+  "materials": [
+   "tint",
+   "tuft"
+  ],
+  "sha256": "7dd273f570ee72b747da3382b551b02398d534667ced4238dbdae69bb0af8596",
+  "file": "seat_cushion.glb",
+  "target": [
+   0.55,
+   0.07,
+   0.59
+  ],
+  "bytes": 96104
  },
  {
   "name": "shelf_cube",
@@ -1652,6 +2793,48 @@
   "sha256": "3ad0908f876d2822d20a9e72369d4679d6d62997756482bd528c940c83e6d1f0"
  },
  {
+  "name": "shelf_cube_4x4",
+  "tris": 1092,
+  "actual": [
+   1.46999990940094,
+   1.4700000433323206,
+   0.3900001049041748
+  ],
+  "materials": [
+   "tint"
+  ],
+  "sha256": "fc8f71d254c670189ba0e7d646a1bcab5f421e35c75701f035f488f78c125489",
+  "file": "shelf_cube_4x4.glb",
+  "target": [
+   1.47,
+   1.47,
+   0.39
+  ],
+  "bytes": 40580
+ },
+ {
+  "name": "shelf_cube_boxes",
+  "tris": 1260,
+  "actual": [
+   0.7999999523162842,
+   0.8000000251330626,
+   0.3630000501871109
+  ],
+  "materials": [
+   "tint",
+   "box",
+   "strap"
+  ],
+  "sha256": "f1e98c4afb7394607b6b3e6ead1ee5e49ec1e7d9d26bd322cddfd7517aed69aa",
+  "file": "shelf_cube_boxes.glb",
+  "target": [
+   0.8,
+   0.8,
+   0.35
+  ],
+  "bytes": 59048
+ },
+ {
   "name": "shelf_low",
   "tris": 672,
   "actual": [
@@ -1670,6 +2853,69 @@
   ],
   "bytes": 25760,
   "sha256": "6068c6ce784604687e524d6d4b748dbb4e53dfdb316b639104d89863fc997d32"
+ },
+ {
+  "name": "shelf_metal",
+  "tris": 3952,
+  "actual": [
+   0.9079999923706055,
+   1.7999999705366267,
+   0.4580000042915344
+  ],
+  "materials": [
+   "tint",
+   "foot"
+  ],
+  "sha256": "3488fcf980fcbdcea7ae66495488f33c36e30eedfda346cca308d5a7cb3543a2",
+  "file": "shelf_metal.glb",
+  "target": [
+   0.9,
+   1.8,
+   0.45
+  ],
+  "bytes": 213304
+ },
+ {
+  "name": "shoe_cabinet",
+  "tris": 828,
+  "actual": [
+   0.800000011920929,
+   1.00000001223066,
+   0.3660000115633011
+  ],
+  "materials": [
+   "wood",
+   "tint"
+  ],
+  "sha256": "1298f9accba68f8ea546c6bb47a6402e1bceeb92c28f5b51c2988c9d025dc4fa",
+  "file": "shoe_cabinet.glb",
+  "target": [
+   0.8,
+   1.0,
+   0.35
+  ],
+  "bytes": 38600
+ },
+ {
+  "name": "shoe_rack",
+  "tris": 1980,
+  "actual": [
+   0.800000011920929,
+   0.5000000110981917,
+   0.30000005662441254
+  ],
+  "materials": [
+   "tint",
+   "wood"
+  ],
+  "sha256": "af9d4465544e2190b8ec9da070736d727b6faf03ecb0d663cd0a3c3543c30496",
+  "file": "shoe_rack.glb",
+  "target": [
+   0.8,
+   0.5,
+   0.3
+  ],
+  "bytes": 79840
  },
  {
   "name": "side_table",
@@ -1711,6 +2957,27 @@
    0.3
   ],
   "bytes": 24472
+ },
+ {
+  "name": "sideboard",
+  "tris": 1344,
+  "actual": [
+   1.600000023841858,
+   0.7000000010624872,
+   0.466000035405159
+  ],
+  "materials": [
+   "tint",
+   "wood"
+  ],
+  "sha256": "23a9a4d7485ac633ac1267d976fd57f8c3641a04b2c8042069a5bf9a345cdd45",
+  "file": "sideboard.glb",
+  "target": [
+   1.6,
+   0.7,
+   0.45
+  ],
+  "bytes": 59368
  },
  {
   "name": "small_plant",
@@ -1839,6 +3106,28 @@
   ],
   "bytes": 218920,
   "sha256": "9537f77bf4edaaef47d72751e9bbe6c18c6d2de93ecb0de13e6a3a0a58d9158a"
+ },
+ {
+  "name": "sofa_bed",
+  "tris": 4824,
+  "actual": [
+   1.4200000762939453,
+   0.7989842008386603,
+   0.8715562522411346
+  ],
+  "materials": [
+   "wood",
+   "tint",
+   "tie"
+  ],
+  "sha256": "83541951ded7014f4f2753a01dc17fd1192abc17519a81ba63ef136e359f7472",
+  "file": "sofa_bed.glb",
+  "target": [
+   1.4,
+   0.8,
+   0.85
+  ],
+  "bytes": 201776
  },
  {
   "name": "sofa_bed_open",
@@ -2010,6 +3299,92 @@
   "sha256": "cf14f3bebcf2ef0bc3a9de7dc1d43879d149b85d3857b95e0df2273126164435"
  },
  {
+  "name": "sofa_modular",
+  "tris": 6656,
+  "actual": [
+   2.0920000076293945,
+   0.7887953679508755,
+   2.0920000076293945
+  ],
+  "materials": [
+   "plinth",
+   "tint"
+  ],
+  "sha256": "578b5716cfc0be095889f3ac218c076d007acc4fc506726bad4e1d13ab4c5bb8",
+  "file": "sofa_modular.glb",
+  "target": [
+   2.1,
+   0.8,
+   2.1
+  ],
+  "bytes": 240208
+ },
+ {
+  "name": "speaker",
+  "tris": 1948,
+  "actual": [
+   0.11999999731779099,
+   0.20100001120567335,
+   0.12000001221895218
+  ],
+  "materials": [
+   "plastic",
+   "tint",
+   "light"
+  ],
+  "sha256": "a83b8b3a5c6340c07fe0d8dde1fd3efa263dfbf63294ded4aa76871b1611adf5",
+  "file": "speaker.glb",
+  "target": [
+   0.12,
+   0.2,
+   0.12
+  ],
+  "bytes": 83392
+ },
+ {
+  "name": "step_stool",
+  "tris": 1200,
+  "actual": [
+   0.4300000071525574,
+   0.4500000027256643,
+   0.4050000309944153
+  ],
+  "materials": [
+   "tint",
+   "wood"
+  ],
+  "sha256": "5b04195075682915b6cbb78a5ba21e94f47b7b75b8b83ff9bb23b6da64f4b46f",
+  "file": "step_stool.glb",
+  "target": [
+   0.43,
+   0.45,
+   0.4
+  ],
+  "bytes": 51732
+ },
+ {
+  "name": "stool_bar",
+  "tris": 1896,
+  "actual": [
+   0.3959999978542328,
+   0.7514872634783387,
+   0.3959999978542328
+  ],
+  "materials": [
+   "tint",
+   "wood",
+   "metal"
+  ],
+  "sha256": "1d6453e550afb146de6a98cad898ef1c5d42e7a886c0eccae9ea549d0be7974d",
+  "file": "stool_bar.glb",
+  "target": [
+   0.4,
+   0.75,
+   0.4
+  ],
+  "bytes": 77304
+ },
+ {
   "name": "stool_round",
   "tris": 1016,
   "actual": [
@@ -2050,6 +3425,69 @@
    0.3
   ],
   "bytes": 141092
+ },
+ {
+  "name": "storage_box_fabric",
+  "tris": 1536,
+  "actual": [
+   0.33000001311302185,
+   0.330000025343681,
+   0.3320000171661377
+  ],
+  "materials": [
+   "tint",
+   "trim"
+  ],
+  "sha256": "3c6290c3851d9bd9f70e9b454f16bfc9948d10f681638c3168bbbed9da9a191d",
+  "file": "storage_box_fabric.glb",
+  "target": [
+   0.33,
+   0.33,
+   0.33
+  ],
+  "bytes": 66688
+ },
+ {
+  "name": "table_bar",
+  "tris": 1340,
+  "actual": [
+   1.2000000476837158,
+   0.8999999920881994,
+   0.45000000298023224
+  ],
+  "materials": [
+   "wood",
+   "metal"
+  ],
+  "sha256": "7c6109c830f12efc9840e47149f09587bce101d6b5b977b96707fd6aa9460fb4",
+  "file": "table_bar.glb",
+  "target": [
+   1.2,
+   0.9,
+   0.45
+  ],
+  "bytes": 51208
+ },
+ {
+  "name": "table_cafe",
+  "tris": 2120,
+  "actual": [
+   0.6000000238418579,
+   0.7199999896312068,
+   0.6000000238418579
+  ],
+  "materials": [
+   "tint",
+   "metal"
+  ],
+  "sha256": "ef2a28b227269f281dc03e216c2ce5fa624f0dd7f03ddef8079582fd7c44e1b9",
+  "file": "table_cafe.glb",
+  "target": [
+   0.6,
+   0.72,
+   0.6
+  ],
+  "bytes": 81120
  },
  {
   "name": "table_dining_rect",
@@ -2194,6 +3632,29 @@
   "sha256": "82f7adf4917fb13f968d52e9672ffced73ccd399c0d7262127b28690bfbb9227"
  },
  {
+  "name": "tableware_set",
+  "tris": 2740,
+  "actual": [
+   0.3499999940395355,
+   0.09800001409832504,
+   0.25
+  ],
+  "materials": [
+   "wood",
+   "tint",
+   "coffee",
+   "plate"
+  ],
+  "sha256": "43cb9d6c0e163bc6db49d17481cdfab3661dfc9bbefd77eae6da3b55bf671d71",
+  "file": "tableware_set.glb",
+  "target": [
+   0.35,
+   0.1,
+   0.25
+  ],
+  "bytes": 120532
+ },
+ {
   "name": "tapestry",
   "tris": 1520,
   "actual": [
@@ -2275,6 +3736,50 @@
   ],
   "bytes": 62640,
   "sha256": "5aaaaacc8352f8506b319ebc293e196dcef9a8c6d796b4dd8f010cb65ed1cb02"
+ },
+ {
+  "name": "tv_stand_wide",
+  "tris": 1092,
+  "actual": [
+   1.7999999523162842,
+   0.3500000073271661,
+   0.41600002348423004
+  ],
+  "materials": [
+   "wood",
+   "tint"
+  ],
+  "sha256": "96a48296cdddbe632a01f506d35872b49eec5fc9ee6e5669c6f68a13aee76ed5",
+  "file": "tv_stand_wide.glb",
+  "target": [
+   1.8,
+   0.35,
+   0.4
+  ],
+  "bytes": 47884
+ },
+ {
+  "name": "vacuum_stick",
+  "tris": 2224,
+  "actual": [
+   0.25,
+   1.0889587492186257,
+   0.25
+  ],
+  "materials": [
+   "stand",
+   "plastic",
+   "tint",
+   "metal"
+  ],
+  "sha256": "eaeac486f38a21929d2bfbd16063d299371a40ea02f9252ab27ce765f6de778f",
+  "file": "vacuum_stick.glb",
+  "target": [
+   0.25,
+   1.1,
+   0.25
+  ],
+  "bytes": 101584
  },
  {
   "name": "vase_tulip",
@@ -2365,6 +3870,27 @@
   "bytes": 47592
  },
  {
+  "name": "wall_hooks",
+  "tris": 1308,
+  "actual": [
+   0.6000000238418579,
+   0.15000000852739293,
+   0.08000000566244125
+  ],
+  "materials": [
+   "tint",
+   "wood"
+  ],
+  "sha256": "996ff9b6cbfe94ba6b2931ac49ed2b8738ec535d4f5f0673cbcf0d70f68a59fd",
+  "file": "wall_hooks.glb",
+  "target": [
+   0.6,
+   0.15,
+   0.08
+  ],
+  "bytes": 49904
+ },
+ {
   "name": "wall_mirror",
   "tris": 2304,
   "actual": [
@@ -2449,5 +3975,26 @@
   ],
   "bytes": 40288,
   "sha256": "9fe787f137e29a22129a92f806c73fd14a5f05517b41269cf3802b0ccdadec57"
+ },
+ {
+  "name": "watering_can",
+  "tris": 1208,
+  "actual": [
+   0.30500413477420807,
+   0.21531759610169,
+   0.11999999731779099
+  ],
+  "materials": [
+   "tint",
+   "accent"
+  ],
+  "sha256": "a0270d283956233a9796839ac108535dfe56cbbb872d90e7946bd91a232c5f2f",
+  "file": "watering_can.glb",
+  "target": [
+   0.3,
+   0.22,
+   0.12
+  ],
+  "bytes": 60304
  }
 ]
