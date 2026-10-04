@@ -1,0 +1,5 @@
+# state には DB パスワードや SECRET_KEY_BASE が平文で入るのでコミットしない
+terraform.tfstate
+terraform.tfstate.*
+terraform.tfvars
+.terraform/

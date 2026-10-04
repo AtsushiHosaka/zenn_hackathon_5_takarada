@@ -62,7 +62,7 @@ app/
     user_serializer.rb             # レスポンスの JSON はここだけで組む (Alba)
   lib/json_failure_app.rb          # 未認証時に JSON の 401 を返す
 lib/
-  middleware/origin_guard.rb       # ORIGIN_SECRET があるとき API Gateway 経由のみ許可
+  middleware/origin_guard.rb       # ORIGIN_SECRET があるとき共有シークレット付きのみ許可 (現構成では未使用)
   tasks/ridgepole.rake
 config/
   routes.rb                        # /api/v1 名前空間 + /api-docs マウント
@@ -90,7 +90,7 @@ swagger/v1/swagger.yaml            # 生成物(コミットする)
 | `DB_NAME` | `app` | `app_development` / `app_test` の接頭辞 |
 | `CORS_ORIGINS` | `*` | カンマ区切りで許可オリジンを制限 |
 | `DEVISE_JWT_SECRET_KEY` | `secret_key_base` | JWT の署名鍵。**本番では必ず指定する** |
-| `ORIGIN_SECRET` | (空) | 値があると `x-origin-secret` ヘッダを検証する。`infra/` 参照 |
+| `ORIGIN_SECRET` | (空) | 値があると `x-origin-secret` ヘッダを検証する。現構成 (Cloud Run) では未設定 |
 
 ## 注意点
 
@@ -101,5 +101,5 @@ swagger/v1/swagger.yaml            # 生成物(コミットする)
 - **credentials は使っていない**: `config/master.key` は `.gitignore` 済み(Rails 既定)。`secret_key_base` は本番では `SECRET_KEY_BASE` 環境変数、開発/テストでは `tmp/local_secret.txt` から来るので、鍵が無くても起動する。fork 後に credentials を使いたくなったら `bin/rails credentials:edit` で作り直すこと(既存の `credentials.yml.enc` は元の鍵が無いと復号できない)。
 - **`json` gem は 2.x に固定**: json 3.x は Rails 8.0 系の JSON エンコーダと非互換(`quirks_mode` 削除)。
 - **console のプロンプト**: `.irbrc` が `irb(dev):001 > ` / `irb(prod):001 > ` に差し替えている。`config/application.rb` の `console do` では `IRB.setup` に上書きされるため効かない。
-- **デプロイ時は本番モード**: `infra/compose.deploy.yaml` が `RAILS_ENV=production` を渡す。ローカルの `docker compose up` は development のまま。
+- **デプロイ時は本番モード**: Cloud Run が `RAILS_ENV=production` を渡す (`infra/gcp/run.tf`)。ローカルの `docker compose up` は development のまま。DB は Cloud SQL コネクタの Unix ソケットに繋ぐので、`DB_HOST` に `/cloudsql/<接続名>` が入る。
 - **API の表示名**: `spec/swagger_helper.rb` の `info.title` / `info.description` が Swagger UI に出る。プロジェクト名が決まったら書き換えて `make docs` を回す。

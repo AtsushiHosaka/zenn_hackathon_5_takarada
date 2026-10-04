@@ -1,5 +1,5 @@
-# ベース定義。ローカルでは compose.override.yaml が自動で重なり、
-# デプロイ時は infra/compose.deploy.yaml を明示的に重ねる。
+# ローカル開発のベース定義。compose.override.yaml が自動で重なる。
+# デプロイ先は Cloud Run なので compose は使わない (infra/gcp/README.md 参照)。
 services:
   db:
     image: postgres:16-alpine
@@ -26,8 +26,7 @@ services:
       retries: 10
 
   api:
-    # ローカルは compose.override.yaml が build して同じタグを付ける。
-    # デプロイ時は ECR のイメージ URI が入る
+    # compose.override.yaml が build して同じタグを付ける
     image: ${API_IMAGE:-hack-api:local}
     command: >
       bash -c "rm -f tmp/pids/server.pid &&

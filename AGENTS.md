@@ -5,5 +5,5 @@
 - `.agents/skills/hackathon-*` を用途で選ぶ。固定フロー・細かな承認待ちは不要。厳格SDDの明示指定は尊重する。
 - フロント・backend・infraとも新規テストは原則書かず、TDDはしない。既存CIは維持し、API契約生成に必要な最小rswag定義だけは追加・更新する。
 - 変更に関係する既存検証を使い、テスト追加は必要性が合意された場合に限る。要求を削って完了扱いせず、未検証・代替実装を明記する。
-- backendは [.claude/docs/backend.md](.claude/docs/backend.md)、Webフロントは [.claude/docs/frontend.md](.claude/docs/frontend.md)、iOSは [.claude/docs/ios.md](.claude/docs/ios.md)、infraは [infra/README.md](infra/README.md) を参照する。
+- backendは [.claude/docs/backend.md](.claude/docs/backend.md)、Webフロントは [.claude/docs/frontend.md](.claude/docs/frontend.md)、iOSは [.claude/docs/ios.md](.claude/docs/ios.md)、infraは [infra/gcp/README.md](infra/gcp/README.md) を参照する。
 - 独立作業はサブエージェントへ分担し、アプリ・コンテナ等は再利用する。PRはリポジトリのテンプレートに従う。

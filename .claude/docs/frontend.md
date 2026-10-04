@@ -112,8 +112,8 @@ backend に `posts` を足した場合:
 
 ## デプロイ
 
-`infra/` の Lightsail + API Gateway は **API だけ**を載せている。web は compose の
-`compose.override.yaml` にしか居ないので、デプロイには含まれない。
-公開するなら `Dockerfile` の `runtime` ステージ (nginx) をどこかに載せるか、
-`npm run build` した `dist/` を静的ホスティングに置く。どちらも
-`VITE_API_ENDPOINT` に `make infra-url` の値を渡してビルドする。
+`Dockerfile` の `runtime` ステージ (nginx + ビルド済みの `dist/`) を Cloud Run に載せている。
+`make infra-release` が API の Cloud Run URL を `VITE_API_ENDPOINT` に渡してビルドするので、
+**API の URL はビルド時にバンドルへ焼き込まれる**。URL が変わったら作り直しが必要。
+`compose.override.yaml` の `web` (Vite dev server) はローカル専用。
+詳細は [infra/gcp/README.md](../../infra/gcp/README.md)。
