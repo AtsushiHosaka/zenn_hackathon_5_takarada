@@ -281,10 +281,11 @@ RSpec.configure do |config|
               after_scene: { allOf: [ { "$ref" => "#/components/schemas/Scene" } ], nullable: true, description: "status が done になると入る" },
               items: { type: :array, items: { "$ref" => "#/components/schemas/CoordinationItem" }, description: "購入リンク一覧。after_scene の suggested と marker で対応する" },
               total_price: { type: :integer, nullable: true, example: 26_840 },
+              planned_by: { type: :string, nullable: true, enum: [ nil, "gemini", "mock" ], description: "gemini: 要望文から AI が商品を選んだ / mock: キーワードでテーマを決めたモック。生成が終わると入る", example: "gemini" },
               error_message: { type: :string, nullable: true, example: nil },
               created_at: { type: :string, format: "date-time" }
             },
-            required: %w[id room_id status prompt budget kept_object_ids title comment before_scene after_scene items total_price error_message created_at]
+            required: %w[id room_id status prompt budget kept_object_ids title comment before_scene after_scene items total_price planned_by error_message created_at]
           }
         }
       }

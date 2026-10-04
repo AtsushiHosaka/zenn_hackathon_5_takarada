@@ -50,6 +50,8 @@ create_table "coordinations", force: :cascade do |t|
   t.jsonb "after_scene"
   t.jsonb "items", null: false, default: []
   t.integer "total_price"
+  t.string "planned_by" # gemini: 要望文から AI が商品を選んだ / mock: キーワードでテーマを決めたモック
+  t.jsonb "analysis" # 精度の確認用: Gemini の回答・モデル・時間・トークン数・採用した商品 (API には出さない)
   t.text "error_message"
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false

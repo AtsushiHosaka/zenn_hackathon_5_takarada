@@ -1,7 +1,7 @@
 # コーデを組み立てる: 商品候補を選ぶ (CoordinationPlanner) → 枠に配置する (SlotLayout) → 予算内に収める。
 # 置き場所が無い商品・予算を超える商品は採用しないので、購入リンク一覧と 3D の表示は常に一致する。
 class CoordinationBuilder
-  Result = Data.define(:title, :comment, :after_scene, :items, :total_price)
+  Result = Data.define(:title, :comment, :after_scene, :items, :total_price, :planned_by, :analysis)
 
   def self.call(coordination)
     new(coordination).call
@@ -15,7 +15,7 @@ class CoordinationBuilder
   def call
     kept = kept_objects
     layout = SlotLayout.new(@scene, kept)
-    plan = CoordinationPlanner.call(prompt: @coordination.prompt, budget: @coordination.budget)
+    plan = CoordinationPlanner.call(prompt: @coordination.prompt, budget: @coordination.budget, room: @scene["room"], kept_objects: kept)
 
     by_slot = plan.candidates.group_by(&:slot) # 枠の優先順・各枠はおすすめ順
     placed = []
@@ -33,10 +33,13 @@ class CoordinationBuilder
 
     Result.new(
       title: plan.title,
-      comment: comment(placed, kept),
+      comment: comment(plan, placed, kept),
       after_scene: { "room" => @scene["room"], "objects" => kept + placed.map { |p| p[:placement].object } },
       items: placed.map.with_index(1) { |p, marker| item_json(p[:item], p[:placement].note, marker) },
-      total_price: placed.sum { |p| p[:item].price }
+      total_price: placed.sum { |p| p[:item].price },
+      planned_by: plan.planned_by,
+      # 精度の確認用: Gemini の回答と、実際に採用した商品
+      analysis: plan.analysis.merge("placed_item_ids" => placed.map { |p| p[:item].id })
     )
   end
 
@@ -72,12 +75,16 @@ class CoordinationBuilder
     ids.blank? ? objects : objects.select { |o| ids.include?(o["id"]) }
   end
 
-  def comment(placed, kept)
+  # コンセプト (Gemini) + 実際に置いた商品 + 活かした家具 + 断り書き (Gemini)。
+  # 商品の部分は置いた結果から組み立てるので、予算や置き場所で外れた商品には触れない
+  def comment(plan, placed, kept)
     added = placed.first(3).map { |p| "#{p[:item].name} (#{p[:placement].note})" }.join("、")
     kept_labels = kept.map { |o| o["label"] }.join("と")
-    text = "#{added} などを追加しました。"
-    text += "今の#{kept_labels}はそのまま活かしています。" if kept_labels.present?
-    text
+    parts = [ plan.concept ]
+    parts << "#{added} などを追加しました。" if added.present?
+    parts << "今の#{kept_labels}はそのまま活かしています。" if kept_labels.present?
+    parts << plan.note
+    parts.compact.join
   end
 
   def item_json(item, note, marker)

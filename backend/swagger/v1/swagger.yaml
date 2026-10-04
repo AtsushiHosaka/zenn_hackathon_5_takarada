@@ -900,6 +900,15 @@ components:
           type: integer
           nullable: true
           example: 26840
+        planned_by:
+          type: string
+          nullable: true
+          enum:
+          -
+          - gemini
+          - mock
+          description: 'gemini: 要望文から AI が商品を選んだ / mock: キーワードでテーマを決めたモック。生成が終わると入る'
+          example: gemini
         error_message:
           type: string
           nullable: true
@@ -920,5 +929,6 @@ components:
       - after_scene
       - items
       - total_price
+      - planned_by
       - error_message
       - created_at
