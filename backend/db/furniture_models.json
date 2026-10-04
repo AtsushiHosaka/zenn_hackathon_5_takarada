@@ -23,6 +23,26 @@
    "sha256": "e34e7c24ce2d4f2ce3db18e5ee6047560ba4e94d3df09dab445e34a54bd1a6d5"
   },
   {
+   "id": "beanbag",
+   "name": "ビーズクッション",
+   "category": "beanbag",
+   "shape": "beanbag",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/beanbag.glb",
+   "size": [
+    0.65,
+    0.45,
+    0.65
+   ],
+   "triangles": 504,
+   "materials": [
+    "tint"
+   ],
+   "bytes": 15188,
+   "sha256": "4eaf9deb534a665b980e965507edbff8556b973baa2c0a8616a21de418903ed6"
+  },
+  {
    "id": "bed_cover",
    "name": "ベッドカバー",
    "category": "bed_cover",
@@ -191,6 +211,46 @@
    "sha256": "da0f7f15fd82c7341aa53ef49a9a520c42293ec5d0ba91d581de4339c1f32031"
   },
   {
+   "id": "bench_wood",
+   "name": "木製ベンチ",
+   "category": "bench",
+   "shape": "bench_wood",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bench_wood.glb",
+   "size": [
+    1.0,
+    0.45,
+    0.35
+   ],
+   "triangles": 368,
+   "materials": [
+    "wood"
+   ],
+   "bytes": 21068,
+   "sha256": "9c2dc2f6ccf4eb6beecebed8af530b77c21373ee83b58f60cf77313ad5aea95d"
+  },
+  {
+   "id": "blanket_folded",
+   "name": "たたんだブランケット",
+   "category": "blanket",
+   "shape": "blanket_folded",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/blanket_folded.glb",
+   "size": [
+    0.5,
+    0.08,
+    0.35
+   ],
+   "triangles": 2292,
+   "materials": [
+    "tint"
+   ],
+   "bytes": 76920,
+   "sha256": "460c31c3594cf33c1123842368f789d3daa7d9d4b54a470bf41b3a6275a1d3ab"
+  },
+  {
    "id": "bookshelf",
    "name": "本棚",
    "category": "shelf",
@@ -293,6 +353,27 @@
    "sha256": "fa3e660276162bb8300be88c8066bd9b51538f6b3ff5e4c2c8d341ff44e57ca1"
   },
   {
+   "id": "chair_lounge",
+   "name": "ラウンジチェア",
+   "category": "chair",
+   "shape": "chair_lounge",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/chair_lounge.glb",
+   "size": [
+    0.7,
+    0.75,
+    0.75
+   ],
+   "triangles": 2716,
+   "materials": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 101576,
+   "sha256": "9ad2d78ce455e5920442b96f550fdcf2ad062161ab72f0cfc9aaa93211bcd887"
+  },
+  {
    "id": "chair_office",
    "name": "デスクチェア",
    "category": "chair",
@@ -334,6 +415,27 @@
    ],
    "bytes": 97024,
    "sha256": "6190585809d03db0421a55994e2dc9bec0d6e795ac2743268ec66966e697e3b3"
+  },
+  {
+   "id": "console_table",
+   "name": "コンソールテーブル",
+   "category": "table",
+   "shape": "console_table",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/console_table.glb",
+   "size": [
+    1.0,
+    0.75,
+    0.3
+   ],
+   "triangles": 1088,
+   "materials": [
+    "wood",
+    "metal"
+   ],
+   "bytes": 39932,
+   "sha256": "852ec2ec3354e0c6932046874b43e76c0569932a9e4dcd85c2f24e719511d98c"
   },
   {
    "id": "curtain_pair",
@@ -763,6 +865,50 @@
    "sha256": "bcc92158cedd16708487fa65744bc9e22880f21e043aadb9b2420b9644f3fa6f"
   },
   {
+   "id": "dresser",
+   "name": "ミラー付きドレッサー",
+   "category": "dresser",
+   "shape": "dresser",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/dresser.glb",
+   "size": [
+    0.8,
+    1.4,
+    0.4
+   ],
+   "triangles": 1160,
+   "materials": [
+    "tint",
+    "knob",
+    "wood",
+    "mirror"
+   ],
+   "bytes": 55928,
+   "sha256": "a5d041a683f3c23c11fc6141c53dd4a202a6fce291b95ec2e9ea4d6ca2e2e312"
+  },
+  {
+   "id": "floor_chair",
+   "name": "座椅子",
+   "category": "chair",
+   "shape": "floor_chair",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/floor_chair.glb",
+   "size": [
+    0.45,
+    0.55,
+    0.55
+   ],
+   "triangles": 1744,
+   "materials": [
+    "frame",
+    "tint"
+   ],
+   "bytes": 59988,
+   "sha256": "592ac51eb8ce89fa658615fa0a946b10164221774f61391b5dd6f09e2a2a1ea1"
+  },
+  {
    "id": "floor_lamp",
    "name": "シェード付きフロアライト",
    "category": "floor_lamp",
@@ -915,6 +1061,68 @@
    "sha256": "ebcdebf2a9b7a31e0788e5b5800970edc0d680971609187f43f4adea002cacf2"
   },
   {
+   "id": "hanger_rack",
+   "name": "ハンガーラック",
+   "category": "storage",
+   "shape": "hanger_rack",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/hanger_rack.glb",
+   "size": [
+    1.0,
+    1.6,
+    0.45
+   ],
+   "triangles": 528,
+   "materials": [
+    "metal",
+    "wood"
+   ],
+   "bytes": 27592,
+   "sha256": "2b34d840dac9e9d30cfb23bfe3df3262acd13030b2b9c061e9dccd4b6d267c3b"
+  },
+  {
+   "id": "kotatsu",
+   "name": "こたつ（掛け布団付き）",
+   "category": "table",
+   "shape": "kotatsu",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/kotatsu.glb",
+   "size": [
+    1.8,
+    0.42,
+    1.8
+   ],
+   "triangles": 12204,
+   "materials": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 313912,
+   "sha256": "b17c3a34bd12b34e3c55301301cd9390aae7e6d8772dc9da446744189e6d6113"
+  },
+  {
+   "id": "ladder_shelf",
+   "name": "ラダーシェルフ",
+   "category": "shelf",
+   "shape": "ladder_shelf",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/ladder_shelf.glb",
+   "size": [
+    0.6,
+    1.6,
+    0.35
+   ],
+   "triangles": 1080,
+   "materials": [
+    "wood"
+   ],
+   "bytes": 46120,
+   "sha256": "9ecfe68734f6d20b2ceb2af7d6a0b95808fd7ebcb188ce4171926a05bc1df070"
+  },
+  {
    "id": "led_strip_segment",
    "name": "直線LEDテープ",
    "category": "led",
@@ -936,6 +1144,48 @@
    "sha256": "1e1c7a4694462fd1b68248d8273799d38d64d79ffd38d124c0664b0cf8f49b51"
   },
   {
+   "id": "mirror_arch",
+   "name": "アーチ型ウォールミラー",
+   "category": "wall_mirror",
+   "shape": "mirror_arch",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/mirror_arch.glb",
+   "size": [
+    0.45,
+    0.8,
+    0.03
+   ],
+   "triangles": 464,
+   "materials": [
+    "tint",
+    "mirror"
+   ],
+   "bytes": 20688,
+   "sha256": "3a32e7ee35360b976fd4fa388037997d08ed4c735c9157cfb0ddc84c1301ad4d"
+  },
+  {
+   "id": "mirror_stand",
+   "name": "スタンドミラー",
+   "category": "floor_mirror",
+   "shape": "mirror_stand",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/mirror_stand.glb",
+   "size": [
+    0.5,
+    1.6,
+    0.45
+   ],
+   "triangles": 520,
+   "materials": [
+    "wood",
+    "mirror"
+   ],
+   "bytes": 24068,
+   "sha256": "daf593c813dd0448fcd31e45b13115971fb1ef4739c30d96de44033c34e2c62c"
+  },
+  {
    "id": "monitor",
    "name": "デスク上モニター",
    "category": "monitor",
@@ -955,6 +1205,112 @@
    ],
    "bytes": 18024,
    "sha256": "f750dd9554830e56758266e5c5630164e1164684df76e6d75ddf437a6842eb55"
+  },
+  {
+   "id": "nightstand",
+   "name": "ナイトテーブル",
+   "category": "side_table",
+   "shape": "nightstand",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/nightstand.glb",
+   "size": [
+    0.4,
+    0.5,
+    0.35
+   ],
+   "triangles": 1000,
+   "materials": [
+    "wood",
+    "knob"
+   ],
+   "bytes": 47952,
+   "sha256": "44d4a284986994805abdbbc55e98f4ed6f20996f50bfb6431e20ea9332120ad4"
+  },
+  {
+   "id": "ottoman_round",
+   "name": "丸型オットマン",
+   "category": "ottoman",
+   "shape": "ottoman_round",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/ottoman_round.glb",
+   "size": [
+    0.45,
+    0.4,
+    0.45
+   ],
+   "triangles": 1020,
+   "materials": [
+    "tint",
+    "piping"
+   ],
+   "bytes": 41396,
+   "sha256": "15affc3dd5b780a7fd452babf455a2078c030d072029ff63bc6d54b41ddc1d0c"
+  },
+  {
+   "id": "pegboard",
+   "name": "有孔ボード",
+   "category": "pegboard",
+   "shape": "pegboard",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/pegboard.glb",
+   "size": [
+    0.6,
+    0.6,
+    0.03
+   ],
+   "triangles": 3712,
+   "materials": [
+    "tint",
+    "hole"
+   ],
+   "bytes": 221820,
+   "sha256": "408432a951eb7ea43f1b1bdde25f9cb65551c086cdd811382c44cdaa70d546db"
+  },
+  {
+   "id": "pendant_light",
+   "name": "ペンダントライト",
+   "category": "pendant_light",
+   "shape": "pendant_light",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/pendant_light.glb",
+   "size": [
+    0.4,
+    0.6,
+    0.4
+   ],
+   "triangles": 2988,
+   "materials": [
+    "cord",
+    "tint",
+    "light"
+   ],
+   "bytes": 109056,
+   "sha256": "1740bf6a7573c103436956bac5e843cba4bc3176dfd036f7ec0ffea27d761a1b"
+  },
+  {
+   "id": "photo_frame",
+   "name": "卓上フォトフレーム",
+   "category": "photo_frame",
+   "shape": "photo_frame",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/photo_frame.glb",
+   "size": [
+    0.15,
+    0.2,
+    0.08
+   ],
+   "triangles": 476,
+   "materials": [
+    "tint",
+    "print"
+   ],
+   "bytes": 23060,
+   "sha256": "93e324df130d559b0b8de54517de24348ba10e9e8d34a1707ce066342a8f0638"
   },
   {
    "id": "plant_eucalyptus",
@@ -980,6 +1336,29 @@
    "sha256": "c78854b502bc8208f4f3d25aa97de0b96b2d03b4074e66cd7e22126041f06c7c"
   },
   {
+   "id": "plant_fiddle",
+   "name": "ウンベラータ",
+   "category": "plant",
+   "shape": "plant_fiddle",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plant_fiddle.glb",
+   "size": [
+    0.6,
+    1.4,
+    0.6
+   ],
+   "triangles": 6852,
+   "materials": [
+    "pot",
+    "soil",
+    "stem",
+    "leaf"
+   ],
+   "bytes": 285768,
+   "sha256": "8f249f156dffcafb5df02bbdef7a8add983b93ea87889ee1895f3f16ebae4f11"
+  },
+  {
    "id": "plant_monstera",
    "name": "モンステラ",
    "category": "plant",
@@ -1001,6 +1380,92 @@
    ],
    "bytes": 223116,
    "sha256": "93dfc27541f6638ecc260b4e0e68d181b9d673a4aa97db2d9ffca671d6a0f653"
+  },
+  {
+   "id": "plant_olive",
+   "name": "オリーブの木",
+   "category": "plant",
+   "shape": "plant_olive",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plant_olive.glb",
+   "size": [
+    0.5,
+    1.5,
+    0.5
+   ],
+   "triangles": 13908,
+   "materials": [
+    "pot",
+    "soil",
+    "stem",
+    "leaf"
+   ],
+   "bytes": 669384,
+   "sha256": "b4a0009ac6cbf958e0ecc94d9a5400da5f29457d91ad3da17f9549ea52824fd2"
+  },
+  {
+   "id": "plant_stand",
+   "name": "2段フラワースタンド",
+   "category": "plant_stand",
+   "shape": "plant_stand",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plant_stand.glb",
+   "size": [
+    0.4,
+    0.6,
+    0.4
+   ],
+   "triangles": 1060,
+   "materials": [
+    "wood"
+   ],
+   "bytes": 45612,
+   "sha256": "9d4cac24d99f4ce4559d03b17419b985dab4ab31d593d9219cac826bd900e0ee"
+  },
+  {
+   "id": "plush_bear",
+   "name": "くまのぬいぐるみ",
+   "category": "plush",
+   "shape": "plush_bear",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plush_bear.glb",
+   "size": [
+    0.3,
+    0.35,
+    0.25
+   ],
+   "triangles": 3764,
+   "materials": [
+    "tint",
+    "muzzle",
+    "eye"
+   ],
+   "bytes": 135304,
+   "sha256": "f447975febf477ba04b4c6b159dc5a19d8527a94e4807008538f58b6925543a7"
+  },
+  {
+   "id": "room_divider",
+   "name": "3連パーテーション",
+   "category": "room_divider",
+   "shape": "room_divider",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/room_divider.glb",
+   "size": [
+    1.2,
+    1.6,
+    0.25
+   ],
+   "triangles": 1332,
+   "materials": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 58508,
+   "sha256": "699c0286868a3f1db9d94f1a259cef5504e5a93db67c73bd45a8aa681e85dabc"
   },
   {
    "id": "rug_rect",
@@ -1228,6 +1693,27 @@
    ],
    "bytes": 47892,
    "sha256": "e806678f318c45ab12c5072291d51776add2bd8cfb9c84504682b53595a4094d"
+  },
+  {
+   "id": "side_table_c",
+   "name": "コの字サイドテーブル",
+   "category": "side_table",
+   "shape": "side_table_c",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/side_table_c.glb",
+   "size": [
+    0.45,
+    0.55,
+    0.3
+   ],
+   "triangles": 648,
+   "materials": [
+    "wood",
+    "metal"
+   ],
+   "bytes": 24472,
+   "sha256": "3d59bb5eecddb35b6d31620f21fe61f8135494c1a8fb8256acf60771e1e406be"
   },
   {
    "id": "small_plant",
@@ -1548,6 +2034,27 @@
    "sha256": "54bb873ee02e86c940ba11f1556a71a7e66afeb0c4359e25c891357125c1f0db"
   },
   {
+   "id": "storage_basket",
+   "name": "ラタン調収納バスケット",
+   "category": "storage_box",
+   "shape": "storage_basket",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/storage_basket.glb",
+   "size": [
+    0.4,
+    0.3,
+    0.3
+   ],
+   "triangles": 3308,
+   "materials": [
+    "tint",
+    "weave"
+   ],
+   "bytes": 141092,
+   "sha256": "485096e4e5e48bab9e3c1239a37c3fb2eebf6ccc801567aa605357c770bffdad"
+  },
+  {
    "id": "table_dining_rect",
    "name": "長方形ダイニングテーブル",
    "category": "table",
@@ -1586,6 +2093,27 @@
    ],
    "bytes": 48880,
    "sha256": "49a382ed2659d96aa833a274f38dfa96b8be528760889e8270a1cd1f91a5e1ec"
+  },
+  {
+   "id": "table_lamp",
+   "name": "マッシュルーム型テーブルランプ",
+   "category": "table_lamp",
+   "shape": "table_lamp",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_lamp.glb",
+   "size": [
+    0.25,
+    0.3,
+    0.25
+   ],
+   "triangles": 2164,
+   "materials": [
+    "tint",
+    "light"
+   ],
+   "bytes": 65452,
+   "sha256": "1fd1c9e5bb040c76b4889d138803cc1dc94ef3c0620ce3e59eacd3e533b96639"
   },
   {
    "id": "table_low_rect",
@@ -1690,6 +2218,47 @@
    "sha256": "f4b1e4e82d6d863aa72cab2d39a648055c7945021eb2989a25b46c3c1803ec2d"
   },
   {
+   "id": "trash_bin",
+   "name": "ゴミ箱",
+   "category": "trash_bin",
+   "shape": "trash_bin",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/trash_bin.glb",
+   "size": [
+    0.25,
+    0.35,
+    0.25
+   ],
+   "triangles": 560,
+   "materials": [
+    "tint"
+   ],
+   "bytes": 20516,
+   "sha256": "53b503c0e5153c2426ea9a58840d96c98a2d500344f02ba30df52556dd71c505"
+  },
+  {
+   "id": "tv",
+   "name": "43型テレビ",
+   "category": "tv",
+   "shape": "tv",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/tv.glb",
+   "size": [
+    0.97,
+    0.62,
+    0.2
+   ],
+   "triangles": 660,
+   "materials": [
+    "tint",
+    "screen"
+   ],
+   "bytes": 25328,
+   "sha256": "b456b52dc8b2c9f9c19ac0be84f08f24013007e0588c6f16c0b87a8471a5c947"
+  },
+  {
    "id": "tv_stand",
    "name": "テレビ台",
    "category": "storage",
@@ -1709,6 +2278,50 @@
    ],
    "bytes": 62640,
    "sha256": "5aaaaacc8352f8506b319ebc293e196dcef9a8c6d796b4dd8f010cb65ed1cb02"
+  },
+  {
+   "id": "vase_tulip",
+   "name": "花瓶とチューリップ",
+   "category": "vase",
+   "shape": "vase_tulip",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/vase_tulip.glb",
+   "size": [
+    0.15,
+    0.4,
+    0.15
+   ],
+   "triangles": 1496,
+   "materials": [
+    "vase",
+    "stem",
+    "tint",
+    "leaf"
+   ],
+   "bytes": 71512,
+   "sha256": "ced4285d8ded10d230276c43834927ce0a40ca29285e7f426fea6eb28611f1bc"
+  },
+  {
+   "id": "wagon_cart",
+   "name": "3段ワゴン",
+   "category": "storage",
+   "shape": "wagon_cart",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/wagon_cart.glb",
+   "size": [
+    0.45,
+    0.78,
+    0.35
+   ],
+   "triangles": 2404,
+   "materials": [
+    "tint",
+    "wheel"
+   ],
+   "bytes": 108016,
+   "sha256": "9f0f75d49e8a9b7f372597f914c2923c871720e7dfd2346bfa6070f89d1f1bf0"
   },
   {
    "id": "wall_art",
@@ -1731,6 +2344,28 @@
    ],
    "bytes": 35916,
    "sha256": "5a9aadcc9ae25be83cabf5fe9f32e6158339828632b16b79fca8043ed98ef180"
+  },
+  {
+   "id": "wall_clock",
+   "name": "壁掛け時計",
+   "category": "wall_clock",
+   "shape": "wall_clock",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/wall_clock.glb",
+   "size": [
+    0.3,
+    0.3,
+    0.04
+   ],
+   "triangles": 972,
+   "materials": [
+    "tint",
+    "face",
+    "ink"
+   ],
+   "bytes": 47592,
+   "sha256": "fcfb75ac9d883c9a3cb22be4287fbdb56b05e39fc1044471a021cd1a733f5bdd"
   },
   {
    "id": "wall_mirror",

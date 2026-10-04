@@ -165,3 +165,106 @@ def wall_planter(tint=None):
             yaw = rnd.uniform(-70, 70) + (180 if k % 2 else 0)
             leaf_mesh(m, oval, leaf, 0.002, p, yaw, rnd.uniform(-60, -20), length=0.048)
     return m
+
+
+# ---------- 追加モデル (2026-10-04) ----------
+
+@asset("plant_fiddle.glb", (0.60, 1.40, 0.60))
+def plant_fiddle(tint=None):
+    """ウンベラータ。大きなハート形の葉。"""
+    m = Model("plant_fiddle")
+    m.tol = 0.5  # 枝葉の広がりは目安寸法に合わせて伸縮する
+    leaf = m.mat("leaf", tint or "#6aa85c", rough=0.6)
+    stem = m.mat("stem", "#8a7a63", rough=0.8)
+    potm = m.mat("pot", "#cfa98a", rough=0.7)
+    soil = m.mat("soil", P.SOIL, rough=1.0)
+    pot(m, 0.15, 0.12, 0.30, potm, soil)
+    rnd = random.Random(21)
+    for b, (lean_a, h) in enumerate([(30, 1.25), (150, 1.05), (270, 1.15)]):
+        a = math.radians(lean_a)
+        pts = [Vector((0.02 * math.cos(a), 0.28, 0.02 * math.sin(a)))]
+        for k in range(1, 5):
+            t = k / 4
+            pts.append(Vector((0.1 * t ** 1.5 * math.cos(a), 0.28 + (h - 0.28) * t, 0.1 * t ** 1.5 * math.sin(a))))
+        for p0, p1 in zip(pts, pts[1:]):
+            m.rod(p0, p1, 0.012, stem, seg=8, r2=0.009, name="trunk")
+        for k in range(6):
+            t = 0.45 + 0.55 * k / 5
+            i = min(3, int(t * 4))
+            p = pts[i].lerp(pts[i + 1], t * 4 - i)
+            yaw = lean_a + rnd.uniform(-70, 70) + 140 * (k % 2)
+            L = rnd.uniform(0.17, 0.22) * (1.1 if k > 3 else 1.0)
+            leaf_mesh(m, monstera_outline(L, L * 0.95, slits=0), leaf, 0.004, p, 90 - yaw, rnd.uniform(15, 45),
+                      droop=0.25, curl=0.8, length=L)
+    return m
+
+
+@asset("plant_olive.glb", (0.50, 1.50, 0.50))
+def plant_olive(tint=None):
+    m = Model("plant_olive")
+    m.tol = 0.5  # 枝葉の広がりは目安寸法に合わせて伸縮する
+    leaf = m.mat("leaf", tint or "#8fa58a", rough=0.7)
+    stem = m.mat("stem", "#7a6a58", rough=0.8)
+    potm = m.mat("pot", "#d8cfc2", rough=0.7)
+    soil = m.mat("soil", P.SOIL, rough=1.0)
+    pot(m, 0.13, 0.1, 0.28, potm, soil)
+    rnd = random.Random(8)
+    trunk = [Vector((0, 0.26, 0)), Vector((0.02, 0.5, 0.01)), Vector((-0.01, 0.75, -0.01)), Vector((0.0, 0.9, 0.0))]
+    for p0, p1 in zip(trunk, trunk[1:]):
+        m.rod(p0, p1, 0.018, stem, seg=8, r2=0.015, name="trunk")
+    narrow = [(0.011 * math.sin(math.pi * i / 6), 0.085 * (1 - math.cos(math.pi * i / 6)) / 2) for i in range(7)]
+    narrow = narrow + [(-x, z) for x, z in reversed(narrow[1:-1])]
+    for c in range(9):
+        a = math.tau * c / 9 + rnd.uniform(-0.2, 0.2)
+        rr = rnd.uniform(0.1, 0.18)
+        cy = rnd.uniform(1.0, 1.36)
+        center = Vector((rr * math.cos(a), cy, rr * math.sin(a)))
+        m.rod(trunk[-1], center, 0.008, stem, seg=6, r2=0.005, name="branch")
+        for k in range(30):
+            off = Vector((rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.uniform(-1, 1)))
+            if off.length > 1:
+                off.normalize()
+            p = center + off * 0.09
+            leaf_mesh(m, narrow, leaf, 0.0015, p, rnd.uniform(0, 360), rnd.uniform(-40, 50), length=0.085)
+    return m
+
+
+@asset("plant_stand.glb", (0.40, 0.60, 0.40))
+def plant_stand(tint=None):
+    m = Model("plant_stand")
+    wood = m.mat("wood", tint or P.WOOD_LIGHT, rough=0.55)
+    m.cyl(0.2, 0.025, (0, 0.6 - 0.0125, 0), wood, seg=40, bevel=0.006, name="top_tray")
+    m.cyl(0.17, 0.022, (0, 0.27, 0), wood, seg=40, bevel=0.006, name="low_tray")
+    for k in range(3):
+        a = math.radians(90 + 120 * k)
+        m.rod((0.19 * math.cos(a), 0.0, 0.19 * math.sin(a)), (0.15 * math.cos(a), 0.58, 0.15 * math.sin(a)), 0.014,
+              wood, seg=10, r2=0.016, name="leg")
+    return m
+
+
+@asset("vase_tulip.glb", (0.15, 0.40, 0.15))
+def vase_tulip(tint=None):
+    m = Model("vase_tulip")
+    m.tol = 0.5  # 花の広がりは目安寸法に合わせて伸縮する
+    vase = m.mat("vase", "#e9ddd0", rough=0.5)
+    flower = m.mat("tint", tint or "#eaa7b8", rough=0.7)
+    stem = m.mat("stem", P.STEM, rough=0.7)
+    leaf = m.mat("leaf", "#7fae6a", rough=0.6)
+    m.lathe([(0.0, 0.0), (0.04, 0.0), (0.058, 0.03), (0.064, 0.07), (0.055, 0.11), (0.032, 0.145), (0.03, 0.16),
+             (0.034, 0.168), (0.0, 0.166)], (0, 0, 0), vase, seg=36, name="vase")
+    rnd = random.Random(4)
+    head = [(0.0, 0.0), (0.011, 0.002), (0.018, 0.012), (0.02, 0.026), (0.018, 0.04), (0.012, 0.046),
+            (0.0, 0.042)]
+    for k in range(5):
+        a = math.tau * k / 5 + rnd.uniform(-0.3, 0.3)
+        r = rnd.uniform(0.025, 0.05)
+        top = Vector((r * math.cos(a), rnd.uniform(0.31, 0.355), r * math.sin(a)))
+        mid = Vector((0.008 * math.cos(a), 0.22, 0.008 * math.sin(a)))
+        m.rod((0, 0.15, 0), mid, 0.0028, stem, seg=6, name="stem")
+        m.rod(mid, top, 0.0028, stem, seg=6, name="stem")
+        m.lathe(head, (top.x, top.y - 0.003, top.z), flower, seg=12, name="tulip")
+    blade = [(0.012 * math.sin(math.pi * i / 8), 0.14 * i / 8) for i in range(9)]
+    blade = blade + [(-x, z) for x, z in reversed(blade[1:-1])]
+    for k in range(3):
+        leaf_mesh(m, blade, leaf, 0.002, Vector((0, 0.16, 0)), 120 * k + 20, 62, droop=0.05, length=0.14)
+    return m

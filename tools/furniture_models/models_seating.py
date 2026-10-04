@@ -202,3 +202,96 @@ def stool_round(tint=None):
     for k in range(4):
         m.rod(legs[k], legs[(k + 1) % 4], 0.009, wood, seg=8, name="stretcher")
     return m
+
+
+# ---------- 追加モデル (2026-10-04) ----------
+
+@asset("ottoman_round.glb", (0.45, 0.40, 0.45))
+def ottoman_round(tint=None):
+    m = Model("ottoman_round")
+    fab = m.mat("tint", tint or "#c9b8a6", rough=0.95)
+    seam = m.mat("piping", "#a8968a", rough=0.95)
+    m.lathe([(0.0, 0.0), (0.2, 0.0), (0.218, 0.015), (0.225, 0.05), (0.225, 0.34), (0.218, 0.375), (0.2, 0.395),
+             (0.12, 0.4), (0.0, 0.398)], (0, 0, 0), fab, seg=40, name="body")
+    m.lathe([(0.226, 0.355), (0.231, 0.36), (0.226, 0.366), (0.221, 0.36)], (0, 0, 0), seam, seg=40, closed=True,
+            name="piping")
+    m.cyl(0.018, 0.012, (0, 0.398, 0), seam, seg=12, bevel=0.004, name="button")
+    return m
+
+
+@asset("bench_wood.glb", (1.00, 0.45, 0.35))
+def bench_wood(tint=None):
+    m = Model("bench_wood")
+    wood = m.mat("wood", tint or P.WOOD_LIGHT, rough=0.55)
+    W, H, D, t = 1.00, 0.45, 0.35, 0.04
+    m.box((W, t, D), (0, H - t / 2, 0), wood, bevel=0.01, name="seat")
+    feet = []
+    for sx in (-1, 1):
+        for sz in (-1, 1):
+            top = (sx * (W / 2 - 0.1), H - t, sz * (D / 2 - 0.07))
+            bottom = (sx * (W / 2 - 0.06), 0.0, sz * (D / 2 - 0.04))
+            m.rod(bottom, top, 0.019, wood, seg=12, r2=0.024, name="leg")
+            feet.append(tuple(b + (c - b) * 0.35 for b, c in zip(bottom, top)))
+    for a, b in ((0, 1), (2, 3)):
+        m.rod(feet[a], feet[b], 0.012, wood, seg=8, name="stretcher")
+    m.rod(((feet[0][0] + feet[1][0]) / 2, feet[0][1], 0), ((feet[2][0] + feet[3][0]) / 2, feet[2][1], 0), 0.012, wood,
+          seg=8, name="stretcher")
+    return m
+
+
+@asset("chair_lounge.glb", (0.70, 0.75, 0.75))
+def chair_lounge(tint=None):
+    m = Model("chair_lounge")
+    wood = m.mat("wood", P.WOOD_LIGHT, rough=0.55)
+    fab = m.mat("tint", tint or "#b8c4b0", rough=0.95)
+    W, D = 0.70, 0.75
+    s = 0.045
+    for sx in (-1, 1):
+        x = sx * (W / 2 - s / 2)
+        m.box((s, 0.56, s), (x, 0.28, D / 2 - 0.08), wood, bevel=0.006, name="front_leg")
+        m.box((s, 0.5, s), (x, 0.25, -D / 2 + 0.1), wood, bevel=0.006, rot=(-6, 0, 0), name="back_leg")
+        m.box((s + 0.02, 0.035, D - 0.06), (x, 0.56, 0.0), wood, bevel=0.008, name="arm")
+        m.box((s, 0.04, D - 0.14), (x, 0.2, 0.0), wood, bevel=0.005, name="side_rail")
+    for z in (D / 2 - 0.08, -D / 2 + 0.1):
+        m.box((W - 2 * s, 0.05, 0.03), (0, 0.24, z), wood, bevel=0.005, name="cross_rail")
+    m.cushion((W - 2 * s - 0.01, 0.13, 0.62), (0, 0.32, 0.03), fab, puff=0.3, round_=0.35, cuts=4, rot=(-3, 0, 0),
+              name="seat")
+    m.cushion((W - 2 * s - 0.03, 0.46, 0.12), (0, 0.52, -0.27), fab, puff=0.3, round_=0.35, cuts=4, rot=(-16, 0, 0),
+              name="back")
+    m.box((W - 2 * s, 0.04, 0.025), (0, 0.6, -0.355), wood, bevel=0.005, rot=(-16, 0, 0), name="back_rail")
+    return m
+
+
+@asset("beanbag.glb", (0.65, 0.45, 0.65))
+def beanbag(tint=None):
+    m = Model("beanbag")
+    fab = m.mat("tint", tint or "#cdb4d6", rough=0.95)
+    profile = [(0.0, 0.0), (0.26, 0.0), (0.31, 0.04), (0.325, 0.13), (0.31, 0.25), (0.26, 0.35), (0.17, 0.42),
+               (0.07, 0.448), (0.0, 0.45)]
+    # くぼみで下がる分を見込んで高めに作る
+    ob = m.lathe([(r, y * 1.1) for r, y in profile], (0, 0, 0), fab, seg=36, name="body")
+    import math
+
+    def sag(co):
+        # 座った跡のくぼみと、少し前へ流れたシルエット
+        r2 = co.x * co.x + (co.z - 0.05) * (co.z - 0.05)
+        if co.y > 0.2:
+            co.y -= 0.09 * math.exp(-r2 / 0.025) * (co.y - 0.2) / 0.25
+        co.z += 0.03 * (co.y / 0.45) * (1 if co.z > 0 else 0.3)
+        return co
+
+    m.deform(ob, sag)
+    ob.data.set_sharp_from_angle(angle=math.pi)
+    return m
+
+
+@asset("floor_chair.glb", (0.45, 0.55, 0.55))
+def floor_chair(tint=None):
+    m = Model("floor_chair")
+    fab = m.mat("tint", tint or "#9fa9b8", rough=0.95)
+    frame = m.mat("frame", "#5b566b", rough=0.8)
+    m.box((0.43, 0.03, 0.50), (0, 0.015, 0.02), frame, bevel=0.008, name="base")
+    m.cushion((0.45, 0.1, 0.5), (0, 0.075, 0.025), fab, puff=0.3, round_=0.35, cuts=4, name="seat")
+    m.box((0.38, 0.38, 0.03), (0, 0.27, -0.205), frame, bevel=0.008, rot=(-22, 0, 0), name="back_frame")
+    m.cushion((0.44, 0.47, 0.1), (0, 0.33, -0.165), fab, puff=0.3, round_=0.35, cuts=4, rot=(-22, 0, 0), name="back")
+    return m
