@@ -74,6 +74,7 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     analysisInput,
     prompt: record.prompt,
     budget: record.budget,
+    keptObjectIds: record.kept_object_ids.length > 0 ? record.kept_object_ids : record.before_scene.objects.filter(item => item.source === "existing").map(item => item.id),
   };
   if (!isRoomDesign(design)) invalid("Coordination の部屋データ");
   return design;

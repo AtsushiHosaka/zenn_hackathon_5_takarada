@@ -49,6 +49,7 @@ function searchLink(query: string): string {
 export function createDummyRoomRepository(): RoomRepository {
   return {
     demo: createDemoRoom,
+    analyze: (input, signal) => createDummyRoomRepository().generate(input, signal),
     async capabilities() {
       return { generation: true, coordination: false, input: "dimensions", message: "オフラインモックでは畳数と形から部屋の寸法とベッド・デスク・本棚を表示します。写真・希望・スタイルの解析と、商品生成は行いません。商品付きの提案はAPI接続で確認できます。" };
     },
