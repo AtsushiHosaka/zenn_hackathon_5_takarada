@@ -143,3 +143,5 @@ PR #5を#6へマージした後、既存APIテスト23件・RuboCop・Swagger再
 | `npm run types` | `../backend/swagger/v1/swagger.yaml` から TS 型を再生成 |
 
 規約・レイヤ構成・エンドポイントの足し方は [.claude/docs/frontend.md](../.claude/docs/frontend.md)。
+
+家具のGLBはWebへ同梱せず、公開GCS URLから取得します。API接続ではDBの家具・商品IDとの対応からモデルを割り当て、未設定や取得失敗時は簡易形状を表示します。寸法・保存先などの台帳は公開API `/api/v1/furniture_models` で取得できます。配置手順は[家具モデルの運用](../docs/furniture-models.md)を参照してください。

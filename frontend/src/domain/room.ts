@@ -32,6 +32,8 @@ export type RoomItem = {
   // Y軸まわりの回転角度。単位は度、0以上360未満。
   rotation?: number;
   modelUrl?: string;
+  // APIのitem_id。画面内のidやmarkerから商品IDを推定しない。
+  productId?: string;
   marker?: number;
 };
 
@@ -125,6 +127,7 @@ export function isRoomItem(value: unknown): value is RoomItem {
   if (value.price !== undefined && (typeof value.price !== "number" || !Number.isFinite(value.price) || value.price < 0)) return false;
   if (value.marker !== undefined && (typeof value.marker !== "number" || !Number.isSafeInteger(value.marker) || value.marker <= 0)) return false;
   if (value.shop !== undefined && !nonemptyString(value.shop)) return false;
+  if (value.productId !== undefined && (typeof value.productId !== "string" || !/^[1-9]\d*$/.test(value.productId))) return false;
   return optionalHttpUrl(value.productUrl) && optionalHttpUrl(value.modelUrl) && optionalHttpUrl(value.imageUrl);
 }
 

@@ -173,6 +173,48 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/NotFound"
+  "/api/v1/furniture_models":
+    get:
+      summary: 利用できる 3D 家具モデルを一覧で取得する
+      tags:
+      - FurnitureModels
+      description: 寸法はメートル。GCS の公開ベース URL が未設定の場合、model_url は null。
+      security: []
+      responses:
+        '200':
+          description: モデル一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/FurnitureModel"
+  "/api/v1/furniture_models/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: モデルの安定 ID (GLB ファイル名から拡張子を除いた値)
+      schema:
+        type: string
+    get:
+      summary: 3D 家具モデルのメタデータを取得する
+      tags:
+      - FurnitureModels
+      security: []
+      responses:
+        '200':
+          description: モデルのメタデータ
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/FurnitureModel"
+        '404':
+          description: モデルが無い、または無効
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFound"
   "/api/v1/rooms":
     post:
       summary: 部屋を登録して解析を始める
@@ -499,6 +541,108 @@ components:
       - w
       - h
       - d
+    FurnitureModelBinding:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum:
+          - existing
+          - product
+          example: existing
+        reference:
+          type: string
+          description: 既存家具の object ID または商品の ID
+          example: bed-1
+      required:
+      - kind
+      - reference
+    FurnitureModel:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 安定 ID。GLB ファイル名から拡張子を除いた値
+          example: bed_single
+        name:
+          type: string
+          example: シングルベッド
+        category:
+          type: string
+          example: bed
+        shape:
+          type: string
+          example: bed_single
+        variant:
+          type: string
+          nullable: true
+          example:
+        format:
+          type: string
+          enum:
+          - glb
+          example: glb
+        object_key:
+          type: string
+          description: 公開ベース URL からの相対 GCS オブジェクトパス
+          example: furniture/bed_single.glb
+        size:
+          "$ref": "#/components/schemas/Size"
+        unit:
+          type: string
+          enum:
+          - meter
+          example: meter
+        axes:
+          type: string
+          enum:
+          - "+Y up, +Z front, origin bottom center"
+          example: "+Y up, +Z front, origin bottom center"
+        triangle_count:
+          type: integer
+          minimum: 0
+          example: 1200
+        byte_size:
+          type: integer
+          minimum: 1
+          example: 48000
+        sha256:
+          type: string
+          pattern: "^[0-9a-f]{64}$"
+          example: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        materials:
+          type: array
+          items:
+            type: string
+          example:
+          - wood
+          - fabric
+        model_url:
+          type: string
+          nullable: true
+          description: GCS の公開 GLB URL。ベース URL が未設定なら null
+          example:
+        bindings:
+          type: array
+          items:
+            "$ref": "#/components/schemas/FurnitureModelBinding"
+      required:
+      - id
+      - name
+      - category
+      - shape
+      - variant
+      - format
+      - object_key
+      - size
+      - unit
+      - axes
+      - triangle_count
+      - byte_size
+      - sha256
+      - materials
+      - model_url
+      - bindings
     Position:
       type: object
       description: 物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き

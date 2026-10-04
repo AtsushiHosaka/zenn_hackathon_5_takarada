@@ -108,6 +108,7 @@ function sceneSnapshot(scene: components["schemas"]["Scene"], baseUrl: string): 
       size: [item.size.w, item.size.h, item.size.d],
       rotation: item.rotation_y,
       marker: item.marker ?? undefined,
+      productId: item.item_id === null ? undefined : String(item.item_id),
       modelUrl: url(item.model_url, baseUrl),
     })),
   };
@@ -193,6 +194,7 @@ export function toAnalyzedRoomDesign(value: unknown, baseUrl: string): RoomDesig
       position: [item.position.x - room.width / 2, item.position.y + item.size.h / 2, item.position.z - room.depth / 2],
       size: [item.size.w, item.size.h, item.size.d],
       rotation: item.rotation_y,
+      productId: item.item_id === null ? undefined : String(item.item_id),
       modelUrl: url(item.model_url, baseUrl),
     })),
   };
