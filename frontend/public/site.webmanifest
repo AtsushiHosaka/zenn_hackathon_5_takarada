@@ -1,0 +1,24 @@
+{
+  "name": "へやいろ",
+  "short_name": "へやいろ",
+  "description": "今ある家具から、好きな部屋へ",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#F5F4F8",
+  "background_color": "#16141C",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
