@@ -39,9 +39,9 @@ description: ハッカソンのSpecに沿って実装し、既存CI・Swagger生
 
 - iOSは `.claude/docs/ios.md` を読み、変更時は `make ios-build` 等で確認する。
 - `Info.plist` がなければ `make ios-setup`。ダミー動作・ビルド成功と実API接続成功を区別する。
-- infraは `infra/README.md` を読み、shell変更は `bash -n`、Terraform変更はfmt/validateを使う。
-- Terraformは既存 `infra/bin/tf.sh` を使う。validateの初期化が必要なら `init -backend=false`。
-- AWSへ接続するplanや、apply・deploy・destroy・seed・resetは通常検証として一律に実行しない。
+- infraは `infra/gcp/README.md` を読み、shell変更は `bash -n`、Terraform変更はfmt/validateを使う。
+- Terraformはホストの `terraform -chdir=infra/gcp` を使う。validateの初期化が必要なら `init -backend=false`。
+- GCPへ接続するplanや、apply・deploy・destroy・seed・resetは通常検証として一律に実行しない。
 - 既存アプリ・コンテナを再利用し、独立作業の編集範囲と共有資源の競合を避ける。
 
 ## 完了の判断

@@ -391,6 +391,61 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 部屋写真のアップロード先を発行する
+         * @description 写真は Rails を通さず、ここで得た upload_url へブラウザから直接 PUT する。
+         *     PUT には Content-Type だけを付ける (署名と食い違うヘッダがあると GCS が 403 を返す)。
+         *     size も署名に含まれるため、実際に送る大きさと一致させる。
+         *     アップロード後、key を POST /api/v1/rooms の photo_keys に渡す。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UploadInput"];
+                };
+            };
+            responses: {
+                /** @description 発行に成功 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Upload"][];
+                    };
+                };
+                /** @description 対応していない形式 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ValidationErrors"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users": {
         parameters: {
             query?: never;
@@ -736,6 +791,32 @@ export interface components {
             room: components["schemas"]["RoomShape"];
             objects: components["schemas"]["SceneObject"][];
         };
+        UploadInput: {
+            uploads: {
+                /**
+                 * @example image/jpeg
+                 * @enum {string}
+                 */
+                content_type: "image/jpeg" | "image/png" | "image/webp";
+                /**
+                 * @description バイト数。署名に含めるので実際に送る大きさと一致させる
+                 * @example 284113
+                 */
+                size: number;
+            }[];
+        };
+        Upload: {
+            /**
+             * @description POST /api/v1/rooms の photo_keys に渡す
+             * @example photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg
+             */
+            key: string;
+            /**
+             * @description この URL へ写真を PUT する。Content-Type だけを付け、他のヘッダは足さない (署名と食い違うと 403)
+             * @example https://storage.googleapis.com/example-uploads/photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256
+             */
+            upload_url: string;
+        };
         RoomInput: {
             room: {
                 /**
@@ -749,6 +830,11 @@ export interface components {
                  * @enum {string}
                  */
                 shape: "square" | "standard" | "long";
+                /**
+                 * @description POST /api/v1/uploads で得た key。アップロード済みのものだけ受け付ける。省略すると写真なしで解析する
+                 * @example []
+                 */
+                photo_keys?: string[];
             };
         };
         Room: {
@@ -768,6 +854,12 @@ export interface components {
             status: "analyzing" | "ready" | "failed";
             /** @description status が ready になると入る */
             scene: components["schemas"]["Scene"] | null;
+            /**
+             * @description gemini: 写真を AI で解析した / mock: 写真か API キーが無く、決まった家具を置いたモック。解析が終わると入る
+             * @example gemini
+             * @enum {string|null}
+             */
+            analyzed_by: null | "gemini" | "mock";
             /** @example null */
             error_message: string | null;
             /** Format: date-time */

@@ -21,6 +21,8 @@ class SlotLayout
     @objects = kept_objects
     @floor_rects = kept_objects.map { |o| footprint(o) }
     @wall_spans = Hash.new { |h, k| h[k] = [] }
+    # 壁に掛けたもの (宙に浮いている) の床の占有と高さ。背の高い床置きのものがぶつからないようにする
+    @raised = []
   end
 
   def place(item)
@@ -70,20 +72,33 @@ class SlotLayout
 
   def place_curtain(item)
     window = @room["windows"]&.first or return
-    height = [ window["bottom"] + window["height"] + 0.15, @room["height"] - 0.05 ].min
-    size = { "w" => window["width"] + 0.4, "h" => height, "d" => item.size["d"] }
-    x, z, rotation = wall_pose(window["wall"], window["center"], size["d"] / 2 + 0.05)
-    build(item, size, { "x" => x, "y" => 0.0, "z" => z }, rotation, window["id"], "窓")
+    # 窓より左右 20cm ずつ広く掛ける。部屋の角に近い窓では、壁からはみ出さないよう縮める
+    left = [ window["center"] - window["width"] / 2 - 0.2, MARGIN ].max
+    right = [ window["center"] + window["width"] / 2 + 0.2, wall_length(window["wall"]) - MARGIN ].min
+    top = [ window["bottom"] + window["height"] + 0.15, @room["height"] - 0.05 ].min
+    # 窓の下に家具 (デスクなど) があれば、床まで垂らさず窓の下端の少し下で止める
+    under = furniture_on(window["wall"]).any? { |l, r, _, _| l < right && r > left }
+    bottom = under ? [ window["bottom"] - 0.1, 0.0 ].max : 0.0
+    size = { "w" => right - left, "h" => top - bottom, "d" => item.size["d"] }
+    x, z, rotation = wall_pose(window["wall"], (left + right) / 2, size["d"] / 2 + 0.05)
+    # 床まで垂らすときは、カーテンの前 (壁から 15cm) に床置きのものを置かない
+    occupy_floor(*wall_pose(window["wall"], (left + right) / 2, 0.075).first(2), size.merge("d" => 0.15), rotation) if bottom.zero?
+    build(item, size, { "x" => x, "y" => bottom, "z" => z }, rotation, window["id"], "窓")
   end
 
   def place_wall_decor(item)
     [ find("desk"), find("bed") ].compact.each do |anchor|
       wall = BACK_WALL.fetch(anchor["rotation_y"] % 360)
       bottom = [ anchor["size"]["h"] + 0.3, 1.0 ].max
-      along = free_wall_position(wall, along_of(anchor, wall), item.size["w"], bottom, bottom + item.size["h"]) or next
+      preferred = along_of(anchor, wall)
+      along = free_wall_position(wall, preferred, item.size["w"], bottom, bottom + item.size["h"]) or next
       @wall_spans[wall] << [ along - item.size["w"] / 2, along + item.size["w"] / 2, bottom, bottom + item.size["h"] ]
       x, z, rotation = wall_pose(wall, along, item.size["d"] / 2 + 0.01)
-      return build(item, item.size, { "x" => x, "y" => bottom, "z" => z }, rotation, anchor["id"], "#{anchor['label']}の上の壁")
+      fw, fd = footprint_size(item.size, rotation)
+      @raised << [ [ x - fw / 2, z - fd / 2, x + fw / 2, z + fd / 2 ], bottom ]
+      # 窓や棚を避けてずらしたときは「上」ではなくなる
+      note = (along - preferred).abs < 0.3 ? "#{anchor['label']}の上の壁" : "#{anchor['label']}の近くの壁"
+      return build(item, item.size, { "x" => x, "y" => bottom, "z" => z }, rotation, anchor["id"], note)
     end
     nil
   end
@@ -91,12 +106,29 @@ class SlotLayout
   # 窓や他の壁飾りと重ならない位置を、希望位置から近い順に探す
   def free_wall_position(wall, preferred, width, bottom, top)
     length = %w[north south].include?(wall) ? @room["width"] : @room["depth"]
-    blocked = @wall_spans[wall] + windows_on(wall)
+    blocked = @wall_spans[wall] + windows_on(wall) + furniture_on(wall)
     candidates = (0..(length / GRID_STEP)).map { |i| i * GRID_STEP }
                                           .select { |c| c - width / 2 >= MARGIN && c + width / 2 <= length - MARGIN }
     candidates.sort_by { |c| (c - preferred).abs }.find do |c|
       blocked.none? { |l, r, b, t| c - width / 2 < r && c + width / 2 > l && bottom < t && top > b }
     end
+  end
+
+  # 壁際に置かれた家具が、壁のどの範囲を床から天板の高さまでふさいでいるか
+  def furniture_on(wall)
+    @objects.filter_map do |object|
+      fw, fd = footprint_size(object["size"], object["rotation_y"])
+      x = object["position"]["x"]
+      z = object["position"]["z"]
+      next if wall_gap(wall, x, z, fw, fd) > 0.15
+
+      along, half = %w[north south].include?(wall) ? [ x, fw / 2 ] : [ z, fd / 2 ]
+      [ along - half, along + half, 0, object["position"]["y"] + object["size"]["h"] ]
+    end
+  end
+
+  def wall_length(wall)
+    %w[north south].include?(wall) ? @room["width"] : @room["depth"]
   end
 
   def windows_on(wall)
@@ -162,6 +194,7 @@ class SlotLayout
         rect = [ cx - fw / 2, cz - fd / 2, cx + fw / 2, cz + fd / 2 ]
         overlap = @floor_rects.sum { |other| overlap_area(rect, other) }
         next if !allow_overlap && overlap.positive?
+        next if @raised.any? { |raised, bottom| size["h"] > bottom && overlap_area(rect, raised).positive? }
 
         score = yield(cx, cz, overlap)
         best = [ score, cx, cz, rotation ] if best.nil? || score < best[0]

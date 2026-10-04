@@ -4,6 +4,10 @@ services:
   api:
     build: ./backend
     image: hack-api:local
+    # Gemini の API キーなど (backend/.env.example 参照)。無くても起動する
+    env_file:
+      - path: ./backend/.env
+        required: false
     # ローカルではデモユーザーも入れる
     command: >
       bash -c "rm -f tmp/pids/server.pid &&
@@ -21,12 +25,15 @@ services:
   worker:
     build: ./backend
     image: hack-api:local
+    env_file:
+      - path: ./backend/.env
+        required: false
     volumes:
       - ./backend:/app
       - bundle_data:/usr/local/bundle
 
   # Web フロント (Vite dev server)。**ローカル専用**なので base ではなくここに置く
-  # (デプロイ時は compose.yaml しか読まないため、Lightsail 側に web は入らない)
+  # (本番の web は nginx イメージを Cloud Run に載せる。infra/gcp/README.md 参照)
   web:
     build:
       context: ./frontend

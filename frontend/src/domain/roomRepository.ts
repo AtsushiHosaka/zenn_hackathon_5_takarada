@@ -11,7 +11,9 @@ export type GenerateRoomInput = {
   keptObjectIds?: string[];
 };
 
-export type RoomCapabilities = { generation: boolean; coordination: boolean; message: string; input: "dimensions" | "photos" };
+// photos: 部屋の写真を受け取れるか (dummyは受け取らない)。
+// input: 寸法を入力させるか、写真だけで解析するか。
+export type RoomCapabilities = { generation: boolean; coordination: boolean; message: string; input: "dimensions" | "photos"; photos: boolean };
 
 export type RoomRepository = {
   demo(style?: Style): RoomDesign;
