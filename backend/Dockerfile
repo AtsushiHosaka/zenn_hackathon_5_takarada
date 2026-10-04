@@ -7,7 +7,9 @@ ENV LANG=C.UTF-8 \
 
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
-      build-essential libpq-dev postgresql-client git curl && \
+      build-essential libpq-dev postgresql-client git curl \
+      # 部屋の写真を縮小してから Gemini に送る (image_processing gem が使う)
+      libvips42t64 && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
