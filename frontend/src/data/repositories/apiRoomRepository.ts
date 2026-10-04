@@ -1,5 +1,5 @@
 import { DomainError } from "../../domain/error";
-import { isRoomShape } from "../../domain/room";
+import { isRoomItem, isRoomShape } from "../../domain/room";
 import type { GenerateRoomInput, RoomRepository } from "../../domain/roomRepository";
 import type { ApiClient } from "../apiClient";
 import { createDemoRoom } from "../dummy/dummyRoomRepository";
@@ -62,7 +62,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
             if (!config.coordinationPath.includes("{id}")) throw new DomainError("コーディネートの作成先が設定されていません");
             const keptObjectIds = input.keptObjectIds ?? [];
             if (!Array.isArray(keptObjectIds) || keptObjectIds.some(id => typeof id !== "string" || !record.scene?.objects.some(item => item.source === "existing" && item.id === id)) || new Set(keptObjectIds).size !== keptObjectIds.length) throw new DomainError("活かす家具の選択が正しくありません");
-            const request: components["schemas"]["CoordinationInput"] = { coordination: { prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds } };
+            const request: components["schemas"]["CoordinationInput"] = { coordination: { prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: editedObjects(input, record) } };
             let coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationPath.replace("{id}", String(record.id)), { method: "POST", body: request, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 120_000 }));
             const coordinationId = coordination.id;
             if (coordination.room_id !== expectedId) throw new DomainError("別の部屋のコーディネートを受け取りました");
@@ -112,6 +112,19 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
       throw new DomainError("生成に時間がかかっています。少し待ってから再度お試しください");
     },
   };
+}
+
+function editedObjects(input: GenerateRoomInput, record: components["schemas"]["Room"]): components["schemas"]["FurnitureEdit"][] {
+  if (!input.editedItems) return [];
+  if (!Array.isArray(input.editedItems) || !input.editedItems.every(isRoomItem) || new Set(input.editedItems.map(item => item.id)).size !== input.editedItems.length || !record.scene) throw new DomainError("家具の編集内容が正しくありません");
+  const { room } = record.scene;
+  return input.editedItems.map(item => ({
+    id: item.id,
+    position: { x: item.position[0] + room.width / 2, y: item.position[1] - item.size[1] / 2, z: item.position[2] + room.depth / 2 },
+    size: { w: item.size[0], h: item.size[1], d: item.size[2] },
+    rotation_y: item.rotation ?? 0,
+    color: item.color,
+  }));
 }
 
 function boundedSignal(signal?: AbortSignal): AbortSignal {

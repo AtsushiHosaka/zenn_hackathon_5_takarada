@@ -9,24 +9,31 @@ class CoordinationBuilder
 
   def initialize(coordination)
     @coordination = coordination
-    @scene = coordination.room.scene
+    @scene = coordination.room.scene.deep_dup
+    @scene["objects"].map! do |object|
+      edit = coordination.edited_objects.find { |value| value["id"] == object["id"] }
+      edit ? object.merge(edit.except("id")) : object
+    end
   end
 
   def call
     kept = kept_objects
-    layout = SlotLayout.new(@scene, kept)
     plan = CoordinationPlanner.call(prompt: @coordination.prompt, budget: @coordination.budget)
 
     by_slot = plan.candidates.group_by(&:slot) # 枠の優先順・各枠はおすすめ順
+    chosen = choose_within_budget(by_slot)
     placed = []
-    choose_within_budget(by_slot).each do |slot, item|
-      # 置き場所が無ければ、同じ枠のより安い候補で試す (予算は超えない)
-      options = [ item, *by_slot[slot].select { |c| c != item && c.price <= item.price } ]
-      options.each do |candidate|
-        placement = layout.place(candidate) or next
-        placed << { item: candidate, placement: }
-        break
+    loop do
+      reserved_ids = chosen.values.map { |item| "item-#{item.id}" }
+      placed = place_choices(chosen, by_slot, kept)
+      # 編集済みの代替商品を採用したら、先行する枠もその配置を避けて置き直す。
+      newly_kept_edit = placed.any? do |entry|
+        id = "item-#{entry[:item].id}"
+        @coordination.edited_objects.any? { |edit| edit["id"] == id } && !reserved_ids.include?(id)
       end
+      break unless newly_kept_edit
+
+      chosen = placed.to_h { |entry| [ entry[:slot], entry[:item] ] }
     end
 
     placed.each.with_index(1) { |p, marker| p[:placement].object["marker"] = marker }
@@ -41,6 +48,23 @@ class CoordinationBuilder
   end
 
   private
+
+  def place_choices(chosen, by_slot, kept)
+    candidates = by_slot.values.flatten.index_by { |item| "item-#{item.id}" }
+    edits = @coordination.edited_objects.filter_map do |edit|
+      item = candidates[edit["id"]]
+      edit.merge("slot" => item.slot) if item
+    end
+    layout = SlotLayout.new(@scene, kept, edited_objects: edits, reserved_object_ids: chosen.values.map { |item| "item-#{item.id}" })
+    chosen.filter_map do |slot, item|
+      # 置き場所が無ければ、同じ枠のより安い候補で試す (予算は超えない)
+      options = [ item, *by_slot[slot].select { |candidate| candidate != item && candidate.price <= item.price } ]
+      options.each do |candidate|
+        placement = layout.place(candidate) or next
+        break({ slot:, item: candidate, placement: })
+      end.then { |entry| entry.is_a?(Hash) ? entry : nil }
+    end
+  end
 
   # 枠ごとに 1 商品を予算内で選ぶ。
   # まず優先度の高い枠から各枠の最安値を入れてできるだけ多くの枠を埋め、

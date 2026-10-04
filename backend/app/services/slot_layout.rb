@@ -16,16 +16,26 @@ class SlotLayout
   GRID_STEP = 0.05
   BACK_WALL = { 0 => "north", 90 => "west", 180 => "south", 270 => "east" }.freeze
 
-  def initialize(scene, kept_objects)
+  def initialize(scene, kept_objects, edited_objects: [], reserved_object_ids: [])
     @room = scene.fetch("room")
     @objects = kept_objects
+    @edited_objects = edited_objects.index_by { |edit| edit["id"] }
     @floor_rects = kept_objects.map { |o| footprint(o) }
     @wall_spans = Hash.new { |h, k| h[k] = [] }
+    @reserved_edit_ids = []
+    edited_objects.each { |edit| reserve_edit(edit) if reserved_object_ids.include?(edit["id"]) }
     # 壁に掛けたもの (宙に浮いている) の床の占有と高さ。背の高い床置きのものがぶつからないようにする
     @raised = []
   end
 
   def place(item)
+    if (edit = @edited_objects["item-#{item.id}"])
+      reserve_edit(edit)
+      placement = build(item, edit["size"], edit["position"], edit["rotation_y"], nil, "調整した配置")
+      placement.object["color"] = edit["color"]
+      return placement
+    end
+
     case item.slot
     when "bed_cover" then place_bed_cover(item)
     when "cushion" then place_cushion(item)
@@ -39,6 +49,20 @@ class SlotLayout
   end
 
   private
+
+  def reserve_edit(edit)
+    return if @reserved_edit_ids.include?(edit["id"])
+
+    @reserved_edit_ids << edit["id"]
+    if edit["position"]["y"] <= 0.05 && edit["slot"] != "rug"
+      occupy_floor(edit["position"]["x"], edit["position"]["z"], edit["size"], edit["rotation_y"])
+    elsif edit["slot"] == "wall_decor"
+      wall = back_wall(edit["rotation_y"])
+      along = along_of(edit, wall)
+      @wall_spans[wall] << [ along - edit["size"]["w"] / 2, along + edit["size"]["w"] / 2,
+                            edit["position"]["y"], edit["position"]["y"] + edit["size"]["h"] ]
+    end
+  end
 
   def find(category)
     @objects.find { |o| o["category"] == category }
@@ -88,7 +112,7 @@ class SlotLayout
 
   def place_wall_decor(item)
     [ find("desk"), find("bed") ].compact.each do |anchor|
-      wall = BACK_WALL.fetch(anchor["rotation_y"] % 360)
+      wall = back_wall(anchor["rotation_y"])
       bottom = [ anchor["size"]["h"] + 0.3, 1.0 ].max
       preferred = along_of(anchor, wall)
       along = free_wall_position(wall, preferred, item.size["w"], bottom, bottom + item.size["h"]) or next
@@ -171,7 +195,7 @@ class SlotLayout
     # 家具の正面をふさがないよう、同じ壁に沿った横を優先する
     ax = anchor["position"]["x"]
     az = anchor["position"]["z"]
-    wall = BACK_WALL.fetch(anchor["rotation_y"] % 360)
+    wall = back_wall(anchor["rotation_y"])
     fw, fd = footprint_size(item.size, anchor["rotation_y"])
     x, z, rotation = best_floor_spot(item.size, [ anchor["rotation_y"] ]) do |cx, cz, _|
       Math.hypot(cx - ax, cz - az) + wall_gap(wall, cx, cz, fw, fd) * 3
@@ -232,7 +256,13 @@ class SlotLayout
   end
 
   def footprint_size(size, rotation)
-    (rotation % 180).zero? ? [ size["w"], size["d"] ] : [ size["d"], size["w"] ]
+    angle = rotation * Math::PI / 180
+    [ size["w"] * Math.cos(angle).abs + size["d"] * Math.sin(angle).abs,
+      size["w"] * Math.sin(angle).abs + size["d"] * Math.cos(angle).abs ]
+  end
+
+  def back_wall(rotation)
+    BACK_WALL.fetch((rotation / 90.0).round * 90 % 360)
   end
 
   def overlap_area(a, b)

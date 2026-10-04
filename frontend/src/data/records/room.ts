@@ -234,7 +234,7 @@ function analysisObject(value: unknown): components["schemas"]["SceneObject"] {
   const size = object(record.size, "SceneObject.size");
   const position = object(record.position, "SceneObject.position");
   if (record.source !== "existing" && record.source !== "suggested") invalid("SceneObject.source");
-  if (record.rotation_y !== 0 && record.rotation_y !== 90 && record.rotation_y !== 180 && record.rotation_y !== 270) invalid("SceneObject.rotation_y");
+  if (typeof record.rotation_y !== "number" || !Number.isFinite(record.rotation_y) || record.rotation_y < 0 || record.rotation_y >= 360) invalid("SceneObject.rotation_y");
   if (record.slot !== null && record.slot !== "bed_cover" && record.slot !== "curtain" && record.slot !== "rug" && record.slot !== "wall_decor" && record.slot !== "light" && record.slot !== "display" && record.slot !== "cushion" && record.slot !== "desk_top") invalid("SceneObject.slot");
   return {
     id: text(record.id, "SceneObject.id"),
