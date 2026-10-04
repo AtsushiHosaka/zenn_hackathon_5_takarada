@@ -9,7 +9,7 @@
 この変更のbackendがCI・deployを通り、Room ownerによるallowlist判定が動くrevisionになってからキー参照を有効にする。PR #18時点のbackendにはこのallowlistがないため、環境変数だけを先に追加しない。
 
 - 同じGCP project `zenn-hackathon-takarada` に既にあるGeminiキーのSecret IDと固定versionを指定する。キーの値はチャット・Git・Terraformへ渡さない。既存Secretがなければ、本人が安全なSecret Manager入力画面で値を登録する。新規キー作成・Secret作成の費用と権限は別途具体確認する。
-- 指定Secret1つに対する既存APIサービスアカウント `zenn-hackathon-api@zenn-hackathon-takarada.iam.gserviceaccount.com` の `roles/secretmanager.secretAccessor`。既存許可はこの設定で管理・削除しない。許可がなく今回の新規付与が承認された場合だけ `gemini_grant_secret_access=true` で追加する。このSAは既存DBタスクとも共有しているため、IAMの読み取り能力も共有されるが、キーのenv参照はAPIにだけ追加する。新しいSA・project全体のrole・公開IAMは追加しない。
+- 指定Secret1つに対する既存APIサービスアカウントの `roles/secretmanager.secretAccessor`。liveのSA名・指定Secret/version・既存IAMは現時点で未確認なので、実行直前にmetadataで確定し、具体的な対象を本人へ提示する。既存許可はこの設定で管理・削除しない。許可がなく今回の新規付与が承認された場合だけ `gemini_grant_secret_access=true` で追加する。Terraform定義上このSAは既存DBタスクとも共有しているため、IAMの読み取り能力も共有されるが、キーのenv参照はAPIにだけ追加する。新しいSA・project全体のrole・公開IAMは追加しない。
 - 既存APIだけにSecret参照env `GEMINI_API_KEY`、モデル `GEMINI_MODEL=gemini-3.1-flash-lite` を追加し、新revisionのhealthを確認する。thinking levelは既定値を維持、必要な場合だけ明示設定する。Web・DB・Miniへキーを渡さない。
 - 実AIを使える部屋ownerを、管理下の使い捨て検証アカウント1件のIDへ限定する。`gemini_allowed_user_ids` が空なら全員mock、指定ID以外もmock。本番でallowlist envが未設定でもmockを選び、キー追加だけで一般AIを有効にしない。判定に使うIDはサーバー側のRoom ownerで、requestの任意IDは使わない。
 - 検証は合成room画像1枚の写真解析1操作と、短い希望文からのcoordination1操作。ユーザー写真は使わない。内部retry最大3attempt/操作なので最大6HTTPモデルcall、各操作の総期限90秒。これは管理下の検証操作の上限で、アプリ全体の金額制限・操作回数quotaではない。検証者が操作を2回に限定し、試験終了後にallowlistとキー参照を戻す。モデル追加比較や多件数生成をしない。
