@@ -33,3 +33,20 @@ create_table "rooms", force: :cascade do |t|
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
 end
+
+# コーデ提案。採用した商品と配置後のシーンを jsonb で持つ
+create_table "coordinations", force: :cascade do |t|
+  t.references "room", null: false, foreign_key: true
+  t.text "prompt", null: false
+  t.integer "budget", null: false
+  t.jsonb "kept_object_ids", null: false, default: []
+  t.string "status", null: false, default: "pending"
+  t.string "title"
+  t.text "comment"
+  t.jsonb "after_scene"
+  t.jsonb "items", null: false, default: []
+  t.integer "total_price"
+  t.text "error_message"
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+end
