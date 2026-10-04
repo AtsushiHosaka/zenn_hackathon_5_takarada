@@ -23,8 +23,9 @@ npm run dev
 | --- | --- |
 | `/` | `/rooms/sample-oshi` の結果サンプルへ移動 |
 | `/rooms` | ルーム一覧・検索 |
-| `/rooms/new` | 畳数・部屋の形の入力。商品提案API接続では希望・予算も入力 |
+| `/rooms/new` | 畳数・部屋の形を入力して解析。商品提案API接続では活かす家具を選び、希望・予算を入力 |
 | `/rooms/:id` | ルームの結果、生成中の表示、追加の指示 |
+| `/coordinate` | `/rooms/new` へ移動 |
 | `/login` | ログイン |
 | `/signup` | 新規登録 |
 
@@ -48,7 +49,9 @@ Before表示中と、家具を含む完成GLB/GLTFでは家具をドラッグ移
 
 オフラインモックの新規作成は3〜30畳と、`square`・`standard`・`long`の形を使います。backendの`RoomAnalyzer`と同じ寸法・家具配置を返し、希望・スタイル・予算から商品を生成しません。`demo()`の紫の8商品は、参照デザインを確認するサンプルとして残しています。
 
-APIの新規作成では希望を500文字以内、予算を1円以上の整数で入力します。新規の初期予算は3万円で、保存済みの結果はその予算を復元します。backendのモックはキーワードで紫の推し活・ボタニカル・韓国風のテーマを選び、38件の商品候補から予算と配置場所に収まる商品を採用します。自由文を理解するAIではありません。結果への追加指示は同じ部屋IDを再利用して、新しい商品提案を作成します。
+APIの新規作成では、解析後に表示された既存家具から活かす家具を選び、希望を500文字以内、予算を1円以上の整数で入力します。家具は初期状態で全選択です。現在のAPIは空配列を全家具の指定として扱うため、家具がある場合は1点以上の選択が必要です。新規の初期予算は3万円で、保存済みの結果は予算と選択した家具IDを復元します。backendのモックはキーワードで紫の推し活・ボタニカル・韓国風のテーマを選び、38件の商品候補から予算と配置場所に収まる商品を採用します。自由文を理解するAIではありません。結果への追加指示は同じ部屋IDと選択した家具IDを再利用して、新しい商品提案を作成します。
+
+商品提案と追加指示には、解析時の配置と色を使います。配置・色の手動編集は提案後に行い、ブラウザへ保存します。Sceneを更新するAPIがないため、編集した配置と色は追加指示へ送信しません。
 
 保存先はブラウザの `localStorage` にある `room-coordinator.plans` で、最大30件です。復元時は部屋データの型を検証します。以前の `roomie.saved` は使用しません。参照画面の架空ショップ名や完了表示は、結果の出所が伝わる商品検索先・サンプル表示に置き換えています。
 
@@ -79,9 +82,10 @@ APIの新規作成では希望を500文字以内、予算を1円以上の整数�
 正式契約は`backend/swagger/v1/swagger.yaml`、変換は`src/data/records/room.ts`、通信は`src/data/repositories/apiRoomRepository.ts`です。画面は`RoomRepository`だけに依存します。部屋・商品提案のエンドポイントは公開で、ログインを必要としません。
 
 1. `POST /api/v1/rooms`へ`{ room: { tatami, shape } }`をJSONで送ります。`GET /api/v1/rooms/{id}`で`analyzing`から`ready`になるまで待ちます。
-2. `POST /api/v1/rooms/{id}/coordinations`へ`{ coordination: { prompt, budget, kept_object_ids: [] } }`を送ります。`GET /api/v1/coordinations/{id}`で`pending`・`processing`から`done`になるまで待ちます。
+2. 解析Sceneの家具から活かすものを選び、希望と予算を入力します。
+3. `POST /api/v1/rooms/{id}/coordinations`へ`{ coordination: { prompt, budget, kept_object_ids } }`を送ります。`kept_object_ids`は選択した解析Sceneの家具IDです。`GET /api/v1/coordinations/{id}`で`pending`・`processing`から`done`になるまで待ちます。
 
-取得は2秒おき、全体は最大120秒です。`failed`はエラーとして表示し、画面からのキャンセルで通信と待機を止めます。追加指示では`backendRoomId`で部屋を再取得し、解析済みの部屋へ提案だけを追加します。
+取得は2秒おき、各処理で最大120秒です。`failed`はエラーとして表示し、画面からのキャンセルで通信と待機を止めます。追加指示では`backendRoomId`で部屋を再取得し、保存した家具IDを指定して解析済みの部屋へ提案だけを追加します。
 
 部屋と家具の型は`src/domain/room.ts`です。backendのSceneは北西の床の角を原点とし、家具位置は底面中心です。画面へ変換するときはX/Zから部屋の幅・奥行きの半分を引き、Yへ家具の高さの半分を加え、部屋中央原点の中心座標にします。単位はメートル、Y軸が高さ、`rotation_y`は度です。部屋の幅・奥行き・高さ・床色・窓の壁と寸法を3Dへ反映します。
 
@@ -98,7 +102,7 @@ VITE_API_ENDPOINT=http://127.0.0.1:13000
 VITE_CONNECTION=api
 ```
 
-ローカルでは既存APIテスト23件・RuboCop・Swagger再生成・型生成、フロントの最終lint・ビルドが成功しています。PC画面でも6畳・標準・紫・3万円の提案が8点・28,840円になることを確認しました。実際の商品画面のスクリーンショットは`output/screenshots/frontend-mock-api-pc.jpg`です。
+PR #5の統合前のローカルでは、既存APIテスト23件・RuboCop・Swagger再生成・型生成、フロントのlint・ビルドが成功しています。PC画面でも6畳・標準・紫・3万円の提案が8点・28,840円になることを確認しました。実際の商品画面のスクリーンショットは`output/screenshots/frontend-mock-api-pc.jpg`です。統合後の検証結果は別途記録します。
 
 `legacy`は未提供の写真APIを接続するための提案形式です。JPEG・PNG・WebPの写真3〜4枚（1枚10MB以内）をmultipartで送る処理と、独自の同期・非同期応答の変換を残しています。mainの正式APIへ写真は送りません。写真解析とAIコーディネートは今後の実装対象です。
 
