@@ -25,6 +25,8 @@ end
 
 # 部屋。写真の解析結果 (シーン) を jsonb で持つ。形は swagger の Scene
 create_table "rooms", force: :cascade do |t|
+  # Legacy anonymous rooms remain unassigned and are not exposed by authenticated APIs.
+  t.references "user", null: true, foreign_key: true
   t.decimal "tatami", precision: 4, scale: 1, null: false
   t.string "shape", null: false, default: "standard" # 既存行の補完用。API では必須 (Room モデル参照)
   t.string "status", null: false, default: "analyzing"

@@ -12,7 +12,7 @@ RSpec.describe "Api::V1::Users", type: :request do
   let(:Authorization) { bearer_token_for(current) }
 
   path "/api/v1/users" do
-    get "ユーザー一覧を取得する" do
+    get "本人のプロフィールを一覧形式で取得する" do
       tags "Users"
       security [ { bearerAuth: [] } ]
       produces "application/json"
@@ -24,7 +24,7 @@ RSpec.describe "Api::V1::Users", type: :request do
 
         run_test! do |response|
           body = JSON.parse(response.body)
-          expect(body.size).to eq(3) # ログイン中の1人 + 2人
+          expect(body.map { |user| user["id"] }).to eq([ current.id ])
           expect(body.first.keys).to contain_exactly("id", "name", "email", "created_at", "updated_at")
         end
       end
@@ -42,7 +42,7 @@ RSpec.describe "Api::V1::Users", type: :request do
   path "/api/v1/users/{id}" do
     parameter name: :id, in: :path, type: :integer, description: "User ID", required: true
 
-    get "ユーザーを1件取得する" do
+    get "本人のプロフィールを取得する" do
       tags "Users"
       security [ { bearerAuth: [] } ]
       produces "application/json"
@@ -50,18 +50,18 @@ RSpec.describe "Api::V1::Users", type: :request do
       response "200", "取得に成功" do
         schema "$ref" => "#/components/schemas/User"
 
-        let(:user) { create(:user, name: "Hanako") }
+        let(:user) { current }
         let(:id) { user.id }
 
         run_test! do |response|
-          expect(JSON.parse(response.body)["name"]).to eq("Hanako")
+          expect(JSON.parse(response.body)["name"]).to eq(current.name)
         end
       end
 
-      response "404", "ユーザーが存在しない" do
+      response "404", "ユーザーが存在しない、または他のユーザー" do
         schema "$ref" => "#/components/schemas/NotFound"
 
-        let(:id) { 0 }
+        let(:id) { create(:user).id }
 
         run_test!
       end
@@ -77,7 +77,7 @@ RSpec.describe "Api::V1::Users", type: :request do
       response "200", "更新に成功" do
         schema "$ref" => "#/components/schemas/User"
 
-        let(:user) { create(:user) }
+        let(:user) { current }
         let(:id) { user.id }
         let(:params) { { user: { name: "Updated Name" } } }
 
@@ -87,10 +87,17 @@ RSpec.describe "Api::V1::Users", type: :request do
         end
       end
 
+      response "404", "本人のプロフィールではない" do
+        schema "$ref" => "#/components/schemas/NotFound"
+        let(:id) { create(:user).id }
+        let(:params) { { user: { name: "Updated Name" } } }
+        run_test!
+      end
+
       response "422", "バリデーションエラー" do
         schema "$ref" => "#/components/schemas/ValidationErrors"
 
-        let(:user) { create(:user) }
+        let(:user) { current }
         let(:id) { user.id }
         let(:params) { { user: { name: "" } } }
 
@@ -103,7 +110,7 @@ RSpec.describe "Api::V1::Users", type: :request do
       security [ { bearerAuth: [] } ]
 
       response "204", "削除に成功" do
-        let(:user) { create(:user) }
+        let(:user) { current }
         let(:id) { user.id }
 
         run_test! do
@@ -111,10 +118,10 @@ RSpec.describe "Api::V1::Users", type: :request do
         end
       end
 
-      response "404", "ユーザーが存在しない" do
+      response "404", "ユーザーが存在しない、または他のユーザー" do
         schema "$ref" => "#/components/schemas/NotFound"
 
-        let(:id) { 0 }
+        let(:id) { create(:user).id }
 
         run_test!
       end

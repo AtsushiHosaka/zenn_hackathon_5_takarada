@@ -200,8 +200,8 @@ RSpec.configure do |config|
           Upload: {
             type: :object,
             properties: {
-              key: { type: :string, description: "POST /api/v1/rooms の photo_keys に渡す", example: "photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg" },
-              upload_url: { type: :string, description: "この URL へ写真を PUT する。Content-Type だけを付け、他のヘッダは足さない (署名と食い違うと 403)", example: "https://storage.googleapis.com/example-uploads/photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256" }
+              key: { type: :string, description: "POST /api/v1/rooms の photo_keys に渡す", example: "photos/users/1/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg" },
+              upload_url: { type: :string, description: "この URL へ写真を PUT する。Content-Type だけを付け、他のヘッダは足さない (署名と食い違うと 403)", example: "https://storage.googleapis.com/example-uploads/photos/users/1/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256" }
             },
             required: %w[key upload_url]
           },

@@ -233,6 +233,24 @@ export interface paths {
                         "application/json": components["schemas"]["Coordination"];
                     };
                 };
+                /** @description ログインが必要 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Unauthorized"];
+                    };
+                };
+                /** @description 本人の部屋ではない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFound"];
+                    };
+                };
                 /** @description 部屋の解析が終わっていない、または入力が不正 */
                 422: {
                     headers: {
@@ -280,6 +298,15 @@ export interface paths {
                         "application/json": components["schemas"]["Coordination"];
                     };
                 };
+                /** @description 本人のコーデではない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFound"];
+                    };
+                };
             };
         };
         put?: never;
@@ -301,7 +328,7 @@ export interface paths {
         put?: never;
         /**
          * 部屋を登録して解析を始める
-         * @description 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。現在の解析は AI 未接続のモック (畳数と部屋の形から部屋を作る)
+         * @description 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ
          */
         post: {
             parameters: {
@@ -323,6 +350,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["Room"];
+                    };
+                };
+                /** @description ログインが必要 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Unauthorized"];
                     };
                 };
                 /** @description 畳数が範囲外 */
@@ -372,7 +408,7 @@ export interface paths {
                         "application/json": components["schemas"]["Room"];
                     };
                 };
-                /** @description 部屋が無い */
+                /** @description 部屋が無い、または本人の部屋ではない */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -429,6 +465,15 @@ export interface paths {
                         "application/json": components["schemas"]["Upload"][];
                     };
                 };
+                /** @description ログインが必要 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Unauthorized"];
+                    };
+                };
                 /** @description 対応していない形式 */
                 422: {
                     headers: {
@@ -453,7 +498,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ユーザー一覧を取得する */
+        /** 本人のプロフィールを一覧形式で取得する */
         get: {
             parameters: {
                 query?: never;
@@ -501,7 +546,7 @@ export interface paths {
             };
             cookie?: never;
         };
-        /** ユーザーを1件取得する */
+        /** 本人のプロフィールを取得する */
         get: {
             parameters: {
                 query?: never;
@@ -523,7 +568,7 @@ export interface paths {
                         "application/json": components["schemas"]["User"];
                     };
                 };
-                /** @description ユーザーが存在しない */
+                /** @description ユーザーが存在しない、または他のユーザー */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -556,7 +601,7 @@ export interface paths {
                     };
                     content?: never;
                 };
-                /** @description ユーザーが存在しない */
+                /** @description ユーザーが存在しない、または他のユーザー */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -591,6 +636,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["User"];
+                    };
+                };
+                /** @description 本人のプロフィールではない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFound"];
                     };
                 };
                 /** @description バリデーションエラー */
@@ -807,12 +861,12 @@ export interface components {
         Upload: {
             /**
              * @description POST /api/v1/rooms の photo_keys に渡す
-             * @example photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg
+             * @example photos/users/1/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg
              */
             key: string;
             /**
              * @description この URL へ写真を PUT する。Content-Type だけを付け、他のヘッダは足さない (署名と食い違うと 403)
-             * @example https://storage.googleapis.com/example-uploads/photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256
+             * @example https://storage.googleapis.com/example-uploads/photos/users/1/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256
              */
             upload_url: string;
         };

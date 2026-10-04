@@ -2,13 +2,11 @@ module Api
   module V1
     # コーデ提案の作成と取得。生成は GenerateCoordinationJob が非同期で行うので、
     # クライアントは GET で status が done / failed になるまでポーリングする。
-    # ハッカソンのデモ用にログイン不要の公開エンドポイントにしている
+    # 認証済みユーザーが所有する部屋・提案だけを扱う。
     class CoordinationsController < ApplicationController
-      skip_before_action :authenticate_identity!
-
       # POST /api/v1/rooms/:room_id/coordinations
       def create
-        room = Room.find(params[:room_id])
+        room = current_user.rooms.find(params[:room_id])
         unless room.ready?
           return render json: { errors: [ "部屋の解析が終わっていません" ] }, status: :unprocessable_entity
         end
@@ -24,7 +22,7 @@ module Api
 
       # GET /api/v1/coordinations/:id
       def show
-        render json: CoordinationSerializer.new(Coordination.includes(:room).find(params[:id]))
+        render json: CoordinationSerializer.new(current_user.coordinations.includes(:room).find(params[:id]))
       end
 
       private

@@ -1,6 +1,9 @@
 require "swagger_helper"
 
 RSpec.describe "Api::V1::Uploads", type: :request do
+  let(:current) { create(:user) }
+  let(:Authorization) { bearer_token_for(current) }
+
   path "/api/v1/uploads" do
     post "部屋写真のアップロード先を発行する" do
       tags "Uploads"
@@ -10,7 +13,7 @@ RSpec.describe "Api::V1::Uploads", type: :request do
         size も署名に含まれるため、実際に送る大きさと一致させる。
         アップロード後、key を POST /api/v1/rooms の photo_keys に渡す。
       DESC
-      security []
+      security [ { bearerAuth: [] } ]
       consumes "application/json"
       produces "application/json"
       parameter name: :params, in: :body, schema: { "$ref" => "#/components/schemas/UploadInput" }
@@ -20,6 +23,13 @@ RSpec.describe "Api::V1::Uploads", type: :request do
 
         let(:params) { { uploads: [ { content_type: "image/jpeg", size: 284_113 } ] } }
 
+        run_test!
+      end
+
+      response "401", "ログインが必要" do
+        schema "$ref" => "#/components/schemas/Unauthorized"
+        let(:Authorization) { "" }
+        let(:params) { { uploads: [ { content_type: "image/jpeg", size: 1024 } ] } }
         run_test!
       end
 

@@ -10,8 +10,9 @@ import RoomScene from './RoomScene';
 import RecommendationPanel from './RecommendationPanel';
 import RoomGenerating from './RoomGenerating';
 import PlannerPanel, { type PlannerView } from './PlannerPanel';
-import { roomPlanKeys, saveRoomPlan, useRoomPlans } from './plans';
+import { roomPlanKeys as sharedRoomPlanKeys, scopedRoomPlanKeys, useRoomPlanScope, saveRoomPlan, useRoomPlans } from './plans';
 import ErrorText from '../shared/ErrorText';
+import { DomainError } from '../../domain/error';
 import './room-studio.css';
 
 const initialPrompt='紫色の推し活ルームにしたい。ベッドとデスクはそのまま使いたいです。';
@@ -34,7 +35,9 @@ function sampleDesign(base:RoomDesign,id:string):RoomDesign {
 export default function RoomStudioPage() {
   const {id='new'}=useParams();
   const isNew=id==='new';
-  const {rooms}=useRepositories();
+  const {rooms,tokenStore}=useRepositories();
+  const scope=useRoomPlanScope();
+  const roomPlanKeys={...sharedRoomPlanKeys,...scopedRoomPlanKeys(scope)};
   const client=useQueryClient();
   const plans=useRoomPlans();
   const location=useLocation();
@@ -85,13 +88,16 @@ export default function RoomStudioPage() {
   const generation=useMutation({
     mutationFn:async({request,budget,targetStyle,analyzeOnly}:{request:string;budget:number;targetStyle?:Style;analyzeOnly?:boolean})=>{
       const controller=new AbortController();abort.current=controller;
+      const token=tokenStore.load();
       const input={photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId:!isNew&&design.source==='api'?design.backendRoomId:undefined,keptObjectIds:selectsFurniture?keptObjectIds:undefined,editedItems:selectsFurniture?[...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))]:undefined};
-      return analyzeOnly?rooms.analyze(input,controller.signal):rooms.generate(input,controller.signal);
+      const result=await (analyzeOnly?rooms.analyze(input,controller.signal):rooms.generate(input,controller.signal));
+      if(controller.signal.aborted||tokenStore.load()!==token) throw new DomainError("ログイン状態が変わりました。もう一度お試しください。");
+      return result;
     },
     onSuccess:(result,variables)=>{
       const editedItems=(design.editedItems??[]).filter(item=>item.existing||result.items.some(current=>current.id===item.id));
       const saved={...result,...(!variables.analyzeOnly&&editedItems.length?{editedItems}:{}),...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request,budget:variables.budget}:{}),id:result.source==='api'?result.id:isNew||id.startsWith('sample-')?`room-${crypto.randomUUID()}`:id};
-      try {saveRoomPlan(client,saved);}catch{client.setQueryData(roomPlanKeys.detail(saved.id),saved);setNotice('ブラウザに保存できませんでした。保存容量を確認してください。');}
+      try {saveRoomPlan(client,saved,scope);}catch{client.setQueryData(roomPlanKeys.detail(saved.id),saved);setNotice('ブラウザに保存できませんでした。保存容量を確認してください。');}
       setSavedFingerprint(JSON.stringify(saved));setHistory({past:[],future:[]});
       navigate(`/rooms/${saved.id}`,{state:{prompt:saved.prompt??(result.kind==='analysis'?analysisPrompt:variables.request),photos:result.analysisInput?[]:photos,editing:result.kind==='analysis'&&!canCoordinate}});
     },
@@ -137,7 +143,7 @@ export default function RoomStudioPage() {
     if(!Number.isSafeInteger(budget)||budget<=0){setPhotoError('予算は1円以上の整数で入力してください。');return;}
     setPhotoError('');generation.mutate({request:prompt.trim(),budget});
   }
-  function changeTitle(event:FormEvent) {event.preventDefault();const value=title.trim();if(!value)return;try{const next={...design,title:value};saveRoomPlan(client,next);setSavedFingerprint(JSON.stringify(next));setRename(false);}catch{setNotice('ルーム名を保存できませんでした。');}}
+  function changeTitle(event:FormEvent) {event.preventDefault();const value=title.trim();if(!value)return;try{const next={...design,title:value};saveRoomPlan(client,next,scope);setSavedFingerprint(JSON.stringify(next));setRename(false);}catch{setNotice('ルーム名を保存できませんでした。');}}
   function editDesign(next:RoomDesign) {
     if(JSON.stringify(next)===JSON.stringify(design))return;
     setBefore(false);
@@ -164,7 +170,7 @@ export default function RoomStudioPage() {
   function saveEdits() {
     const saved={...design,id:id.startsWith('sample-')?`room-${crypto.randomUUID()}`:design.id};
     try {
-      saveRoomPlan(client,saved);setSavedFingerprint(JSON.stringify(saved));
+      saveRoomPlan(client,saved,scope);setSavedFingerprint(JSON.stringify(saved));
       if(saved.id!==id)navigate(`/rooms/${saved.id}`,{state:{prompt,photos,editing:true,view,selectedId,dimensions}});
       else setNotice('家具の配置と色を、このブラウザに保存しました。');
     }catch{setNotice('変更を保存できませんでした。ブラウザの保存容量を確認してください。');}

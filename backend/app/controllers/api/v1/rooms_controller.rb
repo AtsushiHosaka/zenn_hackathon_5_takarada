@@ -2,14 +2,12 @@ module Api
   module V1
     # 部屋の登録と解析結果の取得。解析は AnalyzeRoomJob が非同期で行うので、
     # クライアントは GET で status が ready になるまでポーリングする。
-    # ハッカソンのデモ用にログイン不要の公開エンドポイントにしている
+    # 認証済みユーザーが所有する部屋・提案だけを扱う。
     class RoomsController < ApplicationController
-      skip_before_action :authenticate_identity!
-
       # POST /api/v1/rooms
       def create
-        room = Room.new(room_params)
-        missing = RoomPhoto.missing(room.photo_keys)
+        room = current_user.rooms.new(room_params)
+        missing = RoomPhoto.missing(room.photo_keys, user: current_user)
         return render json: { errors: [ "アップロードできていない写真があります" ] }, status: :unprocessable_entity if missing.any?
 
         if room.save
@@ -22,7 +20,7 @@ module Api
 
       # GET /api/v1/rooms/:id
       def show
-        render json: RoomSerializer.new(Room.find(params[:id]))
+        render json: RoomSerializer.new(current_user.rooms.find(params[:id]))
       end
 
       private
