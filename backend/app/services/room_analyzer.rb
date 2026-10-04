@@ -41,7 +41,7 @@ class RoomAnalyzer
   private
 
   def gemini?
-    @room.photos.attached? && GeminiClient.configured?
+    @room.photo_keys.any? && GeminiClient.configured?
   end
 
   # 畳数と部屋の形 (幅 / 奥行き の比) から幅と奥行きを出す

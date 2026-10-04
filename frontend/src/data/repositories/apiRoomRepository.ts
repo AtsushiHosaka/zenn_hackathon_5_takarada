@@ -3,7 +3,7 @@ import { isRoomShape } from "../../domain/room";
 import type { GenerateRoomInput, RoomRepository } from "../../domain/roomRepository";
 import type { ApiClient } from "../apiClient";
 import { createDemoRoom } from "../dummy/dummyRoomRepository";
-import { toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toRoomDesign } from "../records/room";
+import { toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toRoomDesign, toUploadRecords } from "../records/room";
 import type { components } from "../generated/api";
 
 export type RoomApiConfig = {
@@ -12,6 +12,7 @@ export type RoomApiConfig = {
   jobPath: string;
   coordinationPath: string;
   coordinationJobPath: string;
+  uploadsPath: string;
   requiresAuth: boolean;
   photoField: string;
   promptField: string;
@@ -35,20 +36,21 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
         generation: Boolean(config.generationPath),
         coordination: config.contract !== "analysis",
         input: config.contract === "legacy" ? "photos" : "dimensions",
-        message: config.generationPath ? config.contract === "analysis" ? "畳数と部屋の形から、APIの解析モックで部屋を作成します。写真・希望文の解析や商品提案は行いません。" : config.contract === "coordination" ? "写真を付けると、AI (Gemini) が部屋の色・窓・家具を読み取ります。写真が無いときやサーバーに API キーが無いときは、畳数と部屋の形から作るモックになります。商品提案はモックで、価格は参考値です。" : "設定された生成APIへ写真を送信します。" : unavailableMessage,
+        photos: config.contract === "legacy" || Boolean(config.uploadsPath),
+        message: config.generationPath ? config.contract === "analysis" ? "畳数と部屋の形から、APIの解析モックで部屋を作成します。写真・希望文の解析や商品提案は行いません。" : config.contract === "coordination" ? "部屋解析と商品提案のAPIモックを使います。写真解析とAI生成は未接続で、商品価格は参考値です。" : "設定された生成APIへ写真を送信します。" : unavailableMessage,
       };
     },
     async generate(input, signal) {
       if (!config.generationPath) throw new DomainError(unavailableMessage);
       if (config.contract !== "legacy") {
-        const body = withPhotos(dimensionRequest(input), input.photos);
+        const body = dimensionRequest(input);
         if (config.contract === "coordination") validateCoordinationInput(input);
         if (input.roomId !== undefined && !/^[1-9]\d*$/.test(input.roomId)) throw new DomainError("部屋のIDが正しくありません");
         const jobSignal = boundedSignal(signal);
         if (input.roomId !== undefined && !config.jobPath.includes("{id}")) throw new DomainError("部屋の解析結果の取得先が設定されていません");
         let record = toAnalysisRoomRecord(input.roomId !== undefined
           ? await api.send<unknown>(config.jobPath.replace("{id}", encodeURIComponent(input.roomId)), { requiresAuth: config.requiresAuth, signal: jobSignal })
-          : await api.send<unknown>(config.generationPath, { method: "POST", body, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 120_000 }));
+          : await api.send<unknown>(config.generationPath, { method: "POST", body: await withPhotoKeys(api, config, body, input.photos, jobSignal), requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 120_000 }));
         const expectedId = record.id;
         if (input.roomId !== undefined && String(expectedId) !== input.roomId) throw new DomainError("別の部屋の解析結果を受け取りました");
         if (!config.jobPath.includes("{id}") && record.status === "analyzing") throw new DomainError("部屋の解析結果の取得先が設定されていません");
@@ -117,22 +119,40 @@ function boundedSignal(signal?: AbortSignal): AbortSignal {
   return signal ? AbortSignal.any([signal, deadline]) : deadline;
 }
 
-// 写真があれば multipart/form-data (room[tatami]・room[shape]・room[photos][]) で送る。無ければ JSON のまま
-function withPhotos(body: components["schemas"]["RoomInput"], photos: File[]): components["schemas"]["RoomInput"] | FormData {
-  if (!photos.length) return body;
-  if (photos.length > 4) throw new DomainError("写真は4枚までにしてください");
-  if (photos.some(photo => !["image/jpeg", "image/png", "image/webp"].includes(photo.type) || photo.size > 10 * 1024 * 1024 || photo.size === 0)) throw new DomainError("写真は1枚10MB以内のJPEG・PNG・WebPを選んでください");
-  const form = new FormData();
-  form.append("room[tatami]", String(body.room.tatami));
-  form.append("room[shape]", body.room.shape);
-  photos.forEach(photo => form.append("room[photos][]", photo, photo.name));
-  return form;
-}
-
 function dimensionRequest(input: GenerateRoomInput): components["schemas"]["RoomInput"] {
   if (typeof input.tatami !== "number" || !Number.isFinite(input.tatami) || input.tatami < 3 || input.tatami > 30) throw new DomainError("部屋の広さを3〜30畳で入力してください");
   if (!isRoomShape(input.shape)) throw new DomainError("部屋の形を選んでください");
   return { room: { tatami: input.tatami, shape: input.shape } };
+}
+
+// 写真はAPIを通さずGCSへ直接送り、得たkeyだけをPOST /roomsに渡す。
+// 写真は任意 (backendのphoto_keysも任意で、解析は今も畳数と部屋の形から作るモック)
+async function withPhotoKeys(api: ApiClient, config: RoomApiConfig, body: components["schemas"]["RoomInput"], photos: File[], signal: AbortSignal): Promise<components["schemas"]["RoomInput"]> {
+  if (!config.uploadsPath || photos.length === 0) return body;
+
+  const uploads = toUploadRecords(await api.send<unknown>(config.uploadsPath, {
+    method: "POST",
+    body: { uploads: photoUploadRequest(photos) } satisfies components["schemas"]["UploadInput"],
+    requiresAuth: config.requiresAuth,
+    signal,
+  }), photos.length);
+
+  // 署名にsizeとContent-Typeが入っているので、発行時と同じFileをそのまま送る
+  await Promise.all(uploads.map((upload, index) => api.sendToSignedUrl(upload.upload_url, photos[index], signal)));
+  return { room: { ...body.room, photo_keys: uploads.map(upload => upload.key) } };
+}
+
+type PhotoContentType = components["schemas"]["UploadInput"]["uploads"][number]["content_type"];
+const photoContentTypes: readonly PhotoContentType[] = ["image/jpeg", "image/png", "image/webp"];
+
+// sizeは署名に入るのでここで申告した値とPUTする中身が一致していなければならない
+function photoUploadRequest(photos: File[]): components["schemas"]["UploadInput"]["uploads"] {
+  if (photos.length > 4) throw new DomainError("写真は最大4枚です");
+  return photos.map(photo => {
+    if (!photoContentTypes.includes(photo.type as PhotoContentType)) throw new DomainError("写真はJPEG・PNG・WebPを選んでください");
+    if (photo.size === 0 || photo.size > 10 * 1024 * 1024) throw new DomainError("写真は1枚10MB以内にしてください");
+    return { content_type: photo.type as PhotoContentType, size: photo.size };
+  });
 }
 
 function validateCoordinationInput(input: GenerateRoomInput) {

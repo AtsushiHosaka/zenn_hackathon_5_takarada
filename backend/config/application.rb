@@ -5,8 +5,7 @@ require "rails"
 require "active_model/railtie"
 require "active_job/railtie"
 require "active_record/railtie"
-# 部屋の写真の保存 (config/storage.yml)
-require "active_storage/engine"
+# require "active_storage/engine"
 require "action_controller/railtie"
 require "action_mailer/railtie"
 # require "action_mailbox/engine"
@@ -47,9 +46,6 @@ module App
     # 非同期処理は Sidekiq (Redis) 経由。test だけ config/environments/test.rb で
     # :test アダプタに差し替えるので、spec の実行に Redis は要らない
     config.active_job.queue_adapter = :sidekiq
-
-    # 部屋の写真の保存先 (config/storage.yml)。本番も GCS 対応まではローカルのディスク
-    config.active_storage.service = :local
 
     # スキーマは ridgepole (db/Schemafile) で管理するため、マイグレーションは生成しない
     config.generators do |g|

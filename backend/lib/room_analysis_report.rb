@@ -32,7 +32,7 @@ class RoomAnalysisReport
   private
 
   def header
-    "部屋 ##{@room.id}  #{@room.tatami.to_f}畳・#{@room.shape}  写真 #{@room.photos.size} 枚  解析: #{@analyzed_by || '-'}" \
+    "部屋 ##{@room.id}  #{@room.tatami.to_f}畳・#{@room.shape}  写真 #{@room.photo_keys.size} 枚  解析: #{@analyzed_by || '-'}" \
       "  (#{@analysis['analyzed_at'] || '記録なし'})"
   end
 
@@ -75,7 +75,7 @@ class RoomAnalysisReport
   end
 
   def photos
-    paths = @room.photos.map { |photo| ActiveStorage::Blob.service.path_for(photo.key).delete_prefix("#{Rails.root}/") }
-    "写真: #{paths.join(', ')}" if paths.any?
+    # ローカルでは tmp/storage/<UPLOADS_BUCKET>/<key> にある (Storage::LocalClient)
+    "写真: #{@room.photo_assets.compact.map(&:uri).join(', ')}" if @room.photo_keys.any?
   end
 end

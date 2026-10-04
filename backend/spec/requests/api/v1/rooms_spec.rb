@@ -6,11 +6,9 @@ RSpec.describe "Api::V1::Rooms", type: :request do
       tags "Rooms"
       description "解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。現在の解析は AI 未接続のモック (畳数と部屋の形から部屋を作る)"
       security []
-      consumes "application/json", "multipart/form-data"
+      consumes "application/json"
       produces "application/json"
       parameter name: :params, in: :body, schema: { "$ref" => "#/components/schemas/RoomInput" }
-      # 写真付き (multipart/form-data) の送信用。契約は上の RoomInput
-      parameter name: :room, in: :formData
 
       response "201", "登録に成功 (status: analyzing)" do
         schema "$ref" => "#/components/schemas/Room"
@@ -19,20 +17,6 @@ RSpec.describe "Api::V1::Rooms", type: :request do
 
         run_test! do
           expect(AnalyzeRoomJob).to have_been_enqueued
-        end
-      end
-
-      response "201", "写真付きで登録に成功 (multipart/form-data)" do
-        schema "$ref" => "#/components/schemas/Room"
-
-        let(:'Content-Type') { "multipart/form-data" }
-        let(:room) do
-          photo = Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/files/room.jpg"), "image/jpeg")
-          { tatami: 6, shape: "standard", photos: [ photo ] }
-        end
-
-        run_test! do |response|
-          expect(JSON.parse(response.body)["photo_count"]).to eq(1)
         end
       end
 

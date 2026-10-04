@@ -1,7 +1,6 @@
 module Api
   module V1
-    # 部屋の登録と解析結果の取得。写真を付けるときは multipart/form-data で送る。
-    # 解析は AnalyzeRoomJob が非同期で行うので、
+    # 部屋の登録と解析結果の取得。解析は AnalyzeRoomJob が非同期で行うので、
     # クライアントは GET で status が ready になるまでポーリングする。
     # ハッカソンのデモ用にログイン不要の公開エンドポイントにしている
     class RoomsController < ApplicationController
@@ -10,6 +9,9 @@ module Api
       # POST /api/v1/rooms
       def create
         room = Room.new(room_params)
+        missing = RoomPhoto.missing(room.photo_keys)
+        return render json: { errors: [ "アップロードできていない写真があります" ] }, status: :unprocessable_entity if missing.any?
+
         if room.save
           AnalyzeRoomJob.perform_later(room.id)
           render json: RoomSerializer.new(room), status: :created
@@ -26,7 +28,7 @@ module Api
       private
 
       def room_params
-        params.require(:room).permit(:tatami, :shape, photos: [])
+        params.require(:room).permit(:tatami, :shape, photo_keys: [])
       end
     end
   end

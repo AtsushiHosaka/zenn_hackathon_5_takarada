@@ -6,6 +6,19 @@ import type { components } from "../generated/api";
 export type AnalysisRoomRecord = components["schemas"]["Room"];
 export type CoordinationRecord = components["schemas"]["Coordination"];
 
+export type UploadRecord = components["schemas"]["Upload"];
+
+// 発行されたアップロード先。枚数が合わないとFileとkeyの対応が崩れるので数も見る
+export function toUploadRecords(value: unknown, expected: number): UploadRecord[] {
+  if (!Array.isArray(value) || value.length !== expected) invalid("Upload");
+  return value.map(item => {
+    const record = object(item, "Upload");
+    const uploadUrl = text(record.upload_url, "Upload.upload_url");
+    if (!/^https?:\/\//.test(uploadUrl)) invalid("Upload.upload_url");
+    return { key: text(record.key, "Upload.key"), upload_url: uploadUrl };
+  });
+}
+
 export function toCoordinationRecord(value: unknown): CoordinationRecord {
   const record = object(value, "Coordination");
   if (record.status !== "pending" && record.status !== "processing" && record.status !== "done" && record.status !== "failed") invalid("Coordination.status");
@@ -142,8 +155,7 @@ export function toAnalysisRoomRecord(value: unknown): AnalysisRoomRecord {
   if (!Number.isFinite(Date.parse(createdAt))) invalid("Room.created_at");
   const scene = record.scene === null ? null : analysisScene(record.scene);
   if (record.status === "ready" && !scene) invalid("Room.scene");
-  // 写真の枚数と解析方法 (gemini: 写真を AI で解析 / mock: モック) は古い API では返らない
-  const photoCount = typeof record.photo_count === "number" && Number.isInteger(record.photo_count) && record.photo_count >= 0 ? record.photo_count : 0;
+  // 解析方法 (gemini: 写真を AI で解析 / mock: モック) は古い API では返らない
   const analyzedBy = record.analyzed_by === "gemini" || record.analyzed_by === "mock" ? record.analyzed_by : null;
   return {
     id: record.id,
@@ -151,7 +163,6 @@ export function toAnalysisRoomRecord(value: unknown): AnalysisRoomRecord {
     shape: record.shape,
     status: record.status,
     scene,
-    photo_count: photoCount,
     analyzed_by: analyzedBy,
     error_message: nullableText(record.error_message, "Room.error_message"),
     created_at: createdAt,

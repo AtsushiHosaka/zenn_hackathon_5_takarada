@@ -40,6 +40,9 @@ services:
       DB_NAME: app
       REDIS_URL: redis://redis:6379/0
       RAILS_ENV: ${RAILS_ENV:-development}
+      # ローカルは GCS を使わず tmp/storage に置く (Storage::LocalClient)。
+      # MODELS_BUCKET は未設定なので model_url は null (クライアントが箱で描く)
+      UPLOADS_BUCKET: local-uploads
     ports:
       - "3000:3000"
     depends_on:
@@ -60,6 +63,7 @@ services:
       DB_NAME: app
       REDIS_URL: redis://redis:6379/0
       RAILS_ENV: ${RAILS_ENV:-development}
+      UPLOADS_BUCKET: local-uploads
     depends_on:
       db:
         condition: service_healthy

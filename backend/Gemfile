@@ -23,11 +23,17 @@ gem "bcrypt", "~> 3.1.7"
 # CORS (フロントエンドから叩けるように)
 gem "rack-cors"
 
+# GCS (3D モデルの配信と部屋写真の置き場)。
+# Cloud Run のサービスアカウントは秘密鍵を持たないため、署名付き URL の署名は
+# IAM の signBlob に委譲する (app/services/storage/gcs_client.rb)
+gem "google-cloud-storage", "~> 1.52"
+gem "google-apis-iamcredentials_v1", "~> 0.20"
+
 # 非同期処理。ActiveJob のバックエンドは Sidekiq (キューは Redis)
 gem "sidekiq"
 
-# 部屋の写真の縮小 (libvips を使う。Dockerfile で入れる)
-gem "image_processing", "~> 1.2"
+# 部屋の写真を縮小してから Gemini に送る (libvips を使う。Dockerfile で入れる)
+gem "ruby-vips", "~> 2.2"
 
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false

@@ -70,7 +70,7 @@ class RoomAnalyzer
     end
 
     def observe
-      images = @room.photos.map { |photo| shrink(photo) }
+      images = @room.photo_assets.map { |asset| shrink(download(asset)) }
       @response = @client.generate_json(prompt: PROMPT, schema: SCHEMA, images:)
       @image_bytes = images.sum { |image| image[:data].bytesize }
       @response.json
@@ -82,21 +82,24 @@ class RoomAnalyzer
 
       { "analyzer" => "gemini", "model" => @response.model, "thinking_level" => @response.thinking_level,
         "elapsed_s" => @response.elapsed, "usage" => @response.usage,
-        "photos" => @room.photos.size, "image_bytes" => @image_bytes }
+        "photos" => @room.photo_keys.size, "image_bytes" => @image_bytes }
     end
 
     private
 
+    # 写真は GCS (ローカルでは tmp/storage) にある (RoomPhoto)
+    def download(asset)
+      raise GeminiClient::Error, "部屋の写真の置き場所 (UPLOADS_BUCKET) が設定されていません" unless asset
+
+      Storage.client.download(asset) or raise GeminiClient::Error, "部屋の写真が見つかりません (#{asset.key})"
+    end
+
     # 写真の向き (EXIF) を直し、長辺を MAX_SIDE までに縮めて JPEG にする
-    def shrink(photo)
+    def shrink(bytes)
       # libvips が無い環境 (CI など) でもアプリを起動できるよう、使うときにだけ読み込む
-      require "image_processing/vips"
-      photo.open do |file|
-        output = ImageProcessing::Vips.source(file).resize_to_limit(MAX_SIDE, MAX_SIDE).convert("jpg").saver(quality: 85).call
-        { mime_type: "image/jpeg", data: File.binread(output.path) }
-      ensure
-        output&.close!
-      end
+      require "vips"
+      image = Vips::Image.thumbnail_buffer(bytes, MAX_SIDE, height: MAX_SIDE, size: :down)
+      { mime_type: "image/jpeg", data: image.write_to_buffer(".jpg", Q: 85) }
     end
   end
 end

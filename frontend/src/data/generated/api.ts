@@ -313,11 +313,10 @@ export interface paths {
             requestBody?: {
                 content: {
                     "application/json": components["schemas"]["RoomInput"];
-                    "multipart/form-data": components["schemas"]["RoomInput"];
                 };
             };
             responses: {
-                /** @description 写真付きで登録に成功 (multipart/form-data) */
+                /** @description 登録に成功 (status: analyzing) */
                 201: {
                     headers: {
                         [name: string]: unknown;
@@ -386,6 +385,61 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 部屋写真のアップロード先を発行する
+         * @description 写真は Rails を通さず、ここで得た upload_url へブラウザから直接 PUT する。
+         *     PUT には Content-Type だけを付ける (署名と食い違うヘッダがあると GCS が 403 を返す)。
+         *     size も署名に含まれるため、実際に送る大きさと一致させる。
+         *     アップロード後、key を POST /api/v1/rooms の photo_keys に渡す。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UploadInput"];
+                };
+            };
+            responses: {
+                /** @description 発行に成功 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Upload"][];
+                    };
+                };
+                /** @description 対応していない形式 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ValidationErrors"];
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -737,6 +791,32 @@ export interface components {
             room: components["schemas"]["RoomShape"];
             objects: components["schemas"]["SceneObject"][];
         };
+        UploadInput: {
+            uploads: {
+                /**
+                 * @example image/jpeg
+                 * @enum {string}
+                 */
+                content_type: "image/jpeg" | "image/png" | "image/webp";
+                /**
+                 * @description バイト数。署名に含めるので実際に送る大きさと一致させる
+                 * @example 284113
+                 */
+                size: number;
+            }[];
+        };
+        Upload: {
+            /**
+             * @description POST /api/v1/rooms の photo_keys に渡す
+             * @example photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg
+             */
+            key: string;
+            /**
+             * @description この URL へ写真を PUT する。Content-Type だけを付け、他のヘッダは足さない (署名と食い違うと 403)
+             * @example https://storage.googleapis.com/example-uploads/photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256
+             */
+            upload_url: string;
+        };
         RoomInput: {
             room: {
                 /**
@@ -750,8 +830,11 @@ export interface components {
                  * @enum {string}
                  */
                 shape: "square" | "standard" | "long";
-                /** @description 部屋の写真 (任意・multipart/form-data のときだけ)。JPEG・PNG・WebP、1 枚 10MB まで、4 枚まで。1 枚目の写真で正面に見える壁を北とする */
-                photos?: string[];
+                /**
+                 * @description POST /api/v1/uploads で得た key。アップロード済みのものだけ受け付ける。省略すると写真なしで解析する
+                 * @example []
+                 */
+                photo_keys?: string[];
             };
         };
         Room: {
@@ -764,11 +847,6 @@ export interface components {
              * @enum {string}
              */
             shape: "square" | "standard" | "long";
-            /**
-             * @description 受け取った写真の枚数
-             * @example 4
-             */
-            photo_count: number;
             /**
              * @example ready
              * @enum {string}

@@ -8,7 +8,7 @@ namespace :rooms do
   desc "保存してある写真で解析し直して表示する (SAVE=1 で結果を部屋に保存)  例: bin/rails 'rooms:reanalyze[51,low]'"
   task :reanalyze, [ :id, :thinking_level, :model ] => :environment do |_, args|
     room = Room.find(args.fetch(:id))
-    abort "部屋 ##{room.id} には写真がありません" unless room.photos.attached?
+    abort "部屋 ##{room.id} には写真がありません" if room.photo_keys.empty?
     abort "GEMINI_API_KEY が設定されていません (backend/.env)" unless GeminiClient.configured?
 
     options = { thinking_level: args[:thinking_level].presence, model: args[:model].presence }.compact
