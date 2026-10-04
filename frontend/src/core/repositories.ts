@@ -4,12 +4,14 @@ import { createContext, useContext } from "react";
 import type { AuthRepository } from "../domain/authRepository";
 import type { UserRepository } from "../domain/userRepository";
 import type { RoomRepository } from "../domain/roomRepository";
+import type { FurnitureModelRepository } from "../domain/furnitureModelRepository";
 import type { TokenStore } from "./tokenStore";
 
 export type Repositories = {
   auth: AuthRepository;
   users: UserRepository;
   rooms: RoomRepository;
+  furnitureModels: FurnitureModelRepository;
   tokenStore: TokenStore;
 };
 

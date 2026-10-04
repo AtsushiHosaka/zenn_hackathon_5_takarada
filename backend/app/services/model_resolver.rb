@@ -1,4 +1,4 @@
-# シーンの model_url を config/models.yml から埋める。
+# シーンの model_url は DB カタログを優先し、未対応のものだけ既存 YAML で補う。
 # 載っていないものは null のままで、クライアントが category と size から箱で描く。
 class ModelResolver
   def self.call(scene)
@@ -6,12 +6,17 @@ class ModelResolver
   end
 
   def call(scene)
-    scene.merge("objects" => scene["objects"].map { |object| resolve(object) })
+    resolved = FurnitureModelCatalog.enrich_scene(scene)
+    return nil if resolved.nil?
+
+    resolved.merge("objects" => resolved.fetch("objects", []).map { |object| resolve(object) })
   end
 
   private
 
   def resolve(object)
+    return object if object["model_url"].present?
+
     asset = key_for(object)&.then { |key| Storage.asset(ENV["MODELS_BUCKET"], key) }
     asset ? object.merge("model_url" => asset.url) : object
   end

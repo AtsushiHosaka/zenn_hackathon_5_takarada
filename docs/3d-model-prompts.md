@@ -305,20 +305,20 @@ LEDの直線部材はそのまま既存の部屋全周の寸法へ縮めると�
 - [3D方針・GLB形式・モデル基準の案](../specs/room-coordination/spec.md)
 - [現在の画面と配置編集の仕様](../specs/room-coordinator/spec.md)
 - [既存家具3種と実寸](../backend/app/services/room_analyzer.rb)
-- [商品38件・カテゴリ・色・寸法](../backend/config/interior_links_mock.yml)
+- [商品37件・カテゴリ・色・寸法](../backend/config/interior_links_mock.yml)
 - [寸法を省略した商品の標準値](../backend/app/services/interior_links.rb)
 - [ベッド・窓・壁・机への配置と寸法調整](../backend/app/services/slot_layout.rb)
 - [Web参照サンプルの家具・商品](../frontend/src/data/dummy/dummyRoomRepository.ts)
 - [現行GLBローダー](../frontend/src/feature/room/RoomViewer.tsx)
 
-制作後のモデルURLをAPIに割り当てる`ModelResolver`と対応表は未実装。この文書は制作リストとプロンプト案で、モデル生成・GLB読込検証・アプリへの接続はまだ行っていない。
+制作後のモデルURLはDBの対応表から割り当てる。制作結果と接続状況は以下に記す。
 
 ## 制作結果 (2026-10-04)
 
-生成ツールの代わりに、Blenderのスクリプトで59形状すべてを作成した。手順は[tools/furniture_models](../tools/furniture_models/README.md)を参照。出力は`frontend/public/models/furniture/`の87ファイル。内訳は基本59形状、商品別の色・寸法違い16個、サイズ違い12個（2人掛けソファ・L字ソファ左右・ローテーブル・デスク・本棚に各2サイズ）。
+生成ツールの代わりに、Blenderのスクリプトで59形状すべてを作成した。手順は[tools/furniture_models](../tools/furniture_models/README.md)を参照。出力は`output/furniture_models/furniture/`の87ファイル。内訳は基本59形状、商品別の色・寸法違い16個、サイズ違い12個（2人掛けソファ・L字ソファ左右・ローテーブル・デスク・本棚に各2サイズ）。
 
-- 商品ID・既存家具IDとモデルの対応は`manifest.json`の`products`にまとめた。モックカタログの38商品と既存家具3種がすべて対応する。
-- three.jsのGLTFLoaderで全ファイルを読み込み、寸法と底面中心の原点が指定どおりであることを確認した。最大8.4k三角形、208KB、圧縮なし。
+- 商品ID・既存家具IDとモデルの対応は`backend/db/furniture_models.json`からDBへ取り込む。対応表には37商品と既存家具3種を収録した。
+- 既存の制作検証ではthree.jsのGLTFLoaderで全ファイルを読み込んだ。DB移行時にも全GLBの頂点を測り、寸法と底面中心の原点が指定どおりであることを確認した。最大8,384三角形、329,852バイト、合計8,114,712バイト、圧縮なし。
 - 見た目はユーザー指定の参考画像に合わせ、パステル・マット・フラットなイラスト調にした。
 - 全モデルにUV (1UV = 1m の箱投影) を付け、フロントの`applyMaterialOverrides`で素材名ごとに色・テクスチャを後から張り替えられるようにした。柄・織り目はGLBに含めず、この仕組みで付ける。植物は枝葉の広がりを指定寸法に収めるため、横方向に最大約25%伸縮させている。
-- アプリへの接続（`ModelResolver`と表示側での`modelUrl`の割り当て）は未実装。
+- 部屋APIでDBの対応表から`model_url`を補う処理と、Webで不足URLを補う処理を実装した。公開GCSでの配信設定と実接続検証はバケットURL待ち。[運用手順](furniture-models.md)を参照。

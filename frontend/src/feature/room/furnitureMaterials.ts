@@ -1,9 +1,9 @@
 import * as THREE from "three";
 
 /**
- * 家具GLB (public/models/furniture) の素材を、素材名を指定して後から張り替える。
+ * GCSで配信する家具GLBの素材を、素材名を指定して後から張り替える。
  * 色を変える部分は "tint"。ほかに "wood" / "metal" / "leaf" / "pot" / "trim" / "light" などがある
- * (モデルごとの一覧は manifest.json の materials)。
+ * (モデルごとの一覧は家具モデルAPIの materials)。
  * GLB の UV は 1 = 1m の箱投影なので、繰り返しテクスチャはどのモデルにも同じ実寸で張られる。
  */
 export type MaterialOverride = {

@@ -9,3 +9,6 @@
 end
 
 puts "seeded #{User.count} users"
+
+catalog = FurnitureModelImporter.call
+puts "seeded #{catalog.fetch(:models)} furniture models and #{catalog.fetch(:bindings)} bindings"

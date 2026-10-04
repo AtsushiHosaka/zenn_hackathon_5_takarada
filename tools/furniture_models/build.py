@@ -16,12 +16,18 @@ for name in MODULES:
         importlib.import_module(name)
 
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-out_dir = os.path.abspath(argv[0]) if argv else os.path.join(HERE, "..", "..", "frontend", "public", "models", "furniture")
+out_dir = os.path.abspath(argv[0]) if argv else os.path.join(HERE, "..", "..", "output", "furniture_models", "furniture")
 only = set(argv[1:])
 os.makedirs(out_dir, exist_ok=True)
 
-report = []
+report_path = os.path.join(HERE, "build_report.json")
+# 一部だけ再生成する場合も、ほかのモデルのカタログ情報を残す。
+previous = json.load(open(report_path)) if only and os.path.exists(report_path) else []
+report = {item["file"]: item for item in previous}
 failed = []
+unknown = only - set(lib.ASSETS)
+if unknown:
+    raise ValueError(f"Unknown model files: {sorted(unknown)}")
 for file, (fn, size, variants) in lib.ASSETS.items():
     if only and file not in only:
         continue
@@ -34,7 +40,7 @@ for file, (fn, size, variants) in lib.ASSETS.items():
             stats["file"] = out_name
             stats["target"] = opts.get("size", size)
             stats["bytes"] = os.path.getsize(os.path.join(out_dir, out_name))
-            report.append(stats)
+            report[out_name] = stats
             print(f"OK {out_name} tris={stats['tris']} kb={stats['bytes'] // 1024} mats={stats['materials']}")
         except Exception as exc:  # 1件の失敗で全体を止めない
             import traceback
@@ -42,6 +48,8 @@ for file, (fn, size, variants) in lib.ASSETS.items():
             failed.append(out_name)
             print(f"FAIL {out_name}: {exc}")
 
-with open(os.path.join(HERE, "build_report.json"), "w") as fp:
-    json.dump(report, fp, ensure_ascii=False, indent=1)
+with open(report_path, "w") as fp:
+    json.dump(sorted(report.values(), key=lambda item: item["file"]), fp, ensure_ascii=False, indent=1)
 print("FAILED:", failed)
+if failed:
+    sys.exit(1)

@@ -290,6 +290,96 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/furniture_models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 利用できる 3D 家具モデルを一覧で取得する
+         * @description 寸法はメートル。GCS の公開ベース URL が未設定の場合、model_url は null。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description モデル一覧 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FurnitureModel"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/furniture_models/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description モデルの安定 ID (GLB ファイル名から拡張子を除いた値) */
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** 3D 家具モデルのメタデータを取得する */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description モデルの安定 ID (GLB ファイル名から拡張子を除いた値) */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description モデルのメタデータ */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FurnitureModel"];
+                    };
+                };
+                /** @description モデルが無い、または無効 */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFound"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/rooms": {
         parameters: {
             query?: never;
@@ -685,6 +775,73 @@ export interface components {
             h: number;
             /** @example 1.95 */
             d: number;
+        };
+        FurnitureModelBinding: {
+            /**
+             * @example existing
+             * @enum {string}
+             */
+            kind: "existing" | "product";
+            /**
+             * @description 既存家具の object ID または商品の ID
+             * @example bed-1
+             */
+            reference: string;
+        };
+        FurnitureModel: {
+            /**
+             * @description 安定 ID。GLB ファイル名から拡張子を除いた値
+             * @example bed_single
+             */
+            id: string;
+            /** @example シングルベッド */
+            name: string;
+            /** @example bed */
+            category: string;
+            /** @example bed_single */
+            shape: string;
+            /** @example null */
+            variant: string | null;
+            /**
+             * @example glb
+             * @enum {string}
+             */
+            format: "glb";
+            /**
+             * @description 公開ベース URL からの相対 GCS オブジェクトパス
+             * @example furniture/bed_single.glb
+             */
+            object_key: string;
+            size: components["schemas"]["Size"];
+            /**
+             * @example meter
+             * @enum {string}
+             */
+            unit: "meter";
+            /**
+             * @example +Y up, +Z front, origin bottom center
+             * @enum {string}
+             */
+            axes: "+Y up, +Z front, origin bottom center";
+            /** @example 1200 */
+            triangle_count: number;
+            /** @example 48000 */
+            byte_size: number;
+            /** @example aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa */
+            sha256: string;
+            /**
+             * @example [
+             *       "wood",
+             *       "fabric"
+             *     ]
+             */
+            materials: string[];
+            /**
+             * @description GCS の公開 GLB URL。ベース URL が未設定なら null
+             * @example null
+             */
+            model_url: string | null;
+            bindings: components["schemas"]["FurnitureModelBinding"][];
         };
         /** @description 物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き */
         Position: {
