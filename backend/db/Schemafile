@@ -22,3 +22,14 @@ create_table "identities", force: :cascade do |t|
   t.index [ "email" ], name: "index_identities_on_email", unique: true
   t.index [ "jti" ], name: "index_identities_on_jti", unique: true
 end
+
+# 部屋。写真の解析結果 (シーン) を jsonb で持つ。形は swagger の Scene
+create_table "rooms", force: :cascade do |t|
+  t.decimal "tatami", precision: 4, scale: 1, null: false
+  t.string "shape", null: false, default: "standard" # 既存行の補完用。API では必須 (Room モデル参照)
+  t.string "status", null: false, default: "analyzing"
+  t.jsonb "scene"
+  t.text "error_message"
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+end

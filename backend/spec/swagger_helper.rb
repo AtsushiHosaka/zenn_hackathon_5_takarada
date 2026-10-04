@@ -107,6 +107,104 @@ RSpec.configure do |config|
               error: { type: :string, example: "Couldn't find User with 'id'=999" }
             },
             required: %w[error]
+          },
+          Size: {
+            type: :object,
+            description: "メートル。w: 幅 (ローカル x), h: 高さ, d: 奥行き (ローカル z)",
+            properties: {
+              w: { type: :number, example: 0.97 },
+              h: { type: :number, example: 0.45 },
+              d: { type: :number, example: 1.95 }
+            },
+            required: %w[w h d]
+          },
+          Position: {
+            type: :object,
+            description: "物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き",
+            properties: {
+              x: { type: :number, example: 0.51 },
+              y: { type: :number, example: 0.0 },
+              z: { type: :number, example: 1.0 }
+            },
+            required: %w[x y z]
+          },
+          Window: {
+            type: :object,
+            properties: {
+              id: { type: :string, example: "window-1" },
+              wall: { type: :string, enum: %w[north south east west], example: "south" },
+              center: { type: :number, description: "壁に沿った窓の中心位置 (north/south は x、east/west は z)", example: 1.35 },
+              width: { type: :number, example: 1.2 },
+              bottom: { type: :number, description: "床から窓の下端までの高さ", example: 0.9 },
+              height: { type: :number, example: 1.1 }
+            },
+            required: %w[id wall center width bottom height]
+          },
+          RoomShape: {
+            type: :object,
+            properties: {
+              width: { type: :number, description: "東西方向 (x) の長さ", example: 2.7 },
+              depth: { type: :number, description: "南北方向 (z) の長さ", example: 3.6 },
+              height: { type: :number, example: 2.4 },
+              wall_color: { type: :string, example: "#f4f1ec" },
+              floor_color: { type: :string, example: "#c8a97e" },
+              windows: { type: :array, items: { "$ref" => "#/components/schemas/Window" } }
+            },
+            required: %w[width depth height wall_color floor_color windows]
+          },
+          SceneObject: {
+            type: :object,
+            properties: {
+              id: { type: :string, example: "bed-1" },
+              source: { type: :string, enum: %w[existing suggested], description: "existing: 今ある家具, suggested: AI の追加提案", example: "existing" },
+              category: { type: :string, example: "bed" },
+              label: { type: :string, example: "ベッド" },
+              size: { "$ref" => "#/components/schemas/Size" },
+              position: { "$ref" => "#/components/schemas/Position" },
+              rotation_y: { type: :integer, enum: [ 0, 90, 180, 270 ], description: "度数。正面 (ローカル +z) が 0: 南, 90: 東, 180: 北, 270: 西 を向く (three.js の rotation.y と同じ)", example: 0 },
+              color: { type: :string, example: "#f2f0eb" },
+              model_url: { type: :string, nullable: true, description: "GLB の URL。null なら category と size から箱などで代わりに描く", example: nil },
+              slot: { type: :string, nullable: true, enum: [ nil, "bed_cover", "curtain", "rug", "wall_decor", "light", "display", "cushion", "desk_top" ], description: "suggested の置き場所の枠", example: nil },
+              attach_to: { type: :string, nullable: true, description: "付けた先の家具・窓の id", example: nil },
+              item_id: { type: :integer, nullable: true, description: "suggested の商品 id (Coordination.items と対応)", example: nil },
+              marker: { type: :integer, nullable: true, description: "suggested の番号マーカー (Coordination.items と対応)", example: nil }
+            },
+            required: %w[id source category label size position rotation_y color model_url slot attach_to item_id marker]
+          },
+          Scene: {
+            type: :object,
+            properties: {
+              room: { "$ref" => "#/components/schemas/RoomShape" },
+              objects: { type: :array, items: { "$ref" => "#/components/schemas/SceneObject" } }
+            },
+            required: %w[room objects]
+          },
+          RoomInput: {
+            type: :object,
+            properties: {
+              room: {
+                type: :object,
+                properties: {
+                  tatami: { type: :number, minimum: 3, maximum: 30, description: "部屋の広さ (畳)", example: 6 },
+                  shape: { type: :string, enum: %w[square standard long], description: "部屋の形。square: 正方形に近い (1:1.15), standard: やや縦長 (3:4), long: 細長い (1:2)", example: "standard" }
+                },
+                required: %w[tatami shape]
+              }
+            },
+            required: %w[room]
+          },
+          Room: {
+            type: :object,
+            properties: {
+              id: { type: :integer, example: 1 },
+              tatami: { type: :number, example: 6.0 },
+              shape: { type: :string, enum: %w[square standard long], example: "standard" },
+              status: { type: :string, enum: %w[analyzing ready failed], example: "ready" },
+              scene: { allOf: [ { "$ref" => "#/components/schemas/Scene" } ], nullable: true, description: "status が ready になると入る" },
+              error_message: { type: :string, nullable: true, example: nil },
+              created_at: { type: :string, format: "date-time" }
+            },
+            required: %w[id tatami shape status scene error_message created_at]
           }
         }
       }
