@@ -20,7 +20,8 @@
 
 - Web lint・本番ビルド成功。API生成型も再生成。
 - ローカルの契約生成はlockfileと同じrswag-specs 2.17.0のDSL/formatterでdry-run。DBとRails実行を省略しており、実動作成功ではない。既存mainの生成結果がRuby YAML版の文字列引用・空白差分だけで再現することを確認。最終的な完全生成一致はGitHub CIで確認する。
-- 既存RSpec＋最小401/404契約・RuboCopはGitHub CIで確認する。未検証の間は公開完了扱いにしない。
+- 既存RSpec＋最小401/404契約、RuboCop、通常RailsでのSwagger一致、Web生成型一致はPR #17/#18のGitHub CI成功。
+- 統合後の本番inline処理に合わせ、Geminiの総期限90秒（再試行込み）、接続5秒・読取25秒・書込20秒、nginx待機115秒、ブラウザ120秒へ整合。実AIは未呼出し。
 - DB列は既存Schemafile適用経路で追加する。適用・api更新の順序を維持し、ローカルworkerがある環境はworkerも同じイメージへ更新する。
 - 本番DB・GCP・DNS・既存利用者データはこの変更準備では未操作。
 

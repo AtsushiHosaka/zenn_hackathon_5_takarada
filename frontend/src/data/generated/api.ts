@@ -207,7 +207,7 @@ export interface paths {
         put?: never;
         /**
          * コーデ提案の生成を始める
-         * @description 生成は非同期。GET /api/v1/coordinations/{id} で status が done / failed になるまでポーリングする。現在の商品選定は AI 未接続のモック (キーワードでテーマを判定) で、商品候補はインテリアリンク取得のモック (InteriorLinks::MockClient)
+         * @description 生成は非同期。GET /api/v1/coordinations/{id} で status が done / failed になるまでポーリングする。Geminiの設定がある場合は要望文からAIで商品を選び、無い場合はキーワード判定のモック。商品候補はInteriorLinks::MockClientの参考データ。本人の部屋・提案だけ扱う
          */
         post: {
             parameters: {

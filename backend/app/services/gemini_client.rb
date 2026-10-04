@@ -1,4 +1,5 @@
 require "net/http"
+require "timeout"
 
 # Gemini API (Interactions API) の呼び出し口。画像を添えて、JSON Schema どおりの JSON を返させる。
 # API キーは環境変数 GEMINI_API_KEY (backend/.env)。モデルは GEMINI_MODEL (既定 gemini-3.1-flash-lite)、
@@ -10,6 +11,7 @@ class GeminiClient
   DEFAULT_MODEL = "gemini-3.1-flash-lite".freeze
   THINKING_LEVELS = %w[minimal low medium high].freeze
   RETRYABLE = [ 429, 500, 502, 503, 504 ].freeze
+  REQUEST_DEADLINE_SECONDS = 90
 
   class Error < StandardError; end
 
@@ -44,7 +46,9 @@ class GeminiClient
     }
     body[:generation_config] = { thinking_level: @thinking_level } if @thinking_level
     started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-    json, usage = parse(post(body))
+    json, usage = Timeout.timeout(REQUEST_DEADLINE_SECONDS, Error, "AIの生成が時間内に完了しませんでした。少し待ってから再度お試しください") do
+      parse(post(body))
+    end
     elapsed = (Process.clock_gettime(Process::CLOCK_MONOTONIC) - started).round(1)
     Response.new(json:, model: @model, thinking_level: @thinking_level, usage:, elapsed:)
   end
@@ -52,7 +56,7 @@ class GeminiClient
   private
 
   def post(body, attempt: 1)
-    response = Net::HTTP.start(ENDPOINT.host, ENDPOINT.port, use_ssl: true, open_timeout: 10, read_timeout: 180) do |http|
+    response = Net::HTTP.start(ENDPOINT.host, ENDPOINT.port, use_ssl: true, open_timeout: 5, read_timeout: 25, write_timeout: 20) do |http|
       http.post(ENDPOINT.path, body.to_json, "Content-Type" => "application/json", "x-goog-api-key" => @api_key)
     end
     return response if response.is_a?(Net::HTTPSuccess)
