@@ -205,6 +205,38 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/NotFound"
+  "/api/v1/uploads":
+    post:
+      summary: 部屋写真のアップロード先を発行する
+      tags:
+      - Uploads
+      description: |
+        写真は Rails を通さず、ここで得た upload_url へブラウザから直接 PUT する。
+        PUT には Content-Type だけを付ける (署名と食い違うヘッダがあると GCS が 403 を返す)。
+        size も署名に含まれるため、実際に送る大きさと一致させる。
+        アップロード後、key を POST /api/v1/rooms の photo_keys に渡す。
+      security: []
+      parameters: []
+      responses:
+        '201':
+          description: 発行に成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Upload"
+        '422':
+          description: 対応していない形式
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationErrors"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/UploadInput"
   "/api/v1/users":
     get:
       summary: ユーザー一覧を取得する
@@ -606,6 +638,47 @@ components:
       required:
       - room
       - objects
+    UploadInput:
+      type: object
+      properties:
+        uploads:
+          type: array
+          maxItems: 4
+          items:
+            type: object
+            properties:
+              content_type:
+                type: string
+                enum:
+                - image/jpeg
+                - image/png
+                - image/webp
+                example: image/jpeg
+              size:
+                type: integer
+                maximum: 10485760
+                description: バイト数。署名に含めるので実際に送る大きさと一致させる
+                example: 284113
+            required:
+            - content_type
+            - size
+      required:
+      - uploads
+    Upload:
+      type: object
+      properties:
+        key:
+          type: string
+          description: POST /api/v1/rooms の photo_keys に渡す
+          example: photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg
+        upload_url:
+          type: string
+          description: この URL へ写真を PUT する。Content-Type だけを付け、他のヘッダは足さない (署名と食い違うと
+            403)
+          example: https://storage.googleapis.com/example-uploads/photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256
+      required:
+      - key
+      - upload_url
     RoomInput:
       type: object
       properties:
@@ -627,6 +700,12 @@ components:
               description: '部屋の形。square: 正方形に近い (1:1.15), standard: やや縦長 (3:4), long:
                 細長い (1:2)'
               example: standard
+            photo_keys:
+              type: array
+              items:
+                type: string
+              description: POST /api/v1/uploads で得た key。アップロード済みのものだけ受け付ける。省略すると写真なしで解析する
+              example: []
           required:
           - tatami
           - shape
@@ -660,6 +739,15 @@ components:
           - "$ref": "#/components/schemas/Scene"
           nullable: true
           description: status が ready になると入る
+        analyzed_by:
+          type: string
+          nullable: true
+          enum:
+          -
+          - gemini
+          - mock
+          description: 'gemini: 写真を AI で解析した / mock: 写真か API キーが無く、決まった家具を置いたモック。解析が終わると入る'
+          example: gemini
         error_message:
           type: string
           nullable: true
@@ -673,6 +761,7 @@ components:
       - shape
       - status
       - scene
+      - analyzed_by
       - error_message
       - created_at
     CoordinationInput:

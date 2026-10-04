@@ -1,5 +1,5 @@
-# ベース定義。ローカルでは compose.override.yaml が自動で重なり、
-# デプロイ時は infra/compose.deploy.yaml を明示的に重ねる。
+# ローカル開発のベース定義。compose.override.yaml が自動で重なる。
+# デプロイ先は Cloud Run なので compose は使わない (infra/gcp/README.md 参照)。
 services:
   db:
     image: postgres:16-alpine
@@ -26,8 +26,7 @@ services:
       retries: 10
 
   api:
-    # ローカルは compose.override.yaml が build して同じタグを付ける。
-    # デプロイ時は ECR のイメージ URI が入る
+    # compose.override.yaml が build して同じタグを付ける
     image: ${API_IMAGE:-hack-api:local}
     command: >
       bash -c "rm -f tmp/pids/server.pid &&
@@ -41,6 +40,9 @@ services:
       DB_NAME: app
       REDIS_URL: redis://redis:6379/0
       RAILS_ENV: ${RAILS_ENV:-development}
+      # ローカルは GCS を使わず tmp/storage に置く (Storage::LocalClient)。
+      # MODELS_BUCKET は未設定なので model_url は null (クライアントが箱で描く)
+      UPLOADS_BUCKET: local-uploads
     ports:
       - "3000:3000"
     depends_on:
@@ -61,6 +63,7 @@ services:
       DB_NAME: app
       REDIS_URL: redis://redis:6379/0
       RAILS_ENV: ${RAILS_ENV:-development}
+      UPLOADS_BUCKET: local-uploads
     depends_on:
       db:
         condition: service_healthy

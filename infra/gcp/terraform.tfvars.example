@@ -1,0 +1,26 @@
+# cp terraform.tfvars.example terraform.tfvars して project_id を埋める。
+# terraform.tfvars は .gitignore 済み。
+
+# 必須。make infra-bootstrap が作成/選択したプロジェクト ID を入れる
+project_id = "zenn-hackathon-xxxxxx"
+
+# リソース名の接頭辞
+project = "zenn-hackathon"
+
+region = "asia-northeast1"
+
+# db-f1-micro = 共有コア (最小 / 月 ¥1,500 前後)
+# db-g1-small = 1.7GB (重くなったらこちら)
+db_tier = "db-f1-micro"
+
+# CI/CD を使うなら必須。owner/repo 形式。
+# Workload Identity (鍵なし認証) が作られる
+github_repository = "AtsushiHosaka/zenn_hackathon_5_takarada"
+
+# API が許可するオリジン。空なら Web フロントの Cloud Run URL のみ。
+# ローカルの Vite から実 API を叩くなら足す
+# cors_origins = "http://localhost:5173"
+
+# 暴走時の課金上限になるので、必要になるまで小さく保つ
+api_max_instances = 3
+web_max_instances = 2

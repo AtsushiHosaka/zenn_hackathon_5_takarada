@@ -41,7 +41,7 @@ RSpec.describe "Api::V1::Rooms", type: :request do
       response "200", "解析済みの部屋" do
         schema "$ref" => "#/components/schemas/Room"
 
-        let(:room) { Room.create!(tatami: 6, shape: "standard").tap { |r| r.update!(scene: RoomAnalyzer.call(r), status: "ready") } }
+        let(:room) { Room.create!(tatami: 6, shape: "standard").tap { |r| r.update!(scene: RoomAnalyzer.call(r).scene, analyzed_by: "mock", status: "ready") } }
         let(:id) { room.id }
 
         run_test!
