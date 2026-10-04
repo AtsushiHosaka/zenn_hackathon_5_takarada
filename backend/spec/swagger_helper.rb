@@ -186,7 +186,13 @@ RSpec.configure do |config|
                 type: :object,
                 properties: {
                   tatami: { type: :number, minimum: 3, maximum: 30, description: "部屋の広さ (畳)", example: 6 },
-                  shape: { type: :string, enum: %w[square standard long], description: "部屋の形。square: 正方形に近い (1:1.15), standard: やや縦長 (3:4), long: 細長い (1:2)", example: "standard" }
+                  shape: { type: :string, enum: %w[square standard long], description: "部屋の形。square: 正方形に近い (1:1.15), standard: やや縦長 (3:4), long: 細長い (1:2)", example: "standard" },
+                  photos: {
+                    type: :array,
+                    items: { type: :string, format: :binary },
+                    maxItems: 4,
+                    description: "部屋の写真 (任意・multipart/form-data のときだけ)。JPEG・PNG・WebP、1 枚 10MB まで、4 枚まで。1 枚目の写真で正面に見える壁を北とする"
+                  }
                 },
                 required: %w[tatami shape]
               }
@@ -199,12 +205,14 @@ RSpec.configure do |config|
               id: { type: :integer, example: 1 },
               tatami: { type: :number, example: 6.0 },
               shape: { type: :string, enum: %w[square standard long], example: "standard" },
+              photo_count: { type: :integer, description: "受け取った写真の枚数", example: 4 },
               status: { type: :string, enum: %w[analyzing ready failed], example: "ready" },
               scene: { allOf: [ { "$ref" => "#/components/schemas/Scene" } ], nullable: true, description: "status が ready になると入る" },
+              analyzed_by: { type: :string, nullable: true, enum: [ nil, "gemini", "mock" ], description: "gemini: 写真を AI で解析した / mock: 写真か API キーが無く、決まった家具を置いたモック。解析が終わると入る", example: "gemini" },
               error_message: { type: :string, nullable: true, example: nil },
               created_at: { type: :string, format: "date-time" }
             },
-            required: %w[id tatami shape status scene error_message created_at]
+            required: %w[id tatami shape photo_count status scene analyzed_by error_message created_at]
           },
           CoordinationInput: {
             type: :object,

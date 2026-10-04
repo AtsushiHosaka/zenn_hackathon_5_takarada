@@ -1,0 +1,10 @@
+# 部屋の写真の保存先。いまはローカルのディスク (storage/) だけ。
+# api と worker は同じ backend/ をマウントしているので、api が保存した写真を worker が読める。
+# 本番 (Cloud Run) はコンテナ間でディスクを共有できないので、GCS を足して切り替える (未対応)。
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>

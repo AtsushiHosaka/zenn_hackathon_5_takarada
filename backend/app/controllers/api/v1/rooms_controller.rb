@@ -1,6 +1,7 @@
 module Api
   module V1
-    # 部屋の登録と解析結果の取得。解析は AnalyzeRoomJob が非同期で行うので、
+    # 部屋の登録と解析結果の取得。写真を付けるときは multipart/form-data で送る。
+    # 解析は AnalyzeRoomJob が非同期で行うので、
     # クライアントは GET で status が ready になるまでポーリングする。
     # ハッカソンのデモ用にログイン不要の公開エンドポイントにしている
     class RoomsController < ApplicationController
@@ -25,7 +26,7 @@ module Api
       private
 
       def room_params
-        params.require(:room).permit(:tatami, :shape)
+        params.require(:room).permit(:tatami, :shape, photos: [])
       end
     end
   end

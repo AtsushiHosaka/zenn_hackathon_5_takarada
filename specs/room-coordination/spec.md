@@ -21,6 +21,34 @@ system_workflow.png からの変更 (Docs 未反映):
 - 商品に寸法 (size) を持たせる (3D の縮尺と配置に必須)
 - 要望テキスト・予算・活かす家具はコーデ生成にも渡す
 
+## API 呼び出しの流れ
+
+どの画面のどのボタンで API が呼ばれ、その中のどこで AI を使うか (画面は PR #6 の PC ルーム画面)。
+🤖 は Gemini につながっている部分、🟡 は AI の代わりのモック。
+
+| 画面 | ボタン | 呼ばれる API | AI |
+| --- | --- | --- | --- |
+| `/rooms/new` 新規入力 | 「部屋を解析する」 | `POST /rooms` (写真があれば multipart) → 終わるまで `GET /rooms/:id` | 🤖 **① 写真から部屋と家具を読み取る** (`RoomAnalyzer::Gemini`。写真か API キーが無ければモック) |
+| `/rooms/:id` 活かす家具の選択 | 「この家具でコーディネート」 | `POST /rooms/:id/coordinations` → 終わるまで `GET /coordinations/:id` | 🟡 **② 要望から商品を選び、タイトル・コメントを書く** (`CoordinationPlanner`) |
+| `/rooms/:id` 結果 | チャットの「送信」(追加指示) | 同じ部屋に `POST /rooms/:id/coordinations` → `GET /coordinations/:id` | 🟡 ② と同じ |
+| `/rooms/:id` 結果 | 配置・色の編集、保存、購入リスト CSV | なし (ブラウザの中だけ) | − |
+
+- AI は「ボタンの API」の中ではなく、**その後に裏で動くジョブの中**で呼ぶ。ボタンの API はすぐ返り、画面は `GET` で完了を待つ。
+- 新規入力画面で写真を付けると、畳数・部屋の形と一緒に multipart/form-data で送る (写真は任意)。
+
+```mermaid
+flowchart TD
+    B1["/rooms/new<br/>「部屋を解析する」"] -->|POST /rooms| J1["裏のジョブ: 部屋の解析"]
+    J1 --> AI1["🤖 AI ①<br/>写真 → 部屋の色・窓・家具"]
+    AI1 -->|GET /rooms/:id| V1["/rooms/:id<br/>活かす家具を選ぶ"]
+
+    V1 --> B2["「この家具でコーディネート」<br/>または チャットの「送信」"]
+    B2 -->|POST /rooms/:id/coordinations| J2["裏のジョブ: コーデ生成"]
+    J2 --> AI2["🤖 AI ②<br/>要望 → テーマ・商品選び・コメント"]
+    AI2 --> L["ルール (AI なし)<br/>予算内に収める・置き場所を計算"]
+    L -->|GET /coordinations/:id| V2["/rooms/:id 結果<br/>3D・購入リンク"]
+```
+
 ## 重要な設計判断
 
 - **部屋の 3D は写真から復元しない**。寸法と家具の配置を推定し、箱で組み立てるシーン JSON として返す。
@@ -82,11 +110,12 @@ InteriorLinks.client.search(prompt:, theme:, slots:, max_price:)
 | --- | --- |
 | API・DB・非同期ジョブ・Swagger 契約 | 実装済み |
 | 枠ごとの配置計算 (`SlotLayout`)・予算内に収める処理 (`CoordinationBuilder`) | 実装済み |
-| 部屋の解析 (`RoomAnalyzer`) | **モック**: 畳数と部屋の形から寸法を決め、固定の家具 (ベッド・デスク・本棚・南の窓) を置く。写真は受け取らない |
+| 写真のアップロード | **実装済み**: `POST /rooms` で 4 枚まで受け取り (JPEG・PNG・WebP を中身で判定、1 枚 10MB まで)、ActiveStorage でローカルのディスク (`backend/storage/`) に保存 |
+| 部屋の解析 (`RoomAnalyzer`) | 写真と `GEMINI_API_KEY` があれば **Gemini** (`gemini-3.8-flash`、Interactions API、写真は長辺 1536px に縮小)、無ければ**モック**。どちらも「どの壁沿いのどのあたりか」だけを返し、座標は `RoomLayout` が計算する。結果の `analyzed_by` で区別できる。**実際のキーでの動作は未確認** |
 | 商品の選定 (`CoordinationPlanner`) | **モック**: キーワードでテーマ (推し活パープル / ボタニカル / 韓国) を決める |
 | インテリアリンク取得 (`InteriorLinks`) | **モック** (`InteriorLinks::MockClient` + `config/interior_links_mock.yml`、38 点)。価格はダミー、URL は EC の検索結果ページ |
 | Webの画面 (`/rooms/new`・`/rooms/:id`) | PR #6の画面・3D編集を基準に統合。畳数・部屋の形 → 活かす家具 → 要望・予算 → 3Dと購入リンク。通信と応答変換は共通の `RoomRepository` に一本化。`/coordinate` は `/rooms/new` へ移動 |
-| 写真のアップロード・S3・3D モデル (GLB) | 未実装 |
+| 写真の本番保存先 (GCS)・3D モデル (GLB) | 未実装。Cloud Run ではコンテナ間でディスクを共有できないので、本番では GCS が必要 |
 
 2026年10月4日の依頼により、PR #5をPR #6へ取り込んでからPR #6をmainへマージする。Webの詳細は `specs/room-coordinator/spec.md` を参照する。活かす家具は解析Sceneの家具IDで送信し、選択と予算を結果へ保存する。空配列はAPI上「全家具を活かす」を意味するため、家具がある場合は1点以上の選択を必須とする。この統合判断はGoogle Docsへ未反映。
 

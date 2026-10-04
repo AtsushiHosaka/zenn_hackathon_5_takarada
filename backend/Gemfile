@@ -26,6 +26,9 @@ gem "rack-cors"
 # 非同期処理。ActiveJob のバックエンドは Sidekiq (キューは Redis)
 gem "sidekiq"
 
+# 部屋の写真の縮小 (libvips を使う。Dockerfile で入れる)
+gem "image_processing", "~> 1.2"
+
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false
 

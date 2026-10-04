@@ -35,13 +35,13 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
         generation: Boolean(config.generationPath),
         coordination: config.contract !== "analysis",
         input: config.contract === "legacy" ? "photos" : "dimensions",
-        message: config.generationPath ? config.contract === "analysis" ? "畳数と部屋の形から、APIの解析モックで部屋を作成します。写真・希望文の解析や商品提案は行いません。" : config.contract === "coordination" ? "部屋解析と商品提案のAPIモックを使います。写真解析とAI生成は未接続で、商品価格は参考値です。" : "設定された生成APIへ写真を送信します。" : unavailableMessage,
+        message: config.generationPath ? config.contract === "analysis" ? "畳数と部屋の形から、APIの解析モックで部屋を作成します。写真・希望文の解析や商品提案は行いません。" : config.contract === "coordination" ? "写真を付けると、AI (Gemini) が部屋の色・窓・家具を読み取ります。写真が無いときやサーバーに API キーが無いときは、畳数と部屋の形から作るモックになります。商品提案はモックで、価格は参考値です。" : "設定された生成APIへ写真を送信します。" : unavailableMessage,
       };
     },
     async generate(input, signal) {
       if (!config.generationPath) throw new DomainError(unavailableMessage);
       if (config.contract !== "legacy") {
-        const body = dimensionRequest(input);
+        const body = withPhotos(dimensionRequest(input), input.photos);
         if (config.contract === "coordination") validateCoordinationInput(input);
         if (input.roomId !== undefined && !/^[1-9]\d*$/.test(input.roomId)) throw new DomainError("部屋のIDが正しくありません");
         const jobSignal = boundedSignal(signal);
@@ -115,6 +115,18 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
 function boundedSignal(signal?: AbortSignal): AbortSignal {
   const deadline = AbortSignal.timeout(120_000);
   return signal ? AbortSignal.any([signal, deadline]) : deadline;
+}
+
+// 写真があれば multipart/form-data (room[tatami]・room[shape]・room[photos][]) で送る。無ければ JSON のまま
+function withPhotos(body: components["schemas"]["RoomInput"], photos: File[]): components["schemas"]["RoomInput"] | FormData {
+  if (!photos.length) return body;
+  if (photos.length > 4) throw new DomainError("写真は4枚までにしてください");
+  if (photos.some(photo => !["image/jpeg", "image/png", "image/webp"].includes(photo.type) || photo.size > 10 * 1024 * 1024 || photo.size === 0)) throw new DomainError("写真は1枚10MB以内のJPEG・PNG・WebPを選んでください");
+  const form = new FormData();
+  form.append("room[tatami]", String(body.room.tatami));
+  form.append("room[shape]", body.room.shape);
+  photos.forEach(photo => form.append("room[photos][]", photo, photo.name));
+  return form;
 }
 
 function dimensionRequest(input: GenerateRoomInput): components["schemas"]["RoomInput"] {

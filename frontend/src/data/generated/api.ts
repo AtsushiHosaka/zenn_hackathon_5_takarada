@@ -313,10 +313,11 @@ export interface paths {
             requestBody?: {
                 content: {
                     "application/json": components["schemas"]["RoomInput"];
+                    "multipart/form-data": components["schemas"]["RoomInput"];
                 };
             };
             responses: {
-                /** @description 登録に成功 (status: analyzing) */
+                /** @description 写真付きで登録に成功 (multipart/form-data) */
                 201: {
                     headers: {
                         [name: string]: unknown;
@@ -749,6 +750,8 @@ export interface components {
                  * @enum {string}
                  */
                 shape: "square" | "standard" | "long";
+                /** @description 部屋の写真 (任意・multipart/form-data のときだけ)。JPEG・PNG・WebP、1 枚 10MB まで、4 枚まで。1 枚目の写真で正面に見える壁を北とする */
+                photos?: string[];
             };
         };
         Room: {
@@ -762,12 +765,23 @@ export interface components {
              */
             shape: "square" | "standard" | "long";
             /**
+             * @description 受け取った写真の枚数
+             * @example 4
+             */
+            photo_count: number;
+            /**
              * @example ready
              * @enum {string}
              */
             status: "analyzing" | "ready" | "failed";
             /** @description status が ready になると入る */
             scene: components["schemas"]["Scene"] | null;
+            /**
+             * @description gemini: 写真を AI で解析した / mock: 写真か API キーが無く、決まった家具を置いたモック。解析が終わると入る
+             * @example gemini
+             * @enum {string|null}
+             */
+            analyzed_by: null | "gemini" | "mock";
             /** @example null */
             error_message: string | null;
             /** Format: date-time */
