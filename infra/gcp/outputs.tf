@@ -104,3 +104,13 @@ output "console_url" {
   description = "GCP コンソール (Cloud Run の一覧)"
   value       = "https://console.cloud.google.com/run?project=${var.project_id}"
 }
+
+output "models_bucket" {
+  description = "3D モデル (GLB) の公開バケット"
+  value       = google_storage_bucket.models.name
+}
+
+output "uploads_bucket" {
+  description = "部屋写真の非公開バケット"
+  value       = google_storage_bucket.uploads.name
+}

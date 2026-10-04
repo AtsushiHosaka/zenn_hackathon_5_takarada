@@ -5,7 +5,6 @@ import { RepositoriesContext } from "../core/repositories";
 import { createRepositories } from "./container";
 import LoginPage from "../feature/auth/LoginPage";
 import UserDetailPage from "../feature/users/UserDetailPage";
-import UsersPage from "../feature/users/UsersPage";
 import AppLayout from "../feature/shared/AppLayout";
 import RequireAuth from "../feature/shared/RequireAuth";
 import RoomListPage from '../feature/room/RoomListPage';
@@ -48,7 +47,8 @@ export default function App() {
                 </RequireAuth>
               }
             >
-              <Route path="/users" element={<UsersPage />} />
+              <Route path="/account" element={<UserDetailPage />} />
+              <Route path="/users" element={<Navigate to="/account" replace />} />
               <Route path="/users/:id" element={<UserDetailPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

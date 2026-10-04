@@ -62,9 +62,10 @@ jobs:
           target: runtime
           platforms: linux/amd64
           push: true
-          # VITE_ で始まる値はビルド時にバンドルへ埋め込まれる
+          # API は nginx が同一オリジンで中継する。接続先はサーバー側へ渡す。
           build-args: |
-            VITE_API_ENDPOINT=${{ secrets.GCP_API_URL }}
+            VITE_API_ENDPOINT=
+            API_UPSTREAM_ORIGIN=${{ secrets.GCP_API_URL }}
             VITE_CONNECTION=api
           tags: |
             ${{ secrets.GCP_WEB_IMAGE_REPO }}:${{ github.event.workflow_run.head_sha }}

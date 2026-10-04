@@ -1,17 +1,10 @@
-// JWT の置き場。接続先ごとに別のキーへ持つので、切り替えても混ざらない。
-//
-// **localStorage を直接読むだけでは React が再描画しない**ので、購読できる形にしてある
-// (useSyncExternalStore から使う)。保存・破棄はここを必ず通す。
-//
-// localStorage は XSS でそのまま読める。ハッカソンの土台としては割り切っているが、
-// 本番に持っていくなら httpOnly Cookie + CSRF 対策へ寄せる。
 import type { Connection } from "./connection";
 
 export type TokenStore = {
   load(): string | null;
-  save(token: string): void;
-  clear(): void;
-  // useSyncExternalStore が使う
+  // expectedToken を指定すると、別のログイン状態を上書きしない。
+  save(token: string, expectedToken?: string | null): boolean;
+  clear(expectedToken?: string | null): boolean;
   subscribe(listener: () => void): () => void;
 };
 
@@ -20,27 +13,34 @@ export function createTokenStore(connection: Connection): TokenStore {
   const listeners = new Set<() => void>();
   let current = localStorage.getItem(key);
 
-  const set = (token: string | null) => {
+  const notify = (token: string | null) => {
     if (current === token) return;
     current = token;
-    if (token === null) localStorage.removeItem(key);
-    else localStorage.setItem(key, token);
     listeners.forEach((listener) => listener());
   };
 
-  // 別タブでのログイン / ログアウトにも追従する
+  const set = (token: string | null, expectedToken?: string | null): boolean => {
+    // storage イベントの配送前でも、別タブの更新を確認する。
+    const stored = localStorage.getItem(key);
+    if (expectedToken !== undefined && stored !== expectedToken) {
+      notify(stored);
+      return false;
+    }
+    if (token === null) localStorage.removeItem(key);
+    else localStorage.setItem(key, token);
+    notify(token);
+    return true;
+  };
+
   window.addEventListener("storage", (event) => {
-    if (event.key !== null && event.key !== key) return;
-    const next = localStorage.getItem(key);
-    if (current === next) return;
-    current = next;
-    listeners.forEach((listener) => listener());
+    if (event.storageArea !== localStorage || (event.key !== null && event.key !== key)) return;
+    notify(localStorage.getItem(key));
   });
 
   return {
-    load: () => current,
-    save: (token) => set(token),
-    clear: () => set(null),
+    load: () => localStorage.getItem(key),
+    save: (token, expectedToken) => set(token, expectedToken),
+    clear: (expectedToken) => set(null, expectedToken),
     subscribe: (listener) => {
       listeners.add(listener);
       return () => listeners.delete(listener);

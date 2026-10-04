@@ -1,7 +1,7 @@
 require "swagger_helper"
 
 RSpec.describe "Api::V1::Coordinations", type: :request do
-  let(:room) { Room.create!(tatami: 6, shape: "standard").tap { |r| r.update!(scene: RoomAnalyzer.call(r), status: "ready") } }
+  let(:room) { Room.create!(tatami: 6, shape: "standard").tap { |r| r.update!(scene: RoomAnalyzer.call(r).scene, analyzed_by: "mock", status: "ready") } }
 
   path "/api/v1/rooms/{room_id}/coordinations" do
     parameter name: :room_id, in: :path, type: :integer, required: true

@@ -4,15 +4,15 @@ import { dummyDatabase, tick } from "./dummyDatabase";
 
 export function createDummyAuthRepository(tokenStore: TokenStore): AuthRepository {
   return {
-    async login({ email }) {
+    async login({ email, password }) {
       await tick();
-      const user = dummyDatabase.findByEmail(email);
+      const user = await dummyDatabase.authenticate(email, password);
       return { user, token: dummyDatabase.tokenFor(user) };
     },
 
-    async signup({ name, email }) {
+    async signup({ name, email, password }) {
       await tick();
-      const user = dummyDatabase.create({ name, email });
+      const user = await dummyDatabase.create({ name, email, password });
       return { user, token: dummyDatabase.tokenFor(user) };
     },
 

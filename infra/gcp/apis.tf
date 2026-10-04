@@ -7,6 +7,7 @@ locals {
     "sqladmin.googleapis.com",         # Cloud SQL
     "artifactregistry.googleapis.com", # コンテナイメージの置き場
     "secretmanager.googleapis.com",    # SECRET_KEY_BASE などの保管
+    "storage.googleapis.com",          # GCS (3D モデル・部屋写真)
     "iam.googleapis.com",
     "iamcredentials.googleapis.com", # Workload Identity
     "sts.googleapis.com",            # Workload Identity

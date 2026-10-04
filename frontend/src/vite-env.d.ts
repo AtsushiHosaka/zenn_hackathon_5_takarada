@@ -9,6 +9,7 @@ interface ImportMetaEnv {
   readonly VITE_ROOM_COORDINATION_JOB_PATH?: string;
   readonly VITE_ROOM_GENERATION_PATH?: string;
   readonly VITE_ROOM_JOB_PATH?: string;
+  readonly VITE_ROOM_UPLOADS_PATH?: string;
   readonly VITE_ROOM_REQUIRES_AUTH?: string;
   readonly VITE_ROOM_PHOTO_FIELD?: string;
   readonly VITE_ROOM_PROMPT_FIELD?: string;
