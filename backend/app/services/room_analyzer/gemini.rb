@@ -1,5 +1,3 @@
-require "image_processing/vips"
-
 class RoomAnalyzer
   # 部屋の写真を Gemini で解析し、壁と床の色・窓・今ある家具を「どの壁沿いのどのあたりか」で返させる。
   # 座標や部屋の寸法は出させない (RoomLayout と畳数で決める)。
@@ -77,6 +75,8 @@ class RoomAnalyzer
 
     # 写真の向き (EXIF) を直し、長辺を MAX_SIDE までに縮めて JPEG にする
     def shrink(photo)
+      # libvips が無い環境 (CI など) でもアプリを起動できるよう、使うときにだけ読み込む
+      require "image_processing/vips"
       photo.open do |file|
         output = ImageProcessing::Vips.source(file).resize_to_limit(MAX_SIDE, MAX_SIDE).convert("jpg").saver(quality: 85).call
         { mime_type: "image/jpeg", data: File.binread(output.path) }
