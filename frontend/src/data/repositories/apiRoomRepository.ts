@@ -27,7 +27,6 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
     demo: createDemoRoom,
     async analyze(input, signal) {
       if (config.contract === "legacy") throw new DomainError("この接続先では畳数による部屋解析を利用できません");
-      if (config.contract === "coordination") validateCoordinationInput(input);
       const design = await createApiRoomRepository(api, { ...config, contract: "analysis" }, baseUrl).generate(input, signal);
       return { ...design, prompt: input.prompt.trim() || undefined, budget: input.budget, keptObjectIds: design.items.filter(item => item.existing).map(item => item.id) };
     },
