@@ -18,7 +18,7 @@ class CoordinationBuilder
 
   def call
     kept = kept_objects
-    plan = CoordinationPlanner.call(prompt: @coordination.prompt, budget: @coordination.budget, room: @scene["room"], kept_objects: kept)
+    plan = CoordinationPlanner.call(prompt: @coordination.prompt, budget: @coordination.budget, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id)
 
     by_slot = plan.candidates.group_by(&:slot) # 枠の優先順・各枠はおすすめ順
     chosen = choose_within_budget(by_slot)

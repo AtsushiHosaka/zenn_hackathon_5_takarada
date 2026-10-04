@@ -65,6 +65,73 @@ variable "cors_origins" {
   default     = ""
 }
 
+variable "gemini_api_key_secret_id" {
+  description = "同じGCPプロジェクト内に既にあるGemini APIキーのSecret Manager ID。空ならAI設定と権限を追加しない。秘密値は渡さない。"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.gemini_api_key_secret_id == "" || can(regex("^[A-Za-z0-9_-]+$", var.gemini_api_key_secret_id))
+    error_message = "secret_idは同じプロジェクト内の短いIDを指定してください。キーの値やリソースパスは入力しないでください。"
+  }
+}
+
+variable "gemini_api_key_secret_version" {
+  description = "使用する既存Secretの固定version番号。latestは使わず、ローテーション時に明示更新する。"
+  type        = string
+  default     = "1"
+
+  validation {
+    condition     = can(regex("^[1-9][0-9]*$", var.gemini_api_key_secret_version))
+    error_message = "Secret versionは1以上の固定番号を指定してください。"
+  }
+}
+
+variable "gemini_grant_secret_access" {
+  description = "指定Secretに既存APIサービスアカウントの読取を今回新規付与するときだけtrue。既存grantは管理・削除しない。"
+  type        = bool
+  default     = false
+}
+
+variable "gemini_allowed_user_ids" {
+  description = "実AIを許可する部屋owner ID。限定検証の使い捨てユーザーだけ指定する。空は全員mock。"
+  type        = list(number)
+  default     = []
+
+  validation {
+    condition     = alltrue([for id in var.gemini_allowed_user_ids : id >= 1 && id == floor(id)])
+    error_message = "許可するuser IDは1以上の整数です。"
+  }
+}
+
+variable "gemini_allow_all_users" {
+  description = "一般利用のAIと継続費用を本人が明示承認した場合だけtrue。限定検証の予算とは別。"
+  type        = bool
+  default     = false
+}
+
+variable "gemini_model" {
+  description = "Gemini secret参照を有効にしたAPIで使用するモデル。料金とInteractions API対応を確認してから変更する。"
+  type        = string
+  default     = "gemini-3.1-flash-lite"
+
+  validation {
+    condition     = trimspace(var.gemini_model) != ""
+    error_message = "Gemini modelは空にできません。"
+  }
+}
+
+variable "gemini_thinking_level" {
+  description = "Gemini secret参照を有効にしたAPIのthinking level。空ならモデル既定値。"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = contains(["", "minimal", "low", "medium", "high"], var.gemini_thinking_level)
+    error_message = "thinking levelは空、minimal、low、medium、highのいずれかです。"
+  }
+}
+
 variable "secret_key_base" {
   description = "Rails の SECRET_KEY_BASE。空なら terraform が生成する"
   type        = string

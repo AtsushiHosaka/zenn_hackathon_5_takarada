@@ -36,6 +36,15 @@ locals {
 
   # 空なら Web フロントの Cloud Run URL だけを許可する
   cors_origins = var.cors_origins != "" ? var.cors_origins : google_cloud_run_v2_service.web.uri
+
+  # AIはAPIのinlineジョブで実行する。DBタスクやWebへキーを渡さない。
+  gemini_env = var.gemini_api_key_secret_id == "" ? {} : merge(
+    {
+      GEMINI_MODEL            = var.gemini_model
+      GEMINI_ALLOWED_USER_IDS = var.gemini_allow_all_users ? "*" : join(",", [for id in var.gemini_allowed_user_ids : tostring(id)])
+    },
+    var.gemini_thinking_level == "" ? {} : { GEMINI_THINKING_LEVEL = var.gemini_thinking_level }
+  )
 }
 
 # --- API (Rails) --------------------------------------------------------------
@@ -110,6 +119,30 @@ resource "google_cloud_run_v2_service" "api" {
       }
 
       dynamic "env" {
+        for_each = local.gemini_env
+
+        content {
+          name  = env.key
+          value = env.value
+        }
+      }
+
+      dynamic "env" {
+        for_each = var.gemini_api_key_secret_id == "" ? [] : [var.gemini_api_key_secret_id]
+
+        content {
+          name = "GEMINI_API_KEY"
+
+          value_source {
+            secret_key_ref {
+              secret  = env.value
+              version = var.gemini_api_key_secret_version
+            }
+          }
+        }
+      }
+
+      dynamic "env" {
         for_each = local.env_from_secret
 
         content {
@@ -158,6 +191,7 @@ resource "google_cloud_run_v2_service" "api" {
     google_project_service.this,
     google_secret_manager_secret_version.app,
     google_secret_manager_secret_iam_member.api,
+    google_secret_manager_secret_iam_member.gemini_api,
     google_project_iam_member.api_cloudsql,
     google_storage_bucket_iam_member.uploads_api,
     google_service_account_iam_member.api_sign_blob,
