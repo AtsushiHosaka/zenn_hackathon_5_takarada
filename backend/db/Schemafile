@@ -47,6 +47,8 @@ create_table "coordinations", force: :cascade do |t|
   t.integer "budget", null: false
   t.jsonb "kept_object_ids", null: false, default: []
   t.jsonb "edited_objects", null: false, default: []
+  # 追加の指示で作り直すときの前回のコーデ (同じ部屋)。前回の商品を引き継ぐのに使う
+  t.bigint "base_coordination_id"
   t.string "status", null: false, default: "pending"
   t.string "title"
   t.text "comment"

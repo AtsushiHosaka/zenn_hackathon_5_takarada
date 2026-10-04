@@ -42,6 +42,8 @@ export function toCoordinationRecord(value: unknown): CoordinationRecord {
     total_price: totalPrice,
     // 商品の選び方 (gemini: 要望文から AI が選んだ / mock: モック) は古い API では返らない
     planned_by: record.planned_by === "gemini" || record.planned_by === "mock" ? record.planned_by : null,
+    // 追加の指示で作り直したときの前回のコーデ (古い API では返らない)
+    base_coordination_id: typeof record.base_coordination_id === "number" && Number.isInteger(record.base_coordination_id) && record.base_coordination_id > 0 ? record.base_coordination_id : null,
     error_message: nullableText(record.error_message, "Coordination.error_message"),
     created_at: createdAt,
   };

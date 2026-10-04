@@ -1108,6 +1108,11 @@ export interface components {
                  */
                 kept_object_ids?: string[];
                 /**
+                 * @description 追加の指示 (チャット) で作り直すときの前回のコーデ (同じ部屋・生成済み)。指示に関係ない商品は前回のものを残す
+                 * @example 12
+                 */
+                base_coordination_id?: number | null;
+                /**
                  * @description 家具の最新配置と、手動で調整した商品の配置。同じ商品が再採用される場合に引き継ぐ。省略すると解析時の配置を使う
                  * @example []
                  */
@@ -1180,6 +1185,11 @@ export interface components {
              * @enum {string|null}
              */
             planned_by: null | "gemini" | "mock";
+            /**
+             * @description 追加の指示で作り直したときの前回のコーデ
+             * @example null
+             */
+            base_coordination_id: number | null;
             /** @example null */
             error_message: string | null;
             /** Format: date-time */
