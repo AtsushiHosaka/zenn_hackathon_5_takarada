@@ -66,12 +66,16 @@ resource "google_project_iam_member" "github_actions" {
   member  = "serviceAccount:${google_service_account.github_actions[0].email}"
 }
 
-# Cloud Run を「API のサービスアカウントとして動かす」ためのデプロイ権限。
-# プロジェクト全体ではなく、この 1 つのサービスアカウントに対してだけ与える
+# Cloud Run はリビジョンを作るたびに、実行するサービスアカウントへの
+# iam.serviceAccountUser を要求する。api と web の 2 つに対してだけ与える
+# (プロジェクト全体には与えない)。これが無いと CI のデプロイが権限エラーになる。
 resource "google_service_account_iam_member" "github_actions_act_as" {
-  count = local.gh_enabled ? 1 : 0
+  for_each = local.gh_enabled ? {
+    api = google_service_account.api.name
+    web = google_service_account.web.name
+  } : {}
 
-  service_account_id = google_service_account.api.name
+  service_account_id = each.value
   role               = "roles/iam.serviceAccountUser"
   member             = "serviceAccount:${google_service_account.github_actions[0].email}"
 }

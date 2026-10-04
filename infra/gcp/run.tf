@@ -152,6 +152,14 @@ resource "google_cloud_run_v2_service" "api" {
 
 # --- Web フロント (nginx + ビルド済みの静的ファイル) --------------------------
 
+# web は静的ファイルを配るだけなので、権限を一切持たない専用の
+# サービスアカウントで動かす。指定しないと Compute Engine のデフォルト
+# サービスアカウント (プロジェクトの Editor 相当) が使われてしまう。
+resource "google_service_account" "web" {
+  account_id   = "${var.project}-web"
+  display_name = "${var.project} Cloud Run (Web)"
+}
+
 resource "google_cloud_run_v2_service" "web" {
   name     = "${var.project}-web"
   location = var.region
@@ -160,6 +168,8 @@ resource "google_cloud_run_v2_service" "web" {
   deletion_protection = false
 
   template {
+    service_account = google_service_account.web.email
+
     scaling {
       min_instance_count = 0
       max_instance_count = var.web_max_instances
