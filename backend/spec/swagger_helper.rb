@@ -161,7 +161,7 @@ RSpec.configure do |config|
               label: { type: :string, example: "ベッド" },
               size: { "$ref" => "#/components/schemas/Size" },
               position: { "$ref" => "#/components/schemas/Position" },
-              rotation_y: { type: :integer, enum: [ 0, 90, 180, 270 ], description: "度数。正面 (ローカル +z) が 0: 南, 90: 東, 180: 北, 270: 西 を向く (three.js の rotation.y と同じ)", example: 0 },
+              rotation_y: { type: :number, minimum: 0, exclusiveMaximum: true, maximum: 360, description: "度数。正面 (ローカル +z) が 0: 南, 90: 東, 180: 北, 270: 西 を向く (three.js の rotation.y と同じ)", example: 0 },
               color: { type: :string, example: "#f2f0eb" },
               model_url: { type: :string, nullable: true, description: "GLB の URL。null なら category と size から箱などで代わりに描く", example: nil },
               slot: { type: :string, nullable: true, enum: [ nil, "bed_cover", "curtain", "rug", "wall_decor", "light", "display", "cushion", "desk_top" ], description: "suggested の置き場所の枠", example: nil },
@@ -206,6 +206,18 @@ RSpec.configure do |config|
             },
             required: %w[id tatami shape status scene error_message created_at]
           },
+          FurnitureEdit: {
+            type: :object,
+            description: "編集した家具・商品の配置。元の解析結果は変更しない",
+            properties: {
+              id: { type: :string, description: "元の家具またはこの部屋で採用済みの商品 id", example: "bed-1" },
+              position: { "$ref" => "#/components/schemas/Position" },
+              size: { "$ref" => "#/components/schemas/Size" },
+              rotation_y: { type: :number, minimum: 0, exclusiveMaximum: true, maximum: 360, example: 15 },
+              color: { type: :string, pattern: "^#[0-9a-fA-F]{6}$", example: "#f2f0eb" }
+            },
+            required: %w[id position size rotation_y color]
+          },
           CoordinationInput: {
             type: :object,
             properties: {
@@ -214,7 +226,8 @@ RSpec.configure do |config|
                 properties: {
                   prompt: { type: :string, example: "紫色の推し活ルームにしたい" },
                   budget: { type: :integer, description: "買い足しの予算 (円)", example: 30_000 },
-                  kept_object_ids: { type: :array, items: { type: :string }, description: "活かす家具の id。空なら全部活かす", example: %w[bed-1 desk-1 shelf-1] }
+                  kept_object_ids: { type: :array, items: { type: :string }, description: "活かす家具の id。空なら全部活かす", example: %w[bed-1 desk-1 shelf-1] },
+                  edited_objects: { type: :array, maxItems: 100, items: { "$ref" => "#/components/schemas/FurnitureEdit" }, description: "家具の最新配置と、手動で調整した商品の配置。同じ商品が再採用される場合に引き継ぐ。省略すると解析時の配置を使う", example: [] }
                 },
                 required: %w[prompt budget]
               }

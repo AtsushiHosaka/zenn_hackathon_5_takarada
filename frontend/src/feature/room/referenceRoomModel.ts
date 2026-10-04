@@ -108,7 +108,7 @@ export function usesReferenceRoom(design: RoomDesign): boolean {
   return design.source === 'demo' && design.style === 'oshi';
 }
 
-export function buildReferenceRoom(scene: THREE.Scene, design: RoomDesign): { architecture: THREE.Group; furniture: Map<string, THREE.Group>; bounds: THREE.Box3 } {
+export function buildReferenceRoom(scene: THREE.Scene, design: RoomDesign): { architecture: THREE.Group; furniture: Map<string, THREE.Group>; bounds: THREE.Box3; floorBounds: THREE.Box3 } {
   const architecture = new THREE.Group();
   const furniture = new Map<string, THREE.Group>();
   scene.add(architecture);
@@ -203,5 +203,10 @@ export function buildReferenceRoom(scene: THREE.Scene, design: RoomDesign): { ar
     group.rotation.y = THREE.MathUtils.degToRad(item.rotation ?? 0);
     group.scale.set(...item.size.map((value, index) => value / anchor.size[index]) as [number, number, number]);
   }
-  return { architecture, furniture, bounds: new THREE.Box3(new THREE.Vector3(-3.856, -.52, -3.856), new THREE.Vector3(3.656, 2.6, 3.656)) };
+  const floor = boxes[0];
+  const floorBounds = new THREE.Box3(
+    new THREE.Vector3(floor.position[0] - floor.size[0] / 2, 0, floor.position[2] - floor.size[2] / 2),
+    new THREE.Vector3(floor.position[0] + floor.size[0] / 2, 0, floor.position[2] + floor.size[2] / 2),
+  );
+  return { architecture, furniture, floorBounds, bounds: new THREE.Box3(new THREE.Vector3(-3.856, -.52, -3.856), new THREE.Vector3(3.656, 2.6, 3.656)) };
 }

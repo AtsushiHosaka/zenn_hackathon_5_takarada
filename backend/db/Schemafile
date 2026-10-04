@@ -40,6 +40,7 @@ create_table "coordinations", force: :cascade do |t|
   t.text "prompt", null: false
   t.integer "budget", null: false
   t.jsonb "kept_object_ids", null: false, default: []
+  t.jsonb "edited_objects", null: false, default: []
   t.string "status", null: false, default: "pending"
   t.string "title"
   t.text "comment"

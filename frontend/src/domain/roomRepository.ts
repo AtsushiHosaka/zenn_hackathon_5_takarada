@@ -1,4 +1,4 @@
-import type { RoomDesign, RoomShape, Style } from "./room";
+import type { RoomDesign, RoomItem, RoomShape, Style } from "./room";
 
 export type GenerateRoomInput = {
   photos: File[];
@@ -9,6 +9,7 @@ export type GenerateRoomInput = {
   shape?: RoomShape;
   roomId?: string;
   keptObjectIds?: string[];
+  editedItems?: RoomItem[];
 };
 
 export type RoomCapabilities = { generation: boolean; coordination: boolean; message: string; input: "dimensions" | "photos" };

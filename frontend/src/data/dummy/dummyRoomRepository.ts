@@ -60,6 +60,8 @@ export function createDummyRoomRepository(): RoomRepository {
       const design = toAnalyzedRoomDesign(createAnalyzedRoomFixture(input.tatami, input.shape), "");
       return {
         ...design,
+        items: design.items.map(item => input.editedItems?.find(edited => edited.id === item.id) ?? item),
+        editedItems: input.editedItems,
         source: "demo",
         id: `demo-analysis-${input.tatami}-${input.shape}`,
         backendRoomId: undefined,

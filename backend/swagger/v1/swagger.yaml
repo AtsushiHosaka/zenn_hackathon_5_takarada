@@ -533,12 +533,10 @@ components:
         position:
           "$ref": "#/components/schemas/Position"
         rotation_y:
-          type: integer
-          enum:
-          - 0
-          - 90
-          - 180
-          - 270
+          type: number
+          minimum: 0
+          exclusiveMaximum: true
+          maximum: 360
           description: '度数。正面 (ローカル +z) が 0: 南, 90: 東, 180: 北, 270: 西 を向く (three.js
             の rotation.y と同じ)'
           example: 0
@@ -675,6 +673,34 @@ components:
       - scene
       - error_message
       - created_at
+    FurnitureEdit:
+      type: object
+      description: 編集した家具・商品の配置。元の解析結果は変更しない
+      properties:
+        id:
+          type: string
+          description: 元の家具またはこの部屋で採用済みの商品 id
+          example: bed-1
+        position:
+          "$ref": "#/components/schemas/Position"
+        size:
+          "$ref": "#/components/schemas/Size"
+        rotation_y:
+          type: number
+          minimum: 0
+          exclusiveMaximum: true
+          maximum: 360
+          example: 15
+        color:
+          type: string
+          pattern: "^#[0-9a-fA-F]{6}$"
+          example: "#f2f0eb"
+      required:
+      - id
+      - position
+      - size
+      - rotation_y
+      - color
     CoordinationInput:
       type: object
       properties:
@@ -697,6 +723,13 @@ components:
               - bed-1
               - desk-1
               - shelf-1
+            edited_objects:
+              type: array
+              maxItems: 100
+              items:
+                "$ref": "#/components/schemas/FurnitureEdit"
+              description: 家具の最新配置と、手動で調整した商品の配置。同じ商品が再採用される場合に引き継ぐ。省略すると解析時の配置を使う
+              example: []
           required:
           - prompt
           - budget

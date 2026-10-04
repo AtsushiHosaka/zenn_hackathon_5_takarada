@@ -18,7 +18,7 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
         schema "$ref" => "#/components/schemas/Coordination"
 
         let(:room_id) { room.id }
-        let(:params) { { coordination: { prompt: "紫色の推し活ルームにしたい", budget: 30_000, kept_object_ids: %w[bed-1 desk-1] } } }
+        let(:params) { { coordination: { prompt: "紫色の推し活ルームにしたい", budget: 30_000, kept_object_ids: %w[bed-1 desk-1], edited_objects: [ room.scene["objects"].first.slice("id", "position", "size", "rotation_y", "color") ] } } }
 
         run_test! do
           expect(GenerateCoordinationJob).to have_been_enqueued
