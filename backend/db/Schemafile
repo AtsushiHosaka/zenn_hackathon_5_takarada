@@ -29,6 +29,8 @@ create_table "rooms", force: :cascade do |t|
   t.string "shape", null: false, default: "standard" # 既存行の補完用。API では必須 (Room モデル参照)
   t.string "status", null: false, default: "analyzing"
   t.jsonb "scene"
+  # GCS 上の部屋写真の key。バケット名は設定なので入れない (Storage 参照)
+  t.jsonb "photo_keys", null: false, default: []
   t.text "error_message"
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false

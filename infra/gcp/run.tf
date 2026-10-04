@@ -25,6 +25,13 @@ locals {
     DB_PORT           = "5432"
     DB_NAME           = var.db_name
     DB_USERNAME       = google_sql_user.app.name
+
+    # GCS。models は公開読みで URL を組むだけ、uploads は署名付き URL で読み書きする
+    MODELS_BUCKET  = google_storage_bucket.models.name
+    UPLOADS_BUCKET = google_storage_bucket.uploads.name
+
+    # 署名付き URL の発行者。秘密鍵が無いので signBlob で署名する (storage.tf 参照)
+    STORAGE_SIGNER_EMAIL = google_service_account.api.email
   }
 
   # 空なら Web フロントの Cloud Run URL だけを許可する
@@ -152,6 +159,8 @@ resource "google_cloud_run_v2_service" "api" {
     google_secret_manager_secret_version.app,
     google_secret_manager_secret_iam_member.api,
     google_project_iam_member.api_cloudsql,
+    google_storage_bucket_iam_member.uploads_api,
+    google_service_account_iam_member.api_sign_blob,
   ]
 }
 
@@ -316,5 +325,7 @@ resource "google_cloud_run_v2_job" "task" {
     google_project_iam_member.api_cloudsql,
     google_sql_database.app,
     google_sql_user.app,
+    google_storage_bucket_iam_member.uploads_api,
+    google_service_account_iam_member.api_sign_blob,
   ]
 }
