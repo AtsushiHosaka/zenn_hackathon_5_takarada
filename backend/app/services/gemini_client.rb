@@ -16,8 +16,9 @@ class GeminiClient
   # json: 生成された JSON / usage: トークン数 / elapsed: かかった秒数 (やり直しを含む)
   Response = Data.define(:json, :model, :thinking_level, :usage, :elapsed)
 
+  # テストでは本物の Gemini を呼ばない (手元の backend/.env にキーがあってもモックで動かす)
   def self.configured?
-    ENV["GEMINI_API_KEY"].present?
+    ENV["GEMINI_API_KEY"].present? && !Rails.env.test?
   end
 
   def initialize(api_key: ENV.fetch("GEMINI_API_KEY"), model: ENV["GEMINI_MODEL"].presence || DEFAULT_MODEL,

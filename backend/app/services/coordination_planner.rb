@@ -1,30 +1,20 @@
-# 要望テキストからテーマを決め、インテリアリンク取得 (InteriorLinks) から商品候補をもらって優先順に並べる。
+# 要望文から、足す商品の候補 (枠ごとにおすすめ順) とタイトル・コンセプトを決める。
 #
-# 現在は AI 未接続のモック (キーワードでテーマを判定)。LLM に差し替えるときは
-# 「テーマ・タイトル・商品候補」を返す形を保つ。座標は決めない (SlotLayout の責務)。
+# GEMINI_API_KEY があれば Gemini が要望文と部屋を見て候補を選ぶ (CoordinationPlanner::Gemini)。
+# 無ければキーワードでテーマを決めるモック (CoordinationPlanner::Mock)。
+# どちらも座標と予算は決めない (予算は CoordinationBuilder、置き場所は SlotLayout の責務)。
 class CoordinationPlanner
-  Plan = Data.define(:theme, :title, :candidates)
+  # candidates: 枠の優先順に並べた商品 (各枠の中はおすすめ順)。予算内で枠ごとに 1 つ選ばれる
+  # concept: 方向性の説明 (コメントの冒頭) / note: 要望どおりの商品が無いときの断り書き
+  # planned_by: gemini / mock、analysis: 精度の確認用の記録 (coordinations.analysis)
+  Plan = Data.define(:title, :concept, :note, :candidates, :planned_by, :analysis)
 
   # 雰囲気が大きく変わる順 (色の面積が大きい布もの → 壁 → 照明 → 小物)
   SLOT_PRIORITY = InteriorLinks::SLOTS
 
-  THEMES = {
-    "oshi_purple" => { title: "ラベンダーの推し活ルーム", keywords: %w[推し 紫 パープル ラベンダー アクスタ ぬい] },
-    "botanical" => { title: "グリーンが映えるボタニカルルーム", keywords: %w[ボタニカル 植物 グリーン 緑 観葉] },
-    "korean" => { title: "くすみベージュの韓国風ルーム", keywords: %w[韓国 ベージュ くすみ アイボリー ナチュラル] }
-  }.freeze
-
-  def self.call(prompt:, budget:)
-    theme = detect_theme(prompt)
-    items = InteriorLinks.client.search(prompt:, theme:, slots: SLOT_PRIORITY, max_price: budget)
-    candidates = SLOT_PRIORITY.flat_map { |slot| items.fetch(slot, []) }
-    Plan.new(theme:, title: THEMES.fetch(theme)[:title], candidates:)
+  # kept_objects: 活かす家具 (Scene の object)。部屋の雰囲気に合わせて選ぶのに使う
+  def self.call(prompt:, budget:, room:, kept_objects:)
+    planner = GeminiClient.configured? ? Gemini : Mock
+    planner.new(prompt:, budget:, room:, kept_objects:).plan
   end
-
-  def self.detect_theme(prompt)
-    scores = THEMES.transform_values { |t| t[:keywords].count { |k| prompt.include?(k) } }
-    best, score = scores.max_by { |_, s| s }
-    score.positive? ? best : "oshi_purple"
-  end
-  private_class_method :detect_theme
 end
