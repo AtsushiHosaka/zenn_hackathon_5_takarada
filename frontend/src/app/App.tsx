@@ -37,6 +37,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/rooms/sample-oshi" replace />} />
             <Route path="/rooms" element={<RoomListPage />} />
+            <Route path="/coordinate" element={<Navigate to="/rooms/new" replace />} />
             <Route path="/rooms/:id" element={<RoomStudioRoute />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<LoginPage key="signup" />} />
