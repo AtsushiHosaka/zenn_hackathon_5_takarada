@@ -6,6 +6,19 @@ import type { components } from "../generated/api";
 export type AnalysisRoomRecord = components["schemas"]["Room"];
 export type CoordinationRecord = components["schemas"]["Coordination"];
 
+export type UploadRecord = components["schemas"]["Upload"];
+
+// 発行されたアップロード先。枚数が合わないとFileとkeyの対応が崩れるので数も見る
+export function toUploadRecords(value: unknown, expected: number): UploadRecord[] {
+  if (!Array.isArray(value) || value.length !== expected) invalid("Upload");
+  return value.map(item => {
+    const record = object(item, "Upload");
+    const uploadUrl = text(record.upload_url, "Upload.upload_url");
+    if (!/^https?:\/\//.test(uploadUrl)) invalid("Upload.upload_url");
+    return { key: text(record.key, "Upload.key"), upload_url: uploadUrl };
+  });
+}
+
 export function toCoordinationRecord(value: unknown): CoordinationRecord {
   const record = object(value, "Coordination");
   if (record.status !== "pending" && record.status !== "processing" && record.status !== "done" && record.status !== "failed") invalid("Coordination.status");
