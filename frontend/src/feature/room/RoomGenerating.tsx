@@ -65,7 +65,7 @@ export default function RoomGenerating({ prompt, photos, sample, dimensions = fa
         <div className="room-generating-assistant">
           <span className="room-generating-assistant-icon"><ReferenceSvg page={4} index={6} /></span>
           <div className="room-generating-assistant-content">
-            <span className="room-generating-assistant-name">ルームコーディネーター</span>
+            <span className="room-generating-assistant-name">へやいろ</span>
             <p>{dimensions ? sample ? '畳数と形から、部屋のモックを準備しています。' : '部屋の広さと形を送信しました。APIからの結果を待っています。' : sample ? 'サンプルルームを準備しています。写真の解析は行っていません。' : 'リクエストを送信しました。APIからの結果を待っています。'}</p>
             <ol className="room-generating-steps" aria-label={sample ? 'サンプルの準備状況' : 'APIへのリクエスト状況'}>
               {steps.map((step, index) => <li key={step.title} className={`room-generating-step room-generating-step-${step.state}`}>

@@ -1,6 +1,6 @@
 # frontend
 
-AIルームコーディネーターのPC向けWebフロントです。1440×900をデザインの基準とし、PCウィンドウの幅・高さに合わせて表示を調整します。React 19 + TypeScript + Vite + Tailwind CSS v4 + TanStack Query + React Routerを使います。
+「へやいろ」のPC向けWebフロントです。1440×900をデザインの基準とし、PCウィンドウの幅・高さに合わせて表示を調整します。React 19 + TypeScript + Vite + Tailwind CSS v4 + TanStack Query + React Routerを使います。
 
 ```bash
 # リポジトリ直下で (backend ごと立つ)
@@ -28,6 +28,9 @@ npm run dev
 | `/coordinate` | `/rooms/new` へ移動 |
 | `/login` | ログイン |
 | `/signup` | 新規登録 |
+| `/account` | 本人のプロフィール表示・ニックネーム編集・退会 |
+| `/users` | `/account`へ移動 |
+| `/users/:id` | 本人のIDならアカウント設定を表示 |
 
 結果画面は初期表示から実際のThree.jsで描画します。紫の結果サンプルは`src/feature/room/referenceRoomModel.ts`で参照画像の家具形状・面ごとの色をモデル化し、正投影カメラで表示します。ドラッグ・ホイール・回転や拡大のボタン操作が同じ3Dに働き、家具をクリックすると対応商品を選べます。窓とフレームの描画面には4mm・8mmの深度差を付け、面の重なりを解消しています。植物などの細部は近似で、完全なピクセル一致は未確認です。モデルがないAPI結果は、家具の座標・寸法から簡易形状を組み立てます。
 
@@ -55,17 +58,18 @@ APIの新規作成では、解析後に表示された既存家具から活か�
 
 保存先はブラウザの `localStorage` にある `room-coordinator.plans` で、最大30件です。復元時は部屋データの型を検証します。以前の `roomie.saved` は使用しません。参照画面の架空ショップ名や完了表示は、結果の出所が伝わる商品検索先・サンプル表示に置き換えています。
 
-2026年10月4日の最初の公開Swagger確認時点では、認証とユーザー管理のAPIだけでした。その後mainへ部屋解析・商品提案APIを統合し、ローカルで実行を確認しています。現在のAWS公開APIはDNS解決に失敗して再確認できておらず、mainのAPIが公開環境にも反映済みとは扱いません。APIの失敗時にサンプルへ自動で切り替えません。
+2026年10月4日の最初の公開Swagger確認時点では、認証とユーザー管理のAPIだけでした。その後mainへ部屋解析・商品提案APIを統合し、ローカルで実行を確認しています。現在の接続先はGCP Cloud Runです。認証・ユーザー管理の公開APIを実接続で確認しました。部屋解析・商品提案APIのGCP公開状況は今回の変更では未確認です。APIの失敗時にサンプルへ自動で切り替えません。
 
 このチャットでは、Swaggerの更新を1時間ごとに監視する設定を追加しています。正式契約の変更を確認してから接続を更新し、未確認のエンドポイントは自動で呼び出しません。
 
 ## 接続先を設定する
 
-`.env.example`を`.env`へコピーします。既存の認証APIは`VITE_API_ENDPOINT`のサーバーへ接続します。開発時だけ、右上のアカウントメニューからモックとAPIを切り替えられます。選択は`hack.connection.dev`に保存され、切り替えるとページを再読み込みします。未設定なら開発時はモックです。本番ビルドは保存済みの設定を無視し、`VITE_CONNECTION=dummy`を指定してもAPIへ接続します。Viteの環境変数を変えた後は開発サーバーを再起動、または再ビルドします。
+`.env.example`を`.env`へコピーします。既定では同一オリジンの`/api`を使い、ViteまたはnginxからGCP APIへ中継します。GCP APIは確認したlocalhostのOriginにCORSヘッダーを返さず、ローカルのブラウザからの直接接続は失敗しました。GCP構成では本番WebのOriginを許可しています。開発時だけ、ログイン画面または右上のアカウントメニューからモックとAPIを切り替えられます。選択は`hack.connection.dev`に保存され、切り替えるとページを再読み込みします。未設定なら開発時はモックです。本番ビルドは保存済みの設定を無視し、`VITE_CONNECTION=dummy`を指定してもAPIへ接続します。Viteの環境変数を変えた後は開発サーバーを再起動、または再ビルドします。
 
 | 設定 | 意味 |
 | --- | --- |
-| `VITE_API_ENDPOINT` | APIのベースURL。既定は指定された公開API |
+| `VITE_API_ENDPOINT` | 空欄なら同一オリジン。外部URLへの直接接続にはAPI側のCORS対応が必要 |
+| `API_UPSTREAM_ORIGIN` | Vite dev / preview・nginxの中継先。既定はGCP Cloud Run。ブラウザへ埋め込まない |
 | `VITE_CONNECTION` | 開発時だけ有効。空欄なら`dummy`、`api`で実API接続 |
 | `VITE_ROOM_API_CONTRACT` | 既定は`coordination`。`analysis`は部屋解析のみ、`legacy`は将来の写真API向け提案形式 |
 | `VITE_ROOM_GENERATION_PATH` | 部屋作成POST先。既定は`/api/v1/rooms` |
@@ -76,6 +80,30 @@ APIの新規作成では、解析後に表示された既存家具から活か�
 | `VITE_ROOM_*_FIELD` | `legacy`の写真・指示・雰囲気・予算の送信フィールド名 |
 
 `VITE_`の値はブラウザへ公開されます。秘密鍵やアクセストークンを設定しません。認証トークンは既存のトークン管理を使います。
+
+## GCPのユーザー・認証APIを使う
+
+公開契約は[GCP Swagger](https://zenn-hackathon-api-262220651661.asia-northeast1.run.app/api-docs/index.html)です。登録は`POST /api/v1/signup`、ログインは`POST /api/v1/login`、本人取得は`GET /api/v1/me`を使います。登録・ログインの`Authorization`レスポンスヘッダーを保存し、以後の認証APIに付けます。
+
+ルーム画面右上のアカウントメニューから`/account`へ進みます。メールアドレスは表示のみ、ニックネームは50文字以内で変更できます。`PATCH /api/v1/users/:id`の成功後は画面とヘッダーの名前を更新します。退会は確認後に`DELETE /api/v1/users/:id`を呼び、成功時だけトークンとキャッシュを消します。他人のIDを指定した画面には編集フォームを出しません。
+
+ログインが必要な画面へ直接入ると、ログイン後に元の画面へ戻ります。認証APIの401はトークンを破棄し、通信失敗はトークンを保持して再試行を表示します。別タブのログイン・ログアウトにも追従します。パスワード再設定、メール変更、正式な利用規約・プライバシーポリシーはAPIまたは原稿が未提供です。
+
+開発は`VITE_CONNECTION=api`を指定するか、ログイン画面でAPIを選びます。本番ビルドは常にAPI接続です。`npm run preview`も同じ中継設定を使います。Dockerのruntimeでは`API_UPSTREAM_ORIGIN`を起動時に指定でき、nginxがTLS証明書を検証して中継します。`VITE_API_ENDPOINT`は空欄でビルドしてください。静的ホスティングでは別途同一オリジンの中継設定、またはAPI側のCORS対応が必要です。
+
+```bash
+# frontend/で実行。既定のGCP APIを使う
+VITE_CONNECTION=api npm run dev
+npm run build
+npm run preview
+
+# ローカルAPIを中継する場合
+API_UPSTREAM_ORIGIN=http://127.0.0.1:13000 VITE_CONNECTION=api npm run dev
+```
+
+ダミー接続では初期ユーザー`user1@example.com`〜`user3@example.com`のパスワードは`password`です。登録・名前変更・削除は同じタブのsessionStorageに保存し、再読み込み後も復元します。タブを閉じると保存は消えます。パスワードはSHA-256値のみ保存しますが、ダミーは画面確認用です。実APIの認証基盤として使いません。HTTPSまたはlocalhostでアクセスしてください。
+
+公開APIには他人のユーザー情報を取得・更新・削除できる認可上の問題があります。今回の画面は本人のみ扱いますが、API担当によるサーバー側の本人認可が必要です。詳細と確認結果は`specs/users-auth/spec.md`に記録しています。
 
 ## 部屋解析と商品提案のAPIをつなぐ
 
@@ -98,7 +126,7 @@ APIの新規作成では、解析後に表示された既存家具から活か�
 ```bash
 docker compose -f compose.yaml -f compose.override.yaml -f /tmp/room-api-runtime.override.yaml up -d --no-build api worker
 # frontendの環境変数
-VITE_API_ENDPOINT=http://127.0.0.1:13000
+API_UPSTREAM_ORIGIN=http://127.0.0.1:13000
 VITE_CONNECTION=api
 ```
 

@@ -45,7 +45,7 @@ export default function RoomListPage() {
     <header className="room-list-header">
       <Link to="/rooms" className="room-list-brand">
         <ReferenceSvg page={2} index={0} />
-        <span>Room Coordinator</span>
+        <span>へやいろ</span>
       </Link>
       <AccountMenu />
     </header>
