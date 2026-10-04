@@ -25,9 +25,9 @@ export default function RoomScene({design, panel, before, filter, selectedId, on
   const pins=referenceLayout&&!moved&&!editing&&!before&&view==='perspective';
   const draggable=editing&&!before&&(!design.modelUrl||design.modelKind==='shell');
   const gestureHint=draggable
-    ? view==='front'?'家具をドラッグで左右に移動 · ホイールで拡大'
-      : view==='top'?'家具をドラッグで移動 · ホイールで拡大'
-      : '家具をドラッグで移動 · 空いている場所で回転'
+    ? view==='front'?'10cmのマス目に沿って左右に移動 · ホイールで拡大'
+      : view==='top'?'10cmのマス目に沿って移動 · ホイールで拡大'
+      : '10cmのマス目に沿って移動 · 空いている場所で回転'
     : view==='perspective'?'ドラッグで回転 · ホイールで拡大':'ホイールで拡大 · 右ドラッグで視点を移動';
   function control(action:'left'|'right'|'in'|'out') {setMoved(true);setCommand(old=>({sequence:(old?.sequence??0)+1,action}));}
   function reset() {setResetKey(key=>key+1);setCommand(undefined);setMoved(false);}

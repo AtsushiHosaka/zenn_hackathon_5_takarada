@@ -755,9 +755,8 @@ export interface components {
             /**
              * @description 度数。正面 (ローカル +z) が 0: 南, 90: 東, 180: 北, 270: 西 を向く (three.js の rotation.y と同じ)
              * @example 0
-             * @enum {integer}
              */
-            rotation_y: 0 | 90 | 180 | 270;
+            rotation_y: number;
             /** @example #f2f0eb */
             color: string;
             /**
@@ -865,6 +864,20 @@ export interface components {
             /** Format: date-time */
             created_at: string;
         };
+        /** @description 編集した家具・商品の配置。元の解析結果は変更しない */
+        FurnitureEdit: {
+            /**
+             * @description 元の家具またはこの部屋で採用済みの商品 id
+             * @example bed-1
+             */
+            id: string;
+            position: components["schemas"]["Position"];
+            size: components["schemas"]["Size"];
+            /** @example 15 */
+            rotation_y: number;
+            /** @example #f2f0eb */
+            color: string;
+        };
         CoordinationInput: {
             coordination: {
                 /** @example 紫色の推し活ルームにしたい */
@@ -883,6 +896,11 @@ export interface components {
                  *     ]
                  */
                 kept_object_ids?: string[];
+                /**
+                 * @description 家具の最新配置と、手動で調整した商品の配置。同じ商品が再採用される場合に引き継ぐ。省略すると解析時の配置を使う
+                 * @example []
+                 */
+                edited_objects?: components["schemas"]["FurnitureEdit"][];
             };
         };
         CoordinationItem: {

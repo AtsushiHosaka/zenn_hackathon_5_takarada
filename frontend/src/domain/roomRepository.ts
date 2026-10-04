@@ -1,4 +1,4 @@
-import type { RoomDesign, RoomShape, Style } from "./room";
+import type { RoomDesign, RoomItem, RoomShape, Style } from "./room";
 
 export type GenerateRoomInput = {
   photos: File[];
@@ -9,6 +9,7 @@ export type GenerateRoomInput = {
   shape?: RoomShape;
   roomId?: string;
   keptObjectIds?: string[];
+  editedItems?: RoomItem[];
 };
 
 // photos: 部屋の写真を受け取れるか (dummyは受け取らない)。

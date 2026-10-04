@@ -1,5 +1,6 @@
 import type { RoomDesign, RoomItem } from '../../domain/room';
 import { downloadShoppingCsv } from './exports';
+import { LAYOUT_GRID_STEP, snapItemPosition, snapToLayoutGrid } from './layoutGrid';
 import './planner.css';
 
 export type PlannerView = 'perspective' | 'top' | 'front';
@@ -53,18 +54,29 @@ export default function PlannerPanel({ design, selectedId, onSelect, onChange, o
   function move(axis: 0 | 2, step: number) {
     if (!selected) return;
     const position: RoomItem['position'] = [...selected.position];
-    position[axis] = Math.round((position[axis] + step) * 1000) / 1000;
-    changeItem({ position });
+    position[axis] = snapToLayoutGrid(position[axis]) + step;
+    changeItem({ position: snapItemPosition(selected, position, [axis], design.room) });
+  }
+
+  function canRotate(degrees: number) {
+    if (!selected) return false;
+    if (!design.room) return true;
+    const angle = ((selected.rotation ?? 0) + degrees) * Math.PI / 180;
+    const width = Math.abs(Math.cos(angle)) * selected.size[0] + Math.abs(Math.sin(angle)) * selected.size[2];
+    const depth = Math.abs(Math.sin(angle)) * selected.size[0] + Math.abs(Math.cos(angle)) * selected.size[2];
+    return width <= design.room.width && depth <= design.room.depth;
   }
 
   function rotate(degrees: number) {
-    if (!selected) return;
-    changeItem({ rotation: ((selected.rotation ?? 0) + degrees + 360) % 360 });
+    if (!selected || !canRotate(degrees)) return;
+    const rotation = ((selected.rotation ?? 0) + degrees + 360) % 360;
+    const rotated = { ...selected, rotation };
+    changeItem({ rotation, position: snapItemPosition(rotated, selected.position, [0, 2], design.room) });
   }
 
   return <aside className="rc-panel rc-planner" aria-label="配置を編集">
     <div className="rc-planner-heading">
-      <div><h2>配置を編集</h2><p>{completeModel?'家具の寸法と見え方を確認できます。':view==='front'?'正面では家具を左右にドラッグできます。':'3Dの家具をドラッグして移動できます。'}</p></div>
+      <div><h2>配置を編集</h2><p>{completeModel?'家具の寸法と見え方を確認できます。':view==='front'?'正面では家具が10cmのマス目に沿って左右に動きます。':'家具をドラッグすると10cmのマス目に沿って動きます。'}</p></div>
       <button className="rc-planner-close" type="button" aria-label="編集パネルを閉じる" onClick={onClose}>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>
       </button>
@@ -97,17 +109,18 @@ export default function PlannerPanel({ design, selectedId, onSelect, onChange, o
       </section>
       <fieldset className="rc-planner-section" disabled={itemDisabled}>
         <legend>位置を調整</legend>
-        <p className="rc-planner-note">1回で10cm移動します。</p>
+        <p className="rc-planner-note">10cmのマス目に合わせて移動します。</p>
         <div className="rc-planner-move">
-          <span>左右（X）</span><button type="button" aria-label="X方向にマイナス10cm移動" onClick={() => move(0, -0.1)}>−10cm</button><button type="button" aria-label="X方向にプラス10cm移動" onClick={() => move(0, 0.1)}>＋10cm</button>
-          <span>前後（Z）</span><button type="button" aria-label="Z方向にマイナス10cm移動" onClick={() => move(2, -0.1)}>−10cm</button><button type="button" aria-label="Z方向にプラス10cm移動" onClick={() => move(2, 0.1)}>＋10cm</button>
+          <span>左右（X）</span><button type="button" aria-label="X方向にマイナス10cm移動" onClick={() => move(0, -LAYOUT_GRID_STEP)}>−10cm</button><button type="button" aria-label="X方向にプラス10cm移動" onClick={() => move(0, LAYOUT_GRID_STEP)}>＋10cm</button>
+          <span>前後（Z）</span><button type="button" aria-label="Z方向にマイナス10cm移動" onClick={() => move(2, -LAYOUT_GRID_STEP)}>−10cm</button><button type="button" aria-label="Z方向にプラス10cm移動" onClick={() => move(2, LAYOUT_GRID_STEP)}>＋10cm</button>
         </div>
         {selected && <p className="rc-planner-coordinate">X {cm(selected.position[0])}cm / Z {cm(selected.position[2])}cm</p>}
       </fieldset>
       <fieldset className="rc-planner-section" disabled={itemDisabled}>
         <legend>向きを調整</legend>
-        <div className="rc-planner-rotation"><button type="button" onClick={() => rotate(-15)} aria-label="家具をマイナス15度回転">−15°</button><button type="button" onClick={() => rotate(15)} aria-label="家具をプラス15度回転">＋15°</button><button type="button" onClick={() => rotate(90)} aria-label="家具を90度回転">90°</button></div>
+        <div className="rc-planner-rotation"><button type="button" onClick={() => rotate(-15)} disabled={!canRotate(-15)} aria-label="家具をマイナス15度回転">−15°</button><button type="button" onClick={() => rotate(15)} disabled={!canRotate(15)} aria-label="家具をプラス15度回転">＋15°</button><button type="button" onClick={() => rotate(90)} disabled={!canRotate(90)} aria-label="家具を90度回転">90°</button></div>
         {selected && <p className="rc-planner-coordinate">現在の角度 {selected.rotation ?? 0}°</p>}
+        {design.room && <p className="rc-planner-note">壁を越える場合は位置を部屋の内側へ調整します。部屋に収まらない角度には回転できません。</p>}
       </fieldset>
       <fieldset className="rc-planner-section" disabled={itemDisabled}>
         <legend>家具の色</legend>

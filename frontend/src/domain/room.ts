@@ -56,6 +56,8 @@ export type RoomDesign = {
   prompt?: string;
   budget?: number;
   keptObjectIds?: string[];
+  // 手動で編集した家具。選択から外した既存家具の変更も次の提案まで保持する。
+  editedItems?: RoomItem[];
 };
 
 // ブラウザに保存されたデータも、復元時には信頼しない。
@@ -73,6 +75,7 @@ export function isRoomDesign(value: unknown): value is RoomDesign {
   if (value.prompt !== undefined && (!nonemptyString(value.prompt) || value.prompt.length > 500)) return false;
   if (value.budget !== undefined && (typeof value.budget !== "number" || !Number.isSafeInteger(value.budget) || value.budget <= 0)) return false;
   if (value.before !== undefined && !isRoomSnapshot(value.before)) return false;
+  if (value.editedItems !== undefined && (!Array.isArray(value.editedItems) || !value.editedItems.every(isRoomItem) || new Set(value.editedItems.map(item => item.id)).size !== value.editedItems.length)) return false;
   if (value.keptObjectIds !== undefined && (!Array.isArray(value.keptObjectIds) || !value.keptObjectIds.every(nonemptyString) || new Set(value.keptObjectIds).size !== value.keptObjectIds.length)) return false;
   if (!optionalHttpUrl(value.modelUrl) || !Array.isArray(value.items) || !value.items.every(isRoomItem)) return false;
   if (value.keptObjectIds !== undefined) {
@@ -114,7 +117,7 @@ function isRoomWindow(value: unknown): value is RoomWindow {
   return [value.center, value.bottom].every(number => typeof number === "number" && Number.isFinite(number) && number >= 0);
 }
 
-function isRoomItem(value: unknown): value is RoomItem {
+export function isRoomItem(value: unknown): value is RoomItem {
   if (!isRecord(value)) return false;
   if (![value.id, value.name, value.category, value.color].every(nonemptyString) || typeof value.existing !== "boolean") return false;
   if (!finiteVector(value.position) || !finiteVector(value.size) || value.size.some(number => number <= 0)) return false;

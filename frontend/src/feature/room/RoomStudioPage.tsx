@@ -54,7 +54,7 @@ export default function RoomStudioPage() {
   const analysisPrompt=`${tatami}畳・${shapeLabel(shape)}の部屋を3Dで確認したい。`;
   const [prompt,setPrompt]=useState(inputState?.prompt??design.prompt??(isNew?initialPrompt:samplePrompt));
   const [budget,setBudget]=useState(design.budget??30000);
-  const existingFurniture=(design.before?.items??design.items).filter(item=>item.existing);
+  const existingFurniture=(design.before?.items??design.items).filter(item=>item.existing).map(item=>design.items.find(current=>current.id===item.id)??design.editedItems?.find(edited=>edited.id===item.id)??item);
   const [keptObjectIds,setKeptObjectIds]=useState<string[]>(()=>design.keptObjectIds?.length?design.keptObjectIds:existingFurniture.map(item=>item.id));
   const selectsFurniture=analysisMode&&canCoordinate&&!isNew&&design.source==='api'&&!!design.backendRoomId;
   const noFurnitureSelected=selectsFurniture&&existingFurniture.length>0&&keptObjectIds.length===0;
@@ -85,11 +85,12 @@ export default function RoomStudioPage() {
   const generation=useMutation({
     mutationFn:async({request,budget,targetStyle,analyzeOnly}:{request:string;budget:number;targetStyle?:Style;analyzeOnly?:boolean})=>{
       const controller=new AbortController();abort.current=controller;
-      const input={photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId:!isNew&&design.source==='api'?design.backendRoomId:undefined,keptObjectIds:selectsFurniture?keptObjectIds:undefined};
+      const input={photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId:!isNew&&design.source==='api'?design.backendRoomId:undefined,keptObjectIds:selectsFurniture?keptObjectIds:undefined,editedItems:selectsFurniture?[...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))]:undefined};
       return analyzeOnly?rooms.analyze(input,controller.signal):rooms.generate(input,controller.signal);
     },
     onSuccess:(result,variables)=>{
-      const saved={...result,...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request,budget:variables.budget}:{}),id:result.source==='api'?result.id:isNew||id.startsWith('sample-')?`room-${crypto.randomUUID()}`:id};
+      const editedItems=(design.editedItems??[]).filter(item=>item.existing||result.items.some(current=>current.id===item.id));
+      const saved={...result,...(!variables.analyzeOnly&&editedItems.length?{editedItems}:{}),...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request,budget:variables.budget}:{}),id:result.source==='api'?result.id:isNew||id.startsWith('sample-')?`room-${crypto.randomUUID()}`:id};
       try {saveRoomPlan(client,saved);}catch{client.setQueryData(roomPlanKeys.detail(saved.id),saved);setNotice('ブラウザに保存できませんでした。保存容量を確認してください。');}
       setSavedFingerprint(JSON.stringify(saved));setHistory({past:[],future:[]});
       navigate(`/rooms/${saved.id}`,{state:{prompt:saved.prompt??(result.kind==='analysis'?analysisPrompt:variables.request),photos:result.analysisInput?[]:photos,editing:result.kind==='analysis'&&!canCoordinate}});
@@ -141,7 +142,9 @@ export default function RoomStudioPage() {
     if(JSON.stringify(next)===JSON.stringify(design))return;
     setBefore(false);
     setHistory(previous=>({past:[...previous.past,design].slice(-50),future:[]}));
-    client.setQueryData(roomPlanKeys.detail(id),next);
+    const edits=new Map((design.editedItems??[]).map(item=>[item.id,item]));
+    next.items.forEach(item=>{const previous=design.items.find(value=>value.id===item.id);if(previous&&JSON.stringify([item.position,item.rotation??0,item.size,item.color])!==JSON.stringify([previous.position,previous.rotation??0,previous.size,previous.color]))edits.set(item.id,item);});
+    client.setQueryData(roomPlanKeys.detail(id),{...next,editedItems:[...edits.values()]});
   }
   function moveItem(itemId:string, position:RoomItem['position']) {
     if(!editing||before||(design.modelUrl&&design.modelKind!=='shell'))return;
@@ -200,13 +203,13 @@ export default function RoomStudioPage() {
                   <span>{item.name}</span>
                 </label>)}</div>
                 <p className="rc-setting-note">現在は、家具をすべて外した提案には対応していません。1点以上選んでください。</p>
-                {!analyzed&&<p className="rc-setting-note">追加の提案には解析時の配置と色を使います。手動で編集した配置と色は引き継ぎません。</p>}
+                {!analyzed&&<p className="rc-setting-note">追加の提案にも、編集した家具の配置・角度・色を引き継ぎます。同じ商品を採用する場合は、調整した配置を保ちます。</p>}
               </fieldset>}
               {canCoordinate&&analyzed&&<form className="rc-coordinate-form" onSubmit={coordinate}>
                 <label className="rc-setting" htmlFor="coordinate-request">どんな部屋にしたいか<textarea id="coordinate-request" rows={3} value={prompt} maxLength={500} onChange={event=>setPrompt(event.target.value)} required/></label>
                 <label className="rc-setting" htmlFor="coordinate-budget">買い足すアイテムの予算<span className="rc-tatami-input"><input id="coordinate-budget" type="number" min={1} step={1} value={Number.isNaN(budget)?'':budget} onChange={event=>setBudget(event.target.valueAsNumber)} required/>円</span></label>
                 <button type="submit" className="rc-primary" disabled={noFurnitureSelected}>この家具でコーディネート</button>
-                <p className="rc-setting-note">コーディネートには解析時の配置と色を使います。配置の編集は提案後に行ってください。</p>
+                <p className="rc-setting-note">家具の配置・角度・色を調整してからコーディネートできます。編集した配置に合わせて、買い足すアイテムを提案します。</p>
                 {photoError&&<p className="rc-error" role="alert">{photoError}</p>}
               </form>}
               <ErrorText error={generation.error}/>
