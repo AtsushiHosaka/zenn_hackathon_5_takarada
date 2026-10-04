@@ -1,0 +1,24 @@
+"""全モデル共通の色。明るいパステル寄りのイラスト調に揃える。"""
+WOOD_LIGHT = "#e2c08f"   # 明るいオーク
+WOOD_MED = "#c39462"     # 脚などの中間色
+WOOD_BROWN = "#a87c58"   # 落ち着いた茶色
+METAL_DARK = "#4a4562"   # 紫がかった濃色 (黒の代わり)
+METAL_LIGHT = "#dcd8e4"
+METAL_WHITE = "#f4f2f6"
+GREIGE = "#cbb9a4"
+BEIGE = "#e4cfaa"
+GRAY_FABRIC = "#b9b6c6"
+DARK_FABRIC = "#4d4868"
+MATTRESS = "#fcfaf6"
+MATTRESS_SIDE = "#ede8f3"
+IVORY = "#f7f1e5"
+WHITE = "#fbfaf8"
+LAVENDER = "#c9b6e4"
+PURPLE = "#8e6cc8"
+LEAF = "#5c9b53"
+LEAF_SAGE = "#94b68d"
+STEM = "#6f9a52"
+SOIL = "#6e5241"
+POT_BEIGE = "#e6d1b2"
+GLASS = "#e9e3f6"
+WARM_LIGHT = "#fff1d6"

@@ -1,4 +1,5 @@
-# 3D モデル (GLB) の対応表。ModelResolver がシーンの model_url を埋めるのに使う。
+# 既存運用向けの補完用対応表。ModelResolver はDBカタログを優先する。
+# 新しい家具モデルは db/furniture_models.json で管理する。
 #
 # ここに載っていないものは model_url が null のままになり、クライアントが
 # category と size から箱で描く。GLB を足すときは
