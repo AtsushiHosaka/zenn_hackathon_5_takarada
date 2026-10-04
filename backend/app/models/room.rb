@@ -4,6 +4,8 @@ class Room < ApplicationRecord
   # 部屋の形 => 幅 / 奥行き の比
   SHAPE_RATIOS = { "square" => 1 / 1.15, "standard" => 3 / 4.0, "long" => 1 / 2.0 }.freeze
 
+  belongs_to :user, optional: true # Preserve legacy anonymous records.
+
   has_many :coordinations, dependent: :destroy
 
   # DB の既定値は既存行の補完用。新規作成では必須にするため既定値を外す

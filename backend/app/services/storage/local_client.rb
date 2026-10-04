@@ -4,7 +4,11 @@ module Storage
   # (本番と同じ uploads -> PUT -> rooms の 3 段で試せる)
   class LocalClient
     def upload_url(asset, content_type: nil, size: nil, expires: nil)
-      "#{ENV.fetch('DEV_API_ORIGIN', 'http://localhost:3000')}/api/v1/uploads/#{asset.key}"
+      token = Rails.application.message_verifier(:local_upload).generate(
+        { "key" => asset.key, "content_type" => content_type, "size" => size },
+        expires_in: expires, purpose: :room_photo
+      )
+      "#{ENV.fetch('DEV_API_ORIGIN', 'http://localhost:3000')}/api/v1/uploads/#{asset.key}?token=#{ERB::Util.url_encode(token)}"
     end
 
     # 受け口から呼ばれる。GCS が直接受ける本番側には対応するものが無い

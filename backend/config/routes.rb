@@ -23,7 +23,7 @@ Rails.application.routes.draw do
       get "me", to: "me#show"
       resources :users, only: %i[index show update destroy]
       post "uploads", to: "uploads#create"
-      # 開発用の受け口 (本番は GCS が直接受ける)。key は photos/<uuid>/0.jpg の形
+      # 開発用の受け口 (本番は GCS が直接受ける)。key は photos/users/<user_id>/<uuid>/0.jpg の形 (期限付き署名を検証)
       put "uploads/*key", to: "uploads#update", format: false
 
       resources :rooms, only: %i[create show] do

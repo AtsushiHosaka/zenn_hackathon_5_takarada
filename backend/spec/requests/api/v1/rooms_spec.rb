@@ -1,11 +1,14 @@
 require "swagger_helper"
 
 RSpec.describe "Api::V1::Rooms", type: :request do
+  let(:current) { create(:user) }
+  let(:Authorization) { bearer_token_for(current) }
+
   path "/api/v1/rooms" do
     post "部屋を登録して解析を始める" do
       tags "Rooms"
-      description "解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。現在の解析は AI 未接続のモック (畳数と部屋の形から部屋を作る)"
-      security []
+      description "解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ"
+      security [ { bearerAuth: [] } ]
       consumes "application/json"
       produces "application/json"
       parameter name: :params, in: :body, schema: { "$ref" => "#/components/schemas/RoomInput" }
@@ -18,6 +21,13 @@ RSpec.describe "Api::V1::Rooms", type: :request do
         run_test! do
           expect(AnalyzeRoomJob).to have_been_enqueued
         end
+      end
+
+      response "401", "ログインが必要" do
+        schema "$ref" => "#/components/schemas/Unauthorized"
+        let(:Authorization) { "" }
+        let(:params) { { room: { tatami: 6, shape: "standard" } } }
+        run_test!
       end
 
       response "422", "畳数が範囲外" do
@@ -35,22 +45,22 @@ RSpec.describe "Api::V1::Rooms", type: :request do
 
     get "部屋と解析結果 (シーン) を取得する" do
       tags "Rooms"
-      security []
+      security [ { bearerAuth: [] } ]
       produces "application/json"
 
       response "200", "解析済みの部屋" do
         schema "$ref" => "#/components/schemas/Room"
 
-        let(:room) { Room.create!(tatami: 6, shape: "standard").tap { |r| r.update!(scene: RoomAnalyzer.call(r).scene, analyzed_by: "mock", status: "ready") } }
+        let(:room) { current.rooms.create!(tatami: 6, shape: "standard").tap { |r| r.update!(scene: RoomAnalyzer.call(r).scene, analyzed_by: "mock", status: "ready") } }
         let(:id) { room.id }
 
         run_test!
       end
 
-      response "404", "部屋が無い" do
+      response "404", "部屋が無い、または本人の部屋ではない" do
         schema "$ref" => "#/components/schemas/NotFound"
 
-        let(:id) { 0 }
+        let(:id) { create(:user).rooms.create!(tatami: 6, shape: "standard").id }
 
         run_test!
       end

@@ -9,7 +9,7 @@ module RoomPhoto
   URL_TTL = 600
 
   # keys が作る形。受け取った key をそのまま信じないために使う
-  KEY = %r{\Aphotos/[0-9a-f-]{36}/\d+\.(?:jpg|png|webp)\z}
+  KEY = %r{\Aphotos/(?:users/\d+/)?[0-9a-f-]{36}/\d+\.(?:jpg|png|webp)\z}
 
   # 発行結果。key は後で POST /rooms に返してもらう
   Upload = Data.define(:key, :upload_url)
@@ -20,9 +20,9 @@ module RoomPhoto
     end
 
     # 署名付き URL をまとめて発行する。requested は [{ content_type:, size: }, ...]
-    def issue(requested)
+    def issue(requested, user:)
       client = Storage.client
-      keys(requested.map { |upload| upload[:content_type] }).zip(requested).map do |key, upload|
+      keys(requested.map { |upload| upload[:content_type] }, user: user).zip(requested).map do |key, upload|
         url = client.upload_url(asset(key), content_type: upload[:content_type], size: upload[:size].to_i, expires: URL_TTL)
         Upload.new(key: key, upload_url: url)
       end
@@ -30,10 +30,10 @@ module RoomPhoto
 
     # 申告された key のうち、形式が違う / 実物が無い / 大きすぎるものを返す。
     # 「アップロードし終わった」というクライアントの言葉を確かめずに使わない
-    def missing(keys)
+    def missing(keys, user:)
       client = Storage.client
       keys.reject do |key|
-        next false unless key.is_a?(String) && key.match?(KEY)
+        next false unless key.is_a?(String) && key.match?(KEY) && key.start_with?("photos/users/#{user.id}/")
 
         meta = client.metadata(asset(key))
         meta && meta.size.positive? && meta.size <= MAX_BYTES
@@ -44,9 +44,9 @@ module RoomPhoto
 
     # Room はまだ無いので uuid_v7 で束ねる。key をサーバが決めることで
     # 他人の写真の上書きもパストラバーサルも起きない
-    def keys(content_types)
+    def keys(content_types, user:)
       prefix = SecureRandom.uuid_v7
-      content_types.map.with_index { |type, index| "photos/#{prefix}/#{index}.#{CONTENT_TYPES.fetch(type)}" }
+      content_types.map.with_index { |type, index| "photos/users/#{user.id}/#{prefix}/#{index}.#{CONTENT_TYPES.fetch(type)}" }
     end
   end
 end

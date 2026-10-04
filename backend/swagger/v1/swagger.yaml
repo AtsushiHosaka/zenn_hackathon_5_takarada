@@ -114,7 +114,8 @@ paths:
       - Coordinations
       description: 生成は非同期。GET /api/v1/coordinations/{id} で status が done / failed
         になるまでポーリングする。現在の商品選定は AI 未接続のモック (キーワードでテーマを判定) で、商品候補はインテリアリンク取得のモック (InteriorLinks::MockClient)
-      security: []
+      security:
+      - bearerAuth: []
       parameters: []
       responses:
         '201':
@@ -123,6 +124,18 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Coordination"
+        '401':
+          description: ログインが必要
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Unauthorized"
+        '404':
+          description: 本人の部屋ではない
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFound"
         '422':
           description: 部屋の解析が終わっていない、または入力が不正
           content:
@@ -145,7 +158,8 @@ paths:
       summary: コーデ提案 (配置後のシーンと購入リンク) を取得する
       tags:
       - Coordinations
-      security: []
+      security:
+      - bearerAuth: []
       responses:
         '200':
           description: 生成済みのコーデ
@@ -153,14 +167,21 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Coordination"
+        '404':
+          description: 本人のコーデではない
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFound"
   "/api/v1/rooms":
     post:
       summary: 部屋を登録して解析を始める
       tags:
       - Rooms
-      description: 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。現在の解析は
-        AI 未接続のモック (畳数と部屋の形から部屋を作る)
-      security: []
+      description: 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と
+        Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ
+      security:
+      - bearerAuth: []
       parameters: []
       responses:
         '201':
@@ -169,6 +190,12 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Room"
+        '401':
+          description: ログインが必要
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Unauthorized"
         '422':
           description: 畳数が範囲外
           content:
@@ -191,7 +218,8 @@ paths:
       summary: 部屋と解析結果 (シーン) を取得する
       tags:
       - Rooms
-      security: []
+      security:
+      - bearerAuth: []
       responses:
         '200':
           description: 解析済みの部屋
@@ -200,7 +228,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/Room"
         '404':
-          description: 部屋が無い
+          description: 部屋が無い、または本人の部屋ではない
           content:
             application/json:
               schema:
@@ -215,7 +243,8 @@ paths:
         PUT には Content-Type だけを付ける (署名と食い違うヘッダがあると GCS が 403 を返す)。
         size も署名に含まれるため、実際に送る大きさと一致させる。
         アップロード後、key を POST /api/v1/rooms の photo_keys に渡す。
-      security: []
+      security:
+      - bearerAuth: []
       parameters: []
       responses:
         '201':
@@ -226,6 +255,12 @@ paths:
                 type: array
                 items:
                   "$ref": "#/components/schemas/Upload"
+        '401':
+          description: ログインが必要
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Unauthorized"
         '422':
           description: 対応していない形式
           content:
@@ -239,7 +274,7 @@ paths:
               "$ref": "#/components/schemas/UploadInput"
   "/api/v1/users":
     get:
-      summary: ユーザー一覧を取得する
+      summary: 本人のプロフィールを一覧形式で取得する
       tags:
       - Users
       security:
@@ -268,7 +303,7 @@ paths:
       schema:
         type: integer
     get:
-      summary: ユーザーを1件取得する
+      summary: 本人のプロフィールを取得する
       tags:
       - Users
       security:
@@ -281,7 +316,7 @@ paths:
               schema:
                 "$ref": "#/components/schemas/User"
         '404':
-          description: ユーザーが存在しない
+          description: ユーザーが存在しない、または他のユーザー
           content:
             application/json:
               schema:
@@ -300,6 +335,12 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/User"
+        '404':
+          description: 本人のプロフィールではない
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFound"
         '422':
           description: バリデーションエラー
           content:
@@ -321,7 +362,7 @@ paths:
         '204':
           description: 削除に成功
         '404':
-          description: ユーザーが存在しない
+          description: ユーザーが存在しない、または他のユーザー
 servers:
 - url: http://localhost:3000
   description: Local
@@ -668,12 +709,12 @@ components:
         key:
           type: string
           description: POST /api/v1/rooms の photo_keys に渡す
-          example: photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg
+          example: photos/users/1/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg
         upload_url:
           type: string
           description: この URL へ写真を PUT する。Content-Type だけを付け、他のヘッダは足さない (署名と食い違うと
             403)
-          example: https://storage.googleapis.com/example-uploads/photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256
+          example: https://storage.googleapis.com/example-uploads/photos/users/1/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256
       required:
       - key
       - upload_url
