@@ -151,3 +151,9 @@ Cloud Run がゼロまで縮んでいるためのコールドスタート。常�
 `app` ユーザーは `cloudsqlsuperuser` のメンバーなので通常は作成できる。
 もし落ちたら `make infra-psql` で繋いで
 `GRANT ALL ON SCHEMA public TO app;` を実行する。
+
+## 家具GLBの配置
+
+公開モデル用バケットはTerraformの `models_bucket` 出力で確認できます。BlenderでGLBを生成した後、`make infra-models-publish` で台帳と照合してアップロードします。Terraformのローカル設定がない場合は `MODELS_BUCKET=<バケット名> make infra-models-publish` を使います。
+
+`make infra-release` とGitHub Actionsは、スキーマ適用に続けて `furniture_models:import` を実行し、87モデルの台帳と家具・商品の対応をDBへ取り込んでからCloud Runを更新します。APIは既存の `MODELS_BUCKET` から公開URLを作るため、本番への新しい秘密情報の登録は不要です。GLBのアップロードはリリース前に行います。詳しくは[家具モデルの運用](../../docs/furniture-models.md)を参照してください。

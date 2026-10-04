@@ -26,6 +26,7 @@ Rails.application.routes.draw do
       # 開発用の受け口 (本番は GCS が直接受ける)。key は photos/<uuid>/0.jpg の形
       put "uploads/*key", to: "uploads#update", format: false
 
+      resources :furniture_models, only: %i[index show]
       resources :rooms, only: %i[create show] do
         resources :coordinations, only: :create
       end

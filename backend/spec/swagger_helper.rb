@@ -118,6 +118,36 @@ RSpec.configure do |config|
             },
             required: %w[w h d]
           },
+          FurnitureModelBinding: {
+            type: :object,
+            properties: {
+              kind: { type: :string, enum: %w[existing product], example: "existing" },
+              reference: { type: :string, description: "既存家具の object ID または商品の ID", example: "bed-1" }
+            },
+            required: %w[kind reference]
+          },
+          FurnitureModel: {
+            type: :object,
+            properties: {
+              id: { type: :string, description: "安定 ID。GLB ファイル名から拡張子を除いた値", example: "bed_single" },
+              name: { type: :string, example: "シングルベッド" },
+              category: { type: :string, example: "bed" },
+              shape: { type: :string, example: "bed_single" },
+              variant: { type: :string, nullable: true, example: nil },
+              format: { type: :string, enum: %w[glb], example: "glb" },
+              object_key: { type: :string, description: "公開ベース URL からの相対 GCS オブジェクトパス", example: "furniture/bed_single.glb" },
+              size: { "$ref" => "#/components/schemas/Size" },
+              unit: { type: :string, enum: %w[meter], example: "meter" },
+              axes: { type: :string, enum: [ "+Y up, +Z front, origin bottom center" ], example: "+Y up, +Z front, origin bottom center" },
+              triangle_count: { type: :integer, minimum: 0, example: 1200 },
+              byte_size: { type: :integer, minimum: 1, example: 48000 },
+              sha256: { type: :string, pattern: "^[0-9a-f]{64}$", example: "a" * 64 },
+              materials: { type: :array, items: { type: :string }, example: [ "wood", "fabric" ] },
+              model_url: { type: :string, nullable: true, description: "GCS の公開 GLB URL。ベース URL が未設定なら null", example: nil },
+              bindings: { type: :array, items: { "$ref" => "#/components/schemas/FurnitureModelBinding" } }
+            },
+            required: %w[id name category shape variant format object_key size unit axes triangle_count byte_size sha256 materials model_url bindings]
+          },
           Position: {
             type: :object,
             description: "物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き",
