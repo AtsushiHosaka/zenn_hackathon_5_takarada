@@ -22,7 +22,10 @@ Rails.application.routes.draw do
     namespace :v1 do
       get "me", to: "me#show"
       resources :users, only: %i[index show update destroy]
-      resources :rooms, only: %i[create show]
+      resources :rooms, only: %i[create show] do
+        resources :coordinations, only: :create
+      end
+      resources :coordinations, only: :show
     end
   end
 end

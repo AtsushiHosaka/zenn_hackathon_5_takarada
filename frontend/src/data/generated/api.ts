@@ -194,6 +194,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/rooms/{room_id}/coordinations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                room_id: number;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * コーデ提案の生成を始める
+         * @description 生成は非同期。GET /api/v1/coordinations/{id} で status が done / failed になるまでポーリングする。現在の商品選定は AI 未接続のモック (キーワードでテーマを判定) で、商品候補はインテリアリンク取得のモック (InteriorLinks::MockClient)
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    room_id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CoordinationInput"];
+                };
+            };
+            responses: {
+                /** @description 受付に成功 (status: pending) */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Coordination"];
+                    };
+                };
+                /** @description 部屋の解析が終わっていない、または入力が不正 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ValidationErrors"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coordinations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        /** コーデ提案 (配置後のシーンと購入リンク) を取得する */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 生成済みのコーデ */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Coordination"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/rooms": {
         parameters: {
             query?: never;
@@ -672,6 +768,91 @@ export interface components {
             status: "analyzing" | "ready" | "failed";
             /** @description status が ready になると入る */
             scene: components["schemas"]["Scene"] | null;
+            /** @example null */
+            error_message: string | null;
+            /** Format: date-time */
+            created_at: string;
+        };
+        CoordinationInput: {
+            coordination: {
+                /** @example 紫色の推し活ルームにしたい */
+                prompt: string;
+                /**
+                 * @description 買い足しの予算 (円)
+                 * @example 30000
+                 */
+                budget: number;
+                /**
+                 * @description 活かす家具の id。空なら全部活かす
+                 * @example [
+                 *       "bed-1",
+                 *       "desk-1",
+                 *       "shelf-1"
+                 *     ]
+                 */
+                kept_object_ids?: string[];
+            };
+        };
+        CoordinationItem: {
+            /** @example 1 */
+            marker: number;
+            /** @example 101 */
+            item_id: number;
+            /** @example bed_cover */
+            slot: string;
+            /** @example bed_cover */
+            category: string;
+            /** @example ラベンダー 布団カバー3点セット シングル */
+            name: string;
+            /** @example 4980 */
+            price: number;
+            /**
+             * @example rakuten
+             * @enum {string}
+             */
+            shop: "amazon" | "rakuten";
+            /** @example https://search.rakuten.co.jp/search/mall/... */
+            url: string;
+            /** @example null */
+            image_url: string | null;
+            /** @example #b9a3e3 */
+            color: string;
+            /** @example ベッドに掛ける */
+            placement_note: string;
+        };
+        Coordination: {
+            /** @example 1 */
+            id: number;
+            /** @example 1 */
+            room_id: number;
+            /**
+             * @example done
+             * @enum {string}
+             */
+            status: "pending" | "processing" | "done" | "failed";
+            /** @example 紫色の推し活ルームにしたい */
+            prompt: string;
+            /** @example 30000 */
+            budget: number;
+            /**
+             * @example [
+             *       "bed-1",
+             *       "desk-1",
+             *       "shelf-1"
+             *     ]
+             */
+            kept_object_ids: string[];
+            /** @example ラベンダーの推し活ルーム */
+            title: string | null;
+            /** @example ラベンダー 布団カバー3点セット シングル (ベッドに掛ける) などを追加しました。今のベッドとデスクと本棚はそのまま活かしています。 */
+            comment: string | null;
+            before_scene: components["schemas"]["Scene"] | null;
+            /** @description status が done になると入る */
+            after_scene: components["schemas"]["Scene"] | null;
+            /** @description 購入リンク一覧。after_scene の suggested と marker で対応する */
+            items: components["schemas"]["CoordinationItem"][];
+            /** @example 26840 */
+            total_price: number | null;
             /** @example null */
             error_message: string | null;
             /** Format: date-time */
