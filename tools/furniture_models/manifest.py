@@ -18,6 +18,14 @@ CATEGORY = {
     "curtain": "curtain", "rug": "rug", "cushion": "cushion", "tapestry": "tapestry", "floor_lamp": "floor_lamp",
     "led": "led", "candle": "candle", "plant": "plant", "small_plant": "small_plant",
     "wall_planter": "wall_planter", "wall_mirror": "wall_mirror", "wall_art": "wall_art", "monitor": "monitor",
+    # 2026-10-04 追加分
+    "ottoman": "ottoman", "bench": "bench", "beanbag": "beanbag", "floor_chair": "chair", "kotatsu": "table",
+    "nightstand": "side_table", "console_table": "table", "wagon": "storage", "hanger_rack": "storage",
+    "ladder_shelf": "shelf", "storage_basket": "storage_box", "pegboard": "pegboard", "dresser": "dresser",
+    "mirror_stand": "floor_mirror", "mirror_arch": "wall_mirror", "table_lamp": "table_lamp",
+    "pendant_light": "pendant_light", "tv": "tv", "plant_stand": "plant_stand", "vase": "vase",
+    "wall_clock": "wall_clock", "photo_frame": "photo_frame", "plush": "plush", "blanket": "blanket",
+    "room_divider": "room_divider", "trash_bin": "trash_bin",
 }
 NAMES = {
     "sofa_1seat": "1人掛けソファ", "sofa_2seat": "2人掛けソファ", "sofa_3seat": "3人掛けソファ",
@@ -43,6 +51,17 @@ NAMES = {
     "plant_monstera": "モンステラ", "plant_eucalyptus": "ユーカリ", "small_plant": "卓上ミニ植物",
     "wall_planter": "壁掛けグリーン", "wall_mirror": "ウェーブミラー", "wall_art": "額入りアート",
     "monitor": "デスク上モニター",
+    "ottoman_round": "丸型オットマン", "bench_wood": "木製ベンチ", "chair_lounge": "ラウンジチェア",
+    "beanbag": "ビーズクッション", "floor_chair": "座椅子", "kotatsu": "こたつ（掛け布団付き）",
+    "nightstand": "ナイトテーブル", "console_table": "コンソールテーブル", "side_table_c": "コの字サイドテーブル",
+    "wagon_cart": "3段ワゴン", "hanger_rack": "ハンガーラック", "ladder_shelf": "ラダーシェルフ",
+    "storage_basket": "ラタン調収納バスケット", "pegboard": "有孔ボード", "dresser": "ミラー付きドレッサー",
+    "mirror_stand": "スタンドミラー", "mirror_arch": "アーチ型ウォールミラー",
+    "table_lamp": "マッシュルーム型テーブルランプ", "pendant_light": "ペンダントライト", "tv": "43型テレビ",
+    "plant_fiddle": "ウンベラータ", "plant_olive": "オリーブの木", "plant_stand": "2段フラワースタンド",
+    "vase_tulip": "花瓶とチューリップ", "wall_clock": "壁掛け時計", "photo_frame": "卓上フォトフレーム",
+    "plush_bear": "くまのぬいぐるみ", "blanket_folded": "たたんだブランケット",
+    "room_divider": "3連パーテーション", "trash_bin": "ゴミ箱",
 }
 # モックカタログの商品ID・既存家具ID → モデル
 PRODUCTS = {

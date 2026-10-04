@@ -229,3 +229,180 @@ def display_stand_floor(tint=None):
         m.box((iw, h - t - lo, 0.015), (0, lo + (h - t - lo) / 2, zf - 0.01), white, bevel=0.0, name="riser")
     m.box((iw, heights[-1], 0.015), (0, heights[-1] / 2, -D / 2 + 0.0075), white, bevel=0.0, name="back")
     return m
+
+
+# ---------- 追加モデル (2026-10-04) ----------
+import math  # noqa: E402
+
+
+@asset("wagon_cart.glb", (0.45, 0.78, 0.35))
+def wagon_cart(tint=None):
+    m = Model("wagon_cart")
+    body = m.mat("tint", tint or "#b7cdbf", rough=0.6)
+    wheel = m.mat("wheel", "#5b566b", rough=0.8)
+    W, H, D = 0.45, 0.78, 0.35
+    r = 0.012
+    for sx in (-1, 1):
+        for sz in (-1, 1):
+            x, z = sx * (W / 2 - r), sz * (D / 2 - r)
+            m.cyl(r, H - 0.06, (x, 0.06 + (H - 0.06) / 2, z), body, seg=10, name="post")
+            m.cyl(0.024, 0.02, (x, 0.024, z), wheel, seg=14, axis="x", name="caster")
+            m.box((0.03, 0.02, 0.03), (x, 0.05, z), wheel, bevel=0.004, name="caster_mount")
+    for y in (0.10, 0.42, 0.72):
+        m.box((W - 0.03, 0.008, D - 0.03), (0, y, 0), body, bevel=0.002, name="tray_bottom")
+        for sx in (-1, 1):
+            m.box((0.006, 0.07, D - 0.03), (sx * (W / 2 - 0.018), y + 0.035, 0), body, bevel=0.002, name="tray_wall")
+        for sz in (-1, 1):
+            m.box((W - 0.03, 0.07, 0.006), (0, y + 0.035, sz * (D / 2 - 0.018)), body, bevel=0.002, name="tray_wall")
+    return m
+
+
+@asset("hanger_rack.glb", (1.00, 1.60, 0.45))
+def hanger_rack(tint=None):
+    m = Model("hanger_rack")
+    metal = m.mat("metal", tint or P.METAL_DARK, rough=0.6)
+    wood = m.mat("wood", P.WOOD_LIGHT, rough=0.55)
+    W, H, D = 1.00, 1.60, 0.45
+    for sx in (-1, 1):
+        x = sx * (W / 2 - 0.02)
+        m.box((0.03, 0.03, D), (x, 0.015, 0), metal, bevel=0.005, name="foot")
+        m.cyl(0.014, H - 0.03, (x, 0.03 + (H - 0.03) / 2, 0), metal, seg=12, name="pole")
+    m.cyl(0.014, W - 0.04, (0, H - 0.014, 0), metal, seg=12, axis="x", name="top_rail")
+    m.box((W - 0.08, 0.02, D - 0.1), (0, 0.17, 0), wood, bevel=0.005, name="shelf")
+    for sz in (-1, 1):
+        m.cyl(0.01, W - 0.04, (0, 0.15, sz * (D / 2 - 0.06)), metal, seg=10, axis="x", name="shelf_rail")
+    return m
+
+
+@asset("ladder_shelf.glb", (0.60, 1.60, 0.35))
+def ladder_shelf(tint=None):
+    """壁に立て掛けるはしご形の棚。背面 -Z 側が壁。"""
+    m = Model("ladder_shelf")
+    wood = m.mat("wood", tint or P.WOOD_LIGHT, rough=0.55)
+    W, H, D = 0.60, 1.60, 0.35
+    zf, zb = D / 2 - 0.02, -D / 2 + 0.02  # 脚の前端と、上端の壁側
+    ang = math.degrees(math.atan2(zf - zb, H))
+    for sx in (-1, 1):
+        m.box((0.035, H / math.cos(math.radians(ang)) - 0.02, 0.035), (sx * (W / 2 - 0.0175), H / 2, (zf + zb) / 2),
+              wood, bevel=0.005, rot=(-ang, 0, 0), name="rail")
+    for i, y in enumerate((0.25, 0.62, 0.98, 1.33)):
+        z_rail = zf - (zf - zb) * y / H
+        depth = (z_rail - zb) + 0.03
+        m.box((W - 0.07, 0.022, depth), (0, y, z_rail - depth / 2 + 0.015), wood, bevel=0.004, name="shelf")
+        m.box((W - 0.07, 0.04, 0.012), (0, y + 0.02, zb + 0.01 + 0 * i), wood, bevel=0.003, name="lip")
+    return m
+
+
+@asset("storage_basket.glb", (0.40, 0.30, 0.30))
+def storage_basket(tint=None):
+    m = Model("storage_basket")
+    rattan = m.mat("tint", tint or "#c9a272", rough=0.9)
+    dark = m.mat("weave", "#a9824f", rough=0.9)
+    W, H, D, t = 0.40, 0.30, 0.30, 0.012
+    m.box((W - 0.02, 0.015, D - 0.02), (0, 0.0075, 0), rattan, bevel=0.004, name="bottom")
+    for sx in (-1, 1):
+        m.box((t, H - 0.01, D - 0.01), (sx * (W / 2 - t / 2 - 0.005), (H - 0.01) / 2, 0), rattan, bevel=0.004,
+              name="wall")
+    for sz in (-1, 1):
+        m.box((W - 0.01, H - 0.01, t), (0, (H - 0.01) / 2, sz * (D / 2 - t / 2 - 0.005)), rattan, bevel=0.004,
+              name="wall")
+    # 編み目の横帯と縁
+    for y in [0.04 + 0.045 * i for i in range(6)]:
+        for sx in (-1, 1):
+            m.box((0.006, 0.014, D - 0.02), (sx * (W / 2 - 0.004), y, 0), dark, bevel=0.002, name="band")
+        for sz in (-1, 1):
+            m.box((W - 0.02, 0.014, 0.006), (0, y, sz * (D / 2 - 0.004)), dark, bevel=0.002, name="band")
+    m.box((W, 0.02, D), (0, H - 0.01, 0), dark, bevel=0.006, name="rim_outer")
+    m.box((W - 0.03, 0.022, D - 0.03), (0, H - 0.01, 0), rattan, bevel=0.0, name="rim_inner")
+    for sx in (-1, 1):
+        m.rod((sx * (W / 2 + 0.0), H - 0.06, -0.05), (sx * (W / 2 + 0.0), H - 0.06, 0.05), 0.008, dark, seg=8,
+              name="handle")
+    return m
+
+
+@asset("pegboard.glb", (0.60, 0.60, 0.03))
+def pegboard(tint=None):
+    m = Model("pegboard")
+    board = m.mat("tint", tint or "#e8dcc8", rough=0.6)
+    hole = m.mat("hole", "#6b5f55", rough=0.9)
+    W, H = 0.60, 0.60
+    m.box((W, H, 0.016), (0, H / 2, 0.007), board, bevel=0.004, name="board")
+    for sx in (-1, 1):
+        m.box((0.03, H - 0.06, 0.014), (sx * (W / 2 - 0.05), H / 2, -0.008), board, bevel=0.002, name="spacer")
+    n = 11
+    for i in range(n):
+        for j in range(n):
+            x = -W / 2 + 0.05 + i * (W - 0.1) / (n - 1)
+            y = 0.05 + j * (H - 0.1) / (n - 1)
+            m.cyl(0.0045, 0.001, (x, y, 0.0151), hole, seg=8, axis="z", name="hole")
+    return m
+
+
+@asset("dresser.glb", (0.80, 1.40, 0.40))
+def dresser(tint=None):
+    m = Model("dresser")
+    body = m.mat("tint", tint or "#e6d8c6", rough=0.6)
+    knob = m.mat("knob", P.WOOD_MED, rough=0.5)
+    mirror = m.mat("mirror", "#dfe8f2", rough=0.3)
+    wood = m.mat("wood", P.WOOD_LIGHT, rough=0.55)
+    W, D, Ht, t = 0.80, 0.40, 0.75, 0.025
+    m.box((W, t, D), (0, Ht - t / 2, 0), body, bevel=0.006, name="top")
+    m.box((W - 0.04, 0.14, D - 0.04), (0, Ht - t - 0.07, -0.01), body, bevel=0.004, name="apron")
+    for sx in (-1, 1):
+        m.box((W / 2 - 0.04, 0.11, 0.018), (sx * (W / 4 - 0.005), Ht - t - 0.07, D / 2 - 0.03), body, bevel=0.004,
+              name="drawer")
+        m.cyl(0.01, 0.02, (sx * (W / 4 - 0.005), Ht - t - 0.07, D / 2 - 0.015), knob, seg=12, axis="z", r2=0.013,
+              name="knob")
+        for sz in (-1, 1):
+            m.cyl(0.013, Ht - t - 0.14, (sx * (W / 2 - 0.05), (Ht - t - 0.14) / 2, sz * (D / 2 - 0.05)), wood, seg=12,
+                  r2=0.019, name="leg")
+    # 天板奥に立てたアーチ形の鏡
+    mw, mh = 0.50, 0.63
+    arch = arch_outline(mw, mh)
+    m.prism(arch, 0.025, body, plane="xy", offset=-D / 2 + 0.03, bevel=0.006, fan=True, center=(0, Ht, 0),
+            name="mirror_frame")
+    m.prism(arch_outline(mw - 0.05, mh - 0.05), 0.004, mirror, plane="xy", offset=-D / 2 + 0.055, fan=True,
+            center=(0, Ht + 0.025, 0), name="mirror")
+    return m
+
+
+def arch_outline(w, h, seg=24):
+    """下辺が平らで上が半円のアーチ (x, y)。y=0 が下端。"""
+    r = w / 2
+    pts = [(r, 0.0), (r, h - r)]
+    for i in range(1, seg):
+        a = math.pi * i / seg
+        pts.append((r * math.cos(a), h - r + r * math.sin(a)))
+    pts += [(-r, h - r), (-r, 0.0)]
+    return pts
+
+
+@asset("mirror_stand.glb", (0.50, 1.60, 0.45))
+def mirror_stand(tint=None):
+    """立て掛け式の姿見。背面の脚で支える。"""
+    m = Model("mirror_stand")
+    frame = m.mat("wood", tint or P.WOOD_LIGHT, rough=0.55)
+    mirror = m.mat("mirror", "#dfe8f2", rough=0.3)
+    W, H = 0.50, 1.60
+    tilt = 10
+    outline = arch_outline(W, H / math.cos(math.radians(tilt)) - 0.04, seg=24)
+    m.prism(outline, 0.03, frame, plane="xy", offset=0.0, bevel=0.006, fan=True, rot=(-tilt, 0, 0),
+            center=(0, 0, 0.12), name="frame")
+    m.prism(arch_outline(W - 0.06, H / math.cos(math.radians(tilt)) - 0.1, seg=24), 0.004, mirror, plane="xy",
+            offset=0.03, fan=True, rot=(-tilt, 0, 0), center=(0, 0.03 * math.cos(math.radians(tilt)), 0.12 - 0.03 * math.sin(math.radians(tilt))),
+            name="mirror")
+    for sx in (-1, 1):
+        m.rod((sx * 0.15, 0.0, -0.3), (sx * 0.12, 1.05, 0.12 - 1.05 * math.tan(math.radians(tilt)) + 0.0), 0.012,
+              frame, seg=8, name="easel_leg")
+    return m
+
+
+@asset("mirror_arch.glb", (0.45, 0.80, 0.03))
+def mirror_arch(tint=None):
+    m = Model("mirror_arch")
+    frame = m.mat("tint", tint or "#e3d3bd", rough=0.6)
+    mirror = m.mat("mirror", "#dfe8f2", rough=0.3)
+    m.prism(arch_outline(0.45, 0.80), 0.024, frame, plane="xy", offset=-0.015, bevel=0.006, fan=True, name="frame")
+    m.prism(arch_outline(0.40, 0.75), 0.005, mirror, plane="xy", offset=0.009, fan=True, center=(0, 0.025, 0),
+            name="mirror")
+    return m
