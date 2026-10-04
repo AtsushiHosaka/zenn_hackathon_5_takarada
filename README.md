@@ -4,7 +4,7 @@
 | --- | --- |
 | [`backend/`](backend/README.md) | Rails 8 (API モード) + PostgreSQL 16 + JWT 認証。詳細は `backend/README.md` |
 | [`frontend/`](frontend/README.md) | React 19 + Vite + Tailwind の SPA (Domain / Data / Core のレイヤ分け)。規約は `.claude/docs/frontend.md` |
-| [`infra/`](infra/README.md) | AWS Lightsail + API Gateway (Terraform)。詳細は `infra/README.md` |
+| [`infra/gcp/`](infra/gcp/README.md) | GCP の最小構成 (Cloud Run + Cloud SQL、Terraform)。詳細は `infra/gcp/README.md` |
 | `ios/` | SwiftUI アプリ (Domain / Data / Core のレイヤ分け + FactoryKit で DI)。規約は `.claude/docs/ios.md` |
 
 `frontend/` と `ios/` は**同じレイヤ分け・同じダミー接続の仕組み**にしてある。
@@ -63,7 +63,8 @@ make front-types  # backend の OpenAPI から TypeScript の型を再生成
 | `frontend/src/feature/` | 画面 |
 
 規約は [.claude/docs/frontend.md](.claude/docs/frontend.md)。
-`infra/` のデプロイは API だけなので、web の公開先は別に用意する(同ドキュメント参照)。
+デプロイ先は Cloud Run。静的ファイルを nginx で配信する `frontend/Dockerfile` の
+`runtime` ステージをそのまま使う。
 
 ## iOS
 
@@ -88,96 +89,108 @@ make ios-build   # シミュレータ向けにビルドだけ通す
 
 規約は [.claude/docs/ios.md](.claude/docs/ios.md)。
 
-## デプロイ手順 (AWS アカウント作成から CI/CD まで)
+## デプロイ手順 (GCP: Cloud Run + Cloud SQL)
 
-必要なのは **Docker だけ**。Terraform も AWS CLI もコンテナで動かすので、ホストには入れない。
-
-### 1. AWS アカウントを用意する
-
-1. https://portal.aws.amazon.com/billing/signup からサインアップ(クレジットカードと電話番号が要る)
-2. ルートユーザーに MFA を設定する
-3. IAM で作業用ユーザーを作り、`AdministratorAccess` を付ける(ルートユーザーで作業しない)
-4. そのユーザーでアクセスキーを発行する
-
-### 2. 認証情報を通す
+必要なのは **Docker / gcloud / Terraform**。
 
 ```bash
-aws configure                      # ~/.aws/credentials を作る (aws CLI がある場合)
-# または環境変数でもよい
-export AWS_ACCESS_KEY_ID=...
-export AWS_SECRET_ACCESS_KEY=...
-export AWS_REGION=ap-northeast-1
+brew install --cask google-cloud-sdk
+brew install terraform
 ```
 
-### 3. 設定ファイルを用意する
+構成の全体像と設計の理由は [infra/gcp/README.md](infra/gcp/README.md)。
+
+### 1. GCP プロジェクトを用意して認証を通す
 
 ```bash
-cp infra/terraform/terraform.tfvars.example infra/terraform/terraform.tfvars
+make infra-bootstrap
 ```
 
-CI/CD まで通すなら `github_repository` を必ず埋める。ここが空だと GitHub Actions 用の
-IAM ロールが作られない。
+対話で次を済ませる。何度実行しても壊れない。
+
+1. `gcloud auth login` — ブラウザでログイン
+2. プロジェクトの選択、または新規作成
+3. 請求先アカウントの紐付け(Cloud Run も Cloud SQL も請求先が無いと作れない)
+4. terraform が他の API を有効化するための API を開ける
+5. `gcloud auth application-default login` — terraform が読む認証情報を取る
+6. `infra/gcp/terraform.tfvars` を書く
+
+終わったら `infra/gcp/terraform.tfvars` の `github_repository` を自分のリポジトリに直す。
+ここが空だと GitHub Actions 用の Workload Identity が作られない。
 
 ```hcl
-project           = "hack"
-region            = "ap-northeast-1"
-github_repository = "your-name/your-repo"   # owner/repo
+project_id        = "zenn-hackathon-xxxxxx"   # bootstrap が入れる
+project           = "zenn-hackathon"
+region            = "asia-northeast1"
+github_repository = "your-name/your-repo"     # owner/repo
 ```
 
-### 4. 作成してデプロイする
+### 2. 作成してデプロイする
 
 ```bash
 make infra-up
 ```
 
-以下が順に走る(初回は 10 分ほどかかる)。
+以下が順に走る(初回は Cloud SQL の作成だけで 5〜10 分かかる)。
 
-1. `terraform apply` — Lightsail / 固定IP / ECR / IAM / API Gateway を作成
-2. イメージをビルドして ECR に push(Lightsail は x86_64 なので `linux/amd64` でクロスビルド)
-3. インスタンスに ECR から pull させて起動
+1. `terraform apply` — Artifact Registry / Cloud SQL / Secret Manager / Cloud Run / Workload Identity を作成
+2. backend と frontend のイメージをビルドして Artifact Registry に push
+   (Cloud Run は x86_64 なので `linux/amd64` でクロスビルド)
+3. Cloud Run ジョブで `rails db:apply`(ridgepole)を流してスキーマを当てる
+4. Cloud Run の api / web を新しいイメージに差し替える
 
-終わると**公開 URL が表示される**。
+`make infra-apply` の直後だけ Cloud Run は Google のサンプルイメージで動いている。
+これは「Cloud Run の URL が決まらないとフロントのビルドに埋める API URL が決まらない」
+という順序の問題を 2 段階に分けたもの。`make infra-release` で自分のイメージになる。
 
-### 5. エンドポイントを確認する
+### 3. エンドポイントを確認する
 
 ```bash
 make infra-url
-# => https://xxxxxxxxxx.execute-api.ap-northeast-1.amazonaws.com
+# API  https://zenn-hackathon-api-xxxxxxxxxx.asia-northeast1.run.app
+# Web  https://zenn-hackathon-web-xxxxxxxxxx.asia-northeast1.run.app
 ```
 
 | 見るもの | URL |
 | --- | --- |
-| ヘルスチェック | `<URL>/up` |
-| Swagger UI(全エンドポイントをブラウザから叩ける) | `<URL>/api-docs` |
-| OpenAPI 定義(フロントの型生成に使う) | `<URL>/api-docs/v1/swagger.yaml` |
+| ヘルスチェック | `<API>/up` |
+| Swagger UI(全エンドポイントをブラウザから叩ける) | `<API>/api-docs` |
+| OpenAPI 定義(フロントの型生成に使う) | `<API>/api-docs/v1/swagger.yaml` |
 
 疎通確認:
 
 ```bash
-URL=$(make -s infra-url)
+URL=$(terraform -chdir=infra/gcp output -raw api_url)
 curl -i -X POST "$URL/api/v1/signup" \
   -H 'Content-Type: application/json' \
   -d '{"user":{"name":"Taro","email":"taro@example.com","password":"password"}}'
 # レスポンスヘッダの Authorization: Bearer ... がトークン
 ```
 
-### 6. CI/CD を有効にする
+デモユーザーを入れるなら `make infra-seed`。
+
+### 4. CI/CD を有効にする
 
 ```bash
 gh auth login        # 未ログインなら
 make infra-secrets   # terraform の出力を GitHub Secrets に登録
 ```
 
-登録されるのは次の 6 つ。手で入れる場合は「取得コマンド」を実行した値を設定する。
+登録されるのは次の 10 個。手で入れる場合は `terraform -chdir=infra/gcp output -raw <名前>`
+の値を設定する。
 
-| Secret | 取得コマンド |
+| Secret | terraform の出力名 |
 | --- | --- |
-| `AWS_ROLE_ARN` | `./infra/bin/tf.sh output -raw github_actions_role_arn` |
-| `AWS_REGION` | `./infra/bin/tf.sh output -raw region` |
-| `ECR_REPOSITORY_URL` | `./infra/bin/tf.sh output -raw ecr_repository_url` |
-| `LIGHTSAIL_HOST` | `./infra/bin/tf.sh output -raw instance_ip` |
-| `PUBLIC_URL` | `./infra/bin/tf.sh output -raw public_url` |
-| `SSH_PRIVATE_KEY` | `cat infra/.ssh/hack.pem` |
+| `GCP_WIF_PROVIDER` | `wif_provider` |
+| `GCP_SERVICE_ACCOUNT` | `gha_service_account` |
+| `GCP_PROJECT_ID` | `project_id` |
+| `GCP_REGION` | `region` |
+| `GCP_API_IMAGE_REPO` | `api_image_repo` |
+| `GCP_WEB_IMAGE_REPO` | `web_image_repo` |
+| `GCP_API_SERVICE` | `api_service` |
+| `GCP_WEB_SERVICE` | `web_service` |
+| `GCP_TASK_JOB` | `task_job` |
+| `GCP_API_URL` | `api_url` |
 
 これで **main にマージすると自動デプロイされる**。
 
@@ -185,19 +198,24 @@ make infra-secrets   # terraform の出力を GitHub Secrets に登録
 PR を main にマージ
   └─ CI (.github/workflows/ci.yml)      rspec / OpenAPI定義の鮮度 / rubocop
        └─ Deploy (.github/workflows/deploy.yml)   CI が成功した時だけ走る
-            1. OIDC で AWS にログイン (長期キーは GitHub に置かない)
-            2. イメージをビルドして ECR に push (tag: コミットSHA と latest)
-            3. インスタンスに ssh して docker compose pull && up -d
-            4. <PUBLIC_URL>/up が 200 になるまで確認
+            1. Workload Identity で GCP にログイン (鍵は GitHub に置かない)
+            2. api / web のイメージをビルドして Artifact Registry に push
+               (tag: コミットSHA と latest)
+            3. Cloud Run ジョブで rails db:apply (新しいコードより先にスキーマを当てる)
+            4. Cloud Run の api / web を差し替える
+            5. <API>/up が 200 になるまで確認
 ```
 
-### 7. 片付け
+### 5. 片付け
 
 ```bash
-make infra-destroy   # 作ったものを全部消す (データも消える)
+make infra-destroy   # 作ったものを全部消す (Cloud SQL のデータも消える)
 ```
 
-手動デプロイや運用コマンドは [infra/README.md](infra/README.md) を参照。
+固定費は実質 Cloud SQL (db-f1-micro) の月 ¥1,500 前後だけ。Cloud Run はアクセスが
+無い間ゼロに縮むのでほぼ掛からない。使わない期間は `make infra-destroy` で消す。
+
+運用コマンドの一覧と設計の理由は [infra/gcp/README.md](infra/gcp/README.md) を参照。
 
 ## API
 
@@ -229,13 +247,13 @@ make infra-destroy   # 作ったものを全部消す (データも消える)
 backend/                          # Rails API
 frontend/                         # React + Vite の SPA
 ios/                              # SwiftUI アプリ
-infra/                            # AWS Lightsail + API Gateway + ECR (Terraform)
-compose.yaml                      # ベース (db + redis + api + worker)。デプロイ時もこれを使う
+infra/gcp/                        # GCP の最小構成 (Cloud Run + Cloud SQL + Artifact Registry)
+compose.yaml                      # ローカルのベース (db + redis + api + worker)
 compose.override.yaml             # ローカル専用 (build・コードのマウント・web)
 Makefile
 .claude/docs/backend.md           # backend の規約
 .claude/docs/frontend.md          # frontend の規約
 .claude/docs/ios.md               # ios の規約
 .github/workflows/ci.yml          # rspec / OpenAPI定義の鮮度チェック / rubocop / frontend
-.github/workflows/deploy.yml      # main マージで ECR push -> Lightsail 入れ替え
+.github/workflows/deploy.yml      # main マージで Artifact Registry へ push -> Cloud Run 更新
 ```

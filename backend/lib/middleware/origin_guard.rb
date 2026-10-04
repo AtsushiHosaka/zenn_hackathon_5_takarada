@@ -1,8 +1,8 @@
-# API Gateway が付与する x-origin-secret ヘッダを検証する Rack ミドルウェア。
-# Lightsail の 3000 番は全公開せざるを得ない (API Gateway に固定 IP が無い) ため、
-# IP を直接叩かれたリクエストをここで弾く。
+# 手前のプロキシが付与する x-origin-secret ヘッダを検証する Rack ミドルウェア。
+# オリジンを直接叩かれたリクエストを弾くための仕組み。
 #
-# ORIGIN_SECRET が未設定なら何もしない (ローカル開発では無効)。
+# ORIGIN_SECRET が未設定なら何もしない。現構成 (Cloud Run が直接受ける) では
+# 設定していないので素通しになる。
 class OriginGuard
   def initialize(app)
     @app = app
