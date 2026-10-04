@@ -79,10 +79,25 @@ Rails には `DB_HOST` にそのパスを渡すだけでよい (libpq は `/` �
 **スキーマ管理。** マイグレーションではなく ridgepole (`db/Schemafile` が正)。
 Cloud Run ジョブで `rails db:apply` を流す。新しいコードを出す前に当たる順番にしてある。
 
-**Sidekiq / Redis は本番に置いていない。** ジョブが 1 つも無いため。
-必要になったら Memorystore (Redis) + worker 用の Cloud Run サービス
-(`min_instance_count = 1`) を足す。ローカルの `compose.yaml` は今も redis と
-worker を立てるので、開発側は何も変わらない。
+**Sidekiq / Redis は本番に置いていない。** Memorystore はゼロスケールできず、
+Serverless VPC コネクタと常時稼働の worker も要るので、月 ¥8,000 前後の固定費に
+なってしまう。代わりに production だけ ActiveJob のアダプタを `:inline` にして
+(`backend/config/environments/production.rb`)、`perform_later` をリクエスト内で
+同期実行している。ローカルの `compose.yaml` は今も redis と worker を立てるので、
+開発側は本物の非同期で動く。
+
+今のジョブ (`AnalyzeRoomJob` / `GenerateCoordinationJob`) は外部呼び出しの無い
+純粋な計算でミリ秒で終わるので、これで困らない。`status` をポーリングする API 契約も
+壊れない (即 `ready` / `done` になるだけ)。
+
+**`RoomAnalyzer` / `CoordinationBuilder` を LLM に差し替えるときは要再検討。**
+リクエストが待たされて Cloud Run のタイムアウト (300s) に当たる。移行先の候補:
+
+- **Cloud Tasks** … ゼロスケールのまま本当の非同期になり、タスクの実行時間は最大 30 分。
+  月 100 万タスクまで無料。`perform_later` を Cloud Tasks への enqueue に替え、
+  OIDC 認証付きで叩かれる実行エンドポイントを足す
+- **Memorystore + worker 用 Cloud Run サービス** (`min_instance_count = 1`) …
+  Sidekiq のまま動かせるがコストが上がる
 
 **秘密の値。** `SECRET_KEY_BASE` / JWT 鍵 / DB パスワードは terraform が生成して
 Secret Manager に入れ、Cloud Run が環境変数として読む。`terraform.tfstate` には
