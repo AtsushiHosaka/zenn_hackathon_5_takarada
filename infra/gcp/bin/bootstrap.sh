@@ -44,24 +44,47 @@ echo "   gcloud の既定プロジェクトを $project_id にしました"
 
 echo
 echo "== 3. 請求先アカウントを確認します"
-# Cloud Run も Cloud SQL も、請求先が紐付いていないと作成できない
-billing="$(gcloud billing projects describe "$project_id" \
-  --format='value(billingAccountName)' 2>/dev/null || true)"
-if [ -n "$billing" ]; then
-  echo "   紐付け済み: $billing"
+# Cloud Run も Cloud SQL も、請求先が紐付いていないと API の有効化すら通らない。
+# ここを飛ばすと make infra-apply が Error 400 (Billing account ... is not found) で落ちる。
+if [ "$(gcloud billing projects describe "$project_id" \
+        --format='value(billingEnabled)' 2>/dev/null || true)" = "True" ]; then
+  echo "   紐付け済み: $(gcloud billing projects describe "$project_id" \
+    --format='value(billingAccountName)')"
 else
-  echo "   このプロジェクトには請求先が紐付いていません。候補:"
-  gcloud billing accounts list --format='table(name, displayName, open)' 2>/dev/null || true
-  echo
-  echo "   請求先アカウント ID (例 01ABCD-234567-89EFGH) を入れてください。"
-  echo "   空のまま Enter を押すと、ブラウザで手動で紐付ける前提でスキップします。"
-  read -r -p "   請求先アカウント ID: " billing_id
-  if [ -n "$billing_id" ]; then
-    gcloud billing projects link "$project_id" --billing-account="$billing_id"
-  else
-    echo "   スキップしました。次の URL で紐付けてから、もう一度このコマンドを実行してください:"
-    echo "   https://console.cloud.google.com/billing/linkedaccount?project=$project_id"
+  echo "   このプロジェクトには請求先が紐付いていません。"
+
+  # 閉鎖済み (open=False) のアカウントは紐付けても使えないので候補から外す
+  open_accounts="$(gcloud billing accounts list --filter='open=true' \
+    --format='value(name)' 2>/dev/null || true)"
+  open_count="$(printf '%s' "$open_accounts" | grep -c . || true)"
+
+  if [ "$open_count" = "0" ]; then
+    echo
+    echo "   使える請求先アカウントがありません。次の URL で作成してから、"
+    echo "   もう一度 make infra-bootstrap を実行してください:"
+    echo "   https://console.cloud.google.com/billing/create"
+    die "請求先アカウントが無いため先に進めません。"
   fi
+
+  echo "   使える候補:"
+  gcloud billing accounts list --filter='open=true' \
+    --format='table(name, displayName)' 2>/dev/null || true
+
+  default_account=""
+  if [ "$open_count" = "1" ]; then
+    default_account="$open_accounts"
+    echo
+    echo "   そのまま Enter を押すと $default_account を使います。"
+  fi
+
+  echo
+  read -r -p "   請求先アカウント ID: " billing_id
+  [ -n "$billing_id" ] || billing_id="$default_account"
+  [ -n "$billing_id" ] || die "請求先アカウント ID が必要です。紐付けないと make infra-apply が失敗します。"
+
+  gcloud billing projects link "$project_id" --billing-account="$billing_id"
+  echo "   紐付けました。これ以降このプロジェクトは課金対象です"
+  echo "   (解除は gcloud billing projects unlink $project_id)。"
 fi
 
 echo
