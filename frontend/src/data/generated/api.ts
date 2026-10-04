@@ -1174,6 +1174,12 @@ export interface components {
             items: components["schemas"]["CoordinationItem"][];
             /** @example 26840 */
             total_price: number | null;
+            /**
+             * @description gemini: 要望文から AI が商品を選んだ / mock: キーワードでテーマを決めたモック。生成が終わると入る
+             * @example gemini
+             * @enum {string|null}
+             */
+            planned_by: null | "gemini" | "mock";
             /** @example null */
             error_message: string | null;
             /** Format: date-time */

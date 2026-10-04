@@ -1,4 +1,4 @@
-# 要望と予算からコーデを組み立てる
+# 要望と予算からコーデを組み立てる (GEMINI_API_KEY があれば商品選びは Gemini、無ければモック)
 class GenerateCoordinationJob < ApplicationJob
   queue_as :default
 
