@@ -24,6 +24,12 @@ const unavailableMessage = "部屋APIの接続先が設定されていません�
 export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, baseUrl: string): RoomRepository {
   return {
     demo: createDemoRoom,
+    async analyze(input, signal) {
+      if (config.contract === "legacy") throw new DomainError("この接続先では畳数による部屋解析を利用できません");
+      if (config.contract === "coordination") validateCoordinationInput(input);
+      const design = await createApiRoomRepository(api, { ...config, contract: "analysis" }, baseUrl).generate(input, signal);
+      return { ...design, prompt: input.prompt.trim() || undefined, budget: input.budget, keptObjectIds: design.items.filter(item => item.existing).map(item => item.id) };
+    },
     async capabilities() {
       return {
         generation: Boolean(config.generationPath),
@@ -52,7 +58,9 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
           if (record.status === "ready") {
             if (config.contract === "analysis") return toAnalyzedRoomDesign(record, baseUrl);
             if (!config.coordinationPath.includes("{id}")) throw new DomainError("コーディネートの作成先が設定されていません");
-            const request: components["schemas"]["CoordinationInput"] = { coordination: { prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: [] } };
+            const keptObjectIds = input.keptObjectIds ?? [];
+            if (!Array.isArray(keptObjectIds) || keptObjectIds.some(id => typeof id !== "string" || !record.scene?.objects.some(item => item.source === "existing" && item.id === id)) || new Set(keptObjectIds).size !== keptObjectIds.length) throw new DomainError("活かす家具の選択が正しくありません");
+            const request: components["schemas"]["CoordinationInput"] = { coordination: { prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds } };
             let coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationPath.replace("{id}", String(record.id)), { method: "POST", body: request, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 120_000 }));
             const coordinationId = coordination.id;
             if (coordination.room_id !== expectedId) throw new DomainError("別の部屋のコーディネートを受け取りました");

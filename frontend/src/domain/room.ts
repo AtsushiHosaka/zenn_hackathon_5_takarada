@@ -55,6 +55,7 @@ export type RoomDesign = {
   backendRoomId?: string;
   prompt?: string;
   budget?: number;
+  keptObjectIds?: string[];
 };
 
 // ブラウザに保存されたデータも、復元時には信頼しない。
@@ -72,7 +73,12 @@ export function isRoomDesign(value: unknown): value is RoomDesign {
   if (value.prompt !== undefined && (!nonemptyString(value.prompt) || value.prompt.length > 500)) return false;
   if (value.budget !== undefined && (typeof value.budget !== "number" || !Number.isSafeInteger(value.budget) || value.budget <= 0)) return false;
   if (value.before !== undefined && !isRoomSnapshot(value.before)) return false;
+  if (value.keptObjectIds !== undefined && (!Array.isArray(value.keptObjectIds) || !value.keptObjectIds.every(nonemptyString) || new Set(value.keptObjectIds).size !== value.keptObjectIds.length)) return false;
   if (!optionalHttpUrl(value.modelUrl) || !Array.isArray(value.items) || !value.items.every(isRoomItem)) return false;
+  if (value.keptObjectIds !== undefined) {
+    const furniture = (value.before?.items ?? value.items).filter(item => item.existing);
+    if (value.keptObjectIds.some(id => !furniture.some(item => item.id === id))) return false;
+  }
   return new Set(value.items.map(item => item.id)).size === value.items.length;
 }
 
