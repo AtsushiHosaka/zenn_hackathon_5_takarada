@@ -25,14 +25,19 @@ report_path = os.path.join(HERE, "build_report.json")
 previous = json.load(open(report_path)) if only and os.path.exists(report_path) else []
 report = {item["file"]: item for item in previous}
 failed = []
-unknown = only - set(lib.ASSETS)
+output_names = {
+    file if not suffix else file.replace(".glb", f"__{suffix}.glb")
+    for file, (_, _, variants) in lib.ASSETS.items()
+    for suffix in [""] + list(variants)
+}
+unknown = only - output_names
 if unknown:
     raise ValueError(f"Unknown model files: {sorted(unknown)}")
 for file, (fn, size, variants) in lib.ASSETS.items():
-    if only and file not in only:
-        continue
     for suffix, opts in [("", {})] + list(variants.items()):
         out_name = file if not suffix else file.replace(".glb", f"__{suffix}.glb")
+        if only and file not in only and out_name not in only:
+            continue
         try:
             model = fn(**opts)
             model.name = out_name[:-4]

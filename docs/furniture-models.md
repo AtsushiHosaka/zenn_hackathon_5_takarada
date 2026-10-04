@@ -32,7 +32,7 @@ python3 tools/furniture_models/manifest.py
 
 生成したJSONは`backend/db/furniture_models.json`に保存する。モデル定義やGLBを変更したときは、このJSONも更新して変更に含める。
 
-GCPにログイン済みの環境で、生成済みのGLBをアップロードする。`infra/gcp/bin/models-publish.sh`が台帳とファイルを照合し、`gs://<bucket>/models/furniture/v1/`へ配置する。バケット名は`MODELS_BUCKET`、未設定ならTerraformの`models_bucket`出力から取得する。
+GCPにログイン済みの環境で、生成済みのGLBをアップロードする。`infra/gcp/bin/models-publish.sh`は台帳に載ったGLBだけを一時ディレクトリへ複製し、その内容を検証して`gs://<bucket>/models/furniture/v1/`へ配置する。生成先に余分なGLBがあっても公開しない。バケット名は`MODELS_BUCKET`、未設定ならTerraformの`models_bucket`出力から取得する。
 
 ```bash
 make infra-models-publish
@@ -78,11 +78,13 @@ make furniture-models-import
 
 本番ではデプロイCIと`make infra-release`が、Cloud Runジョブで`db:apply`と`furniture_models:import`を順に実行する。その後、APIとWebのサービスを新しいイメージへ更新する。
 
-取り込みはJSON全体を検証してからトランザクション内で更新する。同じモデルIDや対応IDを再取り込みしても行は増えない。入力にないモデルは削除せず、手動で無効にしたモデルは無効のまま保つ。
+取り込みはJSON全体を検証してからトランザクション内で更新する。同じモデルIDや対応IDを再取り込みしても行は増えない。入力から外した対応関係はDBから削除する。入力にないモデルは削除せず、手動で無効にしたモデルは無効のまま保つ。
 
 DBの一覧は公開API`GET /api/v1/furniture_models`、単体は`GET /api/v1/furniture_models/{id}`で取得する。`{id}`には`bed_single`などのモデルIDを指定する。API契約は[Swaggerの生成元](../backend/spec/swagger_helper.rb)で管理する。
 
 部屋APIは保存済みのシーンにもDBの対応関係を適用してURLを補う。旧フロント同梱用の`/models/furniture/...`だけをGCSのURLへ置き換え、外部URLと保存した寸法・位置・回転は維持する。WebもAPI接続時には台帳から不足URLを補い、ダミー接続では通信せず簡易形状を表示する。
+
+旧ローカルURLに対応するモデルがなければ、そのURLを解除してYAML補完か簡易形状へ戻す。Webは取得したカタログを検証し、不正な行を除外する。正常なモデルは表示に使い続ける。
 
 Webが取得した台帳はブラウザのセッション中にキャッシュする。DBの更新や配信元URLの設定後は、ページを再読み込みして反映する。変更前に保存した提案に商品IDがない場合は、簡易形状のまま表示する。
 

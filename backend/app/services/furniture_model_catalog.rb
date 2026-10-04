@@ -66,7 +66,7 @@ class FurnitureModelCatalog
   # 旧フロント同梱モデルのパスは、対応するGCSモデルへ移行する。
   # 利用者が指定した外部モデルのURLは維持する。
   def self.replaceable_url?(value)
-    value.nil? || value.start_with?("/models/furniture/")
+    value.nil? || (value.is_a?(String) && value.start_with?("/models/furniture/"))
   end
   private_class_method :replaceable_url?
 

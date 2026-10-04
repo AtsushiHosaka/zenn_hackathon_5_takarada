@@ -180,6 +180,8 @@ def main():
         ids.add(model_id)
         base, _, variant = model_id.partition("__")
         stats = measure_glb(args.models_dir / filename)
+        if item.get("sha256") != stats["sha256"]:
+            raise ValueError(f"Build report SHA256 differs from exported file: {filename}")
         target = item["target"]
         if len(target) != 3 or any(not math.isfinite(value) or value <= 0 for value in target):
             raise ValueError(f"Invalid target dimensions: {filename}")

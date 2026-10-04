@@ -3,6 +3,7 @@
 モデルはアプリ座標 (単位m, +Y上, +Z正面) でそのまま組み立て、書き出し直前に
 Blender座標 (+Z上, -Y正面) へ回転する。glTFの+Y上変換で元のアプリ座標に戻る。
 """
+import hashlib
 import math
 
 import bmesh
@@ -358,7 +359,10 @@ class Model:
 
         bpy.ops.export_scene.gltf(filepath=out_path, export_format="GLB", export_yup=True,
                                   export_apply=True, use_selection=False)
-        return {"name": self.name, "tris": tris, "actual": actual, "materials": [m.name for m in me.materials]}
+        with open(out_path, "rb") as fp:
+            sha256 = hashlib.sha256(fp.read()).hexdigest()
+        return {"name": self.name, "tris": tris, "actual": actual,
+                "materials": [m.name for m in me.materials], "sha256": sha256}
 
 
 # ---------- 登録 ----------

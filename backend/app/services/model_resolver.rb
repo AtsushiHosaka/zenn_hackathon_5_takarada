@@ -15,6 +15,9 @@ class ModelResolver
   private
 
   def resolve(object)
+    url = object["model_url"]
+    # 旧フロント同梱モデルがDBで解決できなければ、補完または簡易形状へ戻す。
+    object = object.merge("model_url" => nil) if url.is_a?(String) && url.start_with?("/models/furniture/")
     return object if object["model_url"].present?
 
     asset = key_for(object)&.then { |key| Storage.asset(ENV["MODELS_BUCKET"], key) }

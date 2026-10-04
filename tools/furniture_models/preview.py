@@ -29,7 +29,7 @@ scene = bpy.context.scene
 scene.render.engine = "BLENDER_WORKBENCH"
 scene.render.resolution_x = scene.render.resolution_y = TILE
 scene.display.shading.light = "STUDIO"
-scene.display.shading.color_type = "MATERIAL"
+scene.display.shading.color_type = "TEXTURE" if checker else "MATERIAL"
 scene.display.shading.show_cavity = True
 scene.display.shading.show_shadows = False
 scene.display.shading.show_object_outline = False
@@ -72,6 +72,7 @@ for f in files:
                 nt = mat.node_tree
                 tex = nt.nodes.new("ShaderNodeTexImage")
                 tex.image = grid
+                nt.nodes.active = tex
                 mp = nt.nodes.new("ShaderNodeMapping")
                 mp.inputs["Scale"].default_value = (4, 4, 1)  # 0.25m 角
                 coord = nt.nodes.new("ShaderNodeTexCoord")
