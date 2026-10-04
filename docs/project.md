@@ -26,7 +26,7 @@ fork後に上の空欄へ、このプロジェクトのGoogle Docs URLを記入�
 ## 接続に必要な情報
 
 API契約は上記OpenAPIと `/api-docs` を共有する。未実装のAPIは利用可能と表現しない。
-公開URLは `make infra-url` で確認し、iOSの `ios/Info.plist` の `API_ENDPOINT`、Webフロントの `VITE_API_ENDPOINT` に設定する。
+公開URLは `make infra-url` で確認し、iOSの `ios/Info.plist` の `API_ENDPOINT` に設定する。Webは同一オリジンの中継を使い、APIのURLをサーバー側の `API_UPSTREAM_ORIGIN` に設定する。直接接続を選ぶ場合は `VITE_API_ENDPOINT` とAPI側のCORS設定が必要になる。
 起動・環境変数は [README](../README.md)、[infra](../infra/gcp/README.md)、[frontend規約](../.claude/docs/frontend.md)、[iOS規約](../.claude/docs/ios.md) を参照する。
 実APIでの確認と、Webフロント・iOSの既定のダミー接続での確認を区別する。
 `frontend/src/data/generated/api.ts` は上記OpenAPIからの生成物。手で直さず `make front-types` で更新する。

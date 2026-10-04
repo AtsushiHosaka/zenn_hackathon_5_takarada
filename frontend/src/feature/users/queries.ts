@@ -1,7 +1,6 @@
-// users のデータ取得。キーを 1 か所に集めておく。
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRepositories } from "../../core/repositories";
-import { meQueryKey } from "../../core/session";
+import { sessionQueryKey } from "../../core/session";
 import type { UserId } from "../../domain/user";
 
 export const userKeys = {
@@ -20,27 +19,33 @@ export function useUser(id: UserId) {
 }
 
 export function useUpdateUser(id: UserId) {
-  const { users } = useRepositories();
+  const { users, tokenStore } = useRepositories();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (input: { name: string }) => users.update(id, input),
-    onSuccess: async () => {
-      // 自分を更新した場合はヘッダの名前も変わる
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: userKeys.all }),
-        queryClient.invalidateQueries({ queryKey: meQueryKey }),
-      ]);
+    onMutate: () => tokenStore.load(),
+    onSuccess: async (user, _input, token) => {
+      if (tokenStore.load() !== token) return;
+      await queryClient.cancelQueries({ queryKey: sessionQueryKey(token ?? null) });
+      if (tokenStore.load() !== token) return;
+      queryClient.setQueryData(userKeys.detail(id), user);
+      queryClient.setQueryData(sessionQueryKey(token ?? null), user);
+      void queryClient.invalidateQueries({ queryKey: userKeys.all });
     },
   });
 }
 
 export function useDeleteUser() {
-  const { users } = useRepositories();
+  const { users, tokenStore } = useRepositories();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (id: UserId) => users.remove(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.all }),
+    onMutate: () => tokenStore.load(),
+    onSuccess: (_result, _id, token) => {
+      if (tokenStore.load() !== token) return;
+      tokenStore.clear(token);
+      void queryClient.cancelQueries();
+      queryClient.clear();
+    },
   });
 }

@@ -7,14 +7,15 @@ export default function AppLayout() {
   const logout = useLogout();
 
   return (
-    <div className="min-h-dvh bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+    <div className="min-h-dvh bg-[#F5F4F8] text-[#1D1B26]">
+      <header className="border-b border-[#E4E1EC] bg-white">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-4 px-4 py-3">
-          <Link to="/" className="font-semibold">
-            hack
+          <Link to="/rooms" className="font-semibold">
+            へやいろ
           </Link>
           <div className="ml-auto flex items-center gap-4">
             <ConnectionSwitch />
+            <Link to="/rooms" className="text-sm text-violet-700">ルーム一覧</Link>
             {session.user && (
               <span className="text-sm text-slate-500 dark:text-slate-400">{session.user.name}</span>
             )}

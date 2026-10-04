@@ -35,12 +35,12 @@ docker buildx build \
   "$ROOT/backend"
 
 echo "-- Web フロント"
-# VITE_ で始まる値はビルド時にバンドルへ埋め込まれる。
-# フロントが叩く API の URL はここで固定される
+# クライアントは同一オリジンを使い、nginx の中継先をイメージへ設定する。
 docker buildx build \
   --platform "$platform" \
   --target runtime \
-  --build-arg "VITE_API_ENDPOINT=$api_url" \
+  --build-arg "VITE_API_ENDPOINT=" \
+  --build-arg "API_UPSTREAM_ORIGIN=$api_url" \
   --build-arg "VITE_CONNECTION=api" \
   -t "$web_repo:$tag" -t "$web_repo:latest" \
   --push \

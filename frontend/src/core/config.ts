@@ -6,7 +6,8 @@ const roomContract = configuredRoomContract === "analysis" || configuredRoomCont
 export const appConfig = {
   isDevelopment: import.meta.env.DEV,
   // 空文字も未設定として扱う (compose が空の環境変数を渡してくることがある)
-  apiEndpoint: import.meta.env.VITE_API_ENDPOINT || "https://407mdoxgib.execute-api.ap-northeast-1.amazonaws.com",
+  // 同一オリジンの /api を配信サーバーが GCP へ中継する。
+  apiEndpoint: import.meta.env.VITE_API_ENDPOINT || window.location.origin,
   // モックは開発時だけ。開発時は環境変数で API に切り替えられる。
   defaultConnection: import.meta.env.DEV ? import.meta.env.VITE_CONNECTION || "dummy" : "api",
   roomApi: {

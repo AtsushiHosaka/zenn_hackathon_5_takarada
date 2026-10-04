@@ -15,7 +15,7 @@ Artifact Registry ──▶ Cloud Run (api)  ◀── Secret Manager
                           ▲
                      Cloud Run ジョブ (rails db:apply)
 
-Cloud Run (web, nginx + ビルド済み SPA) ──▶ api を直接叩く
+ブラウザ ──▶ Cloud Run (web, nginx + SPA) ──▶ api へ中継
 ```
 
 | ファイル | 内容 |
@@ -42,7 +42,7 @@ make infra-secrets     # GitHub Secrets を登録して CI/CD を有効化 (任�
 
 `make infra-apply` の直後は Cloud Run が Google のサンプルイメージで動いている。
 `make infra-release` で自分のイメージに置き換わる。これは「Cloud Run の URL が
-決まらないとフロントのビルドに埋める API URL が決まらない」という順序の問題を、
+決まらないとWebイメージに設定する nginx の中継先が決まらない」という順序の問題を、
 素直に 2 段階に分けたもの。
 
 ## ふだんの操作
