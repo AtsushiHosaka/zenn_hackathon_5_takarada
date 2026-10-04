@@ -16,4 +16,9 @@ class Room < ApplicationRecord
   def ready?
     status == "ready"
   end
+
+  # 解析の LLM へは gs:// で渡す (Storage::Asset#uri)
+  def photo_assets
+    photo_keys.map { |key| RoomPhoto.asset(key) }
+  end
 end

@@ -179,6 +179,32 @@ RSpec.configure do |config|
             },
             required: %w[room objects]
           },
+          UploadInput: {
+            type: :object,
+            properties: {
+              uploads: {
+                type: :array,
+                maxItems: 4,
+                items: {
+                  type: :object,
+                  properties: {
+                    content_type: { type: :string, enum: %w[image/jpeg image/png image/webp], example: "image/jpeg" },
+                    size: { type: :integer, maximum: 10_485_760, description: "バイト数。署名に含めるので実際に送る大きさと一致させる", example: 284_113 }
+                  },
+                  required: %w[content_type size]
+                }
+              }
+            },
+            required: %w[uploads]
+          },
+          Upload: {
+            type: :object,
+            properties: {
+              key: { type: :string, description: "POST /api/v1/rooms の photo_keys に渡す", example: "photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg" },
+              upload_url: { type: :string, description: "この URL へ写真を PUT する。Content-Type だけを付け、他のヘッダは足さない (署名と食い違うと 403)", example: "https://storage.googleapis.com/example-uploads/photos/01a105cb-f338-72a2-b843-7de9d31431a1/0.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256" }
+            },
+            required: %w[key upload_url]
+          },
           RoomInput: {
             type: :object,
             properties: {
@@ -186,7 +212,8 @@ RSpec.configure do |config|
                 type: :object,
                 properties: {
                   tatami: { type: :number, minimum: 3, maximum: 30, description: "部屋の広さ (畳)", example: 6 },
-                  shape: { type: :string, enum: %w[square standard long], description: "部屋の形。square: 正方形に近い (1:1.15), standard: やや縦長 (3:4), long: 細長い (1:2)", example: "standard" }
+                  shape: { type: :string, enum: %w[square standard long], description: "部屋の形。square: 正方形に近い (1:1.15), standard: やや縦長 (3:4), long: 細長い (1:2)", example: "standard" },
+                  photo_keys: { type: :array, items: { type: :string }, description: "POST /api/v1/uploads で得た key。アップロード済みのものだけ受け付ける。省略すると写真なしで解析する", example: [] }
                 },
                 required: %w[tatami shape]
               }
