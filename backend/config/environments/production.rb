@@ -43,8 +43,19 @@ Rails.application.configure do
   # Replace the default in-process memory cache store with a durable alternative.
   # config.cache_store = :mem_cache_store
 
-  # Replace the default in-process and non-durable queuing backend for Active Job.
-  # config.active_job.queue_adapter = :resque
+  # 非同期処理のバックエンド。config/application.rb の既定は :sidekiq だが、
+  # 本番 (Cloud Run) には Redis を置いていないので production だけ :inline にする。
+  # perform_later がその場で同期実行されるため、Redis が無くても落ちない。
+  #
+  # 今のジョブ (AnalyzeRoomJob / GenerateCoordinationJob) は外部呼び出しの無い
+  # 純粋な計算でミリ秒で終わるので、リクエスト内で実行しても問題にならない。
+  # status をポーリングする API 契約も壊れない (即 ready / done になるだけ)。
+  #
+  # RoomAnalyzer / CoordinationBuilder を LLM に差し替えるときは、リクエストが
+  # 待たされて Cloud Run のタイムアウト (300s) に当たるので、ここを見直すこと。
+  # 選択肢は Cloud Tasks (ゼロスケールのまま非同期) か Memorystore + worker。
+  # 詳細は infra/gcp/README.md を参照。
+  config.active_job.queue_adapter = :inline
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.

@@ -39,7 +39,8 @@ module App
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
-    # ORIGIN_SECRET が設定されているときだけ、API Gateway 経由のリクエストに限定する (infra/ 参照)
+    # ORIGIN_SECRET が設定されているときだけ、共有シークレット付きのリクエストに限定する。
+    # 現構成 (Cloud Run) では未設定なので素通し (lib/middleware/origin_guard.rb 参照)
     config.middleware.insert_before 0, OriginGuard
 
     # 非同期処理は Sidekiq (Redis) 経由。test だけ config/environments/test.rb で
