@@ -906,6 +906,30 @@ export interface components {
             /** @example 1 */
             z: number;
         };
+        Door: {
+            /** @example door-1 */
+            id: string;
+            /**
+             * @example west
+             * @enum {string}
+             */
+            wall: "north" | "south" | "east" | "west";
+            /**
+             * @description 壁に沿ったドアの中心位置 (north/south は x、east/west は z)
+             * @example 3.16
+             */
+            center: number;
+            /** @example 0.8 */
+            width: number;
+            /** @example 2 */
+            height: number;
+            /**
+             * @description entrance: 部屋の出入り口 / closet: クローゼット・押し入れの扉
+             * @example entrance
+             * @enum {string}
+             */
+            kind: "entrance" | "closet";
+        };
         Window: {
             /** @example window-1 */
             id: string;
@@ -947,6 +971,8 @@ export interface components {
             /** @example #c8a97e */
             floor_color: string;
             windows: components["schemas"]["Window"][];
+            /** @description ドア (部屋の出入り口・クローゼットの扉)。前の床 0.8m には家具・商品を置かない。古いシーンには無い */
+            doors?: components["schemas"]["Door"][];
         };
         SceneObject: {
             /** @example bed-1 */
