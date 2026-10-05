@@ -1,8 +1,9 @@
 class CoordinationPlanner
-  # 要望文・部屋・商品候補を Gemini に渡し、枠ごとに要望に合う商品を順位付けさせる。
-  # Gemini が返すのは商品の id とタイトル・コンセプトだけで、予算と置き場所は Ruby 側で決める。
-  # 存在しない id や枠の違う商品は捨てる (Gemini の回答をそのまま信じない)。
+  # 操作ごとの候補を保持して、予算内で色・素材・用途が合う一式と代替順位を選ぶ。
+  # id/group/slotと合計金額、置き場所はRubyで再確認する。
   class Gemini
+    CANDIDATES_PER_GROUP = 12
+    RANKED_PER_GROUP = 6
     SCHEMA = {
       type: "object",
       properties: {
@@ -15,9 +16,11 @@ class CoordinationPlanner
             type: "object",
             properties: {
               slot: { type: "string", enum: InteriorLinks::SLOTS },
-              item_ids: { type: "array", items: { type: "integer" }, description: "要望に合う順 (最大 3 つ)" }
+              group_id: { type: "string", description: "候補にあるgroup_id。床の追加・交換は各操作を別グループとして扱う" },
+              selected_item_id: { type: "integer", description: "この一式で購入する商品id。採用しないグループは0" },
+              item_ids: { type: "array", items: { type: "integer" }, description: "この一式と相性がよい配置用の代替候補をおすすめ順に最大6件" }
             },
-            required: %w[slot item_ids]
+            required: %w[group_id slot selected_item_id item_ids]
           }
         }
       },
@@ -30,22 +33,30 @@ class CoordinationPlanner
     }.freeze
 
     PROMPT = <<~TEXT.freeze
-      あなたはインテリアコーディネーターです。一人暮らしの部屋の要望に合う商品を選びます。残す家具は維持し、大型家具の追加・入れ替えと配置可否は別の処理で判定します。
+      あなたはインテリアコーディネーターです。複数の商品候補から、要望・テンプレートの雰囲気と予算に合う一式を選びます。
+      残す家具は維持します。寸法と用途も確認しますが、最終的な配置と合計価格は別の処理で判定します。
 
       # 要望
       %<prompt>s
 
       # 部屋
       - 壁の色: %<wall_color>s / 床の色: %<floor_color>s
+      - 寸法 (m): %<room_size>s
       - 活かす家具: %<kept>s
-      - 予算: %<budget>s 円 (合計の調整はこちらで行うので、予算を超える組み合わせでも構わない)
+      - 商品価格の合計予算: %<budget>s 円 (送料と追加部品は別)
 
-      # 商品候補 (id | 置き場所の枠 | 商品名 | 色 | 価格)
+      # 商品候補 (JSON。寸法はm)
+      sizeは配置する寸法、published_sizeは公開寸法 (nullは不明)、estimated_axesは描画用の推定軸です。推定値を公式寸法として説明しないでください。
       %<items>s
 
       # 選び方
-      - 枠ごとに、要望 (色・雰囲気・用途) に合う商品を、合う順に最大 3 つ選ぶ。候補にある id だけを使う。
-      - 要望の雰囲気に合わない枠は、picks に含めなくてよい。合わない商品を無理に選ばない。
+      - 各group_idで最大1商品をselected_item_idに指定し、採用する商品の合計を必ず予算以下にする。全グループの最安商品を埋めることを目的にしない。
+      - 要望・テンプレートの色調、素材、形、用途と、壁・床・残す家具との相性を一式として評価する。高価な1点への偏りを避け、用途の重要度と相性に応じて予算を配分する。
+      - replace:<家具ID>とadd:<番号>はユーザーが指定した床家具の用途。これらを優先し、同じSKUでも別group_idなら別の購入点数として価格を加算する。
+      - 床家具の候補はcategoryとgroup_idを必ず一致させる。交換はtarget_size/元の位置を参照し、部屋に対して大きすぎる候補は避ける。
+      - 各グループのitem_idsは、この一式と素材・色・用途が合う代替候補をおすすめ順に最大6件指定する。合わない商品を価格だけで候補へ加えない。
+      - 候補にあるgroup_id/slot/idの組だけを使う。採用しないグループはselected_item_idを0にするかpicksから省く。無理に埋めない。
+      - picksは指定された床家具を先に、その後はこの提案で重要なグループの順に並べる。
       - 要望の色や雰囲気そのものの商品が無いときは、近い色・雰囲気の商品を選び、unavailable_note で
         「赤い商品が見つからなかったため、近い色の○○を選びました」のように正直に伝える。あれば空文字にする。
       - 今ある家具の色と、壁・床の色とも合うようにする。
@@ -63,17 +74,20 @@ class CoordinationPlanner
     end
 
     def plan
-      items = (@client.search(prompt: @prompt, theme: nil, slots: SLOT_PRIORITY, max_price: @budget).values.flatten + @additional_candidates).uniq(&:id)
+      items = (@client.search(prompt: @prompt, theme: nil, slots: SLOT_PRIORITY, max_price: @budget).values.flatten + @additional_candidates)
+        .uniq { |item| [ group_id(item), item.id ] }.group_by { |item| group_id(item) }.values.flat_map { |group| group.first(CANDIDATES_PER_GROUP) }
       response = GeminiClient.new.generate_json(prompt: prompt_for(items), schema: SCHEMA)
-      json = response.json
+      json = response.json.is_a?(Hash) ? response.json : {}
+      ranked, selection = candidates(json["picks"], items)
       Plan.new(
         title: json["title"].to_s.strip.presence&.truncate(30) || "あなたのコーデ",
         concept: json["concept"].to_s.strip.presence&.truncate(120),
         note: json["unavailable_note"].to_s.strip.presence&.truncate(120),
-        candidates: candidates(json["picks"], items),
+        candidates: ranked,
         planned_by: "gemini",
         analysis: {
           "response" => json,
+          "selection" => selection,
           "meta" => { "planner" => "gemini", "model" => response.model, "thinking_level" => response.thinking_level,
                       "elapsed_s" => response.elapsed, "usage" => response.usage, "candidate_count" => items.size }
         }
@@ -88,26 +102,52 @@ class CoordinationPlanner
         prompt: @prompt,
         wall_color: @room["wall_color"],
         floor_color: @room["floor_color"],
-        kept: @kept_objects.map { |o| "#{o['label']} (#{o['color']})" }.join("、").presence || "なし",
+        room_size: @room.slice("width", "depth", "height").to_json,
+        kept: @kept_objects.map { |o| o.slice("label", "category", "color", "size", "position") }.to_json,
         budget: @budget.to_fs(:delimited),
-        items: items.map { |i| "#{i.id} | #{SLOT_LABELS.fetch(i.slot, i.slot)} (#{i.slot}) | #{i.name} | #{i.color} | #{i.price}円" }.join("\n")
+        items: items.map { |item| candidate_json(item) }.to_json
       )
     end
 
-    # Gemini の順位を、枠の優先順に並べた候補にする。候補に無い id・枠の違う商品・重複は捨てる
-    def candidates(picks, items)
-      by_id = items.index_by(&:id)
-      ranked = Array(picks).each_with_object({}) do |pick, result|
-        slot = pick["slot"]
-        next unless (SLOT_PRIORITY + [ "floor" ]).include?(slot)
+    def group_id(item)
+      item.metadata["group_id"] || item.slot
+    end
 
-        result[slot] ||= []
-        Array(pick["item_ids"]).each do |id|
-          item = by_id[id.to_i]
-          result[slot] << item if item && item.slot == slot && !result[slot].include?(item)
+    def candidate_json(item)
+      metadata = item.metadata
+      { id: item.id, group_id: group_id(item), slot: item.slot, category: item.category, name: item.name,
+        color: item.color, price: item.price, size: item.size, published_size: metadata["size"], estimated_axes: metadata["estimated_axes"],
+        material: metadata["material"], shape: metadata["shape"], color_name: metadata["color_name"],
+        target_size: metadata["target_size"], preferred_position: metadata["preferred_position"] }.compact
+    end
+
+    # 床グループを潰さず、存在しないid・slot/group違い・不正型は捨てる。
+    def candidates(picks, items)
+      groups = items.group_by { |item| group_id(item) }
+      ranked = {}
+      selection = []
+      return [ [], [] ] unless picks.is_a?(Array)
+
+      picks.each do |pick|
+        next unless pick.is_a?(Hash)
+
+        slot = pick["slot"]
+        group = pick["group_id"]
+        next unless (SLOT_PRIORITY + [ "floor" ]).include?(slot) && groups.key?(group) && !ranked.key?(group)
+
+        by_id = groups.fetch(group).select { |item| item.slot == slot }.index_by(&:id)
+        next if by_id.empty?
+
+        ids = pick["item_ids"].is_a?(Array) ? pick["item_ids"] : []
+        selected_id = pick["selected_item_id"]
+        selected = by_id[selected_id] if selected_id.is_a?(Integer) && selected_id.positive?
+        approved = ids.filter_map { |id| by_id[id] if id.is_a?(Integer) }.uniq.first(RANKED_PER_GROUP)
+        ranked[group] = selected ? [ selected, *approved.reject { |item| item.id == selected.id } ] : approved
+        if selected
+          selection << { "group_id" => group, "item_id" => selected.id }
         end
       end
-      (SLOT_PRIORITY + [ "floor" ]).flat_map { |slot| Array(ranked[slot]).first(3) }
+      [ ranked.values.flatten, selection ]
     end
   end
 end

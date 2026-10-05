@@ -130,7 +130,7 @@ class SlotLayout
   def place_bed_cover(item)
     bed = find("bed") or return
     if ec_product?(item)
-      size = official_render_size(item, %w[w d]) or return
+      size = preview_render_size(item, %w[w d]) or return
       return if size["w"] < bed["size"]["w"] || size["d"] < bed["size"]["d"]
 
       fw, fd = footprint_size(size, bed["rotation_y"])
@@ -187,12 +187,9 @@ class SlotLayout
     item.metadata["provider"].present? && item.metadata["source"] != "mock"
   end
 
-  def official_render_size(item, axes)
-    physical = item.metadata["size"]
-    return unless physical.is_a?(Hash) && axes.all? { |axis| positive_dimension?(physical[axis]) }
-    return if (axes & Array(item.metadata["estimated_axes"])).any?
-
-    size = item.size.merge(physical.slice(*axes))
+  def preview_render_size(item, axes)
+    physical = item.metadata["size"].to_h.slice(*axes).select { |_, value| positive_dimension?(value) }
+    size = item.size.merge(physical)
     size if %w[w h d].all? { |axis| positive_dimension?(size[axis]) }
   end
 
@@ -201,7 +198,7 @@ class SlotLayout
   end
 
   def place_ec_curtain(item, window)
-    size = official_render_size(item, %w[w h]) or return
+    size = preview_render_size(item, %w[w h]) or return
     length = wall_length(window["wall"])
     # Published width is a single panel unless the provider explicitly supplies a
     # verified combined width. Do not invent a second panel or compress the fabric.
@@ -222,7 +219,7 @@ class SlotLayout
 
     x, z, rotation = wall_pose(window["wall"], along, size["d"] / 2 + 0.05)
     occupy_floor(*wall_pose(window["wall"], along, 0.075).first(2), size.merge("d" => 0.15), rotation) if bottom <= 0.05
-    build(item, size, { "x" => x, "y" => bottom, "z" => z }, rotation, window["id"], "公式の幅・丈を維持して窓に配置（枚数・金具は未確認）")
+    build(item, size, { "x" => x, "y" => bottom, "z" => z }, rotation, window["id"], "商品のプレビュー寸法で窓に配置（枚数・金具は未確認）")
   end
 
   def place_wall_decor(item)
@@ -419,6 +416,7 @@ class SlotLayout
   end
 
   def build(item, size, position, rotation, attach_to, note)
+    note += "（一部寸法は推定。購入前に商品サイズをご確認ください）" if Array(item.metadata["estimated_axes"]).any?
     object = {
       "id" => self.class.object_id_for(item),
       "source" => "suggested",

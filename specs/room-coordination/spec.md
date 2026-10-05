@@ -103,10 +103,12 @@ InteriorLinks.client.search(prompt:, theme:, slots:, max_price:)
 - `InteriorLinks::Item`: `id, slot, category, name, price, shop, url, image_url, color, size {w,h,d}`
   - `slot` は `InteriorLinks::SLOTS` のどれか (必須。置き場所が決まらないため)
   - `size` が取れない商品は `InteriorLinks::Item.build` がカテゴリの標準寸法 (`InteriorLinks::DEFAULT_SIZES`) で補う
-- 商品の選び方 (`CoordinationBuilder`): 優先度の高い枠から各枠の最安値で予算内にできるだけ多く埋め、
+- モックの選び方 (`CoordinationBuilder`): 優先度の高い枠から各枠の最安値で予算内にできるだけ多く埋め、
   余った予算で優先度の高い枠からおすすめ順の上位へ格上げする。置き場所が無ければ同じ枠のより安い候補で試す
 
-追加要求では、ECの品番と既存契約の内部整数IDを分ける。寸法の標準値補完を実商品の公式寸法として扱わず、必要寸法が不明な商品は配置を確定しない。大型家具の床配置・入れ替え、商品ごとの素材上書きは[EC家具Spec](../ec-furniture/spec.md)に従って拡張する。
+実ECでは、多数の候補から要望・テンプレート、素材・色と合計予算に合う採用一式・代替順位をGeminiが選ぶ。Ruby側で予算と配置を再確認し、採用対象外の枠を最安値で自動補充しない。
+
+追加要求では、ECの品番と既存契約の内部整数IDを分ける。寸法の標準値補完を実商品の公式寸法として扱わず、必要寸法が不明な商品も推定軸を明示した近似配置として候補に残す。大型家具の床配置・入れ替え、商品ごとの素材上書きは[EC家具Spec](../ec-furniture/spec.md)に従って拡張する。
 
 ## 写真の解析の精度を確かめる
 

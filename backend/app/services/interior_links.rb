@@ -6,7 +6,7 @@
 # 枠 (slot) ごとに、おすすめ順の商品候補を返す。価格は max_price 以下に絞る。
 # theme が nil なら、テーマで絞らずに返す (要望文から Gemini が選ぶときに使う)。
 # 選ぶ・置く・予算に収めるのは呼び出し側 (CoordinationBuilder) の責務で、ここは候補を出すだけ。
-# 現在の実装は MockClient (config/interior_links_mock.yml)。本物を作ったら client で切り替える。
+# 認証と利用許可がある場合は実EC検索、未設定時はMockClientへ切り替える。
 module InteriorLinks
   SLOTS = %w[bed_cover curtain rug wall_decor light display cushion desk_top floor].freeze
   FLOOR_CATEGORIES = %w[sofa bed desk chair shelf table].freeze
