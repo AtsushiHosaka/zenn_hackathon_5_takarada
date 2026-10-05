@@ -7,7 +7,8 @@ module InteriorLinks
   class HtmlProductExtractor
     MAX_HTML_BYTES = 120_000
     DEADLINE_SECONDS = 25
-    CATEGORIES = %w[bed_cover curtain rug cushion floor_lamp desk_lamp wall_mirror wall_art wall_planter plant small_plant sofa bed desk chair shelf table].freeze
+    CATEGORIES = %w[bed_cover curtain rug cushion floor_lamp desk_lamp wall_mirror wall_art wall_planter plant small_plant sofa bed desk chair shelf table
+                    acrylic_stand_case oshi_goods display_case tapestry neon wall_shelf vase candle].freeze
     SHAPES = %w[round oval rectangular corner_left corner_right corner tripod unknown].freeze
     class Error < StandardError; end
 
@@ -16,11 +17,12 @@ module InteriorLinks
       @client = client
     end
 
-    def extract(document:, url:)
+    def extract(document:, url:, tax_included_by_platform: false)
       raise Error, "HTML抽出のGemini認証が設定されていません" unless @client || GeminiClient.configured?(user_id: @user_id)
 
       @document = document
       @url = url
+      @tax_included_by_platform = tax_included_by_platform
       html = bounded_html
       @source = normalize(html)
       response = Timeout.timeout(DEADLINE_SECONDS) do
@@ -59,6 +61,8 @@ module InteriorLinks
         URLや価格、寸法、素材を記憶から補わないでください。nameは対象主商品の見出しと一致させ、skuはHTML中の商品番号を使ってください。
         price_jpyは日本円の税込通常購入価格。会員限定価格、分割払い、送料は除外してください。
         name_evidence、sku_evidence、price_evidence、tax_evidence、各寸法evidenceはHTML中の原文を短く引用してください。
+        price_evidenceは金額と「円」または「¥」を含む範囲を引用してください（例: 価格 999 円）。
+        寸法evidenceは単位を含む範囲を引用してください。単位が末尾にだけある表記は、その行全体を引用してください（例: 幅43×奥行43×高さ16cm）。
         幅・高さ・奥行きは商品そのものの寸法です。各軸は数値と単位cm/mm/mを原文どおり返してください。
         直径は幅と奥行きに、ラグの長さは奥行きに、カーテンの丈は高さに対応します。
         一部の軸が不明でも抽出を続け、unknownとvalue=0、空のevidenceを返してください。推定寸法は出さないでください。
@@ -87,7 +91,7 @@ module InteriorLinks
 
       name = result["name"].to_s.strip
       name_evidence = verified_evidence(result["name_evidence"])
-      primary_names = @document.css("h1, title, meta[property='og:title']").map { |node| node["content"] || node.text }
+      primary_names = @document.css("h1, title, meta[property='og:title']").map { |node| node["content"] || node.text } + structured_names
       raise Error, "主商品名と抽出対象を照合できません" if name.blank? || !normalize(name_evidence).include?(normalize(name)) || primary_names.none? { |value| normalize(value).include?(normalize(name)) }
 
       canonical = @document.at_css("link[rel='canonical']")&.[]("href")
@@ -95,8 +99,10 @@ module InteriorLinks
 
       price = result["price_jpy"]
       evidence = verified_evidence(result["price_evidence"])
-      tax = verified_evidence(result["tax_evidence"])
-      raise Error, "公式本文の税込円価格を照合できません" unless price.is_a?(Integer) && price.positive? && number_present?(evidence, price) && evidence.match?(/円|[¥￥]|JPY|price/i) && tax.match?(/税込|消費税.*含|消費税込/)
+      # A platform-wide tax-inclusive rule needs no page quote; do not trust a model-written one.
+      tax = @tax_included_by_platform ? "" : verified_evidence(result["tax_evidence"])
+      tax_ok = @tax_included_by_platform || tax.match?(/税込|消費税.*含|消費税込/)
+      raise Error, "公式本文の税込円価格を照合できません" unless price.is_a?(Integer) && price.positive? && number_present?(evidence, price) && evidence.match?(/円|[¥￥]|JPY|price/i) && tax_ok
 
       sku = result["sku"].to_s.strip
       sku_evidence = sku.present? ? verified_evidence(result["sku_evidence"]) : ""
@@ -119,6 +125,16 @@ module InteriorLinks
         product["_html_extraction"][axis] = proof
       end
       product
+    end
+
+    # Some pages (Yahoo! Shopping) have no h1; the page's own Product JSON-LD name also identifies it.
+    def structured_names
+      @document.css('script[type="application/ld+json"]').flat_map do |script|
+        value = JSON.parse(script.text)
+        value.is_a?(Array) ? value : [ value ]
+      rescue JSON::ParserError
+        []
+      end.filter_map { |value| value["name"] if value.is_a?(Hash) && Array(value["@type"]).include?("Product") }
     end
 
     def sourced_text(value)

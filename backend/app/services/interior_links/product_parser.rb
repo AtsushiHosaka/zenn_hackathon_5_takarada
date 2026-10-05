@@ -1,26 +1,41 @@
 require "nokogiri"
 require "bigdecimal"
 require "digest"
+require "cgi"
 
 module InteriorLinks
   # Prices remain verified. Missing dimensions may use explicit category estimates.
   class ProductParser
     CATEGORY_RULES = [
+      # Oshi-katsu and display goods come first: their names often also contain ラック/シェルフ/ミラー.
+      [ "oshi_goods", "desk_top", /うちわ(?:スタンド|立て|ホルダー)|団扇立て|アクスタ(?:スタンド|台座|ステージ)|アクリルスタンド(?:用)?\s?(?:台座|ステージ|ひな壇)|ひな壇/ ],
+      [ "oshi_goods", "wall_decor", /壁掛け.*缶バッジ|缶バッジ.*壁掛け/ ],
+      [ "oshi_goods", "desk_top", /缶バッジ\s?(?:ディスプレイ|ホルダー|ボード|スタンド)|バッジディスプレイ/ ],
+      [ "acrylic_stand_case", "desk_top", /アクスタ(?:ケース|ボックス)|アクリルスタンド(?:用)?ケース|アクリル(?:コレクション|ディスプレイ)(?:ケース|スタンド)/ ],
+      [ "display_case", "display", /(?:コレクション|ディスプレイ|フィギュア)(?:ケース|ラック|キャビネット)|ガラス(?:キャビネット|ケース)/ ],
+      [ "tapestry", "wall_decor", /タペストリー/ ], [ "neon", "wall_decor", /ネオン(?:サイン|ライト|管)/ ],
+      [ "wall_shelf", "wall_decor", /ウォール\s?(?:シェルフ|ラック)|壁(?:掛け|付け)(?:棚|ラック|シェルフ)/ ],
       [ "bed_cover", "bed_cover", /掛け?布団カバー|掛ふとんカバー|ベッドカバー|掛けふとんカバー/ ],
       [ "curtain", "curtain", /カーテン/ ], [ "rug", "rug", /ラグ|カーペット|じゅうたん/ ],
       [ "cushion", "cushion", /クッション/ ], [ "floor_lamp", "light", /フロアランプ|フロアライト|スタンドライト/ ],
       [ "desk_lamp", "desk_top", /デスクライト|テーブルランプ|卓上ライト|クリップライト/ ],
+      [ "candle", "desk_top", /キャンドル(?!ホルダー|スタンド)/ ],
       [ "wall_mirror", "wall_decor", /ミラー|鏡/ ],
       [ "wall_art", "wall_decor", /ポスター|アートパネル|フォトフレーム|写真立て|額縁/ ],
       [ "wall_planter", "wall_decor", /つり下げ型|ハンギング|壁掛け.*グリーン/ ],
       [ "plant", "display", /観葉植物|フェイクグリーン|人工植物/ ],
+      [ "vase", "display", /花瓶|フラワーベース|一輪挿し|ドライフラワー/ ],
       [ "sofa", "floor", /ソファ|ソファー/ ], [ "bed", "floor", /ベッドフレーム|ベッド(?!カバー|サイド)/ ],
       [ "desk", "floor", /デスク|机/ ], [ "chair", "floor", /チェア|椅子|スツール/ ],
       [ "shelf", "floor", /シェルフ|本棚|(?<!ブ)ラック|キャビネット|チェスト|書棚/ ],
       [ "table", "floor", /テーブル/ ]
     ].freeze
+    # Carried or worn "アクスタケース" (pouches, binders, phone cases) are not room display items.
+    PORTABLE_GOODS = /ポーチ|持ち運び|バインダー|リフィル|スマホケース|iPhone|ペンケース|筆箱|筆入れ|バッグ|痛バ/
+    DISPLAY_GOODS = %w[oshi_goods acrylic_stand_case display_case].freeze
     THIN_AXES = { "rug" => [ "h", 0.02 ], "bed_cover" => [ "h", 0.04 ],
-                  "curtain" => [ "d", 0.04 ], "cushion" => [ "h", 0.15 ], "wall_art" => [ "d", 0.02 ] }.freeze
+                  "curtain" => [ "d", 0.04 ], "cushion" => [ "h", 0.15 ], "wall_art" => [ "d", 0.02 ],
+                  "tapestry" => [ "d", 0.01 ], "neon" => [ "d", 0.03 ] }.freeze
     COLORS = { /ホワイト|白|アイボリー/ => "#f2efe8", /ブラック|黒/ => "#303030", /グリーン|緑/ => "#799469",
                /ブルー|青/ => "#778da6", /ピンク/ => "#d6a5b3", /グレー/ => "#aaa9a5", /ブラウン|茶|ウォールナット/ => "#987b61",
                /ナチュラル|ベージュ|無垢|オーク|アッシュ/ => "#c4ae8c", /パープル|紫/ => "#ad96bb" }.freeze
@@ -30,7 +45,12 @@ module InteriorLinks
       "shelf" => { "w" => 0.8, "h" => 1.5, "d" => 0.35 }, "table" => { "w" => 0.8, "h" => 0.73, "d" => 0.6 },
       "desk_lamp" => { "w" => 0.25, "h" => 0.4, "d" => 0.25 }, "wall_mirror" => { "w" => 0.5, "h" => 0.7, "d" => 0.03 },
       "wall_art" => { "w" => 0.4, "h" => 0.5, "d" => 0.02 }, "wall_planter" => { "w" => 0.3, "h" => 0.4, "d" => 0.2 },
-      "small_plant" => { "w" => 0.2, "h" => 0.3, "d" => 0.2 }
+      "small_plant" => { "w" => 0.2, "h" => 0.3, "d" => 0.2 },
+      # Matches the generic 3D models of the same category.
+      "acrylic_stand_case" => { "w" => 0.3, "h" => 0.15, "d" => 0.15 }, "display_case" => { "w" => 0.4, "h" => 1.2, "d" => 0.3 },
+      "oshi_goods" => { "w" => 0.25, "h" => 0.38, "d" => 0.1 }, "tapestry" => { "w" => 0.6, "h" => 0.9, "d" => 0.01 },
+      "neon" => { "w" => 0.4, "h" => 0.35, "d" => 0.03 }, "wall_shelf" => { "w" => 0.6, "h" => 0.15, "d" => 0.15 },
+      "vase" => { "w" => 0.15, "h" => 0.4, "d" => 0.15 }, "candle" => { "w" => 0.1, "h" => 0.12, "d" => 0.1 }
     ).freeze
 
     class Unverified < StandardError; end
@@ -51,7 +71,8 @@ module InteriorLinks
       product = products.find { |entry| identity_matches?(entry) }
       if needs_html_extraction?(product)
         begin
-          extracted = (@extractor || HtmlProductExtractor.new(user_id: @user_id)).extract(document: @document, url:)
+          extracted = (@extractor || HtmlProductExtractor.new(user_id: @user_id))
+            .extract(document: @document, url:, tax_included_by_platform: store[:provider] == "yahoo_shopping")
           product = merge_extraction(product, extracted)
         rescue HtmlProductExtractor::Error => e
           raise Unverified, e.message unless product
@@ -71,6 +92,12 @@ module InteriorLinks
       if category == "plant" && dimensions["h"] && dimensions["h"] < 0.5
         category, slot = "small_plant", "desk_top"
       end
+      # Collection cases range from desk-top acrylic boxes to floor cabinets.
+      if category == "acrylic_stand_case" && dimensions["h"] && dimensions["h"] >= 0.5
+        category, slot = "display_case", "display"
+      elsif category == "display_case" && dimensions["h"] && dimensions["h"] < 0.45
+        category, slot = "acrylic_stand_case", "desk_top"
+      end
       physical_size = %w[w h d].to_h { |axis| [ axis, dimensions[axis] ] }
       estimated_axes = []
       if (thin = THIN_AXES[category]) && dimensions[thin[0]].nil?
@@ -88,7 +115,11 @@ module InteriorLinks
       price, availability, price_evidence = price_for(product)
       raise Unverified, "商品が売り切れまたは販売終了です" if availability == "out_of_stock"
 
-      product_id = product["sku"].presence || product["mpn"].presence || URI(url).path.split("/").last
+      product_id = if store[:provider] == "yahoo_shopping"
+        URI(url).path.delete_prefix("/").delete_suffix(".html")
+      else
+        product["sku"].presence || product["mpn"].presence || URI(url).path.split("/").last
+      end
       # Article/SKU identifies IKEA/Nitori/MUJI's size and color variation. For a
       # retailer with a parent SKU, include published variant attributes as well.
       variant = if store[:provider] == "lowya"
@@ -119,10 +150,26 @@ module InteriorLinks
       }
       metadata["html_extraction"] = product["_html_extraction"] if product["_html_extraction"]
       metadata["html_extraction_failure"] = @extraction_failure if @extraction_failure
-      { slot:, category:, name:, price:, shop: store[:shop], url:, image_url: image_url(product), color:, size: dimensions, metadata: }
+      { slot:, category:, name:, price:, shop: shop_name, url:, image_url: image_url(product), color:, size: dimensions, metadata: }
     end
 
     private
+
+    # Yahoo! hosts many sellers; show the seller name from the breadcrumb when published.
+    def shop_name
+      return @store[:shop] unless @store[:provider] == "yahoo_shopping"
+
+      seller = URI(@url).path.split("/")[1]
+      crumb = @document.css('script[type="application/ld+json"]').filter_map do |script|
+        JSON.parse(script.text)
+      rescue JSON::ParserError
+        nil
+      end.flat_map { |value| value.is_a?(Array) ? value : [ value ] }.select { |value| value.is_a?(Hash) && value["@type"] == "BreadcrumbList" }
+        .flat_map { |list| Array(list["itemListElement"]) }
+        .find { |entry| entry.is_a?(Hash) && entry.dig("item", "@id").to_s.delete_suffix("/").end_with?("/#{seller}") }
+      name = CGI.unescapeHTML(crumb&.dig("item", "name").to_s).strip.first(80)
+      name.present? ? "#{name}（Yahoo!ショッピング）" : @store[:shop]
+    end
 
     def needs_html_extraction?(product)
       return true unless product && product["name"].present?
@@ -191,7 +238,9 @@ module InteriorLinks
     end
 
     def identity_matches?(product)
-      targets = [ product["url"], *Array(product["offers"]).filter_map { |offer| offer["url"] if offer.is_a?(Hash) } ].compact
+      # Array(Hash) would split a single Offer object into key/value pairs.
+      offers = product["offers"].is_a?(Array) ? product["offers"] : [ product["offers"] ]
+      targets = [ product["url"], *offers.filter_map { |offer| offer["url"] if offer.is_a?(Hash) } ].compact
       return targets.any? { |target| same_page?(target) } if targets.any?
 
       # IKEA publishes variant SKU in Product even when Product.url is absent.
@@ -208,6 +257,8 @@ module InteriorLinks
     end
 
     def category_for(name, product)
+      return if PORTABLE_GOODS.match?(name) && DISPLAY_GOODS.include?(CATEGORY_RULES.find { |_, _, pattern| pattern.match?(name) }&.first)
+
       rule = CATEGORY_RULES.find { |_, _, pattern| pattern.match?(name) } ||
         CATEGORY_RULES.find { |_, _, pattern| pattern.match?(product["category"].to_s) }
       return rule.first(2) if rule
@@ -273,6 +324,8 @@ module InteriorLinks
       return if line.match?(/梱包|パッケージ|箱サイズ|内寸/)
 
       match = line.match(/幅\s*([\d.]+)\s*(cm|mm|m)?\s*[×xX・]\s*奥行(?:き)?\s*([\d.]+)\s*(cm|mm|m)?\s*[×xX・]\s*高さ\s*([\d.]+)\s*(cm|mm|m)/)
+      # Francfranc: W795×D795×H630(SH:380)mm. The seat height note is not a size axis.
+      match ||= line.match(/\AW\s*([\d.]+)\s*(cm|mm|m)?\s*[×xX]\s*D\s*([\d.]+)\s*(cm|mm|m)?\s*[×xX]\s*H\s*([\d.]+)\s*(?:\([^)]*\))?\s*(cm|mm|m)\z/)
       return unless match
 
       dimensions["w"] ||= unit_value("#{match[1]}#{match[2] || match[6]}")
@@ -303,10 +356,13 @@ module InteriorLinks
       offer = offers.find { |entry| entry["priceCurrency"] == "JPY" && (entry["url"].blank? || same_page?(entry["url"])) && entry["price"].present? }
       raise Unverified, "対象バリエーションの円価格がありません" unless offer
       tax_text = [ @text, product.dig("_html_extraction", "tax_evidence") ].compact.join(" ")
-      raise Unverified, "消費税込みの根拠を確認できません" unless tax_text.match?(/税込|消費税.*含|消費税込/)
+      # Yahoo! pages print "価格 999 円" without the word 税込; listed prices are
+      # tax-inclusive under the mandatory total-price display rule.
+      platform_tax_rule = @store[:provider] == "yahoo_shopping"
+      raise Unverified, "消費税込みの根拠を確認できません" unless platform_tax_rule || tax_text.match?(/税込|消費税.*含|消費税込/)
 
       amount = BigDecimal(offer["price"].to_s.delete(","))
-      evidence = "JSON-LD Offer.price (JPY)"
+      evidence = platform_tax_rule ? "JSON-LD Offer.price (JPY, Yahoo!ショッピングの税込総額表示)" : "JSON-LD Offer.price (JPY)"
       if product.dig("_html_extraction", "price_evidence").present?
         evidence = { "kind" => "gemini_official_html", "evidence" => product.dig("_html_extraction", "price_evidence") }
       end
