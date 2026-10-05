@@ -3,13 +3,24 @@ class Coordination < ApplicationRecord
   STATUSES = %w[pending processing done failed].freeze
 
   belongs_to :room
+  # 追加の指示 (チャット) で作り直すときの前回のコーデ
+  belongs_to :base_coordination, class_name: "Coordination", optional: true
 
   validates :prompt, presence: true, length: { maximum: 500 }
   validates :budget, numericality: { only_integer: true, greater_than: 0 }
   validates :status, inclusion: { in: STATUSES }
   validate :valid_furniture_input
+  validate :valid_base_coordination
 
   private
+
+  # 前回のコーデは、同じ部屋の、生成が終わったものだけ
+  def valid_base_coordination
+    return if base_coordination_id.nil?
+    return if base_coordination && base_coordination.room_id == room_id && base_coordination.status == "done"
+
+    errors.add(:base_coordination_id, "前回のコーデが正しくありません")
+  end
 
   def valid_furniture_input
     existing_ids = room&.scene&.fetch("objects", [])&.select { |object| object["source"] == "existing" }&.pluck("id") || []

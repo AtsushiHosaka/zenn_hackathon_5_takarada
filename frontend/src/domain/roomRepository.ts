@@ -10,6 +10,8 @@ export type GenerateRoomInput = {
   roomId?: string;
   keptObjectIds?: string[];
   editedItems?: RoomItem[];
+  // 追加の指示 (チャット) で作り直すときの前回のコーデ (backend の ID)。指示に関係ない商品は前回のものが残る
+  baseCoordinationId?: string;
 };
 
 // photos: 部屋の写真を受け取れるか (dummyは受け取らない)。
