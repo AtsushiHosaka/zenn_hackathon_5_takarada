@@ -3,6 +3,8 @@
 出典: `docs/specification.md`, `docs/system_workflow.png`, `docs/design.png` と担当者 (はせがび) との設計相談 (2026-10-03)。
 Google Docs は URL 未設定のため未確認。
 
+2026年10月5日、日本向け家具ECの実商品検索、既存モデルとの照合、テクスチャのみの画像生成、大型家具の追加・入れ替えを対象に追加した。詳細は[EC家具Spec](../ec-furniture/spec.md)、対象店舗と取得条件は[EC調査](../ec-furniture/research.md)を参照する。以下の8枠とモック商品は現行実装の説明であり、追加要求の完成を意味しない。
+
 ## 目的
 
 部屋の写真と「こうしたい」という要望から、今ある家具を活かしたコーデを 3D シーンと購入リンクで返す。
@@ -58,19 +60,20 @@ flowchart TD
   (3) 提案商品も DB から選び、(4) 合わせてクライアントがレンダリングする。
   写真解析の LLM には座標を出させず、位置関係 (どの壁沿いか・どの角か) だけを出させて座標はルールで計算する。
 - **家具の 3D は既存モデルを使う**。`model_url` が null ならクライアントが category と size から箱で描く。
-  まずはカテゴリ別の汎用モデル、後で商品ごとの事前生成 GLB を足す (画像→3D は当日実行しない)。
+  商品とカタログモデルの明示対応を優先する。新しい実商品は用途・形状から照合し、採用した対応を保存する。追加要求ではテクスチャだけを生成する。
 - **座標は LLM に出させない**。AI は「どの枠 (slot) にどの商品を入れるか」だけ決め、
   座標は `SlotLayout` がルールで計算する。
 - **MVP の枠は布もの・壁・照明・小物**: bed_cover / curtain / rug / wall_decor / light / display / cushion / desk_top。
   床が埋まった部屋でも雰囲気を変えられるよう、家具の上・壁・窓に付けるものを中心にする。
-  家具の入れ替え (replace) や床への自由配置は後で広げる。
+  この8枠は現行実装の範囲。2026年10月5日の追加要求では大型家具の追加・入れ替えと床配置も扱うが、配置処理とAPIの拡張は未実装。
 - **認証なしの公開エンドポイント** (デモ用)。
 
 ## 3D モデル
 
 - **既存家具も EC 商品も、3D モデルは事前に用意したものから選ぶ** (当日に画像→3D 生成はしない)。
   - 既存家具・専用モデルの無い商品: カテゴリ別の汎用モデルを `color` で塗り替えて使う
-  - デモの主役の商品: item_id ごとの専用モデル (画像→3D で事前生成し、目視で選ぶ)
+  - 明示対応のない実商品: カタログから用途・形状が合うモデルを照合し、採用した対応を保存する (追加要求。未実装)
+  - 商品の色・素材・柄: 生成テクスチャでモデルの素材だけを上書きする (追加要求。未実装)
   - どちらも無ければ `model_url: null` で、クライアントが箱で描く
 - **形式は GLB (glTF 2.0) のみ**。クライアントは Web だけなので USDZ などは用意しない (2026-10-04 決定)。
 - モデルの決まりごと (案。ほさかと合意が必要):
@@ -80,9 +83,8 @@ flowchart TD
   - 箱への収め方はモデルごとに `fit: stretch` (縦横奥行きを個別に合わせる: 家具・ラグ・カーテン) か
     `fit: contain` (縦横比を保つ: 植物・照明・小物)
   - 見た目はローポリ・フラット色を基本にそろえる。専用モデル (リアル寄り) と混ぜて違和感がないかは試作で確認
-- 対応表は `config/models.yml` (カテゴリ → GLB、item_id → GLB、fit、tint、ライセンス)、
-  `ModelResolver` がシーンを返す前に `model_url` を埋める (未実装)。
-- 商品専用モデルを前提にするため、商品データは静的 DB 中心になる (EC 連携の方式はうらっしゅと要合意)。
+- 対応表はDBの`furniture_models / furniture_model_bindings`を優先し、`ModelResolver`が`config/models.yml`で補完する。GCS配信と台帳管理は[家具モデルSpec](../furniture-models/spec.md)を参照する。実商品からのモデル照合は未実装。
+- 商品データは現在モック。追加要求では日本向けECを検索し、商品バリエーション・出典・取得日時を保持する。専用GLBや静的商品DBだけを前提にしない。
 
 座標系: 単位はメートル。y が上、原点は北西の床の角、x は東、z は南。position は底面中心。
 rotation_y は 0/90/180/270 で、正面 (ローカル +z) が南/東/北/西を向く (three.js の rotation.y と同じ)。
@@ -101,8 +103,12 @@ InteriorLinks.client.search(prompt:, theme:, slots:, max_price:)
 - `InteriorLinks::Item`: `id, slot, category, name, price, shop, url, image_url, color, size {w,h,d}`
   - `slot` は `InteriorLinks::SLOTS` のどれか (必須。置き場所が決まらないため)
   - `size` が取れない商品は `InteriorLinks::Item.build` がカテゴリの標準寸法 (`InteriorLinks::DEFAULT_SIZES`) で補う
-- 商品の選び方 (`CoordinationBuilder`): 優先度の高い枠から各枠の最安値で予算内にできるだけ多く埋め、
+- モックの選び方 (`CoordinationBuilder`): 優先度の高い枠から各枠の最安値で予算内にできるだけ多く埋め、
   余った予算で優先度の高い枠からおすすめ順の上位へ格上げする。置き場所が無ければ同じ枠のより安い候補で試す
+
+実ECでは、多数の候補から要望・テンプレート、素材・色と合計予算に合う採用一式・代替順位をGeminiが選ぶ。Ruby側で予算と配置を再確認し、採用対象外の枠を最安値で自動補充しない。
+
+追加要求では、ECの品番と既存契約の内部整数IDを分ける。寸法の標準値補完を実商品の公式寸法として扱わず、必要寸法が不明な商品も推定軸を明示した近似配置として候補に残す。大型家具の床配置・入れ替え、商品ごとの素材上書きは[EC家具Spec](../ec-furniture/spec.md)に従って拡張する。
 
 ## 写真の解析の精度を確かめる
 
@@ -158,17 +164,18 @@ docker compose exec worker bin/rails 'rooms:reanalyze[51,,gemini-3.1-flash-lite]
 | 写真のアップロード | **実装済み (PR #12)**: `POST /uploads` で署名付き URL を発行し、ブラウザから GCS へ直接送る。`POST /rooms` は `photo_keys` を受け取り、実物があるか確かめる。解析では `Storage.client.download` で読み出す |
 | 部屋の解析 (`RoomAnalyzer`) | 写真と `GEMINI_API_KEY` があれば **Gemini** (既定 `gemini-3.1-flash-lite`、Interactions API、写真は長辺 1536px に縮小)、無ければ**モック**。どちらも「どの壁沿いのどのあたりか」だけを返し、座標は `RoomLayout` が計算する。結果の `analyzed_by` で区別できる。**実際のキーでの動作は未確認** |
 | 商品の選定 (`CoordinationPlanner`) | `GEMINI_API_KEY` があれば **Gemini**: 要望文・部屋 (壁と床の色・活かす家具)・商品候補を渡し、枠ごとに要望に合う商品を順位付けさせる。タイトル・コンセプト・要望どおりの商品が無いときの断り書きも書かせる。予算と置き場所は Ruby で決め、コメントの商品部分は実際に置いた商品から組み立てる。存在しない id・枠の違う商品は捨てる。キーが無ければ**モック** (キーワードでテーマを決める)。結果の `planned_by` で区別し、`coordinations.analysis` に回答を残す (`bin/rails 'coordinations:report[ID]'`) |
-| インテリアリンク取得 (`InteriorLinks`) | **静的モック** (`InteriorLinks::MockClient` + `config/interior_links_mock.yml`、37件)。34件は実商品の参考価格・詳細URL、未確認3件は参考モックの検索リンク。[出典と制約](../mock-product-references/spec.md) |
+| インテリアリンク取得 (`InteriorLinks`) | 既存Geminiの接続設定とowner許可があればGoogle検索と公式ECページ確認を実行。未設定時は37件の静的モック。[ECの接続確認と制限](../ec-furniture/spec.md)、[モックの出典と制約](../mock-product-references/spec.md) |
 | Webの画面 (`/rooms/new`・`/rooms/:id`) | PR #6の画面・3D編集を基準に統合。畳数・部屋の形 → 活かす家具 → 要望・予算 → 3Dと購入リンク。通信と応答変換は共通の `RoomRepository` に一本化。`/coordinate` は `/rooms/new` へ移動 |
 | 本番 (Cloud Run) での Gemini | 本番はジョブが `:inline` (PR #7) なので、`POST /rooms` は Gemini の応答を待ってから返る (flash-lite なら数秒)。写真は GCS から読む。**本番の `GEMINI_API_KEY` (Secret Manager) は未設定**なので本番はモックで動く |
-| 3D モデル (GLB) | `ModelResolver` (PR #12) が `config/models.yml` から `model_url` を埋める。モデルはまだ未登録 |
+| 3D モデル (GLB) | DBカタログの明示対応とGCS配信を実装済み。`ModelResolver`は既存YAMLで補完する。実商品からの形状照合・生成テクスチャのAPI/画面接続を実装。接続確認と制限はEC家具Specを参照 |
 
 2026年10月4日の依頼により、PR #5をPR #6へ取り込んでからPR #6をmainへマージする。Webの詳細は `specs/room-coordinator/spec.md` を参照する。活かす家具は解析Sceneの家具IDで送信し、選択と予算を結果へ保存する。空配列はAPI上「全家具を活かす」を意味するため、家具がある場合は1点以上の選択を必須とする。この統合判断はGoogle Docsへ未反映。
+
+上記の空配列と1点以上の制限は操作リスト未指定の旧クライアント向けである。大型家具の入れ替え対応では、`furniture_operations`から残すIDを導き、残す家具がない指定も扱う。操作リスト未指定のクライアントは従来互換とする。詳細は[EC家具Spec](../ec-furniture/spec.md)を参照する。
 
 ## 残作業
 
 - 写真アップロード (S3) と、LLM による部屋の解析 (家具の種類・大きさ・色・位置関係を構造化出力)
 - 既存家具を位置関係から置く処理 (SlotLayout と同じくルールで座標を計算)
-- インテリアリンク取得の本物 (うらっしゅ) への差し替え。`category` / `slot` の候補リストを合わせる
-- カテゴリ別の汎用 3D モデルの用意と `model_url` の設定
+- EC対応店舗の取得率改善と本番テクスチャ書き込みIAMの反映。実検索・大型家具操作・モデル照合・テクスチャ適用の実装と確認は[EC家具Spec](../ec-furniture/spec.md)
 - 進み具合 (progress) の返却、共有リンク

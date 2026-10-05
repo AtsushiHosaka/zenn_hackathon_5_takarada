@@ -1,5 +1,6 @@
 require "google/cloud/storage"
 require "google/apis/iamcredentials_v1"
+require "stringio"
 
 module Storage
   # Cloud Run のサービスアカウントは秘密鍵を持たず、gem は signBlob へ自動で
@@ -35,6 +36,20 @@ module Storage
 
     def download(asset)
       bucket(asset).file(asset.key)&.download&.string
+    end
+
+    def store(asset, bytes, content_type: "image/png")
+      target = bucket(asset)
+      return asset if target.file(asset.key)
+
+      target.create_file(StringIO.new(bytes), asset.key, content_type: content_type, cache_control: "public, max-age=31536000, immutable", if_generation_match: 0)
+      asset
+    rescue Google::Cloud::Error
+      # Another worker can win the same immutable key. Creator permission is enough;
+      # generated textures never overwrite GLB assets or earlier cached images.
+      raise unless target&.file(asset.key)
+
+      asset
     end
 
     private

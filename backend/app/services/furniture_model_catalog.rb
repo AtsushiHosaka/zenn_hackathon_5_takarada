@@ -44,7 +44,11 @@ class FurnitureModelCatalog
 
     resolved = scene.deep_dup
     objects = resolved.fetch("objects", [])
-    references = objects.filter_map { |object| binding_reference(object) if replaceable_url?(object["model_url"]) }
+    references = objects.filter_map do |object|
+      next if object["texture_status"] == "unmatched"
+
+      binding_reference(object) if replaceable_url?(object["model_url"])
+    end
     if references.empty?
       fill_by_category(objects, base)
       return resolved
@@ -58,6 +62,7 @@ class FurnitureModelCatalog
       .index_by { |binding| [ binding.kind, binding.reference ] }
 
     objects.each do |object|
+      next if object["texture_status"] == "unmatched"
       next unless replaceable_url?(object["model_url"])
 
       binding = bindings[binding_reference(object)]
@@ -70,7 +75,9 @@ class FurnitureModelCatalog
   # 対応表に無い家具・商品は、カテゴリ (または形の種類) が同じモデルのうち大きさが一番近いものを使う。
   # 写真の解析で出てくる chair-1・shelf-2 などや、対応表に載る前の商品にもモデルを付けるため
   def self.fill_by_category(objects, base)
-    missing = objects.select { |object| replaceable_url?(object["model_url"]) && object["category"].present? }
+    missing = objects.select do |object|
+      object["texture_status"] != "unmatched" && replaceable_url?(object["model_url"]) && object["category"].present?
+    end
     return if missing.empty?
 
     categories = missing.map { |object| object["category"] }.uniq

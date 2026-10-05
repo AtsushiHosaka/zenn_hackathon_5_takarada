@@ -34,7 +34,7 @@ locals {
     DB_NAME           = var.db_name
     DB_USERNAME       = google_sql_user.app.name
 
-    # GCS。models は公開読みで URL を組むだけ、uploads は署名付き URL で読み書きする
+    # GCS。modelsは公開配信とtextures/限定の新規保存、uploadsは署名付きURLで読み書きする
     MODELS_BUCKET  = google_storage_bucket.models.name
     UPLOADS_BUCKET = google_storage_bucket.uploads.name
 

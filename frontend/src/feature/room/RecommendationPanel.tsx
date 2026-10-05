@@ -6,20 +6,38 @@ const money=(value:number)=>`¥${value.toLocaleString('ja-JP')}`;
 const illustrations:Record<string,number>={led:21,shelf:23,display:23,rug:25,artwork:27,wall_decor:27,cushion:29,lamp:31,light:31,plant:33,cover:35,bed_cover:35};
 const labels=[['all','すべて'],['light','照明'],['storage','収納'],['fabric','ファブリック'],['goods','雑貨']];
 function productLink(value?:string) {try { const url=new URL(value??'');return ['https:','http:'].includes(url.protocol)?url.href:null; }catch{return null;} }
-export default function RecommendationPanel({items,selectedId,filter,onSelect,onFilter,onClose}:{items:RoomItem[];selectedId:string|null;filter:string;onSelect:(id:string)=>void;onFilter:(filter:string)=>void;onClose:()=>void}) {
+const textureLabels = {disabled:'単色プレビュー',ready:'生成素材による近似プレビュー',failed:'素材生成に失敗・単色表示',skipped:'素材は未生成・単色表示',unmatched:'対応モデルなし・簡易形状'};
+const axisLabels = {w:'幅',h:'高さ',d:'奥行き'};
+const dimensionLabel = (value:number|null) => value === null ? '不明' : `${Math.round(value*1000)/10}cm`;
+function ProductDetails({item,originalItems}:{item:RoomItem;originalItems?:RoomItem[]}) {
+  const metadata=item.productMetadata;
+  const replaced=originalItems?.find(original=>original.id===item.replacesObjectId);
+  return <>
+    {item.replacesObjectId&&<span className="rc-item-shop">{replaced?.name??item.replacesObjectId}の入れ替え</span>}
+    {metadata?.priceCheckedAt&&<span className="rc-item-shop">参考価格の確認: {new Date(metadata.priceCheckedAt).toLocaleString('ja-JP')}</span>}
+    {metadata?.size&&<span className="rc-item-shop">商品寸法: 幅{dimensionLabel(metadata.size.w)} × 高さ{dimensionLabel(metadata.size.h)} × 奥行き{dimensionLabel(metadata.size.d)}</span>}
+    {!!metadata?.estimatedAxes?.length&&<span className="rc-item-shop">{metadata.estimatedAxes.map(axis=>axisLabels[axis]).join('・')}は描画・配置用の推定寸法</span>}
+    {item.modelMatch?.approximate&&<span className="rc-item-shop" title={item.modelMatch.reason}>形状は既存モデルによる近似</span>}
+    {item.textureStatus&&<span className="rc-item-shop">{textureLabels[item.textureStatus]}</span>}
+    {item.textureStatus==='ready'&&item.textureSource==='description'&&<span className="rc-item-shop">色・素材の説明から生成。商品画像の再現ではありません。</span>}
+  </>;
+}
+export default function RecommendationPanel({items,originalItems,searchEntryPoints,selectedId,filter,onSelect,onFilter,onClose}:{items:RoomItem[];originalItems?:RoomItem[];searchEntryPoints?:string[];selectedId:string|null;filter:string;onSelect:(id:string)=>void;onFilter:(filter:string)=>void;onClose:()=>void}) {
   const listRef = useRef<HTMLUListElement>(null);
   useEffect(() => {
     listRef.current?.querySelector('.is-selected')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }, [selectedId, filter]);
   const total=items.reduce((sum,item)=>sum+(item.price??0),0);
+  const searchSuggestions=[...new Set([...(searchEntryPoints??[]),...items.flatMap(item=>item.productMetadata?.searchEntryPointHtml?[item.productMetadata.searchEntryPointHtml]:[])])];
   return <aside className="rc-panel" aria-label="おすすめアイテム">
-    <div className="rc-panel-header"><div className="rc-panel-title"><h2>おすすめアイテム<span>{items.length}</span></h2><button type="button" aria-label="パネルを閉じる" onClick={onClose}><ReferenceSvg page={5} index={20}/></button></div><div className="rc-panel-total"><span>合計</span><strong>{money(total)}</strong><span>{items.length}点すべて購入した場合</span></div>
+    <div className="rc-panel-header"><div className="rc-panel-title"><h2>おすすめアイテム<span>{items.length}</span></h2><button type="button" aria-label="パネルを閉じる" onClick={onClose}><ReferenceSvg page={5} index={20}/></button></div><div className="rc-panel-total"><span>商品価格の合計</span><strong>{money(total)}</strong><span>{items.length}点・送料と追加部品は別</span></div>
       <div className="rc-categories" role="group" aria-label="カテゴリで絞り込み">{labels.map(([key,label])=><button type="button" key={key} aria-pressed={filter===key} onClick={()=>onFilter(key)}>{label} {key==='all'?items.length:items.filter(item=>categoryOf(item)===key).length}</button>)}</div>
     </div>
     <ul ref={listRef} className="rc-items">{items.filter(item=>filter==='all'||categoryOf(item)===filter).map((item,index)=>{const url=productLink(item.productUrl);const body=<>
       <span className="rc-item-art">{productLink(item.imageUrl)?<img src={productLink(item.imageUrl)!} alt={item.name} loading="lazy"/>:illustrations[item.category.toLowerCase()]!==undefined?<ReferenceSvg page={5} index={illustrations[item.category.toLowerCase()]}/>:<ReferenceSvg page={3} index={2}/>}<span className="rc-item-number">{item.marker??items.indexOf(item)+1}</span></span>
-      <span className="rc-item-copy"><span className="rc-item-name clamp2">{item.name}</span><span className="rc-item-shop">{labels.find(([key])=>key===categoryOf(item))?.[1]} · {item.shop??'購入先未登録'}</span><span className="rc-money">{item.price===undefined?'価格未登録':money(item.price)}</span></span><span className="rc-item-external">{url&&<ReferenceSvg page={5} index={22}/>}</span>
+      <span className="rc-item-copy"><span className="rc-item-name clamp2">{item.name}</span><span className="rc-item-shop">{labels.find(([key])=>key===categoryOf(item))?.[1]} · {item.shop??'購入先未登録'}</span><span className="rc-money">{item.price===undefined?'価格未登録':money(item.price)}</span><ProductDetails item={item} originalItems={originalItems}/></span><span className="rc-item-external">{url&&<ReferenceSvg page={5} index={22}/>}</span>
     </>;return <li key={item.id}>{url?<a href={url} target="_blank" rel="noopener noreferrer" className={`rc-item-link${selectedId===item.id?' is-selected':''}`} onMouseEnter={()=>onSelect(item.id)} onFocus={()=>onSelect(item.id)} onClick={()=>onSelect(item.id)}>{body}</a>:<button type="button" className={`rc-item-link${selectedId===item.id?' is-selected':''}`} onClick={()=>onSelect(item.id)} aria-label={`${index+1}. ${item.name}（購入リンク未登録）`}>{body}</button>}</li>;})}</ul>
+    {!!searchSuggestions.length&&<div className="rc-panel-note" style={{maxHeight:220,overflowY:"auto"}}><span>Googleの検索候補</span>{searchSuggestions.map((html,index)=><iframe key={html} title={`Googleの検索候補 ${index+1}`} srcDoc={html} sandbox="allow-popups allow-popups-to-escape-sandbox" referrerPolicy="no-referrer" style={{display:'block',width:'100%',height:160,border:0,background:'#fff'}}/>)}</div>}
     <p className="rc-panel-note">商品情報と価格は参考値です。3Dの形・色・寸法は近似です。価格・在庫・仕様はリンク先でご確認ください。</p>
   </aside>;
 }

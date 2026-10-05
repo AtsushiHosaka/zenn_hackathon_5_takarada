@@ -1,4 +1,4 @@
-import type { RoomDesign, RoomItem, RoomShape, Style } from "./room";
+import type { FurnitureAddition, FurnitureOperation, RoomDesign, RoomItem, RoomShape, Style } from "./room";
 
 export type GenerateRoomInput = {
   photos: File[];
@@ -10,6 +10,8 @@ export type GenerateRoomInput = {
   roomId?: string;
   keptObjectIds?: string[];
   editedItems?: RoomItem[];
+  furnitureOperations?: FurnitureOperation[];
+  furnitureAdditions?: FurnitureAddition[];
   // 追加の指示 (チャット) で作り直すときの前回のコーデ (backend の ID)。指示に関係ない商品は前回のものが残る
   baseCoordinationId?: string;
 };

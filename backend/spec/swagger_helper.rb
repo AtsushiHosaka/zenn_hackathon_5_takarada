@@ -207,10 +207,17 @@ RSpec.configure do |config|
               rotation_y: { type: :number, minimum: 0, exclusiveMaximum: true, maximum: 360, description: "度数。正面 (ローカル +z) が 0: 南, 90: 東, 180: 北, 270: 西 を向く (three.js の rotation.y と同じ)", example: 0 },
               color: { type: :string, example: "#f2f0eb" },
               model_url: { type: :string, nullable: true, description: "GLB の URL。null なら category と size から箱などで代わりに描く", example: nil },
-              slot: { type: :string, nullable: true, enum: [ nil, "bed_cover", "curtain", "rug", "wall_decor", "light", "display", "cushion", "desk_top" ], description: "suggested の置き場所の枠", example: nil },
+              slot: { type: :string, nullable: true, enum: [ nil, "bed_cover", "curtain", "rug", "wall_decor", "light", "display", "cushion", "desk_top", "floor" ], description: "suggested の置き場所の枠", example: nil },
               attach_to: { type: :string, nullable: true, description: "付けた先の家具・窓の id", example: nil },
               item_id: { type: :integer, nullable: true, description: "suggested の商品 id (Coordination.items と対応)", example: nil },
-              marker: { type: :integer, nullable: true, description: "suggested の番号マーカー (Coordination.items と対応)", example: nil }
+              marker: { type: :integer, nullable: true, description: "suggested の番号マーカー (Coordination.items と対応)", example: nil },
+              replaces_object_id: { type: :string, nullable: true, example: "bed-1" },
+              model_size: { "$ref" => "#/components/schemas/Size" },
+              model_fit: { type: :string, enum: %w[contain], example: "contain" },
+              model_match: { "$ref" => "#/components/schemas/ModelMatch" },
+              texture_status: { type: :string, enum: %w[disabled ready failed skipped unmatched], example: "ready" },
+              texture_source: { type: :string, enum: %w[description], example: "description" },
+              material_overrides: { type: :object, additionalProperties: { "$ref" => "#/components/schemas/MaterialOverride" }, example: {} }
             },
             required: %w[id source category label size position rotation_y color model_url slot attach_to item_id marker]
           },
@@ -289,6 +296,62 @@ RSpec.configure do |config|
             },
             required: %w[id position size rotation_y color]
           },
+          FurnitureOperation: {
+            type: :object,
+            properties: {
+              object_id: { type: :string, example: "bed-1" },
+              action: { type: :string, enum: %w[keep replace remove], example: "keep" }
+            },
+            required: %w[object_id action]
+          },
+          FurnitureAddition: {
+            type: :object,
+            properties: { category: { type: :string, enum: %w[sofa bed desk chair shelf table], example: "sofa" } },
+            required: %w[category]
+          },
+          MaterialOverride: {
+            type: :object,
+            properties: {
+              color: { type: :string, pattern: "^#[0-9a-fA-F]{6}$", example: "#ffffff" },
+              texture_url: { type: :string, example: "https://storage.googleapis.com/example-models/textures/v1/tile.png" },
+              tile_size_m: { type: :number, exclusiveMinimum: true, minimum: 0, example: 0.5 }
+            }
+          },
+          ModelMatch: {
+            type: :object,
+            properties: {
+              model_id: { type: :integer, example: 1 },
+              reason: { type: :string, example: "category_shape_ratio:desk/desk_wood" },
+              approximate: { type: :boolean, example: true }
+            },
+            required: %w[model_id reason approximate]
+          },
+          ProductMetadata: {
+            type: :object,
+            description: "実商品・バリエーション・出典・取得日時・公式寸法と推定軸。商品写真は生成入力へ送らない",
+            properties: {
+              provider: { type: :string, example: "ikea" },
+              provider_product_id: { type: :string, example: "50337820" },
+              variant_id: { type: :string, example: "50337820" },
+              currency: { type: :string, enum: %w[JPY], example: "JPY" },
+              source_url: { type: :string, example: "https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/" },
+              price_checked_at: { type: :string, format: "date-time", example: "2026-10-05T04:00:00Z" },
+              fetched_at: { type: :string, format: "date-time", example: "2026-10-05T04:00:00Z" },
+              availability: { type: :string, example: "unknown" },
+              size: { type: :object, properties: {
+                w: { type: :number, nullable: true, example: 1.3 },
+                h: { type: :number, nullable: true, example: nil },
+                d: { type: :number, nullable: true, example: 1.3 }
+              } },
+              size_source: { type: :object, additionalProperties: true, example: { "kind" => "official_page" } },
+              search_entry_point_html: { type: :string, description: "Googleから返された検索候補表示HTML。隔離したiframeへ未改変で表示", example: "" },
+              estimated_axes: { type: :array, items: { type: :string, enum: %w[w h d] }, example: [] },
+              material: { type: :string, example: "スチール" },
+              shape: { type: :string, nullable: true, example: nil },
+              image_usage: { type: :object, additionalProperties: true, example: { "generation_input" => "not_used" } }
+            },
+            additionalProperties: true
+          },
           CoordinationInput: {
             type: :object,
             properties: {
@@ -296,8 +359,10 @@ RSpec.configure do |config|
                 type: :object,
                 properties: {
                   prompt: { type: :string, example: "紫色の推し活ルームにしたい" },
-                  budget: { type: :integer, description: "買い足しの予算 (円)", example: 30_000 },
+                  budget: { type: :integer, description: "追加・入れ替え商品の予算 (円・送料別)", example: 30_000 },
                   kept_object_ids: { type: :array, items: { type: :string }, description: "活かす家具の id。空なら全部活かす", example: %w[bed-1 desk-1 shelf-1] },
+                  furniture_operations: { type: :array, maxItems: 100, items: { "$ref" => "#/components/schemas/FurnitureOperation" }, description: "指定時は既存家具すべてにkeep/replace/removeを一つ指定。全replace・全removeも可能。未指定・空配列は旧kept_object_idsの意味を維持", example: [] },
+                  additions: { type: :array, maxItems: 6, items: { "$ref" => "#/components/schemas/FurnitureAddition" }, example: [] },
                   base_coordination_id: { type: :integer, nullable: true, description: "追加の指示 (チャット) で作り直すときの前回のコーデ (同じ部屋・生成済み)。指示に関係ない商品は前回のものを残す", example: 12 },
                   edited_objects: { type: :array, maxItems: 100, items: { "$ref" => "#/components/schemas/FurnitureEdit" }, description: "家具の最新配置と、手動で調整した商品の配置。同じ商品が再採用される場合に引き継ぐ。省略すると解析時の配置を使う", example: [] }
                 },
@@ -319,7 +384,11 @@ RSpec.configure do |config|
               url: { type: :string, description: "確認済みの商品詳細URL。未確認の参考商品では検索結果URL", example: "https://francfranc.com/products/1102030047044" },
               image_url: { type: :string, nullable: true, example: nil },
               color: { type: :string, example: "#b9a3e3" },
-              placement_note: { type: :string, example: "ベッドに掛ける" }
+              placement_note: { type: :string, example: "ベッドに掛ける" },
+              product_metadata: { "$ref" => "#/components/schemas/ProductMetadata" },
+              texture_status: { type: :string, enum: %w[disabled ready failed skipped unmatched], example: "ready" },
+              texture_source: { type: :string, enum: %w[description], example: "description" },
+              model_match: { "$ref" => "#/components/schemas/ModelMatch" }
             },
             required: %w[marker item_id slot category name price shop url image_url color placement_note]
           },
@@ -332,6 +401,10 @@ RSpec.configure do |config|
               prompt: { type: :string, example: "紫色の推し活ルームにしたい" },
               budget: { type: :integer, example: 30_000 },
               kept_object_ids: { type: :array, items: { type: :string }, example: %w[bed-1 desk-1 shelf-1] },
+              furniture_operations: { type: :array, items: { "$ref" => "#/components/schemas/FurnitureOperation" }, example: [] },
+              additions: { type: :array, items: { "$ref" => "#/components/schemas/FurnitureAddition" }, example: [] },
+              search_entry_points: { type: :array, items: { type: :string }, description: "Google検索候補HTML。各要素を未改変で隔離表示する", example: [] },
+              product_source: { type: :string, nullable: true, enum: [ nil, "ec", "mock" ], example: "ec" },
               title: { type: :string, nullable: true, example: "ラベンダーの推し活ルーム" },
               comment: { type: :string, nullable: true, example: "ラベンダー 布団カバー3点セット シングル (ベッドに掛ける) などを追加しました。今のベッドとデスクと本棚はそのまま活かしています。" },
               before_scene: { allOf: [ { "$ref" => "#/components/schemas/Scene" } ], nullable: true },

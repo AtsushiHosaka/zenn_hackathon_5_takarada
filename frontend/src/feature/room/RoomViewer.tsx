@@ -7,6 +7,7 @@ import type { RoomDesign, RoomItem } from "../../domain/room";
 import { buildReferenceRoom, usesReferenceRoom } from "./referenceRoomModel";
 import { buildMeasuredRoom } from "./roomArchitecture";
 import { LAYOUT_GRID_STEP, snapItemPosition } from "./layoutGrid";
+import { applyMaterialOverrides } from "./furnitureMaterials";
 
 interface RoomViewerProps {
   design: RoomDesign;
@@ -466,7 +467,7 @@ function disposeObject(object: THREE.Object3D) {
   });
   for (const texture of textures) {
     texture.dispose();
-    if (typeof ImageBitmap !== "undefined" && texture.image instanceof ImageBitmap) texture.image.close();
+    if (!texture.userData.sharedImage && typeof ImageBitmap !== "undefined" && texture.image instanceof ImageBitmap) texture.image.close();
   }
 }
 
@@ -485,6 +486,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   const canvasHost = useRef<HTMLDivElement>(null);
   const fallback = useRef<HTMLDivElement>(null);
   const modelNotice = useRef<HTMLDivElement>(null);
+  const textureNotice = useRef<HTMLDivElement>(null);
   const runtime = useRef<ViewerRuntime | null>(null);
   const roomBounds = useRef<{ id: string; bounds: THREE.Box3 } | null>(null);
   const cameraState = useRef<{ id: string; position: THREE.Vector3; target: THREE.Vector3; zoom: number; view: RoomViewerProps["view"]; lastCommandSequence: number | null } | null>(null);
@@ -514,7 +516,9 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     }
     if (fallback.current) fallback.current.hidden = true;
     if (modelNotice.current) modelNotice.current.hidden = true;
+    if (textureNotice.current) textureNotice.current.hidden = true;
     let disposed = false;
+    const textureCleanups: (() => void)[] = [];
     const scene = new THREE.Scene();
     const reference = !design.room && usesReferenceRoom(design);
     const aspect = Math.max(host.clientWidth, 1) / Math.max(host.clientHeight, 1);
@@ -777,6 +781,11 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         gltf.scene.traverse((object) => {
           if (object instanceof THREE.Mesh) { object.castShadow = true; object.receiveShadow = true; }
         });
+        if (!item.existing && item.materialOverrides) {
+          textureCleanups.push(applyMaterialOverrides(gltf.scene, item.materialOverrides, scale, () => {
+            if (!disposed && textureNotice.current) textureNotice.current.hidden = false;
+          }));
+        }
         for (const child of [...group.children]) { group.remove(child); disposeObject(child); }
         group.scale.set(1, 1, 1);
         group.add(gltf.scene);
@@ -1032,6 +1041,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       cancelDrag();
       cameraState.current = { id: design.id, position: camera.position.clone(), target: controls.target.clone(), zoom: camera.zoom, view: currentView, lastCommandSequence };
       disposed = true;
+      textureCleanups.forEach(cleanup => cleanup());
       runtime.current = null;
       observer.disconnect();
       renderer.setAnimationLoop(null);
@@ -1071,6 +1081,9 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       </div>
       <div ref={modelNotice} className="viewer-model-notice" hidden role="status">
         3Dモデルを読み込めなかったため、家具の形と配置を簡易表示しています。
+      </div>
+      <div ref={textureNotice} className="viewer-model-notice" style={{bottom:84}} hidden role="status">
+        一部の生成テクスチャを読み込めなかったため、単色で表示しています。
       </div>
     </div>
   );
