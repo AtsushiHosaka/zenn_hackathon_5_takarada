@@ -44,7 +44,11 @@ class FurnitureModelCatalog
 
     resolved = scene.deep_dup
     objects = resolved.fetch("objects", [])
-    references = objects.filter_map { |object| binding_reference(object) if replaceable_url?(object["model_url"]) }
+    references = objects.filter_map do |object|
+      next if object["texture_status"] == "unmatched"
+
+      binding_reference(object) if replaceable_url?(object["model_url"])
+    end
     return resolved if references.empty?
 
     existing = references.select { |kind, _| kind == "existing" }.map(&:last)
@@ -55,6 +59,7 @@ class FurnitureModelCatalog
       .index_by { |binding| [ binding.kind, binding.reference ] }
 
     objects.each do |object|
+      next if object["texture_status"] == "unmatched"
       next unless replaceable_url?(object["model_url"])
 
       binding = bindings[binding_reference(object)]

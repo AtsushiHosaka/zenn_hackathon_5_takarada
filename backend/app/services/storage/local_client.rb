@@ -12,7 +12,7 @@ module Storage
     end
 
     # 受け口から呼ばれる。GCS が直接受ける本番側には対応するものが無い
-    def store(asset, bytes)
+    def store(asset, bytes, content_type: nil)
       path = path_for(asset)
       path.dirname.mkpath
       path.binwrite(bytes)

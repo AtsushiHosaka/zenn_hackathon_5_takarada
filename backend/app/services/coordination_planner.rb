@@ -10,11 +10,11 @@ class CoordinationPlanner
   Plan = Data.define(:title, :concept, :note, :candidates, :planned_by, :analysis)
 
   # 雰囲気が大きく変わる順 (色の面積が大きい布もの → 壁 → 照明 → 小物)
-  SLOT_PRIORITY = InteriorLinks::SLOTS
+  SLOT_PRIORITY = %w[bed_cover curtain rug wall_decor light display cushion desk_top].freeze
 
   # kept_objects: 活かす家具 (Scene の object)。部屋の雰囲気に合わせて選ぶのに使う
-  def self.call(prompt:, budget:, room:, kept_objects:, user_id: nil)
+  def self.call(prompt:, budget:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [])
     planner = GeminiClient.configured?(user_id:) ? Gemini : Mock
-    planner.new(prompt:, budget:, room:, kept_objects:).plan
+    planner.new(prompt:, budget:, room:, kept_objects:, user_id:, client:, additional_candidates:).plan
   end
 end

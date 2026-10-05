@@ -5,6 +5,36 @@ info:
   version: v1
   description: Rails API
 paths:
+  "/api/v1/assets/{key}":
+    parameters:
+    - name: key
+      in: path
+      required: true
+      description: textures/description-seamless-v1/<64桁のハッシュ>.png等
+      schema:
+        type: string
+    get:
+      summary: 開発環境の生成テクスチャを取得する
+      tags:
+      - Assets
+      description: 開発・テスト限定。本番は404となり、SceneObjectのGCS公開texture_urlを使用する。
+      security: []
+      responses:
+        '200':
+          description: 生成画像
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/webp:
+              schema:
+                type: string
+                format: binary
   "/api/v1/signup":
     post:
       summary: サインアップしてトークンを受け取る
@@ -112,8 +142,7 @@ paths:
       summary: コーデ提案の生成を始める
       tags:
       - Coordinations
-      description: 生成は非同期。GET /api/v1/coordinations/{id} で status が done / failed
-        になるまでポーリングする。Geminiの設定がある場合は要望文からAIで商品を選び、無い場合はキーワード判定のモック。商品候補はInteriorLinks::MockClientの参考データ。本人の部屋・提案だけ扱う
+      description: GET /api/v1/coordinations/{id} で status が done / failed になるまで待つ。本番inline実行ではPOSTも処理完了を待つ。Geminiの設定とownerの利用許可があれば公式EC商品を検索し、配置後に既存モデルの素材テクスチャを生成する。未設定時はモック。furniture_operationsで既存家具のkeep/replace、additionsで最大6点の大型家具追加を指定できる。本人の部屋・提案だけ扱う
       security:
       - bearerAuth: []
       parameters: []
@@ -778,6 +807,7 @@ components:
           - display
           - cushion
           - desk_top
+          - floor
           description: suggested の置き場所の枠
           example:
         attach_to:
@@ -795,6 +825,38 @@ components:
           nullable: true
           description: suggested の番号マーカー (Coordination.items と対応)
           example:
+        replaces_object_id:
+          type: string
+          nullable: true
+          example: bed-1
+        model_size:
+          "$ref": "#/components/schemas/Size"
+        model_fit:
+          type: string
+          enum:
+          - contain
+          example: contain
+        model_match:
+          "$ref": "#/components/schemas/ModelMatch"
+        texture_status:
+          type: string
+          enum:
+          - disabled
+          - ready
+          - failed
+          - skipped
+          - unmatched
+          example: ready
+        texture_source:
+          type: string
+          enum:
+          - description
+          example: description
+        material_overrides:
+          type: object
+          additionalProperties:
+            "$ref": "#/components/schemas/MaterialOverride"
+          example: {}
       required:
       - id
       - source
@@ -975,6 +1037,145 @@ components:
       - size
       - rotation_y
       - color
+    FurnitureOperation:
+      type: object
+      properties:
+        object_id:
+          type: string
+          example: bed-1
+        action:
+          type: string
+          enum:
+          - keep
+          - replace
+          example: keep
+      required:
+      - object_id
+      - action
+    FurnitureAddition:
+      type: object
+      properties:
+        category:
+          type: string
+          enum:
+          - sofa
+          - bed
+          - desk
+          - chair
+          - shelf
+          - table
+          example: sofa
+      required:
+      - category
+    MaterialOverride:
+      type: object
+      properties:
+        color:
+          type: string
+          pattern: "^#[0-9a-fA-F]{6}$"
+          example: "#ffffff"
+        texture_url:
+          type: string
+          example: https://storage.googleapis.com/example-models/textures/v1/tile.png
+        tile_size_m:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+          example: 0.5
+    ModelMatch:
+      type: object
+      properties:
+        model_id:
+          type: integer
+          example: 1
+        reason:
+          type: string
+          example: category_shape_ratio:desk/desk_wood
+        approximate:
+          type: boolean
+          example: true
+      required:
+      - model_id
+      - reason
+      - approximate
+    ProductMetadata:
+      type: object
+      description: 実商品・バリエーション・出典・取得日時・公式寸法と推定軸。商品写真は生成入力へ送らない
+      properties:
+        provider:
+          type: string
+          example: ikea
+        provider_product_id:
+          type: string
+          example: '50337820'
+        variant_id:
+          type: string
+          example: '50337820'
+        currency:
+          type: string
+          enum:
+          - JPY
+          example: JPY
+        source_url:
+          type: string
+          example: https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/
+        price_checked_at:
+          type: string
+          format: date-time
+          example: '2026-10-05T04:00:00Z'
+        fetched_at:
+          type: string
+          format: date-time
+          example: '2026-10-05T04:00:00Z'
+        availability:
+          type: string
+          example: unknown
+        size:
+          type: object
+          properties:
+            w:
+              type: number
+              nullable: true
+              example: 1.3
+            h:
+              type: number
+              nullable: true
+              example:
+            d:
+              type: number
+              nullable: true
+              example: 1.3
+        size_source:
+          type: object
+          additionalProperties: true
+          example:
+            kind: official_page
+        search_entry_point_html:
+          type: string
+          description: Googleから返された検索候補表示HTML。隔離したiframeへ未改変で表示
+          example: ''
+        estimated_axes:
+          type: array
+          items:
+            type: string
+            enum:
+            - w
+            - h
+            - d
+          example: []
+        material:
+          type: string
+          example: スチール
+        shape:
+          type: string
+          nullable: true
+          example:
+        image_usage:
+          type: object
+          additionalProperties: true
+          example:
+            generation_input: not_used
+      additionalProperties: true
     CoordinationInput:
       type: object
       properties:
@@ -986,7 +1187,7 @@ components:
               example: 紫色の推し活ルームにしたい
             budget:
               type: integer
-              description: 買い足しの予算 (円)
+              description: 追加・入れ替え商品の予算 (円・送料別)
               example: 30000
             kept_object_ids:
               type: array
@@ -997,6 +1198,19 @@ components:
               - bed-1
               - desk-1
               - shelf-1
+            furniture_operations:
+              type: array
+              maxItems: 100
+              items:
+                "$ref": "#/components/schemas/FurnitureOperation"
+              description: 指定時は既存家具すべてにkeep/replaceを一つ指定。全replaceも可能。未指定・空配列は旧kept_object_idsの意味を維持
+              example: []
+            additions:
+              type: array
+              maxItems: 6
+              items:
+                "$ref": "#/components/schemas/FurnitureAddition"
+              example: []
             edited_objects:
               type: array
               maxItems: 100
@@ -1048,6 +1262,24 @@ components:
         placement_note:
           type: string
           example: ベッドに掛ける
+        product_metadata:
+          "$ref": "#/components/schemas/ProductMetadata"
+        texture_status:
+          type: string
+          enum:
+          - disabled
+          - ready
+          - failed
+          - skipped
+          - unmatched
+          example: ready
+        texture_source:
+          type: string
+          enum:
+          - description
+          example: description
+        model_match:
+          "$ref": "#/components/schemas/ModelMatch"
       required:
       - marker
       - item_id
@@ -1091,6 +1323,30 @@ components:
           - bed-1
           - desk-1
           - shelf-1
+        furniture_operations:
+          type: array
+          items:
+            "$ref": "#/components/schemas/FurnitureOperation"
+          example: []
+        additions:
+          type: array
+          items:
+            "$ref": "#/components/schemas/FurnitureAddition"
+          example: []
+        search_entry_points:
+          type: array
+          items:
+            type: string
+          description: Google検索候補HTML。各要素を未改変で隔離表示する
+          example: []
+        product_source:
+          type: string
+          nullable: true
+          enum:
+          -
+          - ec
+          - mock
+          example: ec
         title:
           type: string
           nullable: true

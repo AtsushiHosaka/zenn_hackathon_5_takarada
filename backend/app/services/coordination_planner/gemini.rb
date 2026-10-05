@@ -26,11 +26,11 @@ class CoordinationPlanner
 
     SLOT_LABELS = {
       "bed_cover" => "ベッドカバー", "curtain" => "カーテン", "rug" => "ラグ", "wall_decor" => "壁飾り",
-      "light" => "照明", "display" => "飾り棚・大きめの飾り", "cushion" => "クッション", "desk_top" => "デスクの上の小物"
+      "light" => "照明", "display" => "飾り棚・大きめの飾り", "cushion" => "クッション", "desk_top" => "デスクの上の小物", "floor" => "追加・入れ替え用の大型家具"
     }.freeze
 
     PROMPT = <<~TEXT.freeze
-      あなたはインテリアコーディネーターです。一人暮らしの部屋に、今ある家具を活かしたまま買い足す商品を選びます。
+      あなたはインテリアコーディネーターです。一人暮らしの部屋の要望に合う商品を選びます。残す家具は維持し、大型家具の追加・入れ替えと配置可否は別の処理で判定します。
 
       # 要望
       %<prompt>s
@@ -52,15 +52,18 @@ class CoordinationPlanner
       - title と concept は要望に合わせて日本語で書く。concept には商品名を書かない。
     TEXT
 
-    def initialize(prompt:, budget:, room:, kept_objects:)
+    def initialize(prompt:, budget:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [])
       @prompt = prompt
       @budget = budget
       @room = room
       @kept_objects = kept_objects
+      @user_id = user_id
+      @client = client || InteriorLinks.client(user_id: user_id)
+      @additional_candidates = additional_candidates
     end
 
     def plan
-      items = InteriorLinks.client.search(prompt: @prompt, theme: nil, slots: SLOT_PRIORITY, max_price: @budget).values.flatten
+      items = (@client.search(prompt: @prompt, theme: nil, slots: SLOT_PRIORITY, max_price: @budget).values.flatten + @additional_candidates).uniq(&:id)
       response = GeminiClient.new.generate_json(prompt: prompt_for(items), schema: SCHEMA)
       json = response.json
       Plan.new(
@@ -96,7 +99,7 @@ class CoordinationPlanner
       by_id = items.index_by(&:id)
       ranked = Array(picks).each_with_object({}) do |pick, result|
         slot = pick["slot"]
-        next unless SLOT_PRIORITY.include?(slot)
+        next unless (SLOT_PRIORITY + [ "floor" ]).include?(slot)
 
         result[slot] ||= []
         Array(pick["item_ids"]).each do |id|
@@ -104,7 +107,7 @@ class CoordinationPlanner
           result[slot] << item if item && item.slot == slot && !result[slot].include?(item)
         end
       end
-      SLOT_PRIORITY.flat_map { |slot| Array(ranked[slot]).first(3) }
+      (SLOT_PRIORITY + [ "floor" ]).flat_map { |slot| Array(ranked[slot]).first(3) }
     end
   end
 end

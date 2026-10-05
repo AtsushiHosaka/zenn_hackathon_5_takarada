@@ -15,6 +15,8 @@ class ModelResolver
   private
 
   def resolve(object)
+    return object.merge("model_url" => nil) if object["texture_status"] == "unmatched"
+
     url = object["model_url"]
     # 旧フロント同梱モデルがDBで解決できなければ、補完または簡易形状へ戻す。
     object = object.merge("model_url" => nil) if url.is_a?(String) && url.start_with?("/models/furniture/")

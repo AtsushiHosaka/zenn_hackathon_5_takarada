@@ -11,7 +11,7 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
 
     post "コーデ提案の生成を始める" do
       tags "Coordinations"
-      description "生成は非同期。GET /api/v1/coordinations/{id} で status が done / failed になるまでポーリングする。Geminiの設定がある場合は要望文からAIで商品を選び、無い場合はキーワード判定のモック。商品候補はInteriorLinks::MockClientの参考データ。本人の部屋・提案だけ扱う"
+      description "GET /api/v1/coordinations/{id} で status が done / failed になるまで待つ。本番inline実行ではPOSTも処理完了を待つ。Geminiの設定とownerの利用許可があれば公式EC商品を検索し、配置後に既存モデルの素材テクスチャを生成する。未設定時はモック。furniture_operationsで既存家具のkeep/replace、additionsで最大6点の大型家具追加を指定できる。本人の部屋・提案だけ扱う"
       security [ { bearerAuth: [] } ]
       consumes "application/json"
       produces "application/json"
@@ -21,10 +21,18 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
         schema "$ref" => "#/components/schemas/Coordination"
 
         let(:room_id) { room.id }
-        let(:params) { { coordination: { prompt: "紫色の推し活ルームにしたい", budget: 30_000, kept_object_ids: %w[bed-1 desk-1], edited_objects: [ room.scene["objects"].first.slice("id", "position", "size", "rotation_y", "color") ] } } }
+        let(:params) do
+          objects = room.scene["objects"]
+          { coordination: { prompt: "紫色の推し活ルームにしたい", budget: 30_000,
+                            kept_object_ids: objects.pluck("id"),
+                            furniture_operations: objects.map { |object| { object_id: object["id"], action: "keep" } },
+                            additions: [ { category: "table" } ],
+                            edited_objects: [ objects.first.slice("id", "position", "size", "rotation_y", "color") ] } }
+        end
 
-        run_test! do
+        run_test! do |response|
           expect(GenerateCoordinationJob).to have_been_enqueued
+          expect(JSON.parse(response.body)["additions"]).to eq([ { "category" => "table" } ])
         end
       end
 
