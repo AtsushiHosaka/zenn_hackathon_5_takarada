@@ -106,7 +106,7 @@ class SlotLayout
     bottom = under.any? ? [ window["bottom"] - 0.1, under.map { |_, _, _, t| t + 0.02 }.max ].max : 0.0
     # 床まで垂らすときは、ドアの前 (開け閉めの範囲) にかからないよう、かかる側を切り詰める
     left, right = trim_for_doors(window["wall"], left, right) if bottom.zero?
-    return if right - left < 0.3
+    return if right - left < 0.3 || bottom >= top
     size = { "w" => right - left, "h" => top - bottom, "d" => item.size["d"] }
     x, z, rotation = wall_pose(window["wall"], (left + right) / 2, size["d"] / 2 + 0.05)
     # 床まで垂らすときは、カーテンの前 (壁から 15cm) に床置きのものを置かない
