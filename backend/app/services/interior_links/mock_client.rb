@@ -3,7 +3,7 @@ require "erb"
 module InteriorLinks
   # インテリアリンク取得のモック。config/interior_links_mock.yml の静的な商品から、
   # テーマと枠で候補を絞って返す。prompt は使わない (本物は検索語の生成に使う想定)。
-  # 価格はダミー、url は EC の検索結果ページ (実在の商品ページではない)。
+  # 確認済みの商品は参考価格と商品詳細URLを使う。未確認の商品は従来の検索リンクを使う。
   class MockClient
     SEARCH_URLS = {
       "amazon" => "https://www.amazon.co.jp/s?k=%s",
@@ -30,7 +30,7 @@ module InteriorLinks
         name: row["name"],
         price: row["price"],
         shop: row["shop"],
-        url: format(SEARCH_URLS.fetch(row["shop"]), ERB::Util.url_encode(row["query"])),
+        url: row["url"].presence || format(SEARCH_URLS.fetch(row["shop"]), ERB::Util.url_encode(row["query"])),
         image_url: row["image_url"],
         color: row["color"],
         size: row["size"]

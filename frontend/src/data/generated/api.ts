@@ -1123,16 +1123,19 @@ export interface components {
             slot: string;
             /** @example bed_cover */
             category: string;
-            /** @example ラベンダー 布団カバー3点セット シングル */
+            /** @example フリルチェック 掛け布団カバー シングル オレンジ×パープル */
             name: string;
-            /** @example 4980 */
+            /** @example 12800 */
             price: number;
             /**
-             * @example rakuten
-             * @enum {string}
+             * @description 購入先の識別子。静的な実商品参照はikeaなど、従来の検索リンクはamazonまたはrakuten
+             * @example francfranc
              */
-            shop: "amazon" | "rakuten";
-            /** @example https://search.rakuten.co.jp/search/mall/... */
+            shop: string;
+            /**
+             * @description 確認済みの商品詳細URL。未確認の参考商品では検索結果URL
+             * @example https://francfranc.com/products/1102030047044
+             */
             url: string;
             /** @example null */
             image_url: string | null;
