@@ -4,6 +4,53 @@
  */
 
 export interface paths {
+    "/api/v1/assets/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description textures/description-seamless-v1/<64桁のハッシュ>.png等 */
+                key: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * 開発環境の生成テクスチャを取得する
+         * @description 開発・テスト限定。本番は404となり、SceneObjectのGCS公開texture_urlを使用する。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description textures/description-seamless-v1/<64桁のハッシュ>.png等 */
+                    key: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 生成画像 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "image/png": string;
+                        "image/jpeg": string;
+                        "image/webp": string;
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/signup": {
         parameters: {
             query?: never;
@@ -207,7 +254,7 @@ export interface paths {
         put?: never;
         /**
          * コーデ提案の生成を始める
-         * @description 生成は非同期。GET /api/v1/coordinations/{id} で status が done / failed になるまでポーリングする。Geminiの設定がある場合は要望文からAIで商品を選び、無い場合はキーワード判定のモック。商品候補はInteriorLinks::MockClientの参考データ。本人の部屋・提案だけ扱う
+         * @description GET /api/v1/coordinations/{id} で status が done / failed になるまで待つ。本番inline実行ではPOSTも処理完了を待つ。Geminiの設定とownerの利用許可があれば公式EC商品を検索し、配置後に既存モデルの素材テクスチャを生成する。未設定時はモック。furniture_operationsで既存家具のkeep/replace、additionsで最大6点の大型家具追加を指定できる。本人の部屋・提案だけ扱う
          */
         post: {
             parameters: {
@@ -980,7 +1027,7 @@ export interface components {
              * @example null
              * @enum {string|null}
              */
-            slot: null | "bed_cover" | "curtain" | "rug" | "wall_decor" | "light" | "display" | "cushion" | "desk_top";
+            slot: null | "bed_cover" | "curtain" | "rug" | "wall_decor" | "light" | "display" | "cushion" | "desk_top" | "floor";
             /**
              * @description 付けた先の家具・窓の id
              * @example null
@@ -996,6 +1043,29 @@ export interface components {
              * @example null
              */
             marker: number | null;
+            /** @example bed-1 */
+            replaces_object_id?: string | null;
+            model_size?: components["schemas"]["Size"];
+            /**
+             * @example contain
+             * @enum {string}
+             */
+            model_fit?: "contain";
+            model_match?: components["schemas"]["ModelMatch"];
+            /**
+             * @example ready
+             * @enum {string}
+             */
+            texture_status?: "disabled" | "ready" | "failed" | "skipped" | "unmatched";
+            /**
+             * @example description
+             * @enum {string}
+             */
+            texture_source?: "description";
+            /** @example {} */
+            material_overrides?: {
+                [key: string]: components["schemas"]["MaterialOverride"];
+            };
         };
         Scene: {
             room: components["schemas"]["RoomShape"];
@@ -1089,12 +1159,109 @@ export interface components {
             /** @example #f2f0eb */
             color: string;
         };
+        FurnitureOperation: {
+            /** @example bed-1 */
+            object_id: string;
+            /**
+             * @example keep
+             * @enum {string}
+             */
+            action: "keep" | "replace";
+        };
+        FurnitureAddition: {
+            /**
+             * @example sofa
+             * @enum {string}
+             */
+            category: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table";
+        };
+        MaterialOverride: {
+            /** @example #ffffff */
+            color?: string;
+            /** @example https://storage.googleapis.com/example-models/textures/v1/tile.png */
+            texture_url?: string;
+            /** @example 0.5 */
+            tile_size_m?: number;
+        };
+        ModelMatch: {
+            /** @example 1 */
+            model_id: number;
+            /** @example category_shape_ratio:desk/desk_wood */
+            reason: string;
+            /** @example true */
+            approximate: boolean;
+        };
+        /** @description 実商品・バリエーション・出典・取得日時・公式寸法と推定軸。商品写真は生成入力へ送らない */
+        ProductMetadata: {
+            /** @example ikea */
+            provider?: string;
+            /** @example 50337820 */
+            provider_product_id?: string;
+            /** @example 50337820 */
+            variant_id?: string;
+            /**
+             * @example JPY
+             * @enum {string}
+             */
+            currency?: "JPY";
+            /** @example https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/ */
+            source_url?: string;
+            /**
+             * Format: date-time
+             * @example 2026-10-05T04:00:00Z
+             */
+            price_checked_at?: string;
+            /**
+             * Format: date-time
+             * @example 2026-10-05T04:00:00Z
+             */
+            fetched_at?: string;
+            /** @example unknown */
+            availability?: string;
+            size?: {
+                /** @example 1.3 */
+                w?: number | null;
+                /** @example null */
+                h?: number | null;
+                /** @example 1.3 */
+                d?: number | null;
+            };
+            /**
+             * @example {
+             *       "kind": "official_page"
+             *     }
+             */
+            size_source?: {
+                [key: string]: unknown;
+            };
+            /**
+             * @description Googleから返された検索候補表示HTML。隔離したiframeへ未改変で表示
+             * @example
+             */
+            search_entry_point_html?: string;
+            /** @example [] */
+            estimated_axes?: ("w" | "h" | "d")[];
+            /** @example スチール */
+            material?: string;
+            /** @example null */
+            shape?: string | null;
+            /**
+             * @example {
+             *       "generation_input": "not_used"
+             *     }
+             */
+            image_usage?: {
+                [key: string]: unknown;
+            };
+        } & {
+            [key: string]: unknown;
+        };
         CoordinationInput: {
             coordination: {
                 /** @example 紫色の推し活ルームにしたい */
                 prompt: string;
                 /**
-                 * @description 買い足しの予算 (円)
+                 * @description 追加・入れ替え商品の予算 (円・送料別)
                  * @example 30000
                  */
                 budget: number;
@@ -1107,6 +1274,13 @@ export interface components {
                  *     ]
                  */
                 kept_object_ids?: string[];
+                /**
+                 * @description 指定時は既存家具すべてにkeep/replaceを一つ指定。全replaceも可能。未指定・空配列は旧kept_object_idsの意味を維持
+                 * @example []
+                 */
+                furniture_operations?: components["schemas"]["FurnitureOperation"][];
+                /** @example [] */
+                additions?: components["schemas"]["FurnitureAddition"][];
                 /**
                  * @description 家具の最新配置と、手動で調整した商品の配置。同じ商品が再採用される場合に引き継ぐ。省略すると解析時の配置を使う
                  * @example []
@@ -1143,6 +1317,18 @@ export interface components {
             color: string;
             /** @example ベッドに掛ける */
             placement_note: string;
+            product_metadata?: components["schemas"]["ProductMetadata"];
+            /**
+             * @example ready
+             * @enum {string}
+             */
+            texture_status?: "disabled" | "ready" | "failed" | "skipped" | "unmatched";
+            /**
+             * @example description
+             * @enum {string}
+             */
+            texture_source?: "description";
+            model_match?: components["schemas"]["ModelMatch"];
         };
         Coordination: {
             /** @example 1 */
@@ -1166,6 +1352,20 @@ export interface components {
              *     ]
              */
             kept_object_ids: string[];
+            /** @example [] */
+            furniture_operations?: components["schemas"]["FurnitureOperation"][];
+            /** @example [] */
+            additions?: components["schemas"]["FurnitureAddition"][];
+            /**
+             * @description Google検索候補HTML。各要素を未改変で隔離表示する
+             * @example []
+             */
+            search_entry_points?: string[];
+            /**
+             * @example ec
+             * @enum {string|null}
+             */
+            product_source?: null | "ec" | "mock";
             /** @example ラベンダーの推し活ルーム */
             title: string | null;
             /** @example ラベンダー 布団カバー3点セット シングル (ベッドに掛ける) などを追加しました。今のベッドとデスクと本棚はそのまま活かしています。 */

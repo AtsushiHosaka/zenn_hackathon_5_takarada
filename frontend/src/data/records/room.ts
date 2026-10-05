@@ -1,6 +1,6 @@
 import { DomainError } from "../../domain/error";
-import type { RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
-import { isRoomDesign, isRoomShape } from "../../domain/room";
+import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
+import { furnitureCategories, isRoomDesign, isRoomShape, isTextureStatus } from "../../domain/room";
 import type { components } from "../generated/api";
 
 export type AnalysisRoomRecord = components["schemas"]["Room"];
@@ -44,6 +44,10 @@ export function toCoordinationRecord(value: unknown): CoordinationRecord {
     planned_by: record.planned_by === "gemini" || record.planned_by === "mock" ? record.planned_by : null,
     error_message: nullableText(record.error_message, "Coordination.error_message"),
     created_at: createdAt,
+    furniture_operations: record.furniture_operations == null || Array.isArray(record.furniture_operations) && record.furniture_operations.length === 0 ? undefined : furnitureOperations(record.furniture_operations),
+    additions: record.additions == null ? undefined : furnitureAdditions(record.additions),
+    product_source: productSource(record.product_source),
+    search_entry_points: record.search_entry_points == null ? undefined : searchEntryPoints(record.search_entry_points),
   };
   if (new Set(parsed.items.map(item => item.marker)).size !== parsed.items.length) invalid("Coordination.items.marker の重複");
   if (parsed.status === "done") {
@@ -68,7 +72,7 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     kind: "coordination",
     id: `api-coordination-${record.id}`,
     title: record.title,
-    description: record.planned_by === "gemini" ? `${record.comment} 商品情報は静的な参考データで、価格・在庫は購入先でご確認ください。3Dの形・色・寸法は近似です。` : `${record.comment} 希望文の解析とAI生成は行っていないモックです。商品情報は静的な参考データで、価格・在庫は購入先でご確認ください。3Dの形・色・寸法は近似です。`,
+    description: `${record.comment} ${record.product_source === "ec" ? "ECで確認した商品の参考価格です。商品価格の合計は送料別です。" : "商品情報は静的な参考データです。"} 価格・在庫・仕様は購入先でご確認ください。3Dの形・色・寸法は近似で、通路や扉の開閉は未確認です。`,
     ...(record.planned_by ? { generatedBy: record.planned_by } : {}),
     style: record.title === "ラベンダーの推し活ルーム" ? "oshi" : record.title === "グリーンが映えるボタニカルルーム" ? "botanical" : "natural",
     ...after,
@@ -76,13 +80,15 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
       if (item.existing) return item;
       const product = record.items.find(product => product.marker === item.marker);
       if (!product) invalid("Coordination.items");
+      const metadata = productMetadata(product.product_metadata, baseUrl);
       return {
         ...item,
         name: product.name,
         price: product.price,
         shop: productShopLabel(product.shop, product.url),
         productUrl: url(product.url, baseUrl),
-        imageUrl: url(product.image_url, baseUrl),
+        imageUrl: record.product_source === "ec" && !metadata?.imageDisplayAllowed ? undefined : url(product.image_url, baseUrl),
+        productMetadata: metadata,
       };
     }),
     before: sceneSnapshot(record.before_scene, baseUrl),
@@ -90,7 +96,14 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     analysisInput,
     prompt: record.prompt,
     budget: record.budget,
-    keptObjectIds: record.kept_object_ids.length > 0 ? record.kept_object_ids : record.before_scene.objects.filter(item => item.source === "existing").map(item => item.id),
+    keptObjectIds: record.furniture_operations !== undefined ? record.furniture_operations.filter(operation => operation.action === "keep").map(operation => operation.object_id) : record.kept_object_ids.length > 0 ? record.kept_object_ids : record.before_scene.objects.filter(item => item.source === "existing").map(item => item.id),
+    furnitureOperations: record.furniture_operations?.map(operation => ({ objectId: operation.object_id, action: operation.action })),
+    furnitureAdditions: record.additions,
+    productSource: record.product_source ?? undefined,
+    searchEntryPoints: [...new Set([...(record.search_entry_points ?? []), ...record.items.flatMap(item => {
+      const metadata = productMetadata(item.product_metadata, baseUrl);
+      return metadata?.searchEntryPointHtml ? [metadata.searchEntryPointHtml] : [];
+    })])],
   };
   if (!isRoomDesign(design)) invalid("Coordination の部屋データ");
   return design;
@@ -112,7 +125,8 @@ function sceneSnapshot(scene: components["schemas"]["Scene"], baseUrl: string): 
       rotation: item.rotation_y,
       marker: item.marker ?? undefined,
       productId: item.item_id === null ? undefined : String(item.item_id),
-      modelUrl: url(item.model_url, baseUrl),
+      modelUrl: item.source === "suggested" && item.texture_status === "unmatched" ? undefined : url(item.model_url, baseUrl),
+      ...sceneProductDetails(item, baseUrl),
     })),
   };
 }
@@ -131,6 +145,7 @@ function coordinationItem(value: unknown): components["schemas"]["CoordinationIt
     image_url: nullableText(record.image_url, "CoordinationItem.image_url"),
     color: text(record.color, "CoordinationItem.color"),
     placement_note: text(record.placement_note, "CoordinationItem.placement_note"),
+    product_metadata: record.product_metadata == null ? undefined : object(record.product_metadata, "CoordinationItem.product_metadata"),
   };
 }
 
@@ -149,6 +164,130 @@ function productShopLabel(shop: string, productUrl: string): string {
   const label = labels[shop] ?? shop;
   const search = /^https:\/\/(?:search\.rakuten\.co\.jp\/search\/mall\/|www\.amazon\.co\.jp\/s(?:\?|$))/.test(productUrl);
   return search ? `${label}（検索）` : label;
+}
+
+function furnitureOperations(value: unknown): { object_id: string; action: "keep" | "replace" }[] {
+  if (!Array.isArray(value)) invalid("furniture_operations");
+  const operations = value.map((value): { object_id: string; action: "keep" | "replace" } => {
+    const operation = object(value, "furniture_operations");
+    if (operation.action !== "keep" && operation.action !== "replace") invalid("furniture_operations.action");
+    return { object_id: text(operation.object_id, "furniture_operations.object_id"), action: operation.action };
+  });
+  if (new Set(operations.map(operation => operation.object_id)).size !== operations.length) invalid("furniture_operations の重複");
+  return operations;
+}
+
+function furnitureAdditions(value: unknown) {
+  if (!Array.isArray(value) || value.length > 6) invalid("additions");
+  return value.map(value => {
+    const addition = object(value, "additions");
+    const category = furnitureCategories.find(category => category === addition.category);
+    if (!category) invalid("additions.category");
+    return { category };
+  });
+}
+
+function productSource(value: unknown): "ec" | "mock" | null {
+  if (value == null) return null;
+  if (value !== "ec" && value !== "mock") invalid("product_source");
+  return value;
+}
+
+function searchEntryPoints(value: unknown): string[] {
+  if (!Array.isArray(value)) invalid("search_entry_points");
+  return value.map(html => text(html, "search_entry_points.html"));
+}
+
+function textureStatus(value: unknown) {
+  if (value == null) return undefined;
+  if (!isTextureStatus(value)) invalid("texture_status");
+  return value;
+}
+
+function descriptionSource(value: unknown): "description" {
+  if (value !== "description") invalid("texture_source");
+  return value;
+}
+
+function containFit(value: unknown): "contain" {
+  if (value !== "contain") invalid("model_fit");
+  return value;
+}
+
+function sizeRecord(value: unknown) {
+  const size = object(value, "size");
+  return { w: positive(size.w, "size.w"), h: positive(size.h, "size.h"), d: positive(size.d, "size.d") };
+}
+
+function modelMatchRecord(value: unknown) {
+  const match = object(value, "model_match");
+  if (typeof match.approximate !== "boolean") invalid("model_match.approximate");
+  return { model_id: integer(match.model_id, "model_match.model_id"), reason: text(match.reason, "model_match.reason"), approximate: match.approximate };
+}
+
+function materialOverridesRecord(value: unknown) {
+  const overrides = object(value, "material_overrides");
+  return Object.fromEntries(Object.entries(overrides).map(([name, value]) => {
+    const override = object(value, "material_overrides.material");
+    return [text(name, "material_overrides.name"), {
+      ...(override.texture_url == null ? {} : { texture_url: text(override.texture_url, "texture_url") }),
+      ...(override.tile_size_m == null ? {} : { tile_size_m: positive(override.tile_size_m, "tile_size_m") }),
+      ...(override.color == null ? {} : { color: hexColor(override.color, "material_overrides.color") }),
+    }];
+  }));
+}
+
+function sceneProductDetails(item: components["schemas"]["SceneObject"], baseUrl: string): Partial<RoomItem> {
+  // Beforeと既存家具には商品の生成素材を適用しない。
+  if (item.source === "existing") return {};
+  const materialOverrides: MaterialOverrides | undefined = item.material_overrides == null ? undefined : Object.fromEntries(Object.entries(item.material_overrides).map(([name, override]) => [name, {
+    textureUrl: url(override.texture_url, baseUrl), tileSizeM: override.tile_size_m ?? undefined, color: override.color ?? undefined,
+  }]));
+  return {
+    materialOverrides,
+    textureStatus: item.texture_status ?? undefined,
+    textureSource: item.texture_source ?? undefined,
+    modelMatch: item.model_match == null ? undefined : { modelId: String(item.model_match.model_id), reason: item.model_match.reason, approximate: item.model_match.approximate },
+    modelSize: item.model_size ?? undefined,
+    modelFit: item.model_fit ?? undefined,
+    replacesObjectId: item.replaces_object_id ?? undefined,
+  };
+}
+
+function productMetadata(value: unknown, baseUrl: string): ProductMetadata | undefined {
+  if (value == null) return undefined;
+  const metadata = object(value, "product_metadata");
+  const result: ProductMetadata = {};
+  if (metadata.source_url != null) result.sourceUrl = url(metadata.source_url, baseUrl);
+  if (metadata.price_checked_at != null) {
+    const checkedAt = text(metadata.price_checked_at, "price_checked_at");
+    if (!Number.isFinite(Date.parse(checkedAt))) invalid("price_checked_at");
+    result.priceCheckedAt = checkedAt;
+  }
+  if (metadata.estimated_axes != null) {
+    if (!Array.isArray(metadata.estimated_axes)) invalid("estimated_axes");
+    result.estimatedAxes = metadata.estimated_axes.map(axis => {
+      if (axis !== "w" && axis !== "h" && axis !== "d") invalid("estimated_axes");
+      return axis;
+    });
+  }
+  if (metadata.size != null) {
+    const size = object(metadata.size, "product_metadata.size");
+    result.size = { w: size.w == null ? null : positive(size.w, "product_metadata.size.w"), h: size.h == null ? null : positive(size.h, "product_metadata.size.h"), d: size.d == null ? null : positive(size.d, "product_metadata.size.d") };
+  }
+  if (metadata.size_source != null) {
+    if (typeof metadata.size_source === "string") result.sizeSource = text(metadata.size_source, "size_source");
+    else {
+      const source = object(metadata.size_source, "size_source");
+      result.sizeSource = { url: url(source.url, baseUrl), evidence: source.evidence == null ? undefined : Array.isArray(source.evidence) ? source.evidence.map(evidence => text(evidence, "size_source.evidence")) : text(source.evidence, "size_source.evidence"), kind: optionalText(source.kind, "size_source.kind") };
+    }
+  }
+  if (metadata.material != null && metadata.material !== "") result.material = text(metadata.material, "material");
+  if (metadata.shape != null && metadata.shape !== "") result.shape = text(metadata.shape, "shape");
+  if (metadata.availability != null) result.availability = text(metadata.availability, "availability");
+  if (metadata.image_usage != null) result.imageDisplayAllowed = object(metadata.image_usage, "image_usage").display === "allowed";
+  if (metadata.search_entry_point_html != null) result.searchEntryPointHtml = text(metadata.search_entry_point_html, "search_entry_point_html");
+  return result;
 }
 
 function integer(value: unknown, field: string): number {
@@ -259,7 +398,7 @@ function analysisObject(value: unknown): components["schemas"]["SceneObject"] {
   const position = object(record.position, "SceneObject.position");
   if (record.source !== "existing" && record.source !== "suggested") invalid("SceneObject.source");
   if (typeof record.rotation_y !== "number" || !Number.isFinite(record.rotation_y) || record.rotation_y < 0 || record.rotation_y >= 360) invalid("SceneObject.rotation_y");
-  if (record.slot !== null && record.slot !== "bed_cover" && record.slot !== "curtain" && record.slot !== "rug" && record.slot !== "wall_decor" && record.slot !== "light" && record.slot !== "display" && record.slot !== "cushion" && record.slot !== "desk_top") invalid("SceneObject.slot");
+  if (record.slot !== null && record.slot !== "bed_cover" && record.slot !== "curtain" && record.slot !== "rug" && record.slot !== "wall_decor" && record.slot !== "light" && record.slot !== "display" && record.slot !== "cushion" && record.slot !== "desk_top" && record.slot !== "floor") invalid("SceneObject.slot");
   return {
     id: text(record.id, "SceneObject.id"),
     source: record.source,
@@ -274,6 +413,13 @@ function analysisObject(value: unknown): components["schemas"]["SceneObject"] {
     attach_to: nullableText(record.attach_to, "SceneObject.attach_to"),
     item_id: nullableInteger(record.item_id, "SceneObject.item_id"),
     marker: nullableInteger(record.marker, "SceneObject.marker"),
+    material_overrides: record.material_overrides == null ? undefined : materialOverridesRecord(record.material_overrides),
+    texture_status: textureStatus(record.texture_status),
+    texture_source: record.texture_source == null ? undefined : descriptionSource(record.texture_source),
+    model_match: record.model_match == null ? undefined : modelMatchRecord(record.model_match),
+    model_size: record.model_size == null ? undefined : sizeRecord(record.model_size),
+    model_fit: record.model_fit == null ? undefined : containFit(record.model_fit),
+    replaces_object_id: record.replaces_object_id == null ? undefined : text(record.replaces_object_id, "SceneObject.replaces_object_id"),
   };
 }
 

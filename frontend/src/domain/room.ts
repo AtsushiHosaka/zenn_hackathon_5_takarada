@@ -1,5 +1,23 @@
 export type Style = "botanical" | "oshi" | "natural";
 export type RoomShape = "square" | "standard" | "long";
+export const furnitureCategories = ["sofa", "bed", "desk", "chair", "shelf", "table"] as const;
+export type FurnitureCategory = typeof furnitureCategories[number];
+export type FurnitureOperation = { objectId: string; action: "keep" | "replace" };
+export type FurnitureAddition = { category: FurnitureCategory };
+export type TextureStatus = "disabled" | "ready" | "failed" | "skipped" | "unmatched";
+export type MaterialOverrides = Record<string, { textureUrl?: string; tileSizeM?: number; color?: string }>;
+export type ProductMetadata = {
+  sourceUrl?: string;
+  priceCheckedAt?: string;
+  sizeSource?: string | { url?: string; evidence?: string | string[]; kind?: string };
+  estimatedAxes?: ("w" | "h" | "d")[];
+  material?: string;
+  shape?: string;
+  availability?: string;
+  size?: { w: number | null; h: number | null; d: number | null };
+  imageDisplayAllowed?: boolean;
+  searchEntryPointHtml?: string;
+};
 export type RoomWindow = {
   id: string;
   wall: "north" | "east" | "south" | "west";
@@ -35,6 +53,14 @@ export type RoomItem = {
   // APIのitem_id。画面内のidやmarkerから商品IDを推定しない。
   productId?: string;
   marker?: number;
+  materialOverrides?: MaterialOverrides;
+  textureStatus?: TextureStatus;
+  textureSource?: "description";
+  modelMatch?: { modelId: string; reason: string; approximate: boolean };
+  modelSize?: { w: number; h: number; d: number };
+  modelFit?: "contain";
+  replacesObjectId?: string;
+  productMetadata?: ProductMetadata;
 };
 
 export type RoomSnapshot = { room: RoomGeometry; items: RoomItem[]; wallColor?: string };
@@ -58,6 +84,10 @@ export type RoomDesign = {
   prompt?: string;
   budget?: number;
   keptObjectIds?: string[];
+  furnitureOperations?: FurnitureOperation[];
+  furnitureAdditions?: FurnitureAddition[];
+  productSource?: "ec" | "mock";
+  searchEntryPoints?: string[];
   // 手動で編集した家具。選択から外した既存家具の変更も次の提案まで保持する。
   editedItems?: RoomItem[];
   // API の結果を AI (Gemini) が作ったか。部屋の解析は analyzed_by、コーデは planned_by から入る。
@@ -83,10 +113,18 @@ export function isRoomDesign(value: unknown): value is RoomDesign {
   if (value.editedItems !== undefined && (!Array.isArray(value.editedItems) || !value.editedItems.every(isRoomItem) || new Set(value.editedItems.map(item => item.id)).size !== value.editedItems.length)) return false;
   if (value.generatedBy !== undefined && value.generatedBy !== "gemini" && value.generatedBy !== "mock") return false;
   if (value.keptObjectIds !== undefined && (!Array.isArray(value.keptObjectIds) || !value.keptObjectIds.every(nonemptyString) || new Set(value.keptObjectIds).size !== value.keptObjectIds.length)) return false;
+  if (value.furnitureOperations !== undefined && !isFurnitureOperations(value.furnitureOperations)) return false;
+  if (value.furnitureAdditions !== undefined && !isFurnitureAdditions(value.furnitureAdditions)) return false;
+  if (value.productSource !== undefined && value.productSource !== "ec" && value.productSource !== "mock") return false;
+  if (value.searchEntryPoints !== undefined && (!Array.isArray(value.searchEntryPoints) || !value.searchEntryPoints.every(nonemptyString))) return false;
   if (!optionalHttpUrl(value.modelUrl) || !Array.isArray(value.items) || !value.items.every(isRoomItem)) return false;
   if (value.keptObjectIds !== undefined) {
     const furniture = (value.before?.items ?? value.items).filter(item => item.existing);
     if (value.keptObjectIds.some(id => !furniture.some(item => item.id === id))) return false;
+  }
+  if (value.furnitureOperations !== undefined) {
+    const furniture = (value.before?.items ?? value.items).filter(item => item.existing);
+    if (value.furnitureOperations.length !== furniture.length || value.furnitureOperations.some(operation => !furniture.some(item => item.id === operation.objectId))) return false;
   }
   return new Set(value.items.map(item => item.id)).size === value.items.length;
 }
@@ -132,7 +170,48 @@ export function isRoomItem(value: unknown): value is RoomItem {
   if (value.marker !== undefined && (typeof value.marker !== "number" || !Number.isSafeInteger(value.marker) || value.marker <= 0)) return false;
   if (value.shop !== undefined && !nonemptyString(value.shop)) return false;
   if (value.productId !== undefined && (typeof value.productId !== "string" || !/^[1-9]\d*$/.test(value.productId))) return false;
+  if (value.materialOverrides !== undefined && !isMaterialOverrides(value.materialOverrides)) return false;
+  if (value.textureStatus !== undefined && !isTextureStatus(value.textureStatus)) return false;
+  if (value.textureSource !== undefined && value.textureSource !== "description") return false;
+  if (value.replacesObjectId !== undefined && !nonemptyString(value.replacesObjectId)) return false;
+  if (value.modelMatch !== undefined && (!isRecord(value.modelMatch) || !nonemptyString(value.modelMatch.modelId) || !nonemptyString(value.modelMatch.reason) || typeof value.modelMatch.approximate !== "boolean")) return false;
+  if (value.productMetadata !== undefined && !isProductMetadata(value.productMetadata)) return false;
+  if (value.modelSize !== undefined && (!isRecord(value.modelSize) || ![value.modelSize.w, value.modelSize.h, value.modelSize.d].every(positiveNumber))) return false;
+  if (value.modelFit !== undefined && value.modelFit !== "contain") return false;
+  if (value.existing && (value.materialOverrides !== undefined || value.replacesObjectId !== undefined)) return false;
   return optionalHttpUrl(value.productUrl) && optionalHttpUrl(value.modelUrl) && optionalHttpUrl(value.imageUrl);
+}
+
+export function isFurnitureOperations(value: unknown): value is FurnitureOperation[] {
+  return Array.isArray(value) && value.every(operation => isRecord(operation) && nonemptyString(operation.objectId) && (operation.action === "keep" || operation.action === "replace")) && new Set(value.map(operation => operation.objectId)).size === value.length;
+}
+
+export function isFurnitureAdditions(value: unknown): value is FurnitureAddition[] {
+  return Array.isArray(value) && value.length <= 6 && value.every(addition => isRecord(addition) && furnitureCategories.some(category => category === addition.category));
+}
+
+export function isTextureStatus(value: unknown): value is TextureStatus {
+  return value === "disabled" || value === "ready" || value === "failed" || value === "skipped" || value === "unmatched";
+}
+
+export function isMaterialOverrides(value: unknown): value is MaterialOverrides {
+  return isRecord(value) && Object.entries(value).every(([name, override]) => nonemptyString(name) && isRecord(override) && optionalHttpUrl(override.textureUrl) && (override.tileSizeM === undefined || positiveNumber(override.tileSizeM)) && (override.color === undefined || typeof override.color === "string" && /^#[0-9a-f]{6}$/i.test(override.color)));
+}
+
+function isProductMetadata(value: unknown): value is ProductMetadata {
+  if (!isRecord(value) || !optionalHttpUrl(value.sourceUrl)) return false;
+  if (value.priceCheckedAt !== undefined && (typeof value.priceCheckedAt !== "string" || !Number.isFinite(Date.parse(value.priceCheckedAt)))) return false;
+  if (![value.material, value.shape, value.availability].every(field => field === undefined || nonemptyString(field))) return false;
+  if (value.estimatedAxes !== undefined && (!Array.isArray(value.estimatedAxes) || !value.estimatedAxes.every(axis => axis === "w" || axis === "h" || axis === "d"))) return false;
+  if (value.size !== undefined && (!isRecord(value.size) || ![value.size.w, value.size.h, value.size.d].every(axis => axis === null || positiveNumber(axis)))) return false;
+  if (value.imageDisplayAllowed !== undefined && typeof value.imageDisplayAllowed !== "boolean") return false;
+  if (value.searchEntryPointHtml !== undefined && !nonemptyString(value.searchEntryPointHtml)) return false;
+  if (value.sizeSource !== undefined && !nonemptyString(value.sizeSource)) {
+    if (!isRecord(value.sizeSource) || !optionalHttpUrl(value.sizeSource.url) || value.sizeSource.kind !== undefined && !nonemptyString(value.sizeSource.kind)) return false;
+    const evidence = value.sizeSource.evidence;
+    if (evidence !== undefined && !nonemptyString(evidence) && (!Array.isArray(evidence) || !evidence.every(nonemptyString))) return false;
+  }
+  return true;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

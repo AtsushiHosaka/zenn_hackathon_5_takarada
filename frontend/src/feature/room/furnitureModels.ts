@@ -34,6 +34,7 @@ export function resolveFurnitureModels(design: RoomDesign, models: FurnitureMode
   function resolve(items: RoomItem[]): RoomItem[] {
     let changed = false;
     const resolved = items.map(item => {
+      if (item.textureStatus === "unmatched") return item;
       const key = bindingKey(item);
       const modelUrl = !item.modelUrl && key ? urls.get(key) : undefined;
       if (!modelUrl) return item;
@@ -56,7 +57,7 @@ export function useFurnitureModelsForDesign(design: RoomDesign): RoomDesign {
   const { furnitureModels } = useRepositories();
   const usesCompleteModel = Boolean(design.modelUrl) && design.modelKind !== "shell";
   const candidates = usesCompleteModel ? design.before?.items ?? [] : [...design.items, ...(design.before?.items ?? [])];
-  const needsModels = design.source === "api" && candidates.some(item => !item.modelUrl && Boolean(bindingKey(item)));
+  const needsModels = design.source === "api" && candidates.some(item => item.textureStatus !== "unmatched" && !item.modelUrl && Boolean(bindingKey(item)));
   const { data } = useQuery({
     queryKey: furnitureModelKeys.all,
     queryFn: () => furnitureModels.list(),

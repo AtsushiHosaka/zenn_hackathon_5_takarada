@@ -1,3 +1,5 @@
+require "digest"
+
 # 商品を「枠 (slot)」のルールで部屋に配置し、Scene の object を作る。
 # AI は「どの枠にどの商品を入れるか」だけを決め、座標はここで計算する (LLM に座標を出させない)。
 #
@@ -16,6 +18,11 @@ class SlotLayout
   GRID_STEP = 0.05
   BACK_WALL = { 0 => "north", 90 => "west", 180 => "south", 270 => "east" }.freeze
 
+  def self.object_id_for(item)
+    group = item.metadata["group_id"]
+    group.present? ? "item-#{item.id}-#{Digest::SHA256.hexdigest(group)[0, 12]}" : "item-#{item.id}"
+  end
+
   def initialize(scene, kept_objects, edited_objects: [], reserved_object_ids: [])
     @room = scene.fetch("room")
     @objects = kept_objects
@@ -23,15 +30,32 @@ class SlotLayout
     @floor_rects = kept_objects.map { |o| footprint(o) }
     @wall_spans = Hash.new { |h, k| h[k] = [] }
     @reserved_edit_ids = []
+    @reserved_floor_rects = {}
     edited_objects.each { |edit| reserve_edit(edit) if reserved_object_ids.include?(edit["id"]) }
     # 壁に掛けたもの (宙に浮いている) の床の占有と高さ。背の高い床置きのものがぶつからないようにする
     @raised = []
   end
 
   def place(item)
-    if (edit = @edited_objects["item-#{item.id}"])
-      reserve_edit(edit)
-      placement = build(item, edit["size"], edit["position"], edit["rotation_y"], nil, "調整した配置")
+    if (edit = @edited_objects[self.class.object_id_for(item)])
+      size = ec_product?(item) ? item.size : edit["size"]
+      attachment = nil
+      if ec_product?(item) && %w[bed_cover curtain].include?(item.slot)
+        validated = item.slot == "bed_cover" ? place_bed_cover(item) : place_curtain(item)
+        return unless validated
+
+        size = validated.object["size"]
+        attachment = validated.object["attach_to"]
+      end
+      if item.slot == "floor"
+        return unless floor_pose_available?(size, edit["position"], edit["rotation_y"], ignored_rect: @reserved_floor_rects[edit["id"]])
+      end
+      if ec_product?(item) && @reserved_floor_rects[edit["id"]]
+        @floor_rects.delete_if { |rect| rect.equal?(@reserved_floor_rects[edit["id"]]) }
+        @reserved_edit_ids.delete(edit["id"])
+      end
+      reserve_edit(edit.merge("size" => size))
+      placement = build(item, size, edit["position"], edit["rotation_y"], attachment, "調整した配置")
       placement.object["color"] = edit["color"]
       return placement
     end
@@ -45,10 +69,42 @@ class SlotLayout
     when "light" then item.category == "desk_lamp" ? place_desk_top(item) : place_floor_lamp(item)
     when "display" then place_display(item)
     when "desk_top" then place_desk_top(item)
+    when "floor" then place_floor_furniture(item)
     end
   end
 
   private
+
+  def floor_pose_available?(size, position, rotation, ignored_rect: nil)
+    return false if size["h"] > @room["height"] || position["y"].abs > 0.001
+
+    fw, fd = footprint_size(size, rotation)
+    x, z = position.values_at("x", "z")
+    rect = [ x - fw / 2, z - fd / 2, x + fw / 2, z + fd / 2 ]
+    rect[0] >= MARGIN && rect[1] >= MARGIN && rect[2] <= @room["width"] - MARGIN && rect[3] <= @room["depth"] - MARGIN &&
+      @floor_rects.none? { |other| !other.equal?(ignored_rect) && overlap_area(rect, other).positive? }
+  end
+
+  def place_floor_furniture(item)
+    return if item.size["h"] > @room["height"]
+
+    preferred = item.metadata["preferred_position"]
+    rotation = item.metadata["preferred_rotation"] || 0
+    if preferred && floor_pose_available?(item.size, preferred, rotation)
+      x, z = preferred.values_at("x", "z")
+    else
+      center = preferred || { "x" => @room["width"] / 2, "z" => @room["depth"] / 2 }
+      x, z, rotation = best_floor_spot(item.size, [ rotation, (rotation + 90) % 360 ].uniq) do |cx, cz, _|
+        Math.hypot(cx - center["x"], cz - center["z"])
+      end
+    end
+    return unless x
+
+    occupy_floor(x, z, item.size, rotation)
+    placement = build(item, item.size, { "x" => x, "y" => 0.0, "z" => z }, rotation, nil, preferred ? "元家具の位置を優先し、空き領域に配置" : "床の空き領域に配置")
+    placement.object["replaces_object_id"] = item.metadata["replaces_object_id"]
+    placement
+  end
 
   def reserve_edit(edit)
     return if @reserved_edit_ids.include?(edit["id"])
@@ -56,6 +112,7 @@ class SlotLayout
     @reserved_edit_ids << edit["id"]
     if edit["position"]["y"] <= 0.05 && edit["slot"] != "rug"
       occupy_floor(edit["position"]["x"], edit["position"]["z"], edit["size"], edit["rotation_y"])
+      @reserved_floor_rects[edit["id"]] = @floor_rects.last
     elsif edit["slot"] == "wall_decor"
       wall = back_wall(edit["rotation_y"])
       along = along_of(edit, wall)
@@ -72,8 +129,22 @@ class SlotLayout
 
   def place_bed_cover(item)
     bed = find("bed") or return
-    size = { "w" => bed["size"]["w"] + 0.08, "h" => 0.06, "d" => bed["size"]["d"] + 0.04 }
+    if ec_product?(item)
+      size = official_render_size(item, %w[w d]) or return
+      return if size["w"] < bed["size"]["w"] || size["d"] < bed["size"]["d"]
+
+      fw, fd = footprint_size(size, bed["rotation_y"])
+      return if fw > @room["width"] || fd > @room["depth"]
+    else
+      size = { "w" => bed["size"]["w"] + 0.08, "h" => 0.06, "d" => bed["size"]["d"] + 0.04 }
+    end
     position = clamp_inside(bed["position"].merge("y" => bed["size"]["h"] - 0.02), size, bed["rotation_y"])
+    if ec_product?(item)
+      angle = bed["rotation_y"] * Math::PI / 180
+      dx, dz = position["x"] - bed["position"]["x"], position["z"] - bed["position"]["z"]
+      local_x, local_z = dx * Math.cos(angle) - dz * Math.sin(angle), dx * Math.sin(angle) + dz * Math.cos(angle)
+      return if local_x.abs > (size["w"] - bed["size"]["w"]) / 2 + 1e-6 || local_z.abs > (size["d"] - bed["size"]["d"]) / 2 + 1e-6
+    end
     build(item, size, position, bed["rotation_y"], bed["id"], "ベッドに掛ける")
   end
 
@@ -96,6 +167,8 @@ class SlotLayout
 
   def place_curtain(item)
     window = @room["windows"]&.first or return
+    return place_ec_curtain(item, window) if ec_product?(item)
+
     # 窓より左右 20cm ずつ広く掛ける。部屋の角に近い窓では、壁からはみ出さないよう縮める
     left = [ window["center"] - window["width"] / 2 - 0.2, MARGIN ].max
     right = [ window["center"] + window["width"] / 2 + 0.2, wall_length(window["wall"]) - MARGIN ].min
@@ -108,6 +181,48 @@ class SlotLayout
     # 床まで垂らすときは、カーテンの前 (壁から 15cm) に床置きのものを置かない
     occupy_floor(*wall_pose(window["wall"], (left + right) / 2, 0.075).first(2), size.merge("d" => 0.15), rotation) if bottom.zero?
     build(item, size, { "x" => x, "y" => bottom, "z" => z }, rotation, window["id"], "窓")
+  end
+
+  def ec_product?(item)
+    item.metadata["provider"].present? && item.metadata["source"] != "mock"
+  end
+
+  def official_render_size(item, axes)
+    physical = item.metadata["size"]
+    return unless physical.is_a?(Hash) && axes.all? { |axis| positive_dimension?(physical[axis]) }
+    return if (axes & Array(item.metadata["estimated_axes"])).any?
+
+    size = item.size.merge(physical.slice(*axes))
+    size if %w[w h d].all? { |axis| positive_dimension?(size[axis]) }
+  end
+
+  def positive_dimension?(value)
+    value.is_a?(Numeric) && value.to_f.finite? && value.positive?
+  end
+
+  def place_ec_curtain(item, window)
+    size = official_render_size(item, %w[w h]) or return
+    length = wall_length(window["wall"])
+    # Published width is a single panel unless the provider explicitly supplies a
+    # verified combined width. Do not invent a second panel or compress the fabric.
+    return if size["w"] + 2 * MARGIN > length
+
+    left = [ window["center"] - window["width"] / 2 - 0.2, MARGIN ].max
+    right = [ window["center"] + window["width"] / 2 + 0.2, length - MARGIN ].min
+    top = [ window["bottom"] + window["height"] + 0.15, @room["height"] - 0.05 ].min
+    return if top < window["bottom"] + window["height"]
+
+    along = window["center"].clamp(size["w"] / 2 + MARGIN, length - size["w"] / 2 - MARGIN)
+    actual_left = along - size["w"] / 2
+    actual_right = along + size["w"] / 2
+    bottom = top - size["h"]
+    required_bottom = [ window["bottom"] - 0.1, 0.0 ].max
+    return if actual_left > left || actual_right < right || bottom.negative? || bottom > required_bottom
+    return if furniture_on(window["wall"]).any? { |l, r, _, height| l < actual_right && r > actual_left && bottom < height + MARGIN }
+
+    x, z, rotation = wall_pose(window["wall"], along, size["d"] / 2 + 0.05)
+    occupy_floor(*wall_pose(window["wall"], along, 0.075).first(2), size.merge("d" => 0.15), rotation) if bottom <= 0.05
+    build(item, size, { "x" => x, "y" => bottom, "z" => z }, rotation, window["id"], "公式の幅・丈を維持して窓に配置（枚数・金具は未確認）")
   end
 
   def place_wall_decor(item)
@@ -305,7 +420,7 @@ class SlotLayout
 
   def build(item, size, position, rotation, attach_to, note)
     object = {
-      "id" => "item-#{item.id}",
+      "id" => self.class.object_id_for(item),
       "source" => "suggested",
       "category" => item.category,
       "label" => item.name,

@@ -47,6 +47,8 @@ create_table "coordinations", force: :cascade do |t|
   t.integer "budget", null: false
   t.jsonb "kept_object_ids", null: false, default: []
   t.jsonb "edited_objects", null: false, default: []
+  t.jsonb "furniture_operations", null: false, default: []
+  t.jsonb "additions", null: false, default: []
   t.string "status", null: false, default: "pending"
   t.string "title"
   t.text "comment"
@@ -58,6 +60,20 @@ create_table "coordinations", force: :cascade do |t|
   t.text "error_message"
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
+end
+
+# 公式ECで確認した商品・バリエーションの安定した内部IDと取得情報を保存する
+create_table "ec_products", force: :cascade do |t|
+  t.string "provider", null: false
+  t.string "provider_product_id", null: false
+  t.string "variant_id", null: false
+  t.string "source_url", null: false
+  t.jsonb "data", null: false, default: {}
+  t.datetime "fetched_at", null: false
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+
+  t.index [ "provider", "provider_product_id", "variant_id" ], unique: true, name: "index_ec_products_on_identity"
 end
 
 # GLB 本体は GCS に置き、DB には検索・描画に必要なメタデータを持つ
@@ -91,9 +107,25 @@ create_table "furniture_model_bindings", force: :cascade do |t|
   t.references "furniture_model", null: false, foreign_key: true
   t.string "kind", null: false
   t.string "reference", null: false
+  t.string "managed_by", null: false, default: "manifest"
+  t.jsonb "match_metadata", null: false, default: {}
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
 
   t.index [ "kind", "reference" ], unique: true
   t.check_constraint "kind::text = ANY (ARRAY['existing'::character varying::text, 'product'::character varying::text])", name: "furniture_model_bindings_valid_kind"
+end
+
+# Description-derived images are immutable and shared by their complete generation key.
+create_table "furniture_textures", force: :cascade do |t|
+  t.string "generation_key", null: false
+  t.string "bucket", null: false
+  t.string "object_key", null: false
+  t.string "generator_model", null: false
+  t.string "material_name", null: false
+  t.text "source_description", null: false
+  t.decimal "tile_size_m", precision: 6, scale: 3, null: false
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+  t.index [ "generation_key" ], unique: true
 end

@@ -62,7 +62,7 @@ resource "google_storage_bucket" "uploads" {
 
 # --- 権限 ---------------------------------------------------------------------
 
-# モデルは誰でも読める。書き込みは release 時の人間 / CI だけなので付けない
+# モデルと生成テクスチャは公開読み。GLBの書き込みはrelease時の人間・CIが行う。
 resource "google_storage_bucket_iam_member" "models_public" {
   bucket = google_storage_bucket.models.name
   role   = "roles/storage.objectViewer"
@@ -83,6 +83,19 @@ resource "google_storage_bucket_iam_member" "models_api" {
   bucket = google_storage_bucket.models.name
   role   = "roles/storage.objectViewer"
   member = "serviceAccount:${google_service_account.api.email}"
+}
+
+# APIは生成画像を新規作成する。GLBや既存画像の上書き・削除は許可しない。
+resource "google_storage_bucket_iam_member" "textures_api" {
+  bucket = google_storage_bucket.models.name
+  role   = "roles/storage.objectCreator"
+  member = "serviceAccount:${google_service_account.api.email}"
+
+  condition {
+    title       = "create-generated-textures"
+    description = "Create immutable generated texture objects only"
+    expression  = "resource.name.startsWith('projects/_/buckets/${google_storage_bucket.models.name}/objects/textures/')"
+  }
 }
 
 # Cloud Run のサービスアカウントは秘密鍵を持たない (メタデータサーバ経由の認証) ため、
