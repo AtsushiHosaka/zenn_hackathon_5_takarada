@@ -36,6 +36,32 @@ class SlotLayout
     @raised = []
   end
 
+  # 上に小物を置ける家具 (卓上の枠)。背の高い棚・収納の上には置かない
+  TOP_ANCHORS = %w[desk table storage tv_stand shelf].freeze
+  TOP_MAX_HEIGHT = 1.2
+  # 上の壁に飾りを掛ける目安にする家具 (壁際にあるものだけ)
+  WALL_ANCHORS = %w[desk bed sofa storage tv_stand shelf table].freeze
+  # 横に飾り棚・観葉植物を置く目安にする家具
+  SIDE_ANCHORS = %w[shelf desk storage tv_stand sofa].freeze
+
+  # その部屋 (活かす家具と窓) で置き場所がありうる枠。商品選びはこの枠の商品だけを候補にする
+  def self.placeable_slots(room, objects)
+    categories = objects.map { |object| object["category"] }
+    CoordinationPlanner::SLOT_PRIORITY.select do |slot|
+      case slot
+      when "bed_cover" then categories.include?("bed")
+      when "cushion" then (categories & %w[bed sofa]).any?
+      when "desk_top" then objects.any? { |object| top_anchor?(object) }
+      when "curtain" then Array(room["windows"]).any?
+      else true # 壁飾り・ラグ・照明・飾り棚は、家具が無くても空いた壁・床に置ける
+      end
+    end
+  end
+
+  def self.top_anchor?(object)
+    TOP_ANCHORS.include?(object["category"]) && object.dig("size", "h").to_f <= TOP_MAX_HEIGHT
+  end
+
   def place(item)
     if (edit = @edited_objects[self.class.object_id_for(item)])
       size = ec_product?(item) ? item.size : edit["size"]
@@ -148,19 +174,34 @@ class SlotLayout
     build(item, size, position, bed["rotation_y"], bed["id"], "ベッドに掛ける")
   end
 
+  # ベッドの枕元。ベッドが無ければソファの座面の奥
   def place_cushion(item)
-    bed = find("bed") or return
-    x, z = local_to_world(bed, 0, -(bed["size"]["d"] / 2 - 0.3))
-    position = { "x" => x, "y" => bed["size"]["h"] + 0.04, "z" => z }
-    build(item, item.size, position, bed["rotation_y"], bed["id"], "ベッドの枕元")
+    if (bed = find("bed"))
+      x, z = local_to_world(bed, 0, -(bed["size"]["d"] / 2 - 0.3))
+      position = { "x" => x, "y" => bed["size"]["h"] + 0.04, "z" => z }
+      return build(item, item.size, position, bed["rotation_y"], bed["id"], "ベッドの枕元")
+    end
+
+    sofa = find("sofa") or return
+    x, z = local_to_world(sofa, 0, -(sofa["size"]["d"] / 2 - item.size["d"] / 2 - 0.12))
+    # 座面はソファの高さのおよそ半分
+    position = { "x" => x, "y" => sofa["size"]["h"] * 0.5, "z" => z }
+    build(item, item.size, position, sofa["rotation_y"], sofa["id"], "#{sofa['label']}の上")
   end
 
+  # デスクの上。無ければテーブル・低い収納・テレビ台・低い棚の上 (天板に収まるものだけ)
   def place_desk_top(item)
-    desk = find("desk") or return
-    lx = desk["size"]["w"] / 2 - item.size["w"] / 2 - 0.08
-    lz = -(desk["size"]["d"] / 2 - item.size["d"] / 2 - 0.05)
-    x, z = local_to_world(desk, lx, lz)
-    build(item, item.size, { "x" => x, "y" => desk["size"]["h"], "z" => z }, desk["rotation_y"], desk["id"], "デスクの上")
+    anchor = TOP_ANCHORS.lazy.filter_map { |category| find(category) if top_anchor_fits?(category, item) }.first or return
+    lx = anchor["size"]["w"] / 2 - item.size["w"] / 2 - 0.08
+    lz = -(anchor["size"]["d"] / 2 - item.size["d"] / 2 - 0.05)
+    x, z = local_to_world(anchor, lx, lz)
+    build(item, item.size, { "x" => x, "y" => anchor["size"]["h"], "z" => z }, anchor["rotation_y"], anchor["id"], "#{anchor['label']}の上")
+  end
+
+  def top_anchor_fits?(category, item)
+    object = find(category)
+    object && self.class.top_anchor?(object) &&
+      item.size["w"] <= object["size"]["w"] - 0.1 && item.size["d"] <= object["size"]["d"]
   end
 
   # --- 壁・窓の枠 ---
@@ -233,10 +274,14 @@ class SlotLayout
     build(item, size, { "x" => x, "y" => bottom, "z" => z }, rotation, window["id"], "商品のプレビュー寸法で窓に配置（枚数・金具は未確認）")
   end
 
+  # 家具 (デスク・ベッド・ソファ・収納など) の上の壁。どれにも掛けられなければ空いている壁
   def place_wall_decor(item)
-    [ find("desk"), find("bed") ].compact.each do |anchor|
+    wall_anchors.each do |anchor|
       wall = back_wall(anchor["rotation_y"])
       bottom = [ anchor["size"]["h"] + 0.3, 1.0 ].max
+      # 背の高い収納などの上では天井に収まらないので、次の家具か空いている壁にする
+      next if bottom + item.size["h"] > @room["height"] - 0.05
+
       preferred = along_of(anchor, wall)
       along = free_wall_position(wall, preferred, item.size["w"], bottom, bottom + item.size["h"]) or next
       @wall_spans[wall] << [ along - item.size["w"] / 2, along + item.size["w"] / 2, bottom, bottom + item.size["h"] ]
@@ -246,6 +291,30 @@ class SlotLayout
       # 窓や棚を避けてずらしたときは「上」ではなくなる
       note = (along - preferred).abs < 0.3 ? "#{anchor['label']}の上の壁" : "#{anchor['label']}の近くの壁"
       return build(item, item.size, { "x" => x, "y" => bottom, "z" => z }, rotation, anchor["id"], note)
+    end
+    place_on_free_wall(item)
+  end
+
+  # 壁際にある家具だけを、壁飾りの目安にする (部屋の中央のテーブルなどは除く)
+  def wall_anchors
+    WALL_ANCHORS.flat_map { |category| @objects.select { |o| o["category"] == category } }.select do |object|
+      fw, fd = footprint_size(object["size"], object["rotation_y"])
+      wall_gap(back_wall(object["rotation_y"]), object["position"]["x"], object["position"]["z"], fw, fd) <= 0.15
+    end
+  end
+
+  # 目の高さ (下端 1.2m) で、長い壁の中央から近い空きに掛ける
+  def place_on_free_wall(item)
+    bottom = 1.2
+    top = bottom + item.size["h"]
+    walls = %w[north east south west].sort_by { |wall| -wall_length(wall) }
+    walls.each do |wall|
+      along = free_wall_position(wall, wall_length(wall) / 2, item.size["w"], bottom, top) or next
+      @wall_spans[wall] << [ along - item.size["w"] / 2, along + item.size["w"] / 2, bottom, top ]
+      x, z, rotation = wall_pose(wall, along, item.size["d"] / 2 + 0.01)
+      fw, fd = footprint_size(item.size, rotation)
+      @raised << [ [ x - fw / 2, z - fd / 2, x + fw / 2, z + fd / 2 ], bottom ]
+      return build(item, item.size, { "x" => x, "y" => bottom, "z" => z }, rotation, nil, "空いている壁")
     end
     nil
   end
@@ -351,8 +420,11 @@ class SlotLayout
     build(item, item.size, { "x" => x, "y" => 0.0, "z" => z }, rotation, nil, "部屋の角")
   end
 
+  # 本棚・デスク・収納・テレビ台・ソファの横の床。どれも無ければ空いた床の壁際
   def place_display(item)
-    anchor = find("shelf") || find("desk") or return
+    anchor = SIDE_ANCHORS.lazy.filter_map { |category| find(category) }.first
+    return place_on_floor_by_wall(item) unless anchor
+
     if item.size["h"] < 0.3 && anchor["category"] == "shelf"
       position = anchor["position"].merge("y" => anchor["size"]["h"])
       return build(item, item.size, position, anchor["rotation_y"], anchor["id"], "本棚の上")
@@ -366,10 +438,21 @@ class SlotLayout
     x, z, rotation = best_floor_spot(item.size, [ anchor["rotation_y"] ]) do |cx, cz, _|
       Math.hypot(cx - ax, cz - az) + wall_gap(wall, cx, cz, fw, fd) * 3
     end
-    return unless x
+    return place_on_floor_by_wall(item) unless x
 
     occupy_floor(x, z, item.size, rotation)
     build(item, item.size, { "x" => x, "y" => 0.0, "z" => z }, rotation, anchor["id"], "#{anchor['label']}の横")
+  end
+
+  # 空いた床のうち、壁に一番近いところ (部屋の真ん中をふさがない)
+  def place_on_floor_by_wall(item)
+    x, z, rotation = best_floor_spot(item.size, [ 0, 90, 180, 270 ]) do |cx, cz, _|
+      [ cz, @room["depth"] - cz, cx, @room["width"] - cx ].min
+    end
+    return unless x
+
+    occupy_floor(x, z, item.size, rotation)
+    build(item, item.size, { "x" => x, "y" => 0.0, "z" => z }, rotation, nil, "壁際")
   end
 
   # 床を格子状に走査し、ブロックの評価値が最小の位置を返す。
