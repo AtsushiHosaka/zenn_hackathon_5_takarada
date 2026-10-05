@@ -4,6 +4,7 @@
 # 観察結果の形 (RoomAnalyzer::Gemini::SCHEMA と同じ):
 #   wall_color / floor_color: "#rrggbb"
 #   windows:   [{ wall: north|south|east|west, position: start|center|end, size: small|medium|large }]
+#   doors:     [{ wall: north|south|east|west, position: start|center|end, kind: entrance|closet }]
 #   furniture: [{ category:, label:, color:, wall: north|south|east|west|none, position: start|center|end,
 #                 width_m:, depth_m:, height_m: }]
 # position は壁の端からの位置。start は north/south の壁なら西 (x=0) 側、east/west の壁なら北 (z=0) 側。
@@ -37,6 +38,11 @@ class RoomLayout
     "large" => { "width" => 1.7, "bottom" => 0.1, "height" => 1.9 }
   }.freeze
 
+  # ドアの幅 (メートル)。高さは DOOR_HEIGHT。前の DOOR_CLEARANCE までは家具を置かない (開け閉めと通り道)
+  DOOR_WIDTHS = { "entrance" => 0.8, "closet" => 0.9 }.freeze
+  DOOR_HEIGHT = 2.0
+  DOOR_CLEARANCE = 0.8
+
   # 壁を背にしたときの向き (正面が部屋の内側を向く)
   ROTATIONS = { "north" => 0, "west" => 90, "south" => 180, "east" => 270 }.freeze
   WALLS = ROTATIONS.keys.freeze
@@ -59,6 +65,9 @@ class RoomLayout
   end
 
   def build(observation)
+    doors = doors(observation["doors"])
+    # ドアの前は、家具より先に使用済みにしておく
+    doors.each { |door| @placed << door_clearance(door) }
     {
       "room" => {
         "width" => @width,
@@ -66,7 +75,8 @@ class RoomLayout
         "height" => @height,
         "wall_color" => hex(observation["wall_color"], "#f4f1ec"),
         "floor_color" => hex(observation["floor_color"], "#c8a97e"),
-        "windows" => windows(observation["windows"])
+        "windows" => windows(observation["windows"]),
+        "doors" => doors
       },
       "objects" => furniture(observation["furniture"])
     }
@@ -81,6 +91,29 @@ class RoomLayout
       width = [ size["width"], length - 0.2 ].min
       center = along_for(window["position"], length, width)
       { "id" => "window-#{index}", "wall" => window["wall"], "center" => center.round(2) }.merge(size).merge("width" => width)
+    end
+  end
+
+  def doors(list)
+    Array(list).select { |d| WALLS.include?(d["wall"]) }.first(3).map.with_index(1) do |door, index|
+      kind = DOOR_WIDTHS.key?(door["kind"]) ? door["kind"] : "entrance"
+      length = wall_length(door["wall"])
+      width = [ DOOR_WIDTHS.fetch(kind), length - 0.2 ].min
+      center = along_for(door["position"], length, width)
+      { "id" => "door-#{index}", "wall" => door["wall"], "center" => center.round(2), "width" => width,
+        "height" => DOOR_HEIGHT, "kind" => kind }
+    end
+  end
+
+  # ドアの前の床 (壁から DOOR_CLEARANCE まで)
+  def door_clearance(door)
+    left = door["center"] - door["width"] / 2
+    right = door["center"] + door["width"] / 2
+    case door["wall"]
+    when "north" then [ left, 0, right, DOOR_CLEARANCE ]
+    when "south" then [ left, @depth - DOOR_CLEARANCE, right, @depth ]
+    when "west" then [ 0, left, DOOR_CLEARANCE, right ]
+    when "east" then [ @width - DOOR_CLEARANCE, left, @width, right ]
     end
   end
 

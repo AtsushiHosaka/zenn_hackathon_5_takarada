@@ -2,7 +2,7 @@ export type Style = "botanical" | "oshi" | "natural";
 export type RoomShape = "square" | "standard" | "long";
 export const furnitureCategories = ["sofa", "bed", "desk", "chair", "shelf", "table"] as const;
 export type FurnitureCategory = typeof furnitureCategories[number];
-export type FurnitureOperation = { objectId: string; action: "keep" | "replace" };
+export type FurnitureOperation = { objectId: string; action: "keep" | "replace" | "remove" };
 export type FurnitureAddition = { category: FurnitureCategory };
 export type TextureStatus = "disabled" | "ready" | "failed" | "skipped" | "unmatched";
 export type MaterialOverrides = Record<string, { textureUrl?: string; tileSizeM?: number; color?: string }>;
@@ -183,7 +183,7 @@ export function isRoomItem(value: unknown): value is RoomItem {
 }
 
 export function isFurnitureOperations(value: unknown): value is FurnitureOperation[] {
-  return Array.isArray(value) && value.every(operation => isRecord(operation) && nonemptyString(operation.objectId) && (operation.action === "keep" || operation.action === "replace")) && new Set(value.map(operation => operation.objectId)).size === value.length;
+  return Array.isArray(value) && value.every(operation => isRecord(operation) && nonemptyString(operation.objectId) && (operation.action === "keep" || operation.action === "replace" || operation.action === "remove")) && new Set(value.map(operation => operation.objectId)).size === value.length;
 }
 
 export function isFurnitureAdditions(value: unknown): value is FurnitureAddition[] {

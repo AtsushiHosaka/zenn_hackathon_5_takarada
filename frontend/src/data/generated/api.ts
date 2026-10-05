@@ -953,6 +953,30 @@ export interface components {
             /** @example 1 */
             z: number;
         };
+        Door: {
+            /** @example door-1 */
+            id: string;
+            /**
+             * @example west
+             * @enum {string}
+             */
+            wall: "north" | "south" | "east" | "west";
+            /**
+             * @description 壁に沿ったドアの中心位置 (north/south は x、east/west は z)
+             * @example 3.16
+             */
+            center: number;
+            /** @example 0.8 */
+            width: number;
+            /** @example 2 */
+            height: number;
+            /**
+             * @description entrance: 部屋の出入り口 / closet: クローゼット・押し入れの扉
+             * @example entrance
+             * @enum {string}
+             */
+            kind: "entrance" | "closet";
+        };
         Window: {
             /** @example window-1 */
             id: string;
@@ -994,6 +1018,8 @@ export interface components {
             /** @example #c8a97e */
             floor_color: string;
             windows: components["schemas"]["Window"][];
+            /** @description ドア (部屋の出入り口・クローゼットの扉)。前の床 0.8m には家具・商品を置かない。古いシーンには無い */
+            doors?: components["schemas"]["Door"][];
         };
         SceneObject: {
             /** @example bed-1 */
@@ -1166,7 +1192,7 @@ export interface components {
              * @example keep
              * @enum {string}
              */
-            action: "keep" | "replace";
+            action: "keep" | "replace" | "remove";
         };
         FurnitureAddition: {
             /**
@@ -1275,12 +1301,17 @@ export interface components {
                  */
                 kept_object_ids?: string[];
                 /**
-                 * @description 指定時は既存家具すべてにkeep/replaceを一つ指定。全replaceも可能。未指定・空配列は旧kept_object_idsの意味を維持
+                 * @description 指定時は既存家具すべてにkeep/replace/removeを一つ指定。全replace・全removeも可能。未指定・空配列は旧kept_object_idsの意味を維持
                  * @example []
                  */
                 furniture_operations?: components["schemas"]["FurnitureOperation"][];
                 /** @example [] */
                 additions?: components["schemas"]["FurnitureAddition"][];
+                /**
+                 * @description 追加の指示 (チャット) で作り直すときの前回のコーデ (同じ部屋・生成済み)。指示に関係ない商品は前回のものを残す
+                 * @example 12
+                 */
+                base_coordination_id?: number | null;
                 /**
                  * @description 家具の最新配置と、手動で調整した商品の配置。同じ商品が再採用される場合に引き継ぐ。省略すると解析時の配置を使う
                  * @example []
@@ -1383,6 +1414,11 @@ export interface components {
              * @enum {string|null}
              */
             planned_by: null | "gemini" | "mock";
+            /**
+             * @description 追加の指示で作り直したときの前回のコーデ
+             * @example null
+             */
+            base_coordination_id: number | null;
             /** @example null */
             error_message: string | null;
             /** Format: date-time */

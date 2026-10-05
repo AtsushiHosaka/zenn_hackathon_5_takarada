@@ -10,6 +10,10 @@ class CoordinationPlanner
         title: { type: "string", description: "コーデの名前 (20 文字以内。例: 深紅の推し活ルーム)" },
         concept: { type: "string", description: "方向性の説明 (80 文字以内・です/ます調)。商品名は書かない" },
         unavailable_note: { type: "string", description: "要望どおりの色・雰囲気の商品が候補に無いときの断り書き (無ければ空文字)" },
+        remove_object_ids: {
+          type: "array", items: { type: "string" },
+          description: "要望で「いらない」「外したい」「捨てる」とはっきり書かれた今ある家具の id。書かれていなければ空"
+        },
         picks: {
           type: "array",
           items: {
@@ -24,7 +28,7 @@ class CoordinationPlanner
           }
         }
       },
-      required: %w[title concept unavailable_note picks]
+      required: %w[title concept unavailable_note remove_object_ids picks]
     }.freeze
 
     SLOT_LABELS = {
@@ -42,7 +46,7 @@ class CoordinationPlanner
       # 部屋
       - 壁の色: %<wall_color>s / 床の色: %<floor_color>s
       - 寸法 (m): %<room_size>s
-      - 活かす家具: %<kept>s
+      - 今ある家具 (id・名前・寸法・配置): %<kept>s
       - 商品価格の合計予算: %<budget>s 円 (送料と追加部品は別)
 
       # 商品候補 (JSON。寸法はm)
@@ -61,13 +65,31 @@ class CoordinationPlanner
         「赤い商品が見つからなかったため、近い色の○○を選びました」のように正直に伝える。あれば空文字にする。
       - 今ある家具の色と、壁・床の色とも合うようにする。
       - title と concept は要望に合わせて日本語で書く。concept には商品名を書かない。
+      - 要望で今ある家具を「いらない」「外したい」「捨てる」「別のに替えたい」とはっきり書いているときだけ、
+        その家具の id を remove_object_ids に入れる。「そのまま使いたい」と書かれた家具や、触れられていない家具は入れない。
+      %<previous>s
     TEXT
 
-    def initialize(prompt:, budget:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [])
+    PREVIOUS = <<~TEXT.freeze
+      # 前回の提案 (追加の指示で作り直す)
+      前回の要望: %<prompt>s
+      前回のタイトル: %<title>s
+      前回の商品 (id | group_id | 枠 | 商品名):
+      %<items>s
+
+      要望の最後の行が、今回の追加の指示。
+      - 追加の指示に関係しないグループは、候補にある前回の商品をselected_item_idに指定し、item_idsの先頭にも入れて残す。
+      - 追加の指示に関係するグループだけを選び直す。group_id・slot・idは今回の商品候補の組を使う。
+      - 前回の商品が候補に無い、予算が減った、配置できない場合は無理に残さず、変更理由をunavailable_noteに書く。
+      - title と concept は、前回からの変化が分かるように書く。
+    TEXT
+
+    def initialize(prompt:, budget:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil)
       @prompt = prompt
       @budget = budget
       @room = room
       @kept_objects = kept_objects
+      @previous = previous
       @user_id = user_id
       @client = client || InteriorLinks.client(user_id: user_id)
       @additional_candidates = additional_candidates
@@ -84,6 +106,7 @@ class CoordinationPlanner
         concept: json["concept"].to_s.strip.presence&.truncate(120),
         note: json["unavailable_note"].to_s.strip.presence&.truncate(120),
         candidates: ranked,
+        removed_object_ids: Array(json["remove_object_ids"]).map(&:to_s) & @kept_objects.pluck("id"),
         planned_by: "gemini",
         analysis: {
           "response" => json,
@@ -103,9 +126,21 @@ class CoordinationPlanner
         wall_color: @room["wall_color"],
         floor_color: @room["floor_color"],
         room_size: @room.slice("width", "depth", "height").to_json,
-        kept: @kept_objects.map { |o| o.slice("label", "category", "color", "size", "position") }.to_json,
+        kept: @kept_objects.map { |o| o.slice("id", "label", "category", "color", "size", "position") }.to_json,
+        previous: previous_section,
         budget: @budget.to_fs(:delimited),
         items: items.map { |item| candidate_json(item) }.to_json
+      )
+    end
+
+    def previous_section
+      return "" unless @previous
+
+      format(
+        PREVIOUS,
+        prompt: @previous.prompt,
+        title: @previous.title,
+        items: @previous.items.map { |item| "#{item['item_id']} | #{item['group_id'] || item['slot']} | #{item['slot']} | #{item['name']}" }.join("\n")
       )
     end
 

@@ -158,6 +158,18 @@ RSpec.configure do |config|
             },
             required: %w[x y z]
           },
+          Door: {
+            type: :object,
+            properties: {
+              id: { type: :string, example: "door-1" },
+              wall: { type: :string, enum: %w[north south east west], example: "west" },
+              center: { type: :number, description: "壁に沿ったドアの中心位置 (north/south は x、east/west は z)", example: 3.16 },
+              width: { type: :number, example: 0.8 },
+              height: { type: :number, example: 2.0 },
+              kind: { type: :string, enum: %w[entrance closet], description: "entrance: 部屋の出入り口 / closet: クローゼット・押し入れの扉", example: "entrance" }
+            },
+            required: %w[id wall center width height kind]
+          },
           Window: {
             type: :object,
             properties: {
@@ -178,7 +190,8 @@ RSpec.configure do |config|
               height: { type: :number, example: 2.4 },
               wall_color: { type: :string, example: "#f4f1ec" },
               floor_color: { type: :string, example: "#c8a97e" },
-              windows: { type: :array, items: { "$ref" => "#/components/schemas/Window" } }
+              windows: { type: :array, items: { "$ref" => "#/components/schemas/Window" } },
+              doors: { type: :array, items: { "$ref" => "#/components/schemas/Door" }, description: "ドア (部屋の出入り口・クローゼットの扉)。前の床 0.8m には家具・商品を置かない。古いシーンには無い" }
             },
             required: %w[width depth height wall_color floor_color windows]
           },
@@ -287,7 +300,7 @@ RSpec.configure do |config|
             type: :object,
             properties: {
               object_id: { type: :string, example: "bed-1" },
-              action: { type: :string, enum: %w[keep replace], example: "keep" }
+              action: { type: :string, enum: %w[keep replace remove], example: "keep" }
             },
             required: %w[object_id action]
           },
@@ -348,8 +361,9 @@ RSpec.configure do |config|
                   prompt: { type: :string, example: "紫色の推し活ルームにしたい" },
                   budget: { type: :integer, description: "追加・入れ替え商品の予算 (円・送料別)", example: 30_000 },
                   kept_object_ids: { type: :array, items: { type: :string }, description: "活かす家具の id。空なら全部活かす", example: %w[bed-1 desk-1 shelf-1] },
-                  furniture_operations: { type: :array, maxItems: 100, items: { "$ref" => "#/components/schemas/FurnitureOperation" }, description: "指定時は既存家具すべてにkeep/replaceを一つ指定。全replaceも可能。未指定・空配列は旧kept_object_idsの意味を維持", example: [] },
+                  furniture_operations: { type: :array, maxItems: 100, items: { "$ref" => "#/components/schemas/FurnitureOperation" }, description: "指定時は既存家具すべてにkeep/replace/removeを一つ指定。全replace・全removeも可能。未指定・空配列は旧kept_object_idsの意味を維持", example: [] },
                   additions: { type: :array, maxItems: 6, items: { "$ref" => "#/components/schemas/FurnitureAddition" }, example: [] },
+                  base_coordination_id: { type: :integer, nullable: true, description: "追加の指示 (チャット) で作り直すときの前回のコーデ (同じ部屋・生成済み)。指示に関係ない商品は前回のものを残す", example: 12 },
                   edited_objects: { type: :array, maxItems: 100, items: { "$ref" => "#/components/schemas/FurnitureEdit" }, description: "家具の最新配置と、手動で調整した商品の配置。同じ商品が再採用される場合に引き継ぐ。省略すると解析時の配置を使う", example: [] }
                 },
                 required: %w[prompt budget]
@@ -398,10 +412,11 @@ RSpec.configure do |config|
               items: { type: :array, items: { "$ref" => "#/components/schemas/CoordinationItem" }, description: "購入リンク一覧。after_scene の suggested と marker で対応する" },
               total_price: { type: :integer, nullable: true, example: 26_840 },
               planned_by: { type: :string, nullable: true, enum: [ nil, "gemini", "mock" ], description: "gemini: 要望文から AI が商品を選んだ / mock: キーワードでテーマを決めたモック。生成が終わると入る", example: "gemini" },
+              base_coordination_id: { type: :integer, nullable: true, description: "追加の指示で作り直したときの前回のコーデ", example: nil },
               error_message: { type: :string, nullable: true, example: nil },
               created_at: { type: :string, format: "date-time" }
             },
-            required: %w[id room_id status prompt budget kept_object_ids title comment before_scene after_scene items total_price planned_by error_message created_at]
+            required: %w[id room_id status prompt budget kept_object_ids title comment before_scene after_scene items total_price planned_by base_coordination_id error_message created_at]
           }
         }
       }
