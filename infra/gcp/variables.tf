@@ -65,8 +65,19 @@ variable "cors_origins" {
   default     = ""
 }
 
+variable "gemini_provider" {
+  description = "Gemini の接続先。vertex はこのプロジェクトの ADC 認証、developer は既存 Secret の API キー認証。Vertex からキーへフォールバックしない。"
+  type        = string
+  default     = "developer"
+
+  validation {
+    condition     = contains(["developer", "vertex"], var.gemini_provider)
+    error_message = "gemini_provider は developer または vertex を指定してください。"
+  }
+}
+
 variable "gemini_api_key_secret_id" {
-  description = "同じGCPプロジェクト内に既にあるGemini APIキーのSecret Manager ID。空ならAI設定と権限を追加しない。秘密値は渡さない。"
+  description = "Developer API用の既存GeminiキーのSecret Manager ID。空ならDeveloper APIを有効にしない。Vertexではキーを参照しない。秘密値は渡さない。"
   type        = string
   default     = ""
 
@@ -111,7 +122,7 @@ variable "gemini_allow_all_users" {
 }
 
 variable "gemini_model" {
-  description = "Gemini secret参照を有効にしたAPIで使用するモデル。料金とInteractions API対応を確認してから変更する。"
+  description = "Gemini を有効にした API で使用するモデル。料金と Interactions API 対応を確認してから変更する。"
   type        = string
   default     = "gemini-3.1-flash-lite"
 
@@ -122,7 +133,7 @@ variable "gemini_model" {
 }
 
 variable "gemini_thinking_level" {
-  description = "Gemini secret参照を有効にしたAPIのthinking level。空ならモデル既定値。"
+  description = "Gemini を有効にした API の thinking level。空ならモデル既定値。"
   type        = string
   default     = ""
 

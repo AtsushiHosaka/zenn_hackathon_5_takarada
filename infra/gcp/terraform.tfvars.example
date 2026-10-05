@@ -21,15 +21,25 @@ github_repository = "AtsushiHosaka/zenn_hackathon_5_takarada"
 # ローカルの Vite から実 API を叩くなら足す
 # cors_origins = "http://localhost:5173"
 
-# AIを有効にするときだけ、同じプロジェクト内の既存Secretを参照する。
-# キーの値をここへ書かない。固定versionと、料金を確認したモデルを指定する。
+# 2026-10-05の本番GCP切替を再現する場合は、project_idを
+# "zenn-hackathon-takarada" にし、次の3項目を有効にする。実呼出成功は未確認。
+# Vertex の API と API 用 SA の権限も追加する。
+# gemini_provider               = "vertex"
+# gemini_model                  = "gemini-3.1-flash-lite"
+# gemini_allow_all_users        = true
+# 本番のGEMINI_ALLOWED_USER_IDS未設定と同じ利用方針。既存の認証済みユーザーが実AIを使える。
+# 既定のfalseと空のgemini_allowed_user_idsのままapplyすると、全員mockになる。
+# 検証ownerだけに限定する場合はfalseにし、実IDを指定する。
+# gemini_allowed_user_ids       = [123]
+# 考える量を指定する場合のみ設定する。
+# gemini_thinking_level         = "low"
+
+# 従来の Developer API を使う場合だけ、同じプロジェクトの既存Secretを参照する。
+# キーの値をここへ書かない。Vertex モードではこのキーを使用しない。
+# gemini_provider               = "developer"
 # gemini_api_key_secret_id      = "existing-gemini-api-key"
 # gemini_api_key_secret_version = "1"
-# gemini_model                  = "gemini-3.1-flash-lite"
-# gemini_thinking_level         = "low"
-# gemini_allowed_user_ids       = [123] # 使い捨て検証ownerの実ID
 # gemini_grant_secret_access    = true  # 今回の新規付与が必要・承認済みのときだけ
-# gemini_allow_all_users        = false # 一般公開AIの継続費用は別途承認
 
 # 暴走時の課金上限になるので、必要になるまで小さく保つ
 api_max_instances = 3
