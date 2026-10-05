@@ -68,7 +68,7 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     kind: "coordination",
     id: `api-coordination-${record.id}`,
     title: record.title,
-    description: record.planned_by === "gemini" ? `${record.comment} 商品価格は参考値です。` : `${record.comment} 希望文の解析とAI生成は行っていないモックです。商品価格は参考値です。`,
+    description: record.planned_by === "gemini" ? `${record.comment} 商品情報は静的な参考データで、価格・在庫は購入先でご確認ください。3Dの形・色・寸法は近似です。` : `${record.comment} 希望文の解析とAI生成は行っていないモックです。商品情報は静的な参考データで、価格・在庫は購入先でご確認ください。3Dの形・色・寸法は近似です。`,
     ...(record.planned_by ? { generatedBy: record.planned_by } : {}),
     style: record.title === "ラベンダーの推し活ルーム" ? "oshi" : record.title === "グリーンが映えるボタニカルルーム" ? "botanical" : "natural",
     ...after,
@@ -80,7 +80,7 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
         ...item,
         name: product.name,
         price: product.price,
-        shop: product.shop === "rakuten" ? "楽天市場（検索）" : "Amazon（検索）",
+        shop: productShopLabel(product.shop, product.url),
         productUrl: url(product.url, baseUrl),
         imageUrl: url(product.image_url, baseUrl),
       };
@@ -119,7 +119,6 @@ function sceneSnapshot(scene: components["schemas"]["Scene"], baseUrl: string): 
 
 function coordinationItem(value: unknown): components["schemas"]["CoordinationItem"] {
   const record = object(value, "CoordinationItem");
-  if (record.shop !== "amazon" && record.shop !== "rakuten") invalid("CoordinationItem.shop");
   return {
     marker: integer(record.marker, "CoordinationItem.marker"),
     item_id: integer(record.item_id, "CoordinationItem.item_id"),
@@ -127,12 +126,29 @@ function coordinationItem(value: unknown): components["schemas"]["CoordinationIt
     category: text(record.category, "CoordinationItem.category"),
     name: text(record.name, "CoordinationItem.name"),
     price: nonnegativeInteger(record.price, "CoordinationItem.price"),
-    shop: record.shop,
+    shop: text(record.shop, "CoordinationItem.shop"),
     url: text(record.url, "CoordinationItem.url"),
     image_url: nullableText(record.image_url, "CoordinationItem.image_url"),
     color: text(record.color, "CoordinationItem.color"),
     placement_note: text(record.placement_note, "CoordinationItem.placement_note"),
   };
+}
+
+function productShopLabel(shop: string, productUrl: string): string {
+  const labels: Record<string, string> = {
+    amazon: "Amazon",
+    rakuten: "楽天市場",
+    ikea: "IKEA",
+    nitori: "ニトリ",
+    nitori_yahoo: "ニトリ Yahoo!店",
+    lowya: "LOWYA",
+    muji: "無印良品",
+    francfranc: "Francfranc",
+    kaja: "KAJA",
+  };
+  const label = labels[shop] ?? shop;
+  const search = /^https:\/\/(?:search\.rakuten\.co\.jp\/search\/mall\/|www\.amazon\.co\.jp\/s(?:\?|$))/.test(productUrl);
+  return search ? `${label}（検索）` : label;
 }
 
 function integer(value: unknown, field: string): number {
