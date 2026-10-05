@@ -2,7 +2,7 @@
 # cloudresourcemanager / serviceusage の 2 つだけは terraform 自身が
 # API を有効化するために先に要るので、make infra-bootstrap が gcloud で有効化する。
 locals {
-  services = [
+  services = concat([
     "run.googleapis.com",              # Cloud Run
     "sqladmin.googleapis.com",         # Cloud SQL
     "artifactregistry.googleapis.com", # コンテナイメージの置き場
@@ -12,7 +12,7 @@ locals {
     "iamcredentials.googleapis.com", # Workload Identity
     "sts.googleapis.com",            # Workload Identity
     "logging.googleapis.com",
-  ]
+  ], var.gemini_provider == "vertex" ? ["aiplatform.googleapis.com"] : [])
 }
 
 resource "google_project_service" "this" {

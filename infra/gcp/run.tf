@@ -1,5 +1,5 @@
 # Cloud Run のサービスアカウント。API 本体と db:apply ジョブが共有する。
-# 権限は「Cloud SQL に繋ぐ」「自分の Secret を読む」の 2 つだけ。
+# Cloud SQL・Secret・GCS の権限を持つ。Vertex は選択したときだけ追加する。
 resource "google_service_account" "api" {
   account_id   = "${var.project}-api"
   display_name = "${var.project} Cloud Run (API)"
@@ -8,6 +8,14 @@ resource "google_service_account" "api" {
 resource "google_project_iam_member" "api_cloudsql" {
   project = var.project_id
   role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.api.email}"
+}
+
+resource "google_project_iam_member" "api_vertex" {
+  count = var.gemini_provider == "vertex" ? 1 : 0
+
+  project = var.project_id
+  role    = "roles/aiplatform.user"
   member  = "serviceAccount:${google_service_account.api.email}"
 }
 
@@ -38,12 +46,18 @@ locals {
   cors_origins = var.cors_origins != "" ? var.cors_origins : google_cloud_run_v2_service.web.uri
 
   # AIはAPIのinlineジョブで実行する。DBタスクやWebへキーを渡さない。
-  gemini_env = var.gemini_api_key_secret_id == "" ? {} : merge(
+  gemini_enabled = var.gemini_provider == "vertex" || var.gemini_api_key_secret_id != ""
+  gemini_env = !local.gemini_enabled ? {} : merge(
     {
+      GEMINI_PROVIDER         = var.gemini_provider
       GEMINI_MODEL            = var.gemini_model
       GEMINI_ALLOWED_USER_IDS = var.gemini_allow_all_users ? "*" : join(",", [for id in var.gemini_allowed_user_ids : tostring(id)])
     },
-    var.gemini_thinking_level == "" ? {} : { GEMINI_THINKING_LEVEL = var.gemini_thinking_level }
+    var.gemini_thinking_level == "" ? {} : { GEMINI_THINKING_LEVEL = var.gemini_thinking_level },
+    var.gemini_provider == "vertex" ? {
+      GOOGLE_CLOUD_PROJECT  = var.project_id
+      GOOGLE_CLOUD_LOCATION = "global"
+    } : {}
   )
 }
 
@@ -128,7 +142,7 @@ resource "google_cloud_run_v2_service" "api" {
       }
 
       dynamic "env" {
-        for_each = var.gemini_api_key_secret_id == "" ? [] : [var.gemini_api_key_secret_id]
+        for_each = var.gemini_provider == "developer" && var.gemini_api_key_secret_id != "" ? [var.gemini_api_key_secret_id] : []
 
         content {
           name = "GEMINI_API_KEY"
@@ -193,6 +207,7 @@ resource "google_cloud_run_v2_service" "api" {
     google_secret_manager_secret_iam_member.api,
     google_secret_manager_secret_iam_member.gemini_api,
     google_project_iam_member.api_cloudsql,
+    google_project_iam_member.api_vertex,
     google_storage_bucket_iam_member.uploads_api,
     google_service_account_iam_member.api_sign_blob,
   ]
