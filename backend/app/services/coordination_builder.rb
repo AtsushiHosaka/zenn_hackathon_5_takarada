@@ -24,7 +24,8 @@ class CoordinationBuilder
     client = InteriorLinks.client(user_id: @coordination.room.user_id, preferred_categories:, previous_items: @coordination.base_coordination&.items || [])
     candidate_limit = GeminiClient.configured?(user_id: @coordination.room.user_id) ? CoordinationPlanner::Gemini::CANDIDATES_PER_GROUP : 3
     floor_candidates = FurnitureOperationPlanner.call(@coordination, @scene, client:, candidate_limit:)
-    plan = CoordinationPlanner.call(prompt: @coordination.prompt, budget: @coordination.budget, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id, client:, additional_candidates: floor_candidates, previous:)
+    plan = CoordinationPlanner.call(prompt: @coordination.prompt, budget: @coordination.budget, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id, client:, additional_candidates: floor_candidates, previous:,
+                                    slots: SlotLayout.placeable_slots(@scene["room"], kept))
     removed, kept = kept.partition { |object| plan.removed_object_ids.include?(object["id"]) }
     # 従来の空配列は「全部活かす」。明示操作がある場合は、全置換・全除外も許可する。
     removed, kept = [], kept_objects if kept.empty? && @coordination.furniture_operations.empty?
