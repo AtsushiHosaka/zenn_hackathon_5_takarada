@@ -158,6 +158,18 @@ RSpec.configure do |config|
             },
             required: %w[x y z]
           },
+          Door: {
+            type: :object,
+            properties: {
+              id: { type: :string, example: "door-1" },
+              wall: { type: :string, enum: %w[north south east west], example: "west" },
+              center: { type: :number, description: "壁に沿ったドアの中心位置 (north/south は x、east/west は z)", example: 3.16 },
+              width: { type: :number, example: 0.8 },
+              height: { type: :number, example: 2.0 },
+              kind: { type: :string, enum: %w[entrance closet], description: "entrance: 部屋の出入り口 / closet: クローゼット・押し入れの扉", example: "entrance" }
+            },
+            required: %w[id wall center width height kind]
+          },
           Window: {
             type: :object,
             properties: {
@@ -178,7 +190,8 @@ RSpec.configure do |config|
               height: { type: :number, example: 2.4 },
               wall_color: { type: :string, example: "#f4f1ec" },
               floor_color: { type: :string, example: "#c8a97e" },
-              windows: { type: :array, items: { "$ref" => "#/components/schemas/Window" } }
+              windows: { type: :array, items: { "$ref" => "#/components/schemas/Window" } },
+              doors: { type: :array, items: { "$ref" => "#/components/schemas/Door" }, description: "ドア (部屋の出入り口・クローゼットの扉)。前の床 0.8m には家具・商品を置かない。古いシーンには無い" }
             },
             required: %w[width depth height wall_color floor_color windows]
           },
