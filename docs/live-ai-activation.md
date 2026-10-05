@@ -1,5 +1,7 @@
 # 既存Gemini設定の経路と互換性
 
+2026-10-05、本人は個人APIキーをやめ、既存GCPプロジェクトでGeminiを使う方針へ変更した。[クーポンとVertex AIの移行メモ](../specs/gcp-billing-vertex/spec.md)に従い、Cloud Run APIをVertexのADC認証へ切り替え、画像入力と家具提案の実呼出を確認した。以下は2026-10-04時点の判断と記録であり、今回のVertex対応を禁止するものではない。
+
 2026-10-04、本人はチームメンバーの既存Geminiキーを使う意図を明示した。新しいキー入力・Secret・IAMの提案は取り下げ、既存設定の所在と実行時の状態を先に確認する。Cloud Run revisionのenv名にキーがないことだけで、チームのキーや実行時のキーが存在しないとは扱わない。
 
 根拠は本人の訂正、PR #14 / #15の実AI検証記録と既存ソース。Google Docs URLは `docs/project.md` が空欄のため未確認・未反映。

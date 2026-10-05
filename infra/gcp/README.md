@@ -86,7 +86,7 @@ Serverless VPC コネクタと常時稼働の worker も要るので、月 ¥8,0
 同期実行している。ローカルの `compose.yaml` は今も redis と worker を立てるので、
 開発側は本物の非同期で動く。
 
-`AnalyzeRoomJob` / `GenerateCoordinationJob` はキー未設定ならmock、設定時はGeminiを呼ぶ。
+`AnalyzeRoomJob` / `GenerateCoordinationJob` はGeminiの接続設定とownerの利用許可がある場合に実AIを呼び、それ以外はmockで動く。
 Geminiは再試行込み90秒、Web nginxは115秒、ブラウザは120秒の期限を持つ。
 `status` をポーリングするAPI契約は維持しているが、本番inlineではPOST自体が処理を待つ。
 
@@ -103,13 +103,39 @@ Geminiは再試行込み90秒、Web nginxは115秒、ブラウザは120秒の期
 Secret Manager に入れ、Cloud Run が環境変数として読む。`terraform.tfstate` には
 平文で入るのでコミットしない (`.gitignore` 済み)。
 
-**Geminiキー。** 既定では本番へ渡さない。`gemini_api_key_secret_id` と固定versionを指定した場合だけ、
-同じproject内の既存SecretをAPI envで参照する。今回新規に読み取りを付与するときだけ
-`gemini_grant_secret_access=true` を指定し、既存grantは管理・削除しない。
-`gemini_allowed_user_ids` の検証ownerだけ実AIを使え、空なら全員mock。
-一般利用のAIは別途承認して `gemini_allow_all_users=true` を指定する。キーの値はTerraformへ入力せず、
-WebやDBタスクのenvへ渡さない。モデル・費用・本人の最終確認は
-[本番AIの最小設定](../../docs/live-ai-activation.md)を参照。
+**GeminiをGCPから呼ぶ。** `gemini_provider="vertex"` を指定すると、このプロジェクトの
+Vertex AI APIを有効にし、既存APIサービスアカウントへ `roles/aiplatform.user` を付与する。
+Cloud RunはADCで認証するため、個人APIキーもサービスアカウントの秘密鍵も不要。
+請求先はこのプロジェクトに紐づくCloud Billingアカウントになる。
+[Interactions API](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/interactions)は
+Previewで、接続先は `global`。Cloud Runの配置リージョンとは別に設定する。
+
+2026-10-05の本番切替では、`GEMINI_PROVIDER=vertex`、
+`GOOGLE_CLOUD_PROJECT=zenn-hackathon-takarada`、`GOOGLE_CLOUD_LOCATION=global`、
+`GEMINI_MODEL=gemini-3.1-flash-lite` を設定した。
+`GEMINI_ALLOWED_USER_IDS` は従来どおり未設定とし、既存の認証済みユーザーが実AIを使える利用方針を維持する。
+既存APIサービスアカウントのADC認証で、画像入力の解析と家具提案の実呼出が成功した。
+
+次回の `terraform apply` でも同じ利用方針を維持するには、`terraform.tfvars` に次を指定する。
+
+```hcl
+project_id             = "zenn-hackathon-takarada"
+gemini_provider        = "vertex"
+gemini_model           = "gemini-3.1-flash-lite"
+gemini_allow_all_users = true
+```
+
+Terraformは `gemini_allow_all_users=true` の場合、`GEMINI_ALLOWED_USER_IDS="*"` を設定する。
+既定の `false` と空の `gemini_allowed_user_ids` のまま適用すると、全員mockになる。
+検証対象を限定する場合は `false` にし、`gemini_allowed_user_ids` にownerの実IDを指定する。
+モデル・考える量は `gemini_model` / `gemini_thinking_level` で選ぶ。
+Vertexの設定や認証に失敗しても個人キーへ切り替えない。Web・DBタスクへAI環境変数は渡さない。
+
+従来のDeveloper APIは `gemini_provider="developer"` で利用できる。既定はこのモードだが、
+`gemini_api_key_secret_id` が空ならAI環境変数を追加しない。
+キーは同じプロジェクトの既存Secretと固定versionを参照し、値をTerraformへ入力しない。
+新しく読取権限を付けるときだけ `gemini_grant_secret_access=true` を指定する。
+Vertexを選択するとAPIのキー参照を除去するが、既存Secret本体や手動で付けた権限は削除しない。
 
 ## お金
 
