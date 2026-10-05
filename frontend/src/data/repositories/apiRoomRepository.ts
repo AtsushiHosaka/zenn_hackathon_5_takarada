@@ -1,5 +1,5 @@
 import { DomainError } from "../../domain/error";
-import { isRoomItem, isRoomShape } from "../../domain/room";
+import { isFurnitureAdditions, isFurnitureOperations, isRoomItem, isRoomShape } from "../../domain/room";
 import type { GenerateRoomInput, RoomRepository } from "../../domain/roomRepository";
 import type { ApiClient } from "../apiClient";
 import { createDemoRoom } from "../dummy/dummyRoomRepository";
@@ -59,13 +59,15 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
           if (record.status === "ready") {
             if (config.contract === "analysis") return toAnalyzedRoomDesign(record, baseUrl);
             if (!config.coordinationPath.includes("{id}")) throw new DomainError("コーディネートの作成先が設定されていません");
-            const keptObjectIds = input.keptObjectIds ?? [];
+            const existingIds = record.scene?.objects.filter(item => item.source === "existing").map(item => item.id) ?? [];
+            if (input.furnitureOperations !== undefined && (!isFurnitureOperations(input.furnitureOperations) || input.furnitureOperations.length !== existingIds.length || input.furnitureOperations.some(operation => !existingIds.includes(operation.objectId)))) throw new DomainError("各家具について残すか入れ替えるかを選んでください");
+            const keptObjectIds = input.furnitureOperations?.filter(operation => operation.action === "keep").map(operation => operation.objectId) ?? input.keptObjectIds ?? [];
             if (!Array.isArray(keptObjectIds) || keptObjectIds.some(id => typeof id !== "string" || !record.scene?.objects.some(item => item.source === "existing" && item.id === id)) || new Set(keptObjectIds).size !== keptObjectIds.length) throw new DomainError("活かす家具の選択が正しくありません");
-            const request: components["schemas"]["CoordinationInput"] = { coordination: { prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: editedObjects(input, record), ...(input.baseCoordinationId && /^[1-9]\d*$/.test(input.baseCoordinationId) ? { base_coordination_id: Number(input.baseCoordinationId) } : {}) } };
-            let coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationPath.replace("{id}", String(record.id)), { method: "POST", body: request, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 120_000 }));
+            const request: components["schemas"]["CoordinationInput"] = { coordination: { prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: editedObjects(input, record), ...(input.baseCoordinationId && /^[1-9]\d*$/.test(input.baseCoordinationId) ? { base_coordination_id: Number(input.baseCoordinationId) } : {}), ...(input.furnitureOperations === undefined ? {} : { furniture_operations: input.furnitureOperations.map(operation => ({ object_id: operation.objectId, action: operation.action })) }), ...(input.furnitureAdditions === undefined ? {} : { additions: input.furnitureAdditions }) } };
+            let coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationPath.replace("{id}", String(record.id)), { method: "POST", body: request, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 270_000 }));
             const coordinationId = coordination.id;
             if (coordination.room_id !== expectedId) throw new DomainError("別の部屋のコーディネートを受け取りました");
-            for (let step = 0; step < 60; step++) {
+            for (let step = 0; step < 120; step++) {
               if (coordination.status === "failed") throw new DomainError(coordination.error_message || "コーディネートに失敗しました");
               if (coordination.status === "done") return toCoordinatedRoomDesign(coordination, baseUrl, { tatami: record.tatami, shape: record.shape });
               if (!config.coordinationJobPath.includes("{id}")) throw new DomainError("コーディネートの取得先が設定されていません");
@@ -127,7 +129,7 @@ function editedObjects(input: GenerateRoomInput, record: components["schemas"]["
 }
 
 function boundedSignal(signal?: AbortSignal): AbortSignal {
-  const deadline = AbortSignal.timeout(120_000);
+  const deadline = AbortSignal.timeout(360_000);
   return signal ? AbortSignal.any([signal, deadline]) : deadline;
 }
 
@@ -170,6 +172,8 @@ function photoUploadRequest(photos: File[]): components["schemas"]["UploadInput"
 function validateCoordinationInput(input: GenerateRoomInput) {
   if (!input.prompt.trim() || input.prompt.length > 500) throw new DomainError("部屋の希望を500文字以内で入力してください");
   if (!Number.isSafeInteger(input.budget) || input.budget <= 0) throw new DomainError("予算は1円以上の整数で入力してください");
+  if (input.furnitureOperations !== undefined && !isFurnitureOperations(input.furnitureOperations)) throw new DomainError("家具の操作が正しくありません");
+  if (input.furnitureAdditions !== undefined && !isFurnitureAdditions(input.furnitureAdditions)) throw new DomainError("追加する家具は6点までで種類を選んでください");
 }
 
 function validJobId(value: unknown): value is string | number {
