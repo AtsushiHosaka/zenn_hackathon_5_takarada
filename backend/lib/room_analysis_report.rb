@@ -54,7 +54,9 @@ class RoomAnalysisReport
   def colors_and_windows
     observation = @analysis["observation"] || {}
     windows = Array(observation["windows"]).map { |w| "#{w['wall']}/#{w['position']}/#{w['size']}" }
-    "壁の色: #{observation['wall_color']}  床の色: #{observation['floor_color']}\n窓: #{windows.presence&.join(', ') || 'なし'}"
+    doors = Array(observation["doors"]).map { |d| "#{d['wall']}/#{d['position']}/#{d['kind']}" }
+    "壁の色: #{observation['wall_color']}  床の色: #{observation['floor_color']}\n窓: #{windows.presence&.join(', ') || 'なし'}" \
+      "\nドア: #{doors.presence&.join(', ') || 'なし'}"
   end
 
   def furniture

@@ -22,6 +22,14 @@ class RoomAnalyzer
             required: %w[wall position size]
           }
         },
+        doors: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: { wall: WALL, position: POSITION, kind: { type: "string", enum: %w[entrance closet] } },
+            required: %w[wall position kind]
+          }
+        },
         furniture: {
           type: "array",
           items: {
@@ -40,7 +48,7 @@ class RoomAnalyzer
           }
         }
       },
-      required: %w[wall_color floor_color windows furniture]
+      required: %w[wall_color floor_color windows doors furniture]
     }.freeze
 
     PROMPT = <<~TEXT.freeze
@@ -53,6 +61,10 @@ class RoomAnalyzer
       position は、その壁のどのあたりにあるかです。
       - north と south の壁: west に近い端が start、中央が center、east に近い端が end。
       - east と west の壁: north に近い端が start、中央が center、south に近い端が end。
+
+      ドアについて:
+      - 部屋の出入り口のドアは kind: entrance、クローゼット・押し入れの扉は kind: closet として doors に入れる。
+      - 写真に写っているドアだけを答える。写っていなければ空にする。
 
       家具について:
       - category は決められた種類から最も近いものを選ぶ。小物・家電・ラグ・カーテン・照明は含めない。
