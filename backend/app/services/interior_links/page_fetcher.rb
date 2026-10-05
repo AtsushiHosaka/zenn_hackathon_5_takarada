@@ -18,6 +18,12 @@ module InteriorLinks
 
     class Error < StandardError; end
 
+    def initialize
+      @robots = {}
+      @robot_failures = {}
+      @robot_locks = STORES.keys.to_h { |host| [ host, Mutex.new ] }
+    end
+
     def self.store(url)
       uri = URI.parse(url.to_s)
       store = STORES[uri.host]
@@ -85,24 +91,25 @@ module InteriorLinks
     end
 
     def robots_allowed?(uri)
-      @robots ||= {}
-      @robot_failures ||= {}
-      raise Error, @robot_failures[uri.host] if @robot_failures[uri.host]
+      rules = @robot_locks.fetch(uri.host).synchronize do
+        raise Error, @robot_failures[uri.host] if @robot_failures[uri.host]
 
-      rules = @robots.fetch(uri.host) do
-        response, = request(URI("https://#{uri.host}/robots.txt"), robots: true)
-        raise Error, "robots.txtの取得が制限されています" if response.code.to_i == 403 || response.code.to_i >= 500
-        raise Error, "robots.txtの取得結果を確認できませんでした" unless response.is_a?(Net::HTTPSuccess) || response.code.to_i == 404
-        raise Error, "robots.txtがHTML応答のため許可を確認できませんでした" if response.is_a?(Net::HTTPSuccess) && response["content-type"].to_s.include?("text/html")
-
-        @robots[uri.host] = response.code.to_i == 404 ? [] : robot_rules(response.body)
+        @robots.fetch(uri.host) { load_robot_rules(uri.host) }
       end
       matches = rules.select { |rule| robot_match?(rule[:path], uri.request_uri) }
       longest = matches.max_by { |rule| [ rule[:path].delete("*$").length, rule[:allow] ? 1 : 0 ] }
       longest.nil? || longest[:allow]
+    end
+
+    def load_robot_rules(host)
+      response, = request(URI("https://#{host}/robots.txt"), robots: true)
+      raise Error, "robots.txtの取得が制限されています" if response.code.to_i == 403 || response.code.to_i >= 500
+      raise Error, "robots.txtの取得結果を確認できませんでした" unless response.is_a?(Net::HTTPSuccess) || response.code.to_i == 404
+      raise Error, "robots.txtがHTML応答のため許可を確認できませんでした" if response.is_a?(Net::HTTPSuccess) && response["content-type"].to_s.include?("text/html")
+
+      @robots[host] = response.code.to_i == 404 ? [] : robot_rules(response.body)
     rescue Error => e
-      # A blocked host must not consume the deadline again for every product URL.
-      @robot_failures[uri.host] = e.message
+      @robot_failures[host] = e.message
       raise
     end
 

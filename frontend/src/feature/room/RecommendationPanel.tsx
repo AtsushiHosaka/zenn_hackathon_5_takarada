@@ -16,7 +16,7 @@ function ProductDetails({item,originalItems}:{item:RoomItem;originalItems?:RoomI
     {item.replacesObjectId&&<span className="rc-item-shop">{replaced?.name??item.replacesObjectId}の入れ替え</span>}
     {metadata?.priceCheckedAt&&<span className="rc-item-shop">参考価格の確認: {new Date(metadata.priceCheckedAt).toLocaleString('ja-JP')}</span>}
     {metadata?.size&&<span className="rc-item-shop">商品寸法: 幅{dimensionLabel(metadata.size.w)} × 高さ{dimensionLabel(metadata.size.h)} × 奥行き{dimensionLabel(metadata.size.d)}</span>}
-    {!!metadata?.estimatedAxes?.length&&<span className="rc-item-shop">{metadata.estimatedAxes.map(axis=>axisLabels[axis]).join('・')}は描画用の推定寸法</span>}
+    {!!metadata?.estimatedAxes?.length&&<span className="rc-item-shop">{metadata.estimatedAxes.map(axis=>axisLabels[axis]).join('・')}は描画・配置用の推定寸法</span>}
     {item.modelMatch?.approximate&&<span className="rc-item-shop" title={item.modelMatch.reason}>形状は既存モデルによる近似</span>}
     {item.textureStatus&&<span className="rc-item-shop">{textureLabels[item.textureStatus]}</span>}
     {item.textureStatus==='ready'&&item.textureSource==='description'&&<span className="rc-item-shop">色・素材の説明から生成。商品画像の再現ではありません。</span>}

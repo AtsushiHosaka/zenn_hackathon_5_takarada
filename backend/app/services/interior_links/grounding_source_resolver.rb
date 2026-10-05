@@ -8,47 +8,58 @@ module InteriorLinks
   # destination. Only PageFetcher is allowed to retrieve actual EC pages.
   class GroundingSourceResolver
     HOST = "vertexaisearch.cloud.google.com".freeze
-    MAX_SOURCES = 24
+    MAX_SOURCES = 72
+    CONCURRENCY = 8
     MAX_BYTES = 16 * 1024
-    DEADLINE_SECONDS = 15
+    DEADLINE_SECONDS = 12
     class Error < StandardError; end
 
     def resolve(sources)
-      accepted = []
-      counts = Hash.new(0)
+      fetcher = PageFetcher # Resolve Rails autoload on the caller before worker joins.
+      sources = Array(sources).uniq
+      selected = sources.first(MAX_SOURCES)
       started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      sources.uniq.first(MAX_SOURCES).each do |source|
-        remaining = DEADLINE_SECONDS - (Process.clock_gettime(Process::CLOCK_MONOTONIC) - started)
-        if remaining <= 0
-          counts["deadline"] += 1
-          break
-        end
-        if PageFetcher.store(source)
-          accepted << source
-          counts["direct_official"] += 1
-          next
-        end
-        unless google_uri?(source)
-          counts["unsupported_source"] += 1
-          next
-        end
-        begin
-          target = Timeout.timeout([ remaining, 5 ].min) { follow(URI(source)) }
-          if target
-            accepted << target
-            counts["resolved_official"] += 1
-          else
-            counts["non_product_destination"] += 1
+      queue = Queue.new
+      selected.each_with_index { |source, index| queue << [ source, index ] }
+      # Only fixed Google redirect URLs are resolved here; official destinations
+      # are still fetched and verified by PageFetcher in the catalog stage.
+      workers = []
+      [ selected.length, CONCURRENCY ].min.times do
+        workers << Thread.new do
+          rows = []
+          loop do
+            source, index = queue.pop(true)
+            remaining = DEADLINE_SECONDS - (Process.clock_gettime(Process::CLOCK_MONOTONIC) - started)
+            rows << [ index, resolve_one(source, remaining, fetcher) ]
+          rescue ThreadError
+            break
           end
-        rescue Error, URI::InvalidURIError, SocketError, Resolv::ResolvError, Timeout::Error, IOError, SystemCallError, OpenSSL::SSL::SSLError
-          # Opaque source paths and response bodies must never enter logs/errors.
-          counts["resolution_failed"] += 1
+          rows
         end
       end
-      { urls: accepted.uniq, diagnostics: counts.to_h.merge("source_count" => sources.uniq.length) }
+      rows = workers.flat_map(&:value).sort_by(&:first).map(&:last)
+      counts = rows.each_with_object(Hash.new(0)) { |row, totals| totals[row[:status]] += 1 }
+      counts["source_limit"] = sources.length - selected.length if sources.length > selected.length
+      { urls: rows.filter_map { |row| row[:url] }.uniq,
+        diagnostics: counts.to_h.merge("source_count" => sources.length) }
+    ensure
+      workers&.each { |worker| worker.kill if worker.alive? }
+      workers&.each(&:join)
     end
 
     private
+
+    def resolve_one(source, remaining, fetcher)
+      return { status: "deadline" } if remaining <= 0
+      return { url: source, status: "direct_official" } if fetcher.store(source)
+      return { status: "unsupported_source" } unless google_uri?(source)
+
+      target = Timeout.timeout([ remaining, 5 ].min) { follow(URI(source)) }
+      target ? { url: target, status: "resolved_official" } : { status: "non_product_destination" }
+    rescue Error, URI::InvalidURIError, SocketError, Resolv::ResolvError, Timeout::Error, IOError, SystemCallError, OpenSSL::SSL::SSLError
+      # Opaque source paths and response bodies must never enter logs/errors.
+      { status: "resolution_failed" }
+    end
 
     def google_uri?(url)
       uri = URI(url.to_s)

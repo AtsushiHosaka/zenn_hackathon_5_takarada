@@ -3,7 +3,7 @@ require "bigdecimal"
 require "digest"
 
 module InteriorLinks
-  # All accepted price and dimension values must occur in the fetched official page.
+  # Prices remain verified. Missing dimensions may use explicit category estimates.
   class ProductParser
     CATEGORY_RULES = [
       [ "bed_cover", "bed_cover", /掛け?布団カバー|掛ふとんカバー|ベッドカバー|掛けふとんカバー/ ],
@@ -24,18 +24,42 @@ module InteriorLinks
     COLORS = { /ホワイト|白|アイボリー/ => "#f2efe8", /ブラック|黒/ => "#303030", /グリーン|緑/ => "#799469",
                /ブルー|青/ => "#778da6", /ピンク/ => "#d6a5b3", /グレー/ => "#aaa9a5", /ブラウン|茶|ウォールナット/ => "#987b61",
                /ナチュラル|ベージュ|無垢|オーク|アッシュ/ => "#c4ae8c", /パープル|紫/ => "#ad96bb" }.freeze
+    ESTIMATED_SIZES = DEFAULT_SIZES.merge(
+      "sofa" => { "w" => 1.8, "h" => 0.8, "d" => 0.85 }, "bed" => { "w" => 1.0, "h" => 0.8, "d" => 2.1 },
+      "desk" => { "w" => 1.0, "h" => 0.73, "d" => 0.6 }, "chair" => { "w" => 0.5, "h" => 0.85, "d" => 0.5 },
+      "shelf" => { "w" => 0.8, "h" => 1.5, "d" => 0.35 }, "table" => { "w" => 0.8, "h" => 0.73, "d" => 0.6 },
+      "desk_lamp" => { "w" => 0.25, "h" => 0.4, "d" => 0.25 }, "wall_mirror" => { "w" => 0.5, "h" => 0.7, "d" => 0.03 },
+      "wall_art" => { "w" => 0.4, "h" => 0.5, "d" => 0.02 }, "wall_planter" => { "w" => 0.3, "h" => 0.4, "d" => 0.2 },
+      "small_plant" => { "w" => 0.2, "h" => 0.3, "d" => 0.2 }
+    ).freeze
 
     class Unverified < StandardError; end
 
+    def initialize(user_id: nil, extractor: nil)
+      @user_id = user_id
+      @extractor = extractor
+    end
+
     def parse(html:, url:, store:)
+      @extraction_failure = nil
       @document = Nokogiri::HTML(html)
       @url = url
       @store = store
       @text = @document.at_css("body")&.dup
-      @text&.css("script, style, nav, footer").each(&:remove)
+      @text&.css("script, style, nav, footer")&.each(&:remove)
       @text = @text&.text.to_s.gsub(/[\u00a0\s]+/, " ").strip
       product = products.find { |entry| identity_matches?(entry) }
-      raise Unverified, "対象バリエーションのProduct JSON-LDがありません" unless product
+      if needs_html_extraction?(product)
+        begin
+          extracted = (@extractor || HtmlProductExtractor.new(user_id: @user_id)).extract(document: @document, url:)
+          product = merge_extraction(product, extracted)
+        rescue HtmlProductExtractor::Error => e
+          raise Unverified, e.message unless product
+
+          @extraction_failure = e.message
+        end
+      end
+      raise Unverified, "対象バリエーションの商品情報がありません" unless product
 
       name = product["name"].to_s.strip
       raise Unverified, "公式の商品名がありません" if name.blank?
@@ -53,7 +77,13 @@ module InteriorLinks
         dimensions[thin[0]] = thin[1]
         estimated_axes << thin[0]
       end
-      raise Unverified, "配置に必要な公式寸法が不足しています" unless %w[w h d].all? { |axis| dimensions[axis]&.positive? && dimensions[axis] < 20 }
+      %w[w h d].each do |axis|
+        next if dimensions[axis]&.positive? && dimensions[axis] < 20
+
+        physical_size[axis] = nil
+        dimensions[axis] = ESTIMATED_SIZES.fetch(category, FALLBACK_SIZE).fetch(axis)
+        estimated_axes << axis
+      end
 
       price, availability, price_evidence = price_for(product)
       raise Unverified, "商品が売り切れまたは販売終了です" if availability == "out_of_stock"
@@ -69,11 +99,17 @@ module InteriorLinks
       color_name = product["color"].to_s.presence || name
       color = COLORS.find { |pattern, _| pattern.match?(color_name) }&.last || "#bdb4a8"
       shape = shape_for(name, category, evidence)
+      extracted_shape = product.dig("_html_extraction", "shape")
+      shape ||= extracted_shape if HtmlProductExtractor::SHAPES.include?(extracted_shape) && extracted_shape != "unknown"
       now = Time.current.iso8601
       metadata = {
         "provider" => store[:provider], "provider_product_id" => product_id.to_s, "variant_id" => variant,
+        "extraction_method" => product["_html_extraction"] ? "gemini_html" : "structured_html",
         "source_url" => url, "fetched_at" => now, "price_checked_at" => now, "currency" => "JPY",
-        "size" => physical_size, "size_source" => { "url" => url, "evidence" => evidence, "kind" => "official_page" },
+        "size" => physical_size, "size_source" => { "url" => url, "evidence" => evidence,
+          "kind" => product["_html_extraction"] ? "official_html_with_gemini_extraction" : "official_page",
+          "estimated_axes" => estimated_axes, "estimated_values_m" => dimensions.slice(*estimated_axes),
+          "estimate_basis" => estimated_axes.any? ? "category_standard_dimensions" : nil },
         "estimated_axes" => estimated_axes, "material" => material_for(product),
         "color_name" => color_name, "color_source" => "official_color_name_approximation", "shape" => shape,
         "shape_source" => { "url" => url, "name" => name, "measurements" => evidence, "kind" => "category_and_official_text" },
@@ -81,10 +117,58 @@ module InteriorLinks
         "image_usage" => { "display" => "unconfirmed", "storage" => "unconfirmed", "generation_input" => "unconfirmed",
                            "source_url" => url }, "access_policy" => "public_html_robots_checked"
       }
+      metadata["html_extraction"] = product["_html_extraction"] if product["_html_extraction"]
+      metadata["html_extraction_failure"] = @extraction_failure if @extraction_failure
       { slot:, category:, name:, price:, shop: store[:shop], url:, image_url: image_url(product), color:, size: dimensions, metadata: }
     end
 
     private
+
+    def needs_html_extraction?(product)
+      return true unless product && product["name"].present?
+
+      category, = category_for(product["name"].to_s, product)
+      return true unless category
+
+      dimensions, = dimensions_for(product, category)
+      missing = %w[w h d] - dimensions.keys
+      missing -= [ THIN_AXES[category]&.first ]
+      price_for(product)
+      unknown_color = product["color"].blank? && COLORS.keys.none? { |pattern| pattern.match?(product["name"].to_s) }
+      missing.any? || material_for(product).blank? || unknown_color
+    rescue Unverified
+      true
+    end
+
+    def merge_extraction(product, extracted)
+      return extracted unless product
+
+      structured_sku = product["sku"].presence || product["mpn"].presence
+      raise HtmlProductExtractor::Error, "構造化商品番号とHTML抽出の商品番号が一致しません" if structured_sku && extracted["sku"].present? && structured_sku.to_s != extracted["sku"].to_s
+
+      # Preserve structured identity/fields and supplement only missing data.
+      merged = extracted.merge(product.reject { |_, value| value.blank? })
+      merged["_html_extraction"] = extracted["_html_extraction"].dup
+      category, = category_for(product["name"].to_s, product)
+      merged["category"] = extracted["category"] unless category
+      known_dimensions, = dimensions_for(product, category || extracted["category"])
+      %w[w h d].zip(%w[width height depth]).each do |axis, property|
+        if known_dimensions[axis]
+          merged[property] = product[property]
+          merged["_html_extraction"].delete(axis)
+        elsif !quantitative_value(product[property])
+          merged[property] = extracted[property]
+        end
+      end
+      begin
+        price_for(product)
+        merged["_html_extraction"].delete("price_evidence")
+        merged["_html_extraction"].delete("tax_evidence")
+      rescue Unverified
+        merged["offers"] = extracted["offers"]
+      end
+      merged
+    end
 
     def products
       @document.css('script[type="application/ld+json"]').flat_map do |script|
@@ -126,7 +210,12 @@ module InteriorLinks
     def category_for(name, product)
       rule = CATEGORY_RULES.find { |_, _, pattern| pattern.match?(name) } ||
         CATEGORY_RULES.find { |_, _, pattern| pattern.match?(product["category"].to_s) }
-      rule&.first(2)
+      return rule.first(2) if rule
+
+      category = product["category"].to_s
+      return [ "small_plant", "desk_top" ] if category == "small_plant"
+
+      CATEGORY_RULES.find { |entry| entry.first == category }&.first(2)
     end
 
     def material_for(product)
@@ -149,7 +238,7 @@ module InteriorLinks
         next unless value
 
         dimensions[axis] = value
-        evidence << "JSON-LD #{property}: #{product[property].to_json}"
+        evidence << (product.dig("_html_extraction", axis).presence || "JSON-LD #{property}: #{product[property].to_json}")
       end
       # IKEA's measurement rows exclude the package measurement panel entirely.
       @document.css('[class*="measurements-tab__measurement-row"]').each do |row|
@@ -213,10 +302,14 @@ module InteriorLinks
       offers = offers.flat_map { |offer| offer["@type"] == "AggregateOffer" ? Array(offer["offers"]) : [ offer ] }
       offer = offers.find { |entry| entry["priceCurrency"] == "JPY" && (entry["url"].blank? || same_page?(entry["url"])) && entry["price"].present? }
       raise Unverified, "対象バリエーションの円価格がありません" unless offer
-      raise Unverified, "消費税込みの根拠を確認できません" unless @text.match?(/税込|消費税.*含|消費税込/)
+      tax_text = [ @text, product.dig("_html_extraction", "tax_evidence") ].compact.join(" ")
+      raise Unverified, "消費税込みの根拠を確認できません" unless tax_text.match?(/税込|消費税.*含|消費税込/)
 
       amount = BigDecimal(offer["price"].to_s.delete(","))
       evidence = "JSON-LD Offer.price (JPY)"
+      if product.dig("_html_extraction", "price_evidence").present?
+        evidence = { "kind" => "gemini_official_html", "evidence" => product.dig("_html_extraction", "price_evidence") }
+      end
       if @store[:provider] == "ikea" && (regular = @text.match(/通常価格\s*[:：]?\s*¥\s*([\d,]+)/))
         amount = BigDecimal(regular[1].delete(","))
         evidence = "公式本文 通常価格（会員条件価格を除外）"
