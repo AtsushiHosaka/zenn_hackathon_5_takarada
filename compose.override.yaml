@@ -18,6 +18,10 @@ services:
       # デプロイ時はイメージの中身をそのまま使うのでマウントしない
       - ./backend:/app
       - bundle_data:/usr/local/bundle
+      # GEMINI_PROVIDER=vertex (Agent Platform) 用の手元の ADC。
+      # `gcloud auth application-default login` で作られる認証情報を読み取り専用で渡す
+      # (コンテナは root なので /root/.config/gcloud が既定の探し場所)
+      - ${GCLOUD_CONFIG_DIR:-${HOME}/.config/gcloud}:/root/.config/gcloud:ro
     tty: true
     stdin_open: true
 
@@ -31,6 +35,7 @@ services:
     volumes:
       - ./backend:/app
       - bundle_data:/usr/local/bundle
+      - ${GCLOUD_CONFIG_DIR:-${HOME}/.config/gcloud}:/root/.config/gcloud:ro
 
   # Web フロント (Vite dev server)。**ローカル専用**なので base ではなくここに置く
   # (本番の web は nginx イメージを Cloud Run に載せる。infra/gcp/README.md 参照)
