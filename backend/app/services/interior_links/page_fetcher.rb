@@ -13,7 +13,11 @@ module InteriorLinks
       "www.nitori-net.jp" => { provider: "nitori", shop: "ニトリネット", path: %r{\A/ec/product/[A-Za-z0-9_-]+/\z} },
       "www.low-ya.com" => { provider: "lowya", shop: "LOWYA", path: %r{\A/goods/[A-Za-z0-9_-]+/?\z} },
       "www.muji.com" => { provider: "muji", shop: "無印良品", path: %r{\A/jp/ja/store/cmdty/detail/[0-9]+/?\z} },
-      "www.muji.net" => { provider: "muji", shop: "無印良品", path: %r{\A/store/cmdty/detail/[0-9]+/?\z} }
+      "www.muji.net" => { provider: "muji", shop: "無印良品", path: %r{\A/store/cmdty/detail/[0-9]+/?\z} },
+      "francfranc.com" => { provider: "francfranc", shop: "Francfranc", path: %r{\A/products/[A-Za-z0-9_-]+/?\z} },
+      # Item codes are unique per seller, so the seller's path segment is part of the identity.
+      "store.shopping.yahoo.co.jp" => { provider: "yahoo_shopping", shop: "Yahoo!ショッピング",
+                                        path: %r{\A/[a-z0-9-]+/(?!(?:search|info|guide|privacy)\.html)[A-Za-z0-9_-]+\.html\z} }
     }.freeze
 
     class Error < StandardError; end

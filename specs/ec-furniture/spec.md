@@ -10,7 +10,30 @@ Google Docs URLは`docs/project.md`に未設定。Docsの本文・タブは未�
 
 既存の[コーデ提案Spec](../room-coordination/spec.md)の候補取得境界を維持し、実EC検索・公式ページ確認・大型家具の追加と入れ替え・モデル照合・テクスチャ生成・Web描画を接続した。Google検索と画像生成はVertex AIの既存認証、または設定済みのDeveloper APIを使う。ユーザーごとの利用許可も既存Gemini設定に従う。
 
-EC取得先はIKEA・ニトリ・LOWYA・無印良品の日本向け公式ドメインに限定する。店舗ごとにページ形式と取得成否は異なる。IKEAの商品詳細から価格と寸法を取得できた。ニトリの確認ページはタイムアウト、LOWYAの確認ページは必要情報がなく、候補から除外した。検索対応ドメインの全商品を取得できるとは扱わない。
+EC取得先はIKEA・ニトリ・LOWYA・無印良品・Francfranc の日本向け公式ドメインと、Yahoo!ショッピングの商品詳細（`store.shopping.yahoo.co.jp/<ストア>/<商品コード>.html`）に限定する。店舗ごとにページ形式と取得成否は異なる。IKEAの商品詳細から価格と寸法を取得できた。ニトリの確認ページはタイムアウト、LOWYAの確認ページは必要情報がなく、候補から除外した。検索対応ドメインの全商品を取得できるとは扱わない。
+
+2026年10月5日の提案により、Yahoo!ショッピングとFrancfrancを追加した。Yahoo!は出店ストアが多く推し活グッズも扱い、ニトリも出店している（nitori-netストア）。Francfrancは色・デザインのある雑貨が多い。
+
+- ニトリ公式（nitori-net.jp）は1ページ約10秒かかり、取得の読み取り上限8秒を超えるため、新しい検索候補から外し、Yahoo!のnitori-netストアで探す。保存済みの公式URLの再確認は従来どおり取得を試みる。
+- Yahoo!の商品ページは価格を「価格 999 円」と表示し「税込」の語がない。価格は総額表示（税込）が義務のため、Yahoo!に限りJSON-LDの円価格を税込として扱い、`price_source`にその根拠を書く。商品番号はストアごとなので`provider_product_id`は`<ストア>/<商品コード>`とし、店名はパンくずのストア名（例: ニトリ Yahoo!店）を表示する。
+- Yahoo!はJSON-LDに寸法がなく、説明文の「サイズ(約)：幅43×奥行43×高さ16cm」をGeminiのHTML抽出で読む。Francfrancは仕様表の`W795×D795×H630(SH:380)mm`をそのまま解析し、Geminiを使わない。
+- 楽天市場は商品ページの直接取得が遅いため対象外とし、使う場合は公式API（アプリID登録が必要）にする。
+
+推し活・飾り物の商品も実EC検索の候補にする。既存の3Dモデル（`acrylic_stand_case`、`oshi_goods`、`display_case`、`tapestry`、`neon`、`wall_shelf`、`vase`、`candle`）があるカテゴリに限り、商品名から次の枠へ割り当てる。
+
+| 商品名の例 | カテゴリ | 枠 | 3Dモデル |
+| --- | --- | --- | --- |
+| アクスタケース、アクリルコレクションケース | acrylic_stand_case | desk_top | acrylic_stand_case |
+| コレクションケース、フィギュアケース、ガラスケース | display_case | display | display_case / display_rack_open / cabinet_glass |
+| うちわスタンド、アクスタ台座・ひな壇 | oshi_goods | desk_top | uchiwa_stand / acrylic_stand |
+| 缶バッジディスプレイ（壁掛けは wall_decor） | oshi_goods | desk_top | badge_display |
+| タペストリー、ネオンサイン、ウォールシェルフ | tapestry / neon / wall_shelf | wall_decor | 同名 |
+| 花瓶、キャンドル | vase / candle | display / desk_top | vase_tulip・dried_flowers / candle |
+
+- 高さ50cm以上のアクリルケースはコレクションケース（display）、45cm未満のコレクションケースはアクリルケース（desk_top）に読み替える。
+- 「アクスタケース」の名で売られる持ち運び用のポーチ・バインダー・スマホケース・ペンケースは、部屋に飾る商品ではないため除外する。
+- 3Dモデルは既存の規則どおり、寸法が2軸以上わかる商品だけ縦横比で選ぶ。ネオンサイン・タペストリーなど薄いものは、厚みを除いた面の比で比べる。寸法が推定だけの商品は簡易形状で表示する。
+- 2026年10月6日にYahoo!ショッピングの実商品18点で確認した。カテゴリ・価格・店名は全件取得でき、3Dモデルは寸法がわかった9点に付き、8点を実際の部屋（ベッド・デスク・本棚あり）の想定位置に置けた。
 
 ## 大型家具の配置・入れ替えも対象にする
 
