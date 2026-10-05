@@ -2,7 +2,7 @@ class CoordinationSerializer
   include Alba::Resource
 
   attributes :id, :room_id, :status, :prompt, :budget, :kept_object_ids,
-             :title, :comment, :items, :total_price, :planned_by, :error_message, :furniture_operations, :additions
+             :title, :comment, :items, :total_price, :planned_by, :base_coordination_id, :error_message, :furniture_operations, :additions
 
   attribute(:search_entry_points) { |coordination| coordination.analysis&.fetch("search_entry_points", []) || [] }
   attribute(:product_source) { |coordination| coordination.analysis&.dig("meta", "product_source") }

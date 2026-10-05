@@ -27,7 +27,7 @@ class SlotLayout
     @room = scene.fetch("room")
     @objects = kept_objects
     @edited_objects = edited_objects.index_by { |edit| edit["id"] }
-    @floor_rects = kept_objects.map { |o| footprint(o) }
+    @floor_rects = kept_objects.map { |o| footprint(o) } + doors.map { |door| door_floor_rect(door) }
     @wall_spans = Hash.new { |h, k| h[k] = [] }
     @reserved_edit_ids = []
     @reserved_floor_rects = {}
@@ -173,9 +173,13 @@ class SlotLayout
     left = [ window["center"] - window["width"] / 2 - 0.2, MARGIN ].max
     right = [ window["center"] + window["width"] / 2 + 0.2, wall_length(window["wall"]) - MARGIN ].min
     top = [ window["bottom"] + window["height"] + 0.15, @room["height"] - 0.05 ].min
-    # 窓の下に家具 (デスクなど) があれば、床まで垂らさず窓の下端の少し下で止める
-    under = furniture_on(window["wall"]).any? { |l, r, _, _| l < right && r > left }
-    bottom = under ? [ window["bottom"] - 0.1, 0.0 ].max : 0.0
+    # 窓の下に家具 (デスクなど) があれば、床まで垂らさず窓の下端の少し下で止める。
+    # 掃き出し窓のように窓が床近くまであるときは、家具の天板の上で止める
+    under = furniture_on(window["wall"]).select { |l, r, _, _| l < right && r > left }
+    bottom = under.any? ? [ window["bottom"] - 0.1, under.map { |_, _, _, t| t + 0.02 }.max ].max : 0.0
+    # 床まで垂らすときは、ドアの前 (開け閉めの範囲) にかからないよう、かかる側を切り詰める
+    left, right = trim_for_doors(window["wall"], left, right) if bottom.zero?
+    return if right - left < 0.3 || bottom >= top
     size = { "w" => right - left, "h" => top - bottom, "d" => item.size["d"] }
     x, z, rotation = wall_pose(window["wall"], (left + right) / 2, size["d"] / 2 + 0.05)
     # 床まで垂らすときは、カーテンの前 (壁から 15cm) に床置きのものを置かない
@@ -218,6 +222,13 @@ class SlotLayout
     return if furniture_on(window["wall"]).any? { |l, r, _, height| l < actual_right && r > actual_left && bottom < height + MARGIN }
 
     x, z, rotation = wall_pose(window["wall"], along, size["d"] / 2 + 0.05)
+    return if doors_on(window["wall"]).any? { |l, r, _, height| actual_left < r && actual_right > l && bottom < height }
+    if bottom <= 0.05
+      fw, fd = footprint_size(size.merge("d" => 0.15), rotation)
+      floor_x, floor_z = wall_pose(window["wall"], along, 0.075).first(2)
+      rect = [ floor_x - fw / 2, floor_z - fd / 2, floor_x + fw / 2, floor_z + fd / 2 ]
+      return if doors.any? { |door| overlap_area(rect, door_floor_rect(door)).positive? }
+    end
     occupy_floor(*wall_pose(window["wall"], along, 0.075).first(2), size.merge("d" => 0.15), rotation) if bottom <= 0.05
     build(item, size, { "x" => x, "y" => bottom, "z" => z }, rotation, window["id"], "商品のプレビュー寸法で窓に配置（枚数・金具は未確認）")
   end
@@ -242,7 +253,7 @@ class SlotLayout
   # 窓や他の壁飾りと重ならない位置を、希望位置から近い順に探す
   def free_wall_position(wall, preferred, width, bottom, top)
     length = %w[north south].include?(wall) ? @room["width"] : @room["depth"]
-    blocked = @wall_spans[wall] + windows_on(wall) + furniture_on(wall)
+    blocked = @wall_spans[wall] + windows_on(wall) + furniture_on(wall) + doors_on(wall)
     candidates = (0..(length / GRID_STEP)).map { |i| i * GRID_STEP }
                                           .select { |c| c - width / 2 >= MARGIN && c + width / 2 <= length - MARGIN }
     candidates.sort_by { |c| (c - preferred).abs }.find do |c|
@@ -265,6 +276,49 @@ class SlotLayout
 
   def wall_length(wall)
     %w[north south].include?(wall) ? @room["width"] : @room["depth"]
+  end
+
+  # 壁沿いの範囲 [left, right] (壁から 0.15m まで) が、ドアの前の床にかかる分を切り詰める
+  def trim_for_doors(wall, left, right)
+    doors.each do |door|
+      rect = door_floor_rect(door)
+      along = %w[north south].include?(wall) ? [ rect[0], rect[2] ] : [ rect[1], rect[3] ]
+      gap = wall_gap(wall, (rect[0] + rect[2]) / 2, (rect[1] + rect[3]) / 2, rect[2] - rect[0], rect[3] - rect[1])
+      next if gap > 0.15 || along[1] <= left || along[0] >= right
+
+      # ドアに近い側を切る
+      if (along[0] + along[1]) / 2 < (left + right) / 2
+        left = [ left, along[1] ].max
+      else
+        right = [ right, along[0] ].min
+      end
+    end
+    [ left, right ]
+  end
+
+  # ドア (RoomLayout が room["doors"] に入れる)。古いシーンには無い
+  def doors
+    Array(@room["doors"])
+  end
+
+  # 壁のうちドアがある範囲 (床からドアの高さまで)
+  def doors_on(wall)
+    doors.select { |d| d["wall"] == wall }.map do |d|
+      [ d["center"] - d["width"] / 2, d["center"] + d["width"] / 2, 0, d["height"] ]
+    end
+  end
+
+  # ドアの前の床 (開け閉めと通り道)。ラグ以外の床置きの商品を置かない
+  def door_floor_rect(door)
+    left = door["center"] - door["width"] / 2
+    right = door["center"] + door["width"] / 2
+    reach = RoomLayout::DOOR_CLEARANCE
+    case door["wall"]
+    when "north" then [ left, 0, right, reach ]
+    when "south" then [ left, @room["depth"] - reach, right, @room["depth"] ]
+    when "west" then [ 0, left, reach, right ]
+    when "east" then [ @room["width"] - reach, left, @room["width"], right ]
+    end
   end
 
   def windows_on(wall)

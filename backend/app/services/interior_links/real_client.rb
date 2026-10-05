@@ -15,10 +15,15 @@ module InteriorLinks
 
     attr_reader :diagnostics, :search_entry_points
 
-    def initialize(user_id: nil, preferred_categories: nil)
+    def initialize(user_id: nil, preferred_categories: nil, previous_items: [])
       @user_id = user_id
       @discovery = SearchDiscovery.new(user_id:)
       @preferred_categories = Array(preferred_categories).map(&:to_s).uniq & FLOOR_CATEGORIES
+      @previous_urls = Array(previous_items).filter_map do |item|
+        next unless item.is_a?(Hash) && item.dig("product_metadata", "provider").present?
+
+        item["url"] if PageFetcher.store(item["url"])
+      end.uniq.first(SearchDiscovery::MAX_URLS)
       @fetcher = PageFetcher.new
       @diagnostics = {}
       @catalog_cache = {}
@@ -54,7 +59,10 @@ module InteriorLinks
                        "search_entry_point" => result[:search_entry_point] }
       @search_entry_points = (@search_entry_points + Array(result[:search_entry_points])).uniq
       candidates = []
-      results = fetch_products(ordered_urls(result[:urls]), started)
+      # Reverify previous products before new discoveries so an unrelated chat
+      # instruction does not lose them just because search returns other URLs.
+      urls = (@previous_urls + ordered_urls(result[:urls])).uniq.first(SearchDiscovery::MAX_URLS)
+      results = fetch_products(urls, started)
       fetched_count = results.count { |entry| entry[:fetched] }
       results.each do |entry|
         url = entry[:url]
@@ -64,7 +72,7 @@ module InteriorLinks
           @diagnostics["excluded"] << { "url" => url, "reason" => entry[:excluded] }
         else
           attributes = entry.fetch(:attributes)
-          origin = result[:origins].to_h[url] || "official_url_fixture"
+          origin = result[:origins].to_h[url] || (@previous_urls.include?(url) ? "previous_coordination_reference" : "official_url_fixture")
           @diagnostics["verified_official_page_count"] += 1
           @diagnostics["verified_discovery_sources"][origin] = @diagnostics["verified_discovery_sources"].fetch(origin, 0) + 1
           attributes[:metadata]["discovery_source"] = origin
@@ -79,11 +87,13 @@ module InteriorLinks
       end
       candidates = candidates.uniq(&:id)
       @diagnostics["discovered_url_count"] = result[:urls].size
+      @diagnostics["previous_reference_count"] = @previous_urls.size
+      @diagnostics["requested_page_count"] = urls.size
       @diagnostics["fetched_page_count"] = fetched_count
       @diagnostics["candidate_count"] = candidates.size
       @diagnostics["estimated_dimension_count"] = candidates.count { |item| item.metadata["estimated_axes"].present? }
       @diagnostics["extraction_methods"] = candidates.group_by { |item| item.metadata["extraction_method"] || "structured_html" }.transform_values(&:size)
-      if result[:urls].any? && fetched_count.zero?
+      if urls.any? && fetched_count.zero?
         raise Error.new("公式ECの商品ページを取得できませんでした。条件を変えて再度お試しください", diagnostics: @diagnostics)
       end
 

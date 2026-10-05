@@ -28,7 +28,7 @@ module Api
       private
 
       def coordination_params
-        params.require(:coordination).permit(:prompt, :budget, kept_object_ids: [],
+        params.require(:coordination).permit(:prompt, :budget, :base_coordination_id, kept_object_ids: [],
                                                     furniture_operations: [ :object_id, :action ], additions: [ :category ],
                                                     edited_objects: [ :id, :rotation_y, :color, position: [ :x, :y, :z ], size: [ :w, :h, :d ] ])
       end

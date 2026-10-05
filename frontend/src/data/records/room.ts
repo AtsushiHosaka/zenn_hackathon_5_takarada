@@ -42,6 +42,8 @@ export function toCoordinationRecord(value: unknown): CoordinationRecord {
     total_price: totalPrice,
     // 商品の選び方 (gemini: 要望文から AI が選んだ / mock: モック) は古い API では返らない
     planned_by: record.planned_by === "gemini" || record.planned_by === "mock" ? record.planned_by : null,
+    // 追加の指示で作り直したときの前回のコーデ (古い API では返らない)
+    base_coordination_id: typeof record.base_coordination_id === "number" && Number.isInteger(record.base_coordination_id) && record.base_coordination_id > 0 ? record.base_coordination_id : null,
     error_message: nullableText(record.error_message, "Coordination.error_message"),
     created_at: createdAt,
     furniture_operations: record.furniture_operations == null || Array.isArray(record.furniture_operations) && record.furniture_operations.length === 0 ? undefined : furnitureOperations(record.furniture_operations),
@@ -166,11 +168,11 @@ function productShopLabel(shop: string, productUrl: string): string {
   return search ? `${label}（検索）` : label;
 }
 
-function furnitureOperations(value: unknown): { object_id: string; action: "keep" | "replace" }[] {
+function furnitureOperations(value: unknown): { object_id: string; action: "keep" | "replace" | "remove" }[] {
   if (!Array.isArray(value)) invalid("furniture_operations");
-  const operations = value.map((value): { object_id: string; action: "keep" | "replace" } => {
+  const operations = value.map((value): { object_id: string; action: "keep" | "replace" | "remove" } => {
     const operation = object(value, "furniture_operations");
-    if (operation.action !== "keep" && operation.action !== "replace") invalid("furniture_operations.action");
+    if (operation.action !== "keep" && operation.action !== "replace" && operation.action !== "remove") invalid("furniture_operations.action");
     return { object_id: text(operation.object_id, "furniture_operations.object_id"), action: operation.action };
   });
   if (new Set(operations.map(operation => operation.object_id)).size !== operations.length) invalid("furniture_operations の重複");

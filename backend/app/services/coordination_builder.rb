@@ -1,7 +1,8 @@
 # コーデを組み立てる: 商品候補を選ぶ (CoordinationPlanner) → 枠に配置する (SlotLayout) → 予算内に収める。
 # 置き場所が無い商品・予算を超える商品は採用しないので、購入リンク一覧と 3D の表示は常に一致する。
 class CoordinationBuilder
-  Result = Data.define(:title, :comment, :after_scene, :items, :total_price, :planned_by, :analysis)
+  # kept_object_ids: 実際に活かした家具 (要望文で「いらない」と書かれた家具を除いたもの)
+  Result = Data.define(:title, :comment, :after_scene, :items, :total_price, :planned_by, :analysis, :kept_object_ids, :furniture_operations)
 
   def self.call(coordination)
     new(coordination).call
@@ -20,17 +21,22 @@ class CoordinationBuilder
     kept = kept_objects
     replacement_ids = @coordination.furniture_operations.select { |operation| operation["action"] == "replace" }.pluck("object_id")
     preferred_categories = (@scene["objects"].select { |object| replacement_ids.include?(object["id"]) }.pluck("category") + @coordination.additions.pluck("category")).uniq
-    client = InteriorLinks.client(user_id: @coordination.room.user_id, preferred_categories:)
+    client = InteriorLinks.client(user_id: @coordination.room.user_id, preferred_categories:, previous_items: @coordination.base_coordination&.items || [])
     candidate_limit = GeminiClient.configured?(user_id: @coordination.room.user_id) ? CoordinationPlanner::Gemini::CANDIDATES_PER_GROUP : 3
     floor_candidates = FurnitureOperationPlanner.call(@coordination, @scene, client:, candidate_limit:)
-    plan = CoordinationPlanner.call(prompt: @coordination.prompt, budget: @coordination.budget, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id, client:, additional_candidates: floor_candidates)
+    plan = CoordinationPlanner.call(prompt: @coordination.prompt, budget: @coordination.budget, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id, client:, additional_candidates: floor_candidates, previous:)
+    removed, kept = kept.partition { |object| plan.removed_object_ids.include?(object["id"]) }
+    # 従来の空配列は「全部活かす」。明示操作がある場合は、全置換・全除外も許可する。
+    removed, kept = [], kept_objects if kept.empty? && @coordination.furniture_operations.empty?
+    explicit_remove_ids = @coordination.furniture_operations.select { |operation| operation["action"] == "remove" }.pluck("object_id")
+    removed += @scene["objects"].select { |object| explicit_remove_ids.include?(object["id"]) }
     coherent = plan.planned_by == "gemini"
     candidates = coherent ? plan.candidates : floor_candidates + plan.candidates.reject { |item| item.slot == "floor" }
     by_group = candidates.group_by { |item| item.metadata["group_id"] || item.slot }
     chosen = coherent ? choose_planned_bundle(plan, by_group) : choose_within_budget(by_group)
     floor_choices = chosen.select { |_, item| item.slot == "floor" }
     decor_budget = chosen.values.reject { |item| item.slot == "floor" }.sum(&:price)
-    active, floor_placed = place_floor_choices(floor_choices, by_group, kept, coherent:, reserved_budget: decor_budget)
+    active, floor_placed = place_floor_choices(floor_choices, by_group, kept, coherent:, reserved_budget: decor_budget, removed_object_ids: removed.pluck("id"))
     anchors = active + floor_placed.map { |entry| entry[:placement].object }
     by_slot = by_group.reject { |_, items| items.first.slot == "floor" }
     chosen = chosen.reject { |_, item| item.slot == "floor" }
@@ -63,20 +69,36 @@ class CoordinationBuilder
 
     Result.new(
       title: plan.title,
-      comment: [ comment(plan, placed, active), *failures ].join,
+      comment: [ comment(plan, placed, active, removed), *failures ].join,
       after_scene: appearance.fetch(:scene),
       items: appearance.fetch(:items),
       total_price: placed.sum { |p| p[:item].price },
       planned_by: plan.planned_by,
       # 精度の確認用: Gemini の回答と、実際に採用した商品
-      analysis: plan.analysis.deep_merge("placed_item_ids" => placed.map { |p| p[:item].id }, "budget_adjusted_groups" => @budget_adjusted_groups || [], "meta" => { "product_source" => product_source }, "operation_failures" => failures, "ec_search" => diagnostics, "search_entry_points" => client.respond_to?(:search_entry_points) ? client.search_entry_points : [])
+      analysis: plan.analysis.deep_merge("placed_item_ids" => placed.map { |p| p[:item].id }, "base_coordination_id" => @coordination.base_coordination_id, "budget_adjusted_groups" => @budget_adjusted_groups || [], "meta" => { "product_source" => product_source }, "operation_failures" => failures, "ec_search" => diagnostics, "search_entry_points" => client.respond_to?(:search_entry_points) ? client.search_entry_points : []),
+      kept_object_ids: active.pluck("id"),
+      furniture_operations: result_operations(active, removed)
     )
   end
 
   private
 
-  def place_floor_choices(chosen, by_group, kept, coherent: false, reserved_budget: 0)
-    active = @coordination.furniture_operations.empty? ? kept.dup : @scene.fetch("objects").dup
+  def result_operations(active, removed)
+    if @coordination.furniture_operations.empty?
+      active_ids = active.pluck("id")
+      return @scene["objects"].map do |object|
+        { "object_id" => object["id"], "action" => active_ids.include?(object["id"]) ? "keep" : "remove" }
+      end
+    end
+
+    removed_ids = removed.pluck("id")
+    @coordination.furniture_operations.map do |operation|
+      removed_ids.include?(operation["object_id"]) ? operation.merge("action" => "remove") : operation
+    end
+  end
+
+  def place_floor_choices(chosen, by_group, kept, coherent: false, reserved_budget: 0, removed_object_ids: [])
+    active = @coordination.furniture_operations.empty? ? kept.dup : @scene.fetch("objects").reject { |object| removed_object_ids.include?(object["id"]) }
     placed = []
     remaining = @coordination.budget - reserved_budget
     entries = chosen.to_a
@@ -187,6 +209,14 @@ class CoordinationBuilder
     chosen
   end
 
+  # 追加の指示のときの前回のコーデ。前回の商品を引き継ぐのに使う
+  def previous
+    base = @coordination.base_coordination
+    return unless base&.status == "done"
+
+    CoordinationPlanner::Previous.new(prompt: base.prompt, title: base.title, items: base.items.map { |item| item.slice("item_id", "slot", "name").merge("group_id" => item.dig("product_metadata", "group_id") || item["slot"]) })
+  end
+
   # kept_object_ids が空なら今ある家具をすべて活かす
   def kept_objects
     objects = @scene["objects"]
@@ -200,12 +230,13 @@ class CoordinationBuilder
 
   # コンセプト (Gemini) + 実際に置いた商品 + 活かした家具 + 断り書き (Gemini)。
   # 商品の部分は置いた結果から組み立てるので、予算や置き場所で外れた商品には触れない
-  def comment(plan, placed, kept)
+  def comment(plan, placed, kept, removed)
     added = placed.first(3).map { |p| "#{p[:item].name} (#{p[:placement].note})" }.join("、")
     kept_labels = kept.map { |o| o["label"] }.join("と")
     parts = [ plan.concept ]
     parts << "#{added} などを追加しました。" if added.present?
     parts << "今の#{kept_labels}はそのまま活かしています。" if kept_labels.present?
+    parts << "ご要望に合わせて、#{removed.map { |o| o['label'] }.join('と')}は外しました。" if removed.any?
     parts << plan.note
     parts.compact.join
   end
@@ -223,7 +254,7 @@ class CoordinationBuilder
       "image_url" => item.image_url,
       "color" => item.color,
       "placement_note" => note,
-      "product_metadata" => item.metadata.except("group_id", "preferred_position", "preferred_rotation", "target_size")
+      "product_metadata" => item.metadata.except("preferred_position", "preferred_rotation", "target_size")
     }
   end
 end

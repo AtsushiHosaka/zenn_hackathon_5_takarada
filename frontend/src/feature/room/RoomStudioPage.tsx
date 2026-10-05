@@ -98,10 +98,12 @@ export default function RoomStudioPage() {
   useEffect(()=>()=>abort.current?.abort(),[]);
   useEffect(()=>{if(rename)renameDialog.current?.showModal();else renameDialog.current?.close();},[rename]);
   const generation=useMutation({
-    mutationFn:async({request,budget,targetStyle,analyzeOnly}:{request:string;budget:number;targetStyle?:Style;analyzeOnly?:boolean})=>{
+    mutationFn:async({request,budget,targetStyle,analyzeOnly,followup=false}:{request:string;budget:number;targetStyle?:Style;analyzeOnly?:boolean;followup?:boolean})=>{
       const controller=new AbortController();abort.current=controller;
       const token=tokenStore.load();
-      const input={photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId:!isNew&&design.source==='api'?design.backendRoomId:undefined,keptObjectIds:selectsFurniture?keptObjectIds:undefined,furnitureOperations:selectsFurniture?existingFurniture.map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'})):undefined,furnitureAdditions:selectsFurniture?furnitureAdditions:undefined,editedItems:selectsFurniture?[...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))]:undefined};
+      // 追加の指示のときは前回のコーデを渡し、指示に関係ない商品を残してもらう
+      const baseCoordinationId=followup&&design.source==='api'&&design.kind==='coordination'?design.id.replace(/^api-coordination-/,''):undefined;
+      const input={baseCoordinationId,photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId:!isNew&&design.source==='api'?design.backendRoomId:undefined,keptObjectIds:selectsFurniture?keptObjectIds:undefined,furnitureOperations:selectsFurniture?existingFurniture.map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'})):undefined,furnitureAdditions:selectsFurniture?furnitureAdditions:undefined,editedItems:selectsFurniture?[...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))]:undefined};
       const result=await (analyzeOnly?rooms.analyze(input,controller.signal):rooms.generate(input,controller.signal));
       if(controller.signal.aborted||tokenStore.load()!==token) throw new DomainError("ログイン状態が変わりました。もう一度お試しください。");
       return result;
@@ -151,7 +153,7 @@ export default function RoomStudioPage() {
     if(!canCoordinate){setNotice('希望に合わせたコーディネートと商品提案は、APIの提供待ちです。');return;}
     if(!capability.data?.generation){setNotice('追加のコーディネートは、生成APIの提供待ちです。');return;}
     if(loadConnection()==='dummy'&&!/予算.*[2２]|落ち着いた紫|グリーン/.test(message)){setNotice('サンプルでは、用意したスタイルと予算の変更を試せます。自由な指示での生成はAPIの提供待ちです。');return;}
-    generation.mutate({request:`${prompt}\n${message}`,targetStyle:/グリーン/.test(message)?'botanical':style,budget:/予算.*[2２]|2万円|２万円/.test(message)?20000:budget});
+    generation.mutate({request:`${prompt}\n${message}`,targetStyle:/グリーン/.test(message)?'botanical':style,budget:/予算.*[2２]|2万円|２万円/.test(message)?20000:budget,followup:true});
   }
   function coordinate(event:FormEvent) {
     event.preventDefault();
@@ -226,7 +228,7 @@ export default function RoomStudioPage() {
                 <p>残す家具の配置を保ち、入れ替える家具に合う商品を探します。収まらない場合は元の家具を残します。</p>
                 <div className="rc-kept-options">{existingFurniture.map(item=><label key={item.id}>
                   <span>{item.name}</span>
-                  <select aria-label={`${item.name}の操作`} value={furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'} onChange={event=>{const action=event.target.value==='replace'?'replace':'keep';setFurnitureOperations(previous=>[...previous.filter(operation=>operation.objectId!==item.id),{objectId:item.id,action}]);setPhotoError('');}}><option value="keep">残す</option><option value="replace" disabled={!furnitureCategories.some(category=>category===item.category)}>入れ替える</option></select>
+                  <select aria-label={`${item.name}の操作`} value={furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'} onChange={event=>{const action=event.target.value==='replace'?'replace':event.target.value==='remove'?'remove':'keep';setFurnitureOperations(previous=>[...previous.filter(operation=>operation.objectId!==item.id),{objectId:item.id,action}]);setPhotoError('');}}><option value="keep">残す</option><option value="replace" disabled={!furnitureCategories.some(category=>category===item.category)}>入れ替える</option><option value="remove">外す</option></select>
                 </label>)}</div>
                 <div className="rc-setting"><span>追加したい家具（最大6点）</span>{furnitureAdditions.map((addition,index)=><div key={index}><select aria-label={`追加家具${index+1}の種類`} value={addition.category} onChange={event=>setFurnitureAdditions(previous=>previous.map((value,i)=>i===index?{category:furnitureCategories.find(category=>category===event.target.value)??value.category}:value))}>{Object.entries(furnitureLabels).map(([category,label])=><option key={category} value={category}>{label}</option>)}</select><button type="button" onClick={()=>setFurnitureAdditions(previous=>previous.filter((_,i)=>i!==index))} aria-label={`追加家具${index+1}を削除`}>削除</button></div>)}<button type="button" className="rc-secondary" disabled={furnitureAdditions.length>=6} onClick={()=>setFurnitureAdditions(previous=>[...previous,{category:'sofa'}])}>家具を追加</button></div>
                 {!analyzed&&<p className="rc-setting-note">追加の提案にも、編集した家具の配置・角度・色を引き継ぎます。同じ商品を採用する場合は、調整した配置を保ちます。</p>}

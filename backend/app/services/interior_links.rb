@@ -29,7 +29,7 @@ module InteriorLinks
     selected || (GeminiClient.configured?(user_id:) ? "live" : "mock")
   end
 
-  def self.client(user_id: nil, preferred_categories: nil)
-    provider(user_id:) == "live" ? RealClient.new(user_id:, preferred_categories:) : MockClient.new
+  def self.client(user_id: nil, preferred_categories: nil, previous_items: [])
+    provider(user_id:) == "live" ? RealClient.new(user_id:, preferred_categories:, previous_items:) : MockClient.new
   end
 end
