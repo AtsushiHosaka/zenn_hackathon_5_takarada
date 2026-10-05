@@ -167,3 +167,84 @@ def side_table(tint=None):
     m.lathe([(0.0, 0.0), (0.15, 0.0), (0.155, 0.01), (0.15, 0.022), (0.07, 0.05), (0.055, 0.1), (0.055, H - 0.06),
              (0.08, H - 0.03)], (0, 0, 0), body, seg=40, cap_bottom=False, name="pedestal")
     return m
+
+
+# ---------- 追加モデル (2026-10-04) ----------
+
+@asset("kotatsu.glb", (1.80, 0.42, 1.80))
+def kotatsu(tint=None):
+    m = Model("kotatsu")
+    wood = m.mat("wood", P.WOOD_LIGHT, rough=0.55)
+    quilt = m.mat("tint", tint or "#d9a99a", rough=0.95)
+    top_y = 0.39  # 掛け布団の上面 (天板の下)
+    half = 0.38   # 天板の下の平らな範囲
+
+    def fn(u, v):
+        x, z = (u - 0.5) * 1.8, (v - 0.5) * 1.8
+        d = (abs(x) ** 6 + abs(z) ** 6) ** (1 / 6)  # 角の丸い四角形の距離
+        drop = 0.3
+        if d <= half:
+            y = top_y
+        elif d <= half + drop:
+            t = (d - half) / drop
+            y = 0.02 + (top_y - 0.02) * 0.5 * (1 + math.cos(math.pi * t))  # なめらかに垂れ下がる
+        else:
+            y = 0.02 + 0.01 * math.sin(x * 9) * math.sin(z * 7) * min(1, (d - half - drop) * 6)
+        return (x, y, z)
+
+    m.surface(55, 55, fn, quilt, thickness=0.03, name="quilt")
+    m.box((0.80, 0.03, 0.80), (0, 0.405, 0), wood, bevel=0.008, name="top")
+    return m
+
+
+@asset("nightstand.glb", (0.40, 0.50, 0.35))
+def nightstand(tint=None):
+    m = Model("nightstand")
+    wood = m.mat("wood", tint or P.WOOD_LIGHT, rough=0.55)
+    knob = m.mat("knob", P.WOOD_MED, rough=0.5)
+    W, H, D, leg, t = 0.40, 0.50, 0.35, 0.12, 0.02
+    m.box((W, t, D), (0, H - t / 2, 0), wood, bevel=0.005, name="top")
+    m.box((W - 0.01, t, D - 0.01), (0, leg + t / 2, 0), wood, bevel=0.004, name="bottom")
+    for sx in (-1, 1):
+        m.box((t, H - leg - 2 * t, D - 0.01), (sx * (W / 2 - t / 2 - 0.005), (H + leg) / 2, 0), wood, bevel=0.003,
+              name="side")
+    m.box((W - 0.03, H - leg - 2 * t, 0.008), (0, (H + leg) / 2, -D / 2 + 0.01), wood, bevel=0.0, name="back")
+    m.box((W - 0.05, 0.12, 0.02), (0, H - t - 0.065, D / 2 - 0.01), wood, bevel=0.004, name="drawer")
+    m.cyl(0.012, 0.025, (0, H - t - 0.065, D / 2 + 0.008), knob, seg=14, axis="z", r2=0.016, bevel=0.004, name="knob")
+    m.box((W - 0.04, t * 0.8, D - 0.04), (0, H - t - 0.135, 0), wood, bevel=0.002, name="divider")
+    for sx in (-1, 1):
+        for sz in (-1, 1):
+            m.cyl(0.013, leg, (sx * (W / 2 - 0.04), leg / 2, sz * (D / 2 - 0.04)), knob, seg=12, r2=0.019, name="leg")
+    return m
+
+
+@asset("console_table.glb", (1.00, 0.75, 0.30))
+def console_table(tint=None):
+    m = Model("console_table")
+    wood = m.mat("wood", tint or P.WOOD_LIGHT, rough=0.55)
+    metal = m.mat("metal", P.METAL_DARK, rough=0.6)
+    W, H, D, t = 1.00, 0.75, 0.30, 0.03
+    top_rect(m, W, D, H, t, wood, r=0.02)
+    m.box((W - 0.08, 0.02, D - 0.06), (0, 0.16, 0), wood, bevel=0.004, name="shelf")
+    for sx in (-1, 1):
+        for sz in (-1, 1):
+            m.box((0.03, H - t, 0.03), (sx * (W / 2 - 0.04), (H - t) / 2, sz * (D / 2 - 0.035)), metal, bevel=0.004,
+                  name="leg")
+        m.box((0.03, 0.03, D - 0.07), (sx * (W / 2 - 0.04), 0.14, 0), metal, bevel=0.003, name="shelf_rail")
+    return m
+
+
+@asset("side_table_c.glb", (0.45, 0.55, 0.30))
+def side_table_c(tint=None):
+    """ソファ下へ差し込むコの字。開口は +Z。"""
+    m = Model("side_table_c")
+    wood = m.mat("wood", tint or P.WOOD_LIGHT, rough=0.55)
+    metal = m.mat("metal", P.METAL_DARK, rough=0.6)
+    W, H, D = 0.45, 0.55, 0.30
+    m.box((W, 0.025, D), (0, H - 0.0125, 0), wood, bevel=0.006, name="top")
+    for sx in (-1, 1):
+        x = sx * (W / 2 - 0.05)
+        m.box((0.025, H - 0.025, 0.025), (x, (H - 0.025) / 2, -D / 2 + 0.03), metal, bevel=0.004, name="post")
+        m.box((0.025, 0.02, D - 0.02), (x, 0.01, 0), metal, bevel=0.004, name="foot")
+    m.box((W - 0.1, 0.02, 0.02), (0, 0.01, -D / 2 + 0.03), metal, bevel=0.004, name="foot_bar")
+    return m

@@ -156,3 +156,62 @@ def candle(tint=None):
              (0.02, 0.106), (0.0, 0.105)], (0, 0, 0), wax, seg=40, name="wax")
     m.cyl(0.0025, 0.016, (0, 0.112, 0), wick, seg=8, name="wick")
     return m
+
+
+# ---------- 追加モデル (2026-10-04) ----------
+
+@asset("table_lamp.glb", (0.25, 0.30, 0.25))
+def table_lamp(tint=None):
+    """韓国風インテリアで定番のマッシュルーム型。"""
+    m = Model("table_lamp")
+    body = m.mat("tint", tint or "#efe3cf", rough=0.5)
+    light = m.mat("light", P.WARM_LIGHT, rough=0.5, emit=P.WARM_LIGHT, strength=2.0)
+    m.lathe([(0.0, 0.0), (0.075, 0.0), (0.08, 0.008), (0.075, 0.018), (0.03, 0.03), (0.022, 0.06), (0.022, 0.17)],
+            (0, 0, 0), body, seg=40, cap_top=False, name="base")
+    # 厚みのあるドーム型シェード (下が開いている)
+    outer = [(0.125 * math.cos(a), 0.165 + 0.135 * math.sin(a)) for a in [math.pi / 2 * i / 10 for i in range(11)]]
+    inner = [(max(r - 0.008, 0.0), y - 0.008) for r, y in reversed(outer)]
+    m.lathe(outer + inner, (0, 0, 0), body, seg=40, closed=True, name="shade")
+    m.cyl(0.08, 0.004, (0, 0.17, 0), light, seg=32, name="glow")
+    return m
+
+
+@asset("pendant_light.glb", (0.40, 0.60, 0.40))
+def pendant_light(tint=None):
+    """天井から吊るす照明。コード上端が天井側、最下端 Y=0。"""
+    m = Model("pendant_light")
+    shade = m.mat("tint", tint or "#c49a5e", rough=0.9)
+    cord = m.mat("cord", "#4a4562", rough=0.7)
+    light = m.mat("light", P.WARM_LIGHT, rough=0.5, emit=P.WARM_LIGHT, strength=2.0)
+    m.cyl(0.05, 0.015, (0, 0.5925, 0), cord, seg=24, bevel=0.004, name="canopy")
+    m.cyl(0.004, 0.33, (0, 0.42, 0), cord, seg=8, name="cord")
+    m.cyl(0.02, 0.04, (0, 0.25, 0), cord, seg=14, name="socket")
+    # 編み目風の段がある、浅いドーム形シェード
+    prof_out, prof_in = [], []
+    n = 14
+    for i in range(n + 1):
+        t = i / n
+        a = math.pi / 2 * t
+        r = 0.2 * math.cos(a) + 0.008 * (i % 2)
+        y = 0.02 + 0.24 * math.sin(a)
+        prof_out.append((max(r, 0.02), y))
+        prof_in.append((max(r - 0.007, 0.015), y - 0.006))
+    m.lathe(prof_out + list(reversed(prof_in)), (0, 0, 0), shade, seg=40, closed=True, name="shade")
+    m.sphere(0.04, (0, 0.17, 0), light, seg=16, rings=8, name="bulb")
+    return m
+
+
+@asset("tv.glb", (0.97, 0.62, 0.20))
+def tv(tint=None):
+    m = Model("tv")
+    body = m.mat("tint", tint or "#2f2d38", rough=0.5)
+    screen = m.mat("screen", "#16151c", rough=0.25)
+    W, sh = 0.97, 0.565
+    y0 = 0.62 - sh
+    m.box((W, sh, 0.03), (0, y0 + sh / 2, 0.0), body, bevel=0.004, name="panel")
+    m.box((W - 0.02, sh - 0.02, 0.002), (0, y0 + sh / 2, 0.0155), screen, bevel=0.0, name="screen")
+    m.box((0.5, 0.3, 0.04), (0, y0 + 0.2, -0.03), body, bevel=0.01, name="back_housing")
+    for sx in (-1, 1):
+        m.box((0.04, y0 + 0.02, 0.03), (sx * 0.38, (y0 + 0.02) / 2, 0.0), body, bevel=0.005, name="foot_post")
+        m.box((0.05, 0.015, 0.2), (sx * 0.38, 0.0075, 0.0), body, bevel=0.005, name="foot")
+    return m
