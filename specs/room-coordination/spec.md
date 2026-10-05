@@ -158,7 +158,7 @@ docker compose exec worker bin/rails 'rooms:reanalyze[51,,gemini-3.1-flash-lite]
 | 写真のアップロード | **実装済み (PR #12)**: `POST /uploads` で署名付き URL を発行し、ブラウザから GCS へ直接送る。`POST /rooms` は `photo_keys` を受け取り、実物があるか確かめる。解析では `Storage.client.download` で読み出す |
 | 部屋の解析 (`RoomAnalyzer`) | 写真と `GEMINI_API_KEY` があれば **Gemini** (既定 `gemini-3.1-flash-lite`、Interactions API、写真は長辺 1536px に縮小)、無ければ**モック**。どちらも「どの壁沿いのどのあたりか」だけを返し、座標は `RoomLayout` が計算する。結果の `analyzed_by` で区別できる。**実際のキーでの動作は未確認** |
 | 商品の選定 (`CoordinationPlanner`) | `GEMINI_API_KEY` があれば **Gemini**: 要望文・部屋 (壁と床の色・活かす家具)・商品候補を渡し、枠ごとに要望に合う商品を順位付けさせる。タイトル・コンセプト・要望どおりの商品が無いときの断り書きも書かせる。予算と置き場所は Ruby で決め、コメントの商品部分は実際に置いた商品から組み立てる。存在しない id・枠の違う商品は捨てる。キーが無ければ**モック** (キーワードでテーマを決める)。結果の `planned_by` で区別し、`coordinations.analysis` に回答を残す (`bin/rails 'coordinations:report[ID]'`) |
-| インテリアリンク取得 (`InteriorLinks`) | **モック** (`InteriorLinks::MockClient` + `config/interior_links_mock.yml`、38 点)。価格はダミー、URL は EC の検索結果ページ |
+| インテリアリンク取得 (`InteriorLinks`) | **静的モック** (`InteriorLinks::MockClient` + `config/interior_links_mock.yml`、37件)。34件は実商品の参考価格・詳細URL、未確認3件は参考モックの検索リンク。[出典と制約](../mock-product-references/spec.md) |
 | Webの画面 (`/rooms/new`・`/rooms/:id`) | PR #6の画面・3D編集を基準に統合。畳数・部屋の形 → 活かす家具 → 要望・予算 → 3Dと購入リンク。通信と応答変換は共通の `RoomRepository` に一本化。`/coordinate` は `/rooms/new` へ移動 |
 | 本番 (Cloud Run) での Gemini | 本番はジョブが `:inline` (PR #7) なので、`POST /rooms` は Gemini の応答を待ってから返る (flash-lite なら数秒)。写真は GCS から読む。**本番の `GEMINI_API_KEY` (Secret Manager) は未設定**なので本番はモックで動く |
 | 3D モデル (GLB) | `ModelResolver` (PR #12) が `config/models.yml` から `model_url` を埋める。モデルはまだ未登録 |
