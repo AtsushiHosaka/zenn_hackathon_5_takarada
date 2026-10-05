@@ -20,6 +20,6 @@ export default function RecommendationPanel({items,selectedId,filter,onSelect,on
       <span className="rc-item-art">{productLink(item.imageUrl)?<img src={productLink(item.imageUrl)!} alt={item.name} loading="lazy"/>:illustrations[item.category.toLowerCase()]!==undefined?<ReferenceSvg page={5} index={illustrations[item.category.toLowerCase()]}/>:<ReferenceSvg page={3} index={2}/>}<span className="rc-item-number">{item.marker??items.indexOf(item)+1}</span></span>
       <span className="rc-item-copy"><span className="rc-item-name clamp2">{item.name}</span><span className="rc-item-shop">{labels.find(([key])=>key===categoryOf(item))?.[1]} · {item.shop??'購入先未登録'}</span><span className="rc-money">{item.price===undefined?'価格未登録':money(item.price)}</span></span><span className="rc-item-external">{url&&<ReferenceSvg page={5} index={22}/>}</span>
     </>;return <li key={item.id}>{url?<a href={url} target="_blank" rel="noopener noreferrer" className={`rc-item-link${selectedId===item.id?' is-selected':''}`} onMouseEnter={()=>onSelect(item.id)} onFocus={()=>onSelect(item.id)} onClick={()=>onSelect(item.id)}>{body}</a>:<button type="button" className={`rc-item-link${selectedId===item.id?' is-selected':''}`} onClick={()=>onSelect(item.id)} aria-label={`${index+1}. ${item.name}（購入リンク未登録）`}>{body}</button>}</li>;})}</ul>
-    <p className="rc-panel-note">各アイテムは外部のECサイトで開きます。価格・在庫はリンク先でご確認ください。</p>
+    <p className="rc-panel-note">商品情報と価格は参考値です。3Dの形・色・寸法は近似です。価格・在庫・仕様はリンク先でご確認ください。</p>
   </aside>;
 }
