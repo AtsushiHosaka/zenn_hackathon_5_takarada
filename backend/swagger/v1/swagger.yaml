@@ -997,6 +997,11 @@ components:
               - bed-1
               - desk-1
               - shelf-1
+            base_coordination_id:
+              type: integer
+              nullable: true
+              description: 追加の指示 (チャット) で作り直すときの前回のコーデ (同じ部屋・生成済み)。指示に関係ない商品は前回のものを残す
+              example: 12
             edited_objects:
               type: array
               maxItems: 100
@@ -1127,6 +1132,11 @@ components:
           - mock
           description: 'gemini: 要望文から AI が商品を選んだ / mock: キーワードでテーマを決めたモック。生成が終わると入る'
           example: gemini
+        base_coordination_id:
+          type: integer
+          nullable: true
+          description: 追加の指示で作り直したときの前回のコーデ
+          example:
         error_message:
           type: string
           nullable: true
@@ -1148,5 +1158,6 @@ components:
       - items
       - total_price
       - planned_by
+      - base_coordination_id
       - error_message
       - created_at

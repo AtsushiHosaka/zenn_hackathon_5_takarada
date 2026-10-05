@@ -61,7 +61,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
             if (!config.coordinationPath.includes("{id}")) throw new DomainError("コーディネートの作成先が設定されていません");
             const keptObjectIds = input.keptObjectIds ?? [];
             if (!Array.isArray(keptObjectIds) || keptObjectIds.some(id => typeof id !== "string" || !record.scene?.objects.some(item => item.source === "existing" && item.id === id)) || new Set(keptObjectIds).size !== keptObjectIds.length) throw new DomainError("活かす家具の選択が正しくありません");
-            const request: components["schemas"]["CoordinationInput"] = { coordination: { prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: editedObjects(input, record) } };
+            const request: components["schemas"]["CoordinationInput"] = { coordination: { prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: editedObjects(input, record), ...(input.baseCoordinationId && /^[1-9]\d*$/.test(input.baseCoordinationId) ? { base_coordination_id: Number(input.baseCoordinationId) } : {}) } };
             let coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationPath.replace("{id}", String(record.id)), { method: "POST", body: request, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 120_000 }));
             const coordinationId = coordination.id;
             if (coordination.room_id !== expectedId) throw new DomainError("別の部屋のコーディネートを受け取りました");

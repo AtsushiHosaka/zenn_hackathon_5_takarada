@@ -1,7 +1,8 @@
 # コーデを組み立てる: 商品候補を選ぶ (CoordinationPlanner) → 枠に配置する (SlotLayout) → 予算内に収める。
 # 置き場所が無い商品・予算を超える商品は採用しないので、購入リンク一覧と 3D の表示は常に一致する。
 class CoordinationBuilder
-  Result = Data.define(:title, :comment, :after_scene, :items, :total_price, :planned_by, :analysis)
+  # kept_object_ids: 実際に活かした家具 (要望文で「いらない」と書かれた家具を除いたもの)
+  Result = Data.define(:title, :comment, :after_scene, :items, :total_price, :planned_by, :analysis, :kept_object_ids)
 
   def self.call(coordination)
     new(coordination).call
@@ -17,8 +18,11 @@ class CoordinationBuilder
   end
 
   def call
-    kept = kept_objects
-    plan = CoordinationPlanner.call(prompt: @coordination.prompt, budget: @coordination.budget, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id)
+    plan = CoordinationPlanner.call(prompt: @coordination.prompt, budget: @coordination.budget, room: @scene["room"],
+                                    kept_objects: kept_objects, user_id: @coordination.room.user_id, previous:)
+    removed, kept = kept_objects.partition { |object| plan.removed_object_ids.include?(object["id"]) }
+    # kept_object_ids が空だと「全部活かす」の意味になるので、全部外すことはしない
+    removed, kept = [], kept_objects if kept.empty?
 
     by_slot = plan.candidates.group_by(&:slot) # 枠の優先順・各枠はおすすめ順
     chosen = choose_within_budget(by_slot)
@@ -40,13 +44,14 @@ class CoordinationBuilder
 
     Result.new(
       title: plan.title,
-      comment: comment(plan, placed, kept),
+      comment: comment(plan, placed, kept, removed),
       after_scene: { "room" => @scene["room"], "objects" => kept + placed.map { |p| p[:placement].object } },
       items: placed.map.with_index(1) { |p, marker| item_json(p[:item], p[:placement].note, marker) },
       total_price: placed.sum { |p| p[:item].price },
       planned_by: plan.planned_by,
       # 精度の確認用: Gemini の回答と、実際に採用した商品
-      analysis: plan.analysis.merge("placed_item_ids" => placed.map { |p| p[:item].id })
+      analysis: plan.analysis.merge("placed_item_ids" => placed.map { |p| p[:item].id }, "base_coordination_id" => @coordination.base_coordination_id),
+      kept_object_ids: kept.map { |object| object["id"] }
     )
   end
 
@@ -92,6 +97,14 @@ class CoordinationBuilder
     chosen
   end
 
+  # 追加の指示のときの前回のコーデ。前回の商品を引き継ぐのに使う
+  def previous
+    base = @coordination.base_coordination
+    return unless base&.status == "done"
+
+    CoordinationPlanner::Previous.new(prompt: base.prompt, title: base.title, items: base.items.map { |item| item.slice("item_id", "slot", "name") })
+  end
+
   # kept_object_ids が空なら今ある家具をすべて活かす
   def kept_objects
     objects = @scene["objects"]
@@ -101,12 +114,13 @@ class CoordinationBuilder
 
   # コンセプト (Gemini) + 実際に置いた商品 + 活かした家具 + 断り書き (Gemini)。
   # 商品の部分は置いた結果から組み立てるので、予算や置き場所で外れた商品には触れない
-  def comment(plan, placed, kept)
+  def comment(plan, placed, kept, removed)
     added = placed.first(3).map { |p| "#{p[:item].name} (#{p[:placement].note})" }.join("、")
     kept_labels = kept.map { |o| o["label"] }.join("と")
     parts = [ plan.concept ]
     parts << "#{added} などを追加しました。" if added.present?
     parts << "今の#{kept_labels}はそのまま活かしています。" if kept_labels.present?
+    parts << "ご要望に合わせて、#{removed.map { |o| o['label'] }.join('と')}は外しました。" if removed.any?
     parts << plan.note
     parts.compact.join
   end

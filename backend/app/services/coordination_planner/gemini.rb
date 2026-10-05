@@ -9,6 +9,10 @@ class CoordinationPlanner
         title: { type: "string", description: "コーデの名前 (20 文字以内。例: 深紅の推し活ルーム)" },
         concept: { type: "string", description: "方向性の説明 (80 文字以内・です/ます調)。商品名は書かない" },
         unavailable_note: { type: "string", description: "要望どおりの色・雰囲気の商品が候補に無いときの断り書き (無ければ空文字)" },
+        remove_object_ids: {
+          type: "array", items: { type: "string" },
+          description: "要望で「いらない」「外したい」「捨てる」とはっきり書かれた今ある家具の id。書かれていなければ空"
+        },
         picks: {
           type: "array",
           items: {
@@ -21,7 +25,7 @@ class CoordinationPlanner
           }
         }
       },
-      required: %w[title concept unavailable_note picks]
+      required: %w[title concept unavailable_note remove_object_ids picks]
     }.freeze
 
     SLOT_LABELS = {
@@ -37,7 +41,7 @@ class CoordinationPlanner
 
       # 部屋
       - 壁の色: %<wall_color>s / 床の色: %<floor_color>s
-      - 活かす家具: %<kept>s
+      - 今ある家具 (id: 名前 (色)): %<kept>s
       - 予算: %<budget>s 円 (合計の調整はこちらで行うので、予算を超える組み合わせでも構わない)
 
       # 商品候補 (id | 置き場所の枠 | 商品名 | 色 | 価格)
@@ -50,13 +54,30 @@ class CoordinationPlanner
         「赤い商品が見つからなかったため、近い色の○○を選びました」のように正直に伝える。あれば空文字にする。
       - 今ある家具の色と、壁・床の色とも合うようにする。
       - title と concept は要望に合わせて日本語で書く。concept には商品名を書かない。
+      - 要望で今ある家具を「いらない」「外したい」「捨てる」「別のに替えたい」とはっきり書いているときだけ、
+        その家具の id を remove_object_ids に入れる。「そのまま使いたい」と書かれた家具や、触れられていない家具は入れない。
+      %<previous>s
     TEXT
 
-    def initialize(prompt:, budget:, room:, kept_objects:)
+    PREVIOUS = <<~TEXT.freeze
+      # 前回の提案 (追加の指示で作り直す)
+      前回の要望: %<prompt>s
+      前回のタイトル: %<title>s
+      前回の商品 (id | 枠 | 商品名):
+      %<items>s
+
+      要望の最後の行が、今回の追加の指示。
+      - 追加の指示に関係しない枠は、前回の商品を item_ids の先頭にして、そのまま残す。
+      - 追加の指示に関係する枠 (例: 「もっと落ち着いた紫に」なら色の目立つ布もの、「照明を変えたい」なら照明) だけ選び直す。
+      - title と concept は、前回からの変化が分かるように書く。
+    TEXT
+
+    def initialize(prompt:, budget:, room:, kept_objects:, previous: nil)
       @prompt = prompt
       @budget = budget
       @room = room
       @kept_objects = kept_objects
+      @previous = previous
     end
 
     def plan
@@ -68,6 +89,8 @@ class CoordinationPlanner
         concept: json["concept"].to_s.strip.presence&.truncate(120),
         note: json["unavailable_note"].to_s.strip.presence&.truncate(120),
         candidates: candidates(json["picks"], items),
+        # 今ある家具の id だけを受け付ける (Gemini の回答をそのまま信じない)
+        removed_object_ids: Array(json["remove_object_ids"]).map(&:to_s) & @kept_objects.map { |object| object["id"] },
         planned_by: "gemini",
         analysis: {
           "response" => json,
@@ -85,9 +108,21 @@ class CoordinationPlanner
         prompt: @prompt,
         wall_color: @room["wall_color"],
         floor_color: @room["floor_color"],
-        kept: @kept_objects.map { |o| "#{o['label']} (#{o['color']})" }.join("、").presence || "なし",
+        kept: @kept_objects.map { |o| "#{o['id']}: #{o['label']} (#{o['color']})" }.join("、").presence || "なし",
+        previous: previous_section,
         budget: @budget.to_fs(:delimited),
         items: items.map { |i| "#{i.id} | #{SLOT_LABELS.fetch(i.slot, i.slot)} (#{i.slot}) | #{i.name} | #{i.color} | #{i.price}円" }.join("\n")
+      )
+    end
+
+    def previous_section
+      return "" unless @previous
+
+      format(
+        PREVIOUS,
+        prompt: @previous.prompt,
+        title: @previous.title,
+        items: @previous.items.map { |item| "#{item['item_id']} | #{item['slot']} | #{item['name']}" }.join("\n")
       )
     end
 
