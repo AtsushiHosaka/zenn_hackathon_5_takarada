@@ -170,7 +170,7 @@ PRODUCTS = {
     "103": "rug_rect__103", "203": "rug_rect__203", "303": "rug_wave",
     "111": "rug_round__111", "211": "rug_round__211", "311": "rug_round__311",
     "107": "cushion__107", "207": "cushion__207", "307": "cushion__307",
-    "104": "wall_shelf", "114": "tapestry", "105": "floor_lamp", "112": "floor_lamp_slim",
+    "104": "shelf_floating", "114": "tapestry", "105": "floor_lamp", "112": "floor_lamp_slim",
     "205": "floor_lamp_rattan", "212": "floor_lamp_tripod", "305": "floor_lamp_ball", "312": "floor_lamp_pleated",
     "106": "display_case", "113": "display_rack_open", "108": "acrylic_stand_case", "204": "wall_planter",
     "214": "wall_art", "206": "plant_monstera", "213": "plant_eucalyptus", "208": "small_plant",
