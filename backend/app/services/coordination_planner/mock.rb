@@ -7,9 +7,10 @@ class CoordinationPlanner
       "korean" => { title: "くすみベージュの韓国風ルーム", keywords: %w[韓国 ベージュ くすみ アイボリー ナチュラル] }
     }.freeze
 
-    def initialize(prompt:, budget:, user_id: nil, client: nil, previous: nil, **)
+    def initialize(prompt:, budget:, user_id: nil, client: nil, previous: nil, slots: SLOT_PRIORITY, **)
       @prompt = prompt
       @budget = budget
+      @slots = slots
       @previous = previous
       @user_id = user_id
       @client = client || InteriorLinks.client(user_id: user_id)
@@ -17,12 +18,12 @@ class CoordinationPlanner
 
     def plan
       theme = detect_theme
-      items = @client.search(prompt: @prompt, theme:, slots: SLOT_PRIORITY, max_price: @budget)
+      items = @client.search(prompt: @prompt, theme:, slots: @slots, max_price: @budget)
       Plan.new(
         title: THEMES.fetch(theme)[:title],
         concept: nil,
         note: nil,
-        candidates: SLOT_PRIORITY.flat_map { |slot| keep_previous_first(items.fetch(slot, [])) },
+        candidates: @slots.flat_map { |slot| keep_previous_first(items.fetch(slot, [])) },
         removed_object_ids: [],
         planned_by: "mock",
         analysis: { "meta" => { "planner" => "mock", "theme" => theme } }

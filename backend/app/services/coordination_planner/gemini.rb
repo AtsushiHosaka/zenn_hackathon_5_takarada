@@ -84,7 +84,8 @@ class CoordinationPlanner
       - title と concept は、前回からの変化が分かるように書く。
     TEXT
 
-    def initialize(prompt:, budget:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil)
+    def initialize(prompt:, budget:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil, slots: SLOT_PRIORITY)
+      @slots = slots
       @prompt = prompt
       @budget = budget
       @room = room
@@ -96,7 +97,7 @@ class CoordinationPlanner
     end
 
     def plan
-      items = (@client.search(prompt: @prompt, theme: nil, slots: SLOT_PRIORITY, max_price: @budget).values.flatten + @additional_candidates)
+      items = (@client.search(prompt: @prompt, theme: nil, slots: @slots, max_price: @budget).values.flatten + @additional_candidates)
         .uniq { |item| [ group_id(item), item.id ] }.group_by { |item| group_id(item) }.values.flat_map { |group| group.first(CANDIDATES_PER_GROUP) }
       response = GeminiClient.new.generate_json(prompt: prompt_for(items), schema: SCHEMA)
       json = response.json.is_a?(Hash) ? response.json : {}
