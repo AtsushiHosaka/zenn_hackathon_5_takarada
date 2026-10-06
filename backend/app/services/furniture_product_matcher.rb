@@ -28,7 +28,18 @@ class FurnitureProductMatcher
 
     known_axes = %w[w h d].select { |axis| valid_dimension?(size[axis]) }
     estimated_axes = %w[w h d] - known_axes
-    return nil if known_axes.length < 2 || (estimated_axes - THIN_AXES.fetch(@item["category"], [])).any?
+    unresolved_axes = estimated_axes - THIN_AXES.fetch(@item["category"], [])
+    standard_sized = false
+    # Small display goods vary little in size; Yahoo! pages often omit dimensions,
+    # so fill missing axes with the placed category-standard size.
+    if NAME_SHAPED_CATEGORIES.include?(@item["category"]) && estimated_axes.any? &&
+        estimated_axes.all? { |axis| valid_dimension?(@object.dig("size", axis)) }
+      size = size.merge(estimated_axes.to_h { |axis| [ axis, @object.dig("size", axis) ] })
+      known_axes = %w[w h d]
+      unresolved_axes = []
+      standard_sized = true
+    end
+    return nil if known_axes.length < 2 || unresolved_axes.any?
 
     # Product search uses table as an umbrella; the model catalog separates side tables.
     categories = @item["category"] == "table" ? %w[table side_table] : @item["category"]
@@ -39,7 +50,8 @@ class FurnitureProductMatcher
     ratio_axes = NAME_SHAPED_CATEGORIES.include?(@item["category"]) && face_axes.length >= 2 ? face_axes : known_axes
     scored = candidates.map { |model| [ model, ratio_error(size, model, ratio_axes) ] }
     model, error = scored.min_by { |candidate, score| [ score, candidate.variant.present? ? 1 : 0, candidate.key ] }
-    return nil if model.nil? || error > MAX_RATIO_ERROR
+    # A standard size is only a guess, so the name-based candidates decide the model.
+    return nil if model.nil? || (error > MAX_RATIO_ERROR && !standard_sized)
 
     reason = "category_shape_ratio:#{model.category}/#{model.shape};ratio_error=#{error.round(3)}"
     reason += ";shape_source=#{@metadata['shape'].present? ? 'product_metadata' : 'product_name_approximation'}"
