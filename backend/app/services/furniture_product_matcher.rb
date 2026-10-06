@@ -2,7 +2,9 @@
 class FurnitureProductMatcher
   Result = Data.define(:model, :reason, :approximate)
   MAX_RATIO_ERROR = 1.2
-  THIN_AXES = { "rug" => [ "h" ], "bed_cover" => [ "h" ], "curtain" => [ "d" ], "tapestry" => [ "d" ], "wall_art" => [ "d" ] }.freeze
+  THIN_AXES = { "rug" => [ "h" ], "bed_cover" => [ "h" ], "curtain" => [ "d" ], "tapestry" => [ "d" ], "wall_art" => [ "d" ], "neon" => [ "d" ] }.freeze
+  # Display goods whose model choice depends on the name, not on round/rectangular topology.
+  NAME_SHAPED_CATEGORIES = %w[acrylic_stand_case oshi_goods display_case tapestry neon wall_shelf vase candle].freeze
 
   def self.call(item:, object:)
     new(item, object).call
@@ -26,15 +28,30 @@ class FurnitureProductMatcher
 
     known_axes = %w[w h d].select { |axis| valid_dimension?(size[axis]) }
     estimated_axes = %w[w h d] - known_axes
-    return nil if known_axes.length < 2 || (estimated_axes - THIN_AXES.fetch(@item["category"], [])).any?
+    unresolved_axes = estimated_axes - THIN_AXES.fetch(@item["category"], [])
+    standard_sized = false
+    # Small display goods vary little in size; Yahoo! pages often omit dimensions,
+    # so fill missing axes with the placed category-standard size.
+    if NAME_SHAPED_CATEGORIES.include?(@item["category"]) && estimated_axes.any? &&
+        estimated_axes.all? { |axis| valid_dimension?(@object.dig("size", axis)) }
+      size = size.merge(estimated_axes.to_h { |axis| [ axis, @object.dig("size", axis) ] })
+      known_axes = %w[w h d]
+      unresolved_axes = []
+      standard_sized = true
+    end
+    return nil if known_axes.length < 2 || unresolved_axes.any?
 
     # Product search uses table as an umbrella; the model catalog separates side tables.
     categories = @item["category"] == "table" ? %w[table side_table] : @item["category"]
     candidates = FurnitureModel.available.where(category: categories)
     candidates = candidates.where(shape: candidate_shapes)
-    scored = candidates.map { |model| [ model, ratio_error(size, model, known_axes) ] }
+    # A 6mm neon sign or tapestry differs from its model mainly in thickness; compare the face.
+    face_axes = known_axes - THIN_AXES.fetch(@item["category"], [])
+    ratio_axes = NAME_SHAPED_CATEGORIES.include?(@item["category"]) && face_axes.length >= 2 ? face_axes : known_axes
+    scored = candidates.map { |model| [ model, ratio_error(size, model, ratio_axes) ] }
     model, error = scored.min_by { |candidate, score| [ score, candidate.variant.present? ? 1 : 0, candidate.key ] }
-    return nil if model.nil? || error > MAX_RATIO_ERROR
+    # A standard size is only a guess, so the name-based candidates decide the model.
+    return nil if model.nil? || (error > MAX_RATIO_ERROR && !standard_sized)
 
     reason = "category_shape_ratio:#{model.category}/#{model.shape};ratio_error=#{error.round(3)}"
     reason += ";shape_source=#{@metadata['shape'].present? ? 'product_metadata' : 'product_name_approximation'}"
@@ -65,7 +82,7 @@ class FurnitureProductMatcher
 
   def candidate_shapes
     shape = @metadata["shape"].to_s
-    return inferred_shape if shape.blank?
+    return inferred_shape if shape.blank? || NAME_SHAPED_CATEGORIES.include?(@item["category"])
 
     # Classified topology is a constraint, not an invented catalog-model ID.
     case shape
@@ -110,8 +127,15 @@ class FurnitureProductMatcher
       return nil unless name.match?(/長方形|矩形|角形/)
       name.include?("ダイニング") ? "table_dining_rect" : "table_low_rect"
     when "bed_cover" then "bed_cover"
-    when "wall_shelf" then "shelf_floating"
-    when "display_case" then "display_case"
+    when "wall_shelf" then %w[shelf_floating wall_shelf wall_shelf_hex]
+    when "display_case" then %w[display_case display_rack_open cabinet_glass]
+    when "acrylic_stand_case" then "acrylic_stand_case"
+    when "oshi_goods"
+      return "uchiwa_stand" if name.include?("うちわ")
+      name.include?("缶バッジ") ? "badge_display" : "acrylic_stand"
+    when "neon" then "neon_sign"
+    when "vase" then %w[vase_tulip dried_flowers]
+    when "candle" then "candle"
     when "floor_lamp" then "floor_lamp"
     when "desk_lamp" then name.include?("クリップ") ? "desk_lamp_clip" : "desk_lamp_arm"
     when "tapestry" then "tapestry"

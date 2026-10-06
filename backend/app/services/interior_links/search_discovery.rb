@@ -10,10 +10,16 @@ module InteriorLinks
     MAX_URLS = 36
     REQUEST_SECONDS = 50
     SLOT_NAMES = { "bed_cover" => "寝具・ベッドカバー", "curtain" => "カーテン", "rug" => "ラグ",
-                   "wall_decor" => "壁飾り・アート", "light" => "照明", "display" => "飾り物・花瓶",
-                   "cushion" => "クッション", "desk_top" => "デスク上の小物" }.freeze
-    STORE_PATHS = %w[www.ikea.com/jp/ja/p/ www.nitori-net.jp/ec/product/ www.low-ya.com/goods/
-                     www.muji.com/jp/ja/store/cmdty/detail/].freeze
+                   "wall_decor" => "壁飾り・アート・タペストリー・ウォールシェルフ", "light" => "照明",
+                   "display" => "コレクションケース・飾り物・花瓶", "cushion" => "クッション",
+                   "desk_top" => "アクスタケース・うちわスタンド・デスク上の小物" }.freeze
+    # Nitori is searched through its Yahoo! store: the official site often times out.
+    STORE_PATHS = %w[www.ikea.com/jp/ja/p/ store.shopping.yahoo.co.jp/nitori-net/ francfranc.com/products/
+                     www.low-ya.com/goods/ www.muji.com/jp/ja/store/cmdty/detail/ store.shopping.yahoo.co.jp/].freeze
+    # nitori-net.jp answers in ~10s, beyond PageFetcher's read timeout; its Yahoo! store
+    # carries the same products. Previously saved official URLs are still fetchable.
+    SKIPPED_DISCOVERY_HOSTS = %w[www.nitori-net.jp].freeze
+    BATCH_PRIORITY_PATHS = [ STORE_PATHS.values_at(0, 1), STORE_PATHS.values_at(2, 3, 4), STORE_PATHS ].freeze
     CATEGORY_NAMES = { "sofa" => "ソファ", "bed" => "ベッド", "desk" => "デスク", "chair" => "椅子",
                        "shelf" => "本棚・収納棚", "table" => "テーブル" }.freeze
     class Error < StandardError
@@ -52,7 +58,10 @@ module InteriorLinks
 
       sources = interleave(successful.map { |result| result[:sources] })
       resolved = GroundingSourceResolver.new.resolve(sources)
-      fallback_urls = interleave(successful.map { |result| result[:text_urls] }).select { |url| PageFetcher.store(url) }.uniq
+      skipped = resolved[:urls].count { |url| skipped_host?(url) }
+      resolved[:urls] = resolved[:urls].reject { |url| skipped_host?(url) }
+      resolved[:diagnostics] = resolved[:diagnostics].merge("skipped_slow_store" => skipped)
+      fallback_urls = interleave(successful.map { |result| result[:text_urls] }).select { |url| PageFetcher.store(url) && !skipped_host?(url) }.uniq
       if resolved[:urls].empty? && fallback_urls.empty? && resolved[:diagnostics]["resolution_failed"].to_i.positive?
         raise Error.new("Google検索の出典を解決できませんでした", diagnostics: { "source_resolution" => resolved[:diagnostics] })
       end
@@ -79,6 +88,12 @@ module InteriorLinks
 
     private
 
+    def skipped_host?(url)
+      SKIPPED_DISCOVERY_HOSTS.include?(URI.parse(url).host)
+    rescue URI::InvalidURIError
+      true
+    end
+
     def interleave(groups)
       queues = groups.map(&:dup)
       result = []
@@ -103,17 +118,18 @@ module InteriorLinks
     end
 
     def query(prompt:, theme:, targets:, max_price:, index:)
-      priority_paths = index == 0 ? STORE_PATHS.first(2) : (index == 1 ? STORE_PATHS.last(2) : STORE_PATHS)
+      priority_paths = BATCH_PRIORITY_PATHS.fetch(index, STORE_PATHS)
       <<~PROMPT
-        日本の公式家具EC商品をGoogle検索で探してください。
+        日本の家具・インテリア雑貨ECの商品をGoogle検索で探してください。
         希望・テンプレート: #{prompt.to_s.first(4000)}
         テーマ: #{theme}。1商品の上限: #{max_price}円。安価な候補も含めてください。
         検索する用途候補: #{targets.join('、')}。希望に用途指定があればそれを優先し、無関係な用途は検索しないでください。
         優先サイト: #{priority_paths.join('、')}。希望の店舗指定を優先してください。
-        許可した商品詳細のパス: #{STORE_PATHS.join('、')}。
+        許可した商品詳細のパス: #{STORE_PATHS.join('、')}（Yahoo!ショッピングは store.shopping.yahoo.co.jp/<ストア>/<商品コード>.html）。
         site:指定を含む検索クエリを最大3個にまとめ、各検索結果から複数商品を拾ってください。
         #{index == 2 ? 'この回は低価格帯の候補を優先してください。' : ''}
         最大12件、商品ごとに「公式商品名・詳細URL・出典引用」を1行で出してください。価格・寸法や説明文は不要です。
+        ニトリはYahoo!ショッピングのnitori-netストアの商品詳細URLを返し、公式サイトの商品番号をYahoo!のURLに流用しないでください。
         URLを記憶から作ったり国コードを置換したりせず、検索で見つかった日本の商品詳細URLだけを返してください。
         確認できなければ件数を埋めず省いてください。カテゴリページや検索ページは含めないでください。
       PROMPT
