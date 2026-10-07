@@ -71,6 +71,7 @@ APIの新規作成では、解析後に表示された既存家具から活か�
 | `VITE_API_ENDPOINT` | 空欄なら同一オリジン。外部URLへの直接接続にはAPI側のCORS対応が必要 |
 | `API_UPSTREAM_ORIGIN` | Vite dev / preview・nginxの中継先。既定はGCP Cloud Run。ブラウザへ埋め込まない |
 | `VITE_CONNECTION` | 開発時だけ有効。空欄なら`dummy`、`api`で実API接続 |
+| `VITE_TERMS_URL` / `VITE_PRIVACY_URL` | 正式な公開文書のHTTPS URL、または同一オリジンのパス。ビルド時に埋め込む |
 | `VITE_ROOM_API_CONTRACT` | 既定は`coordination`。`analysis`は部屋解析のみ、`legacy`は将来の写真API向け提案形式 |
 | `VITE_ROOM_GENERATION_PATH` | 部屋作成POST先。既定は`/api/v1/rooms` |
 | `VITE_ROOM_JOB_PATH` | 部屋取得GET先。既定は`/api/v1/rooms/{id}` |
@@ -80,6 +81,8 @@ APIの新規作成では、解析後に表示された既存家具から活か�
 | `VITE_ROOM_*_FIELD` | `legacy`の写真・指示・雰囲気・予算の送信フィールド名 |
 
 `VITE_`の値はブラウザへ公開されます。秘密鍵やアクセストークンを設定しません。認証トークンは既存のトークン管理を使います。
+
+正式文書のURLを設定すると、ログイン・登録画面から別タブで本文を開けます。GitHub Actionsでは同名のRepository variables、`make infra-release`では同名の環境変数を使います。値を変更した後は再ビルドが必要です。正式文書そのものはこのリポジトリに用意されていません。
 
 ## GCPのユーザー・認証APIを使う
 

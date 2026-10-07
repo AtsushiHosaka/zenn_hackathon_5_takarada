@@ -67,6 +67,8 @@ jobs:
             VITE_API_ENDPOINT=
             API_UPSTREAM_ORIGIN=${{ secrets.GCP_API_URL }}
             VITE_CONNECTION=api
+            VITE_TERMS_URL=${{ vars.VITE_TERMS_URL }}
+            VITE_PRIVACY_URL=${{ vars.VITE_PRIVACY_URL }}
           tags: |
             ${{ secrets.GCP_WEB_IMAGE_REPO }}:${{ github.event.workflow_run.head_sha }}
             ${{ secrets.GCP_WEB_IMAGE_REPO }}:latest
