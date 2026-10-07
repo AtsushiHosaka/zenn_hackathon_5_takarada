@@ -42,6 +42,8 @@ docker buildx build \
   --build-arg "VITE_API_ENDPOINT=" \
   --build-arg "API_UPSTREAM_ORIGIN=$api_url" \
   --build-arg "VITE_CONNECTION=api" \
+  --build-arg "VITE_TERMS_URL=${VITE_TERMS_URL:-}" \
+  --build-arg "VITE_PRIVACY_URL=${VITE_PRIVACY_URL:-}" \
   -t "$web_repo:$tag" -t "$web_repo:latest" \
   --push \
   "$ROOT/frontend"
