@@ -8,4 +8,4 @@ Local saved-room storage validates the override and preserves it across reload. 
 
 No API, DB or environment contract changes. API room geometry already includes floor_color. Template reuse of measured scenes uses that existing color.
 
-Verification pending frontend lint/build, desktop/mobile browser screenshots and save/reload/undo/Before/After checks.
+Verification: frontend lint/build passed. Temporary checks using actual Three.js floor descriptors verified saved/invalid hex values, recolored sample floor faces, unchanged walls and original Before colors. Browser fixtures verified actual measured-floor material updates, swatches, a custom color through one DOM input event, undo/redo, original Before/edited After, save/reload, and mobile keyboard activation without horizontal overflow. Screenshots are in docs/pr-evidence/issue-59. The native operating-system color dialog, physical touch and deployed/provider paths remain unverified. The mobile editor panel expansion is handled by the separately stacked mobile editor PRs.
