@@ -1,4 +1,4 @@
-import type { RoomDesign, RoomItem } from '../../domain/room';
+import { furnitureCategories, type FurnitureAddition, type FurnitureCategory, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
 import { downloadShoppingCsv } from './exports';
 import { LAYOUT_GRID_STEP, snapItemPosition, snapToLayoutGrid } from './layoutGrid';
 import './planner.css';
@@ -9,6 +9,13 @@ type PlannerPanelProps = {
   design: RoomDesign;
   selectedId: string | null;
   onSelect: (id: string) => void;
+  furnitureRequests?: {
+    existingItems: RoomItem[];
+    operations: FurnitureOperation[];
+    additions: FurnitureAddition[];
+    onOperationChange: (objectId: string, action: FurnitureOperation['action']) => void;
+    onAdditionsChange: (additions: FurnitureAddition[]) => void;
+  };
   onChange: (next: RoomDesign) => void;
   onUndo: () => void;
   onRedo: () => void;
@@ -34,6 +41,8 @@ const wallColors = [
 ] as const;
 const viewChoices = [['perspective', '立体'], ['top', '真上'], ['front', '正面']] as const;
 const cm = (meters: number) => `${Math.round(meters * 1000) / 10}`;
+const furnitureLabels: Record<FurnitureCategory, string> = { sofa: 'ソファ', bed: 'ベッド', desk: 'デスク', chair: 'チェア', shelf: '収納棚', table: 'テーブル' };
+const furnitureActions = [['keep', '残す'], ['replace', '入れ替える'], ['remove', '外す']] as const;
 
 function ArrowIcon({ redo = false }: { redo?: boolean }) {
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={redo ? { transform: 'scaleX(-1)' } : undefined}>
@@ -41,13 +50,14 @@ function ArrowIcon({ redo = false }: { redo?: boolean }) {
   </svg>;
 }
 
-export default function PlannerPanel({ design, selectedId, onSelect, onChange, onUndo, onRedo, canUndo, canRedo, dirty, onSave, onClose, onProducts, view, onView, dimensions, onDimensions }: PlannerPanelProps) {
-  const selected = design.items.find(item => item.id === selectedId);
+export default function PlannerPanel({ design, selectedId, onSelect, furnitureRequests, onChange, onUndo, onRedo, canUndo, canRedo, dirty, onSave, onClose, onProducts, view, onView, dimensions, onDimensions }: PlannerPanelProps) {
+  const selectableItems = [...design.items, ...(furnitureRequests?.existingItems ?? []).filter(item => !design.items.some(current => current.id === item.id))];
+  const selected = selectableItems.find(item => item.id === selectedId);
   const completeModel = Boolean(design.modelUrl && design.modelKind !== 'shell');
-  const itemDisabled = !selected || completeModel;
+  const itemDisabled = !selected || !design.items.some(item => item.id === selected.id) || completeModel;
 
   function changeItem(change: Partial<RoomItem>) {
-    if (!selected || completeModel) return;
+    if (itemDisabled || !selected) return;
     onChange({ ...design, items: design.items.map(item => item.id === selected.id ? { ...item, ...change } : item) });
   }
 
@@ -97,9 +107,15 @@ export default function PlannerPanel({ design, selectedId, onSelect, onChange, o
         <label id="planner-item-label" className="rc-planner-label" htmlFor="planner-item">編集する家具</label>
         <select id="planner-item" value={selected?.id ?? ''} onChange={event => onSelect(event.target.value)}>
           <option value="" disabled>家具を選択してください</option>
-          {design.items.map(item => <option key={item.id} value={item.id}>{item.name}{item.existing ? '（今ある家具）' : ''}</option>)}
+          {selectableItems.map(item => <option key={item.id} value={item.id}>{item.name}{item.existing ? '（今ある家具）' : ''}</option>)}
         </select>
         {selected ? <>
+          {selected.existing && furnitureRequests && <div className="rc-planner-operation">
+            <div className="rc-planner-segments" role="group" aria-label={`${selected.name}の操作`}>
+              {furnitureActions.map(([action, label]) => <button key={action} type="button" aria-pressed={(furnitureRequests.operations.find(operation => operation.objectId === selected.id)?.action ?? 'keep') === action} disabled={action === 'replace' && !furnitureCategories.some(category => category === selected.category)} onClick={() => furnitureRequests.onOperationChange(selected.id, action)}>{label}</button>)}
+            </div>
+            <p className="rc-planner-note">次のコーディネートに反映します。入れ替え先が収まらない場合は元の家具を残します。</p>
+          </div>}
           <dl className="rc-planner-size">
             {([['幅', 0], ['高さ', 1], ['奥行き', 2]] as const).map(([label, index]) => <div key={label}><dt>{label}</dt><dd>{cm(selected.size[index])}<span>cm</span></dd></div>)}
           </dl>
@@ -135,10 +151,21 @@ export default function PlannerPanel({ design, selectedId, onSelect, onChange, o
           {wallColors.map(([color, label]) => <button key={color} type="button" aria-label={`壁を${label}にする`} title={label} aria-pressed={design.wallColor?.toUpperCase() === color.toUpperCase()} style={{ backgroundColor: color }} onClick={() => onChange({ ...design, wallColor: color })} />)}
         </div>
       </fieldset>
+      {furnitureRequests && <details className="rc-planner-section rc-planner-additions">
+        <summary>家具を追加{furnitureRequests.additions.length > 0 && `（${furnitureRequests.additions.length}点）`}</summary>
+        <p className="rc-planner-note">次のコーディネートで提案する家具を、最大6点指定できます。</p>
+        {furnitureRequests.additions.map((addition, index) => <div className="rc-planner-addition" key={index}>
+          <select aria-label={`追加家具${index + 1}の種類`} value={addition.category} onChange={event => furnitureRequests.onAdditionsChange(furnitureRequests.additions.map((value, i) => i === index ? { category: furnitureCategories.find(category => category === event.target.value) ?? value.category } : value))}>
+            {furnitureCategories.map(category => <option key={category} value={category}>{furnitureLabels[category]}</option>)}
+          </select>
+          <button type="button" className="rc-secondary" aria-label={`追加家具${index + 1}を削除`} onClick={() => furnitureRequests.onAdditionsChange(furnitureRequests.additions.filter((_, i) => i !== index))}>削除</button>
+        </div>)}
+        <button type="button" className="rc-secondary" disabled={furnitureRequests.additions.length >= 6} onClick={() => furnitureRequests.onAdditionsChange([...furnitureRequests.additions, { category: 'sofa' }])}>家具を追加</button>
+      </details>}
     </div>
     <div className="rc-planner-footer">
       <button type="button" className="rc-primary" disabled={!dirty} onClick={onSave}>変更を保存</button>
-      <div><button type="button" className="rc-secondary" onClick={onProducts}>アイテムを見る</button><button type="button" className="rc-secondary" onClick={() => downloadShoppingCsv(design.items, design.title)}>購入リストCSV</button></div>
+      {design.kind !== 'analysis' && <div><button type="button" className="rc-secondary" onClick={onProducts}>アイテムを見る</button><button type="button" className="rc-secondary" onClick={() => downloadShoppingCsv(design.items, design.title)}>購入リストCSV</button></div>}
       <p>変更はこのブラウザに保存されます。</p>
     </div>
   </aside>;

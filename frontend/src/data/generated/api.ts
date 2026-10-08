@@ -462,8 +462,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 本人の保存済みの部屋を一覧で取得する
-         * @description 作成日時の降順。解析中・失敗した部屋も含み、各部屋に最後に成功した提案を返す
+         * 本人の部屋一覧を取得する
+         * @description 本人の部屋をIDの降順で返す。部屋がない場合は空の配列を返す。解析中・失敗した部屋も含み、各部屋に最後に成功した提案を返す。
          */
         get: {
             parameters: {
@@ -474,7 +474,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description 本人の部屋一覧 */
+                /** @description 部屋一覧 */
                 200: {
                     headers: {
                         [name: string]: unknown;

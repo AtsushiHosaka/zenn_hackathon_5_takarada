@@ -6,7 +6,7 @@ module Api
     class RoomsController < ApplicationController
       # GET /api/v1/rooms
       def index
-        rooms = current_user.rooms.includes(:latest_coordination).order(created_at: :desc, id: :desc)
+        rooms = current_user.rooms.includes(:latest_coordination).order(id: :desc)
         render json: RoomSerializer.new(rooms)
       end
 

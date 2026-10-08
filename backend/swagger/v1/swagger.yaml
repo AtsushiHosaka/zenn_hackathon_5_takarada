@@ -246,15 +246,15 @@ paths:
                 "$ref": "#/components/schemas/NotFound"
   "/api/v1/rooms":
     get:
-      summary: 本人の保存済みの部屋を一覧で取得する
+      summary: 本人の部屋一覧を取得する
       tags:
       - Rooms
-      description: 作成日時の降順。解析中・失敗した部屋も含み、各部屋に最後に成功した提案を返す
+      description: 本人の部屋をIDの降順で返す。部屋がない場合は空の配列を返す。解析中・失敗した部屋も含み、各部屋に最後に成功した提案を返す。
       security:
       - bearerAuth: []
       responses:
         '200':
-          description: 本人の部屋一覧
+          description: 部屋一覧
           content:
             application/json:
               schema:
