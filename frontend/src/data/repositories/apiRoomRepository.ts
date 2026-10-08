@@ -195,7 +195,7 @@ function editedObjects(input: GenerateRoomInput, record: components["schemas"]["
     size: { w: item.size[0], h: item.size[1], d: item.size[2] },
     rotation_y: item.rotation ?? 0,
     color: item.color,
-    ...(item.artwork ? { artwork: { data_url: item.artwork.dataUrl } } : {}),
+    ...(item.artwork && isManualFurniture(item) ? { artwork: { data_url: item.artwork.dataUrl } } : {}),
     ...(isManualFurniture(item) ? { category: item.category as components["schemas"]["FurnitureEdit"]["category"], ...(!item.ecProductId ? { label: item.name } : {}) } : {}),
     ...(item.ecProductId ? { ec_product_id: Number(item.ecProductId) } : {}),
     ...(item.replacementEcProductId ? { replacement_ec_product_id: item.replacementEcProductId } : {}),

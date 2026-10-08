@@ -93,6 +93,11 @@ export function isManualFurniture(item: RoomItem): boolean {
   return item.existing && /^manual-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
 }
 
+// Template objects belong to a copied base scene, so they must not be appended as manual input.
+export function isTemplateFurniture(item: RoomItem): boolean {
+  return item.existing && /^template-object-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
+}
+
 export type RoomSnapshot = { room: RoomGeometry; items: RoomItem[]; wallColor?: string };
 
 export type RoomDesign = {
@@ -220,8 +225,8 @@ export function isRoomItem(value: unknown): value is RoomItem {
   if (value.shop !== undefined && !nonemptyString(value.shop)) return false;
   if (value.productId !== undefined && (typeof value.productId !== "string" || !/^[1-9]\d*$/.test(value.productId))) return false;
   if (value.ecProductId !== undefined && (typeof value.ecProductId !== "string" || !/^[1-9]\d*$/.test(value.ecProductId))) return false;
-  if (value.referenceImage !== undefined && (!isManualFurniture(value as RoomItem) || !furnitureCategories.some(category => category === value.category) || !isImageArtwork(value.referenceImage))) return false;
-  if (value.artwork !== undefined && (!isManualFurniture(value as RoomItem) || !imageGoodsCategories.some(category => category === value.category) || !isImageArtwork(value.artwork))) return false;
+  if (value.referenceImage !== undefined && (!(isManualFurniture(value as RoomItem) || isTemplateFurniture(value as RoomItem)) || !furnitureCategories.some(category => category === value.category) || !isImageArtwork(value.referenceImage))) return false;
+  if (value.artwork !== undefined && (!(isManualFurniture(value as RoomItem) || isTemplateFurniture(value as RoomItem)) || !imageGoodsCategories.some(category => category === value.category) || !isImageArtwork(value.artwork))) return false;
   if (value.materialOverrides !== undefined && !isMaterialOverrides(value.materialOverrides)) return false;
   if (value.textureStatus !== undefined && !isTextureStatus(value.textureStatus)) return false;
   if (value.textureSource !== undefined && value.textureSource !== "description") return false;

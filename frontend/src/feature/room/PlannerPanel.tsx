@@ -1,7 +1,7 @@
 import { useState, type DragEvent } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRepositories } from '../../core/repositories';
-import { isManualFurniture, furnitureCategories, replacementFurnitureCategories, type FurnitureAddition, type FurnitureCategory, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
+import { isManualFurniture, isTemplateFurniture, furnitureCategories, replacementFurnitureCategories, type FurnitureAddition, type FurnitureCategory, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
 import ErrorText from '../shared/ErrorText';
 import { downloadShoppingCsv } from './exports';
 import { LAYOUT_GRID_STEP, snapToLayoutGrid } from './layoutGrid';
@@ -229,7 +229,7 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
   const paletteScope = useRoomPlanScope();
   const selectableItems = [...design.items, ...(furnitureRequests?.existingItems ?? []).filter(item => !design.items.some(current => current.id === item.id))];
   const selected = selectableItems.find(item => item.id === selectedId);
-  const detectedItems = furnitureRequests?.existingItems.filter(item => !isManualFurniture(item)) ?? [];
+  const detectedItems = furnitureRequests?.existingItems.filter(item => !isManualFurniture(item) && !isTemplateFurniture(item)) ?? [];
   const selectedProductLink = furnitureLink(selected?.productUrl);
   const completeModel = Boolean(design.modelUrl && design.modelKind !== 'shell');
   const itemDisabled = !selected || !design.items.some(item => item.id === selected.id) || completeModel;
