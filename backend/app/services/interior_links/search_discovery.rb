@@ -6,9 +6,15 @@ module InteriorLinks
   # Google Search grounding discovers URLs only. Generated numbers never enter product data.
   class SearchDiscovery
     DEFAULT_MODEL = "gemini-3.5-flash".freeze
-    MAX_BATCHES = 3
+    MIN_BATCHES = 3
+    # One broad query returns only a few of the requested uses, so split uses
+    # across more parallel searches (one or two uses each).
+    MAX_BATCHES = 6
     MAX_URLS = 36
-    REQUEST_SECONDS = 50
+    # Grounded searches took 16-54s in parallel (2026-10-07); 45s cut off whole batches.
+    REQUEST_SECONDS = 65
+    RETRY_MIN_REMAINING_SECONDS = 25
+    TRANSIENT_ERRORS = [ OpenSSL::SSL::SSLError, EOFError, Errno::ECONNRESET, Net::OpenTimeout ].freeze
     SLOT_NAMES = { "bed_cover" => "寝具・ベッドカバー", "curtain" => "カーテン", "rug" => "ラグ",
                    "wall_decor" => "壁飾り・アート・タペストリー・ウォールシェルフ", "light" => "照明",
                    "display" => "コレクションケース・飾り物・花瓶", "cushion" => "クッション",
@@ -110,10 +116,11 @@ module InteriorLinks
       targets << "家具・インテリア" if targets.empty?
       # A single category still needs several stores and price bands, rather than
       # the same small shortlist returned by one broad Google query.
-      return Array.new(MAX_BATCHES) { targets } if targets.length < MAX_BATCHES
+      return Array.new(MIN_BATCHES) { targets } if targets.length < MIN_BATCHES
 
-      targets.each_with_index.each_with_object(Array.new(MAX_BATCHES) { [] }) do |(target, index), groups|
-        groups[index % MAX_BATCHES] << target
+      batch_count = [ targets.length, MAX_BATCHES ].min
+      targets.each_with_index.each_with_object(Array.new(batch_count) { [] }) do |(target, index), groups|
+        groups[index % batch_count] << target
       end
     end
 
@@ -142,10 +149,22 @@ module InteriorLinks
         effort = search_model.start_with?("gemini-3.5") ? "MINIMAL" : "LOW"
         body[:generationConfig][:thinkingConfig] = { thinkingLevel: effort }
       end
-      response = Timeout.timeout(REQUEST_SECONDS) do
-        Net::HTTP.start(endpoint.host, endpoint.port, use_ssl: true, open_timeout: 5, read_timeout: 45, write_timeout: 10) do |http|
-          http.post(endpoint.request_uri, body.to_json, headers)
+      deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + REQUEST_SECONDS
+      retried = false
+      begin
+        remaining = deadline - Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        response = Timeout.timeout(remaining) do
+          Net::HTTP.start(endpoint.host, endpoint.port, use_ssl: true, open_timeout: 5, read_timeout: remaining, write_timeout: 10) do |http|
+            http.post(endpoint.request_uri, body.to_json, headers)
+          end
         end
+      rescue *TRANSIENT_ERRORS
+        # The endpoint sometimes drops a connection mid-response; losing a batch
+        # cuts the product candidates sharply, so retry once while time remains.
+        raise if retried || deadline - Process.clock_gettime(Process::CLOCK_MONOTONIC) < RETRY_MIN_REMAINING_SECONDS
+
+        retried = true
+        retry
       end
       raise Error, "Google検索groundingが失敗しました (HTTP #{response.code})" unless response.is_a?(Net::HTTPSuccess)
 

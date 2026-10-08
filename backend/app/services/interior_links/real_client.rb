@@ -2,7 +2,9 @@ require "timeout"
 
 module InteriorLinks
   class RealClient
-    DEADLINE_SECONDS = 90
+    # Search may use SearchDiscovery::REQUEST_SECONDS; plus source resolution (12s);
+    # leave ~40s for page fetches. Job total stays under GenerateCoordinationJob's 240s.
+    DEADLINE_SECONDS = 120
     PAGE_WORKERS = 6
     class Error < StandardError
       attr_reader :diagnostics

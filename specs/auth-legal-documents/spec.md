@@ -1,30 +1,33 @@
-# 正式文書のURLを設定して本文を開けるようにする
+# Legal document links and signup availability
 
-## 目的と根拠
+## Source and scope
 
-2026年10月7日のdogfood OBS-001では、登録画面で規約とプライバシーポリシーへの同意を求める一方、どちらのリンクも「正式な文書は準備中です。」と表示していた。ユーザーから、このUX課題の修正と独立したPR作成を依頼された。
+On 2026-10-07, dogfood OBS-001 found that signup required consent while both documents were unavailable. On 2026-10-08, the user selected: remove dummy consent and pause API signup until official documents are configured.
 
-Google Docs URLは `docs/project.md` に未設定。今回の依頼とQA証跡を暫定の根拠とし、Docsは未確認・未反映。正式文書の本文・公開URLは既存資料に見当たらないため、ユーザーに確認中。本文やデータの利用目的などを作り足さない。
+The Google Docs URL in `docs/project.md` remains unset. The explicit requests and existing QA evidence are the provisional sources; this decision remains unreflected in Docs. No official legal text or publication URL is invented.
 
-## 受け入れ条件
+## Acceptance criteria
 
-- 公開済みの正式文書を設定でき、ログイン・登録画面から本文を開ける。
-- 文書は別タブで開き、入力中のフォームを保持する。
-- URLはHTTPSまたは同一オリジンのパスを使う。スクリプトURL、外部HTTP URL、不正な値は採用しない。
-- ローカルVite、Compose、Docker、手動リリース、GitHub Actionsに設定経路を用意する。
+- Configured HTTPS URLs or same-origin root paths open each official document in a new tab and preserve the signup form.
+- Web and API accept the same URI-encoded ASCII configuration format: percent-encode non-ASCII paths and use punycode hostnames. Invalid percent escapes, raw spaces inside URLs, out-of-range ports, invalid schemes, external HTTP, credentials and protocol-relative paths are rejected.
+- Dummy signup clearly identifies the demo and has no consent checkbox.
+- Web API signup is paused when either document URL is absent or invalid. The disabled submit button and submission handler both prevent signup requests.
+- The backend signup endpoint also rejects registration while either runtime document URL is absent or invalid; existing login remains available.
+- API signup resumes when both documents are configured, and its Web form requires consent.
+- Vite, Compose, Docker, manual release and GitHub Actions provide the corresponding build/runtime configuration.
 
-## 設定と実装
+## Configuration
 
-`VITE_TERMS_URL` と `VITE_PRIVACY_URL` を `core/config.ts` で読み取る。GitHub Actionsでは同名のRepository variables、手動リリースでは同名の環境変数をDockerのビルド引数へ渡す。文書の内容は運営者が指定する。設定後は再ビルドが必要。
+The Web reads `VITE_TERMS_URL` and `VITE_PRIVACY_URL` at build time. Repository variables supply the Actions build, and same-named environment variables supply manual releases. Changes require rebuilding the Web. The API receives the same public values at runtime. Operators provide and publish the actual documents.
 
-## 未決事項
+## Verification
 
-正式文書の有無・URLが未回答。現在の差分は設定済みURLへの導線を用意する段階で、未設定時の準備中ダイアログと同意欄は残っている。正式文書が未整備の場合は、ダミーモードの同意欄を外してデモと明示し、実API登録は文書設定まで停止する案をユーザーへ提示している。この案は回答前に適用しない。UX課題が既定の状態で解消したとは扱わず、PRは回答までdraftとする。
+The original 2026-10-07 checks passed frontend lint/build, release shell syntax, document navigation in separate tabs, preserved form input and rejected invalid URLs. They used temporary document pages that were removed, and did not verify official document content.
 
-## 検証
+On 2026-10-08, existing frontend lint/type checks/build passed. Browser verification confirmed dummy demo/no consent, missing-document API signup pause with disabled fields and submission, available login, and configured document links opening separate tabs while preserving nickname input. Temporary document pages and environment values were removed.
 
-新規テストを追加せず、既存lint・ビルドとローカルブラウザを使う。正式本文の代わりに一時的な検証ページを設定し、両リンクが開くこととフォームが保持されることを確認する。検証用のページと設定は確認後に除去する。実APIの登録やデプロイは実施しない。
+The existing Rails suite passed 45 examples, including 9 authentication examples. Temporary actual endpoint checks confirmed 14 unavailable/invalid configuration cases return 503 without records or JWT, and 4 configured cases succeed with rolled-back records. Web and API URL validation agrees on encoded Japanese paths, invalid ports, spaces and percent escapes. Swagger and frontend API types were regenerated; Ruby lint, release shell syntax and whitespace checks passed. No new automated tests were added apart from the minimum 503 Swagger response contract. Official document availability and deployed signup behavior were not verified locally.
 
-2026年10月7日、検証用の文書URLを設定し、登録画面の両リンクが別タブで対応ページを開き、ニックネームの入力が保持されることを確認した。ログイン画面でも両URLが表示された。正式文書の内容確認や実API登録は実施していない。
+## Remaining configuration
 
-`npm run lint` / `npm run build` と `bash -n infra/gcp/bin/release.sh` は成功。ビルドには既存のチャンクサイズ警告がある。HTTPSとlocalhostの両オリジンで、不正なスキーム・外部HTTP・外部へ正規化されるパス・認証情報付きURLを拒否することを確認した。URL未設定時の準備中表示は残ることもブラウザで確認した。Dockerのイメージビルドとデプロイは未実施。
+Official documents and their URLs remain unpublished or unspecified. Under the user-selected policy this keeps API signup paused; it no longer blocks implementing and merging the policy. No legal text is fabricated.

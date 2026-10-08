@@ -5,6 +5,9 @@ const roomContract = configuredRoomContract === "analysis" || configuredRoomCont
 
 function documentUrl(value: string | undefined): string | undefined {
   if (!value?.trim()) return undefined;
+  if (value.includes('\\') || [...value].some(character => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)) return undefined;
+  // Configure URI-encoded paths and punycode hosts, matching the API validator.
+  if (!/^[A-Za-z0-9\-._~:/?#[\]@!$&'()*+,;=%]+$/.test(value.trim()) || /%(?![0-9a-f]{2})/i.test(value.trim())) return undefined;
   const absolute = /^https:\/\//i.test(value.trim());
   if (!absolute && !/^\/(?!\/)/.test(value.trim())) return undefined;
   try {

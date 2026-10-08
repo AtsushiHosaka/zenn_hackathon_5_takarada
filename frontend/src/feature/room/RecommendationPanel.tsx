@@ -11,6 +11,7 @@ const axisLabels = {w:'幅',h:'高さ',d:'奥行き'};
 const dimensionLabel = (value:number|null) => value === null ? '不明' : `${Math.round(value*1000)/10}cm`;
 function ProductDetails({item,originalItems}:{item:RoomItem;originalItems?:RoomItem[]}) {
   const metadata=item.productMetadata;
+  const generatedTexture=Object.values(item.materialOverrides??{}).some(override=>Boolean(override.textureUrl));
   const replaced=originalItems?.find(original=>original.id===item.replacesObjectId);
   return <>
     {item.replacesObjectId&&<span className="rc-item-shop">{replaced?.name??item.replacesObjectId}の入れ替え</span>}
@@ -18,8 +19,8 @@ function ProductDetails({item,originalItems}:{item:RoomItem;originalItems?:RoomI
     {metadata?.size&&<span className="rc-item-shop">商品寸法: 幅{dimensionLabel(metadata.size.w)} × 高さ{dimensionLabel(metadata.size.h)} × 奥行き{dimensionLabel(metadata.size.d)}</span>}
     {!!metadata?.estimatedAxes?.length&&<span className="rc-item-shop">{metadata.estimatedAxes.map(axis=>axisLabels[axis]).join('・')}は描画・配置用の推定寸法</span>}
     {item.modelMatch?.approximate&&<span className="rc-item-shop" title={item.modelMatch.reason}>形状は既存モデルによる近似</span>}
-    {item.textureStatus&&<span className="rc-item-shop">{textureLabels[item.textureStatus]}</span>}
-    {item.textureStatus==='ready'&&item.textureSource==='description'&&<span className="rc-item-shop">色・素材の説明から生成。商品画像の再現ではありません。</span>}
+    {item.textureStatus&&<span className="rc-item-shop">{textureLabels[item.textureStatus==='ready'&&!generatedTexture?'disabled':item.textureStatus]}</span>}
+    {item.textureStatus==='ready'&&generatedTexture&&item.textureSource==='description'&&<span className="rc-item-shop">色・素材の説明から生成。商品画像の再現ではありません。</span>}
   </>;
 }
 export default function RecommendationPanel({items,originalItems,searchEntryPoints,selectedId,filter,onSelect,onFilter,onClose}:{items:RoomItem[];originalItems?:RoomItem[];searchEntryPoints?:string[];selectedId:string|null;filter:string;onSelect:(id:string)=>void;onFilter:(filter:string)=>void;onClose:()=>void}) {
@@ -37,7 +38,8 @@ export default function RecommendationPanel({items,originalItems,searchEntryPoin
       <span className="rc-item-art">{productLink(item.imageUrl)?<img src={productLink(item.imageUrl)!} alt={item.name} loading="lazy"/>:illustrations[item.category.toLowerCase()]!==undefined?<ReferenceSvg page={5} index={illustrations[item.category.toLowerCase()]}/>:<ReferenceSvg page={3} index={2}/>}<span className="rc-item-number">{item.marker??items.indexOf(item)+1}</span></span>
       <span className="rc-item-copy"><span className="rc-item-name clamp2">{item.name}</span><span className="rc-item-shop">{labels.find(([key])=>key===categoryOf(item))?.[1]} · {item.shop??'購入先未登録'}</span><span className="rc-money">{item.price===undefined?'価格未登録':money(item.price)}</span><ProductDetails item={item} originalItems={originalItems}/></span><span className="rc-item-external">{url&&<ReferenceSvg page={5} index={22}/>}</span>
     </>;return <li key={item.id}>{url?<a href={url} target="_blank" rel="noopener noreferrer" className={`rc-item-link${selectedId===item.id?' is-selected':''}`} onMouseEnter={()=>onSelect(item.id)} onFocus={()=>onSelect(item.id)} onClick={()=>onSelect(item.id)}>{body}</a>:<button type="button" className={`rc-item-link${selectedId===item.id?' is-selected':''}`} onClick={()=>onSelect(item.id)} aria-label={`${index+1}. ${item.name}（購入リンク未登録）`}>{body}</button>}</li>;})}</ul>
-    {!!searchSuggestions.length&&<div className="rc-panel-note" style={{maxHeight:220,overflowY:"auto"}}><span>Googleの検索候補</span>{searchSuggestions.map((html,index)=><iframe key={html} title={`Googleの検索候補 ${index+1}`} srcDoc={html} sandbox="allow-popups allow-popups-to-escape-sandbox" referrerPolicy="no-referrer" style={{display:'block',width:'100%',height:160,border:0,background:'#fff'}}/>)}</div>}
+    {/* google.com refuses to render inside a frame, so suggestion links open in a new tab. */}
+    {!!searchSuggestions.length&&<div className="rc-panel-note" style={{maxHeight:220,overflowY:"auto"}}><span>Googleの検索候補</span>{searchSuggestions.map((html,index)=><iframe key={html} title={`Googleの検索候補 ${index+1}`} srcDoc={`<base target="_blank">${html}`} sandbox="allow-popups allow-popups-to-escape-sandbox" referrerPolicy="no-referrer" style={{display:'block',width:'100%',height:160,border:0,background:'#fff'}}/>)}</div>}
     <p className="rc-panel-note">商品情報と価格は参考値です。3Dの形・色・寸法は近似です。価格・在庫・仕様はリンク先でご確認ください。</p>
   </aside>;
 }
