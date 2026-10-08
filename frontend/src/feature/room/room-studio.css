@@ -137,6 +137,8 @@
 .room-viewer {position:absolute;inset:0;height:100%;width:100%}
 .viewer-fallback {position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;background:#16141C;color:#EDEAF4;text-align:center}
 .viewer-model-notice {position:absolute;bottom:12px;left:12px;right:12px;padding:12px;border:1px solid #615176;border-radius:12px;background:#221F2CEE;color:#EDEAF4;font-size:12px;line-height:1.6}
+.viewer-selected-item {position:absolute;top:72px;left:16px;z-index:1;max-width:calc(100% - 32px);min-height:40px;padding:8px 12px;border:1px solid #B49CF0;border-radius:10px;background:#221F2CEE;color:#fff;font:inherit;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.viewer-selected-item:focus-visible {outline:3px solid #BBA5EE;outline-offset:3px}
 .rc-error {color:#A02D4A;font-size:13px;line-height:1.7;margin:0}
 .rc-analysis-settings {display:flex;flex-direction:column;gap:16px}
 .rc-analysis-settings .rc-setting {margin:0}
