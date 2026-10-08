@@ -1330,6 +1330,9 @@ components:
           - bed
           - desk
           - chair
+          - tv_stand
+          - wardrobe
+          - storage
           - shelf
           - table
           - small_plant
@@ -1422,6 +1425,9 @@ components:
           - bed
           - desk
           - chair
+          - tv_stand
+          - wardrobe
+          - storage
           - shelf
           - table
           - small_plant

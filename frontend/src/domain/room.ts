@@ -1,7 +1,8 @@
 export type Style = "botanical" | "oshi" | "natural";
 export type RoomShape = "square" | "standard" | "long";
 export const furnitureCategories = ["sofa", "bed", "desk", "chair", "shelf", "table"] as const;
-export const productCategories = [...furnitureCategories, "bed_cover", "curtain", "rug", "cushion", "floor_lamp", "desk_lamp", "plant", "small_plant", "wall_art", "wall_mirror", "wall_planter", "wall_shelf", "display_case", "acrylic_stand_case", "oshi_goods", "tapestry", "neon", "vase", "candle"] as const;
+export const replacementFurnitureCategories = [...furnitureCategories, "storage", "tv_stand", "wardrobe"] as const;
+export const productCategories = [...replacementFurnitureCategories, "bed_cover", "curtain", "rug", "cushion", "floor_lamp", "desk_lamp", "plant", "small_plant", "wall_art", "wall_mirror", "wall_planter", "wall_shelf", "display_case", "acrylic_stand_case", "oshi_goods", "tapestry", "neon", "vase", "candle"] as const;
 export type ProductCategory = typeof productCategories[number];
 export type FurnitureCategory = typeof furnitureCategories[number];
 export type FurnitureOperation = { objectId: string; action: "keep" | "replace" | "remove" };
@@ -135,8 +136,10 @@ export function isRoomDesign(value: unknown): value is RoomDesign {
   if (value.productSource !== undefined && value.productSource !== "ec" && value.productSource !== "mock") return false;
   if (value.searchEntryPoints !== undefined && (!Array.isArray(value.searchEntryPoints) || !value.searchEntryPoints.every(nonemptyString))) return false;
   if (!optionalHttpUrl(value.modelUrl) || !Array.isArray(value.items) || !value.items.every(isRoomItem)) return false;
+  const currentItems = value.items as RoomItem[];
+  const editedItems = value.editedItems as RoomItem[] | undefined;
   const furniture = [...new Map([
-    ...(value.before?.items ?? value.items).filter(item => item.existing && !isManualFurniture(item)),
+    ...(value.before?.items ?? value.items).filter(item => item.existing && (!isManualFurniture(item) || currentItems.some(current => current.id === item.id || current.replacesObjectId === item.id) || editedItems?.some(current => current.id === item.id))),
     ...value.items.filter(isManualFurniture),
     ...(value.editedItems ?? []).filter(isManualFurniture),
   ].map(item => [item.id, item])).values()];

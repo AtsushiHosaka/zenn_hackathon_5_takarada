@@ -2,6 +2,7 @@
 class Coordination < ApplicationRecord
   STATUSES = %w[pending processing done failed].freeze
   FLOOR_CATEGORIES = %w[sofa bed desk chair shelf table].freeze
+  REPLACEMENT_CATEGORIES = %w[sofa bed desk chair shelf table storage tv_stand wardrobe].freeze
   MANUAL_OBJECT_ID = /\Amanual-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i
 
   belongs_to :room
@@ -55,7 +56,7 @@ class Coordination < ApplicationRecord
         ids = furniture_operations.pluck("object_id")
         valid = ids.uniq == ids && ids.sort == existing.pluck("id").sort
         valid &&= furniture_operations.all? do |operation|
-          operation["action"] != "replace" || FLOOR_CATEGORIES.include?(existing.find { |object| object["id"] == operation["object_id"] }&.fetch("category", nil))
+          operation["action"] != "replace" || REPLACEMENT_CATEGORIES.include?(existing.find { |object| object["id"] == operation["object_id"] }&.fetch("category", nil))
         end
         keep_ids = furniture_operations.select { |operation| operation["action"] == "keep" }.pluck("object_id")
         valid &&= kept_object_ids == [] || (kept_object_ids.is_a?(Array) && kept_object_ids.sort == keep_ids.sort)
