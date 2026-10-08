@@ -1,4 +1,4 @@
-import { isRoomDesign, type RoomDesign } from './room';
+import { isRoomDesign, type RoomDesign, type RoomItem } from './room';
 
 export type RoomTemplate = { id: string; design: RoomDesign; updatedAt: string };
 export const isTemplateId = (id: string) => /^room-template-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
@@ -9,4 +9,11 @@ export function isRoomTemplate(value: unknown): value is RoomTemplate {
     && record.design.id === record.id && record.design.items.length <= 100
     && !!record.design.room && !!record.design.analysisInput
     && typeof record.updatedAt === 'string' && Number.isFinite(Date.parse(record.updatedAt));
+}
+
+/** Give copied furniture new identities while keeping valid shelf contacts. */
+export function remapTemplateItems(items: RoomItem[]): RoomItem[] {
+  const identities = new Map(items.map(item => [item.id, `template-object-${crypto.randomUUID()}`]));
+  return items.map(item => ({...structuredClone(item), id: identities.get(item.id)!,
+    supportObjectId: item.supportObjectId ? identities.get(item.supportObjectId) : undefined}));
 }
