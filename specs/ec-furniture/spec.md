@@ -8,6 +8,8 @@
 
 Google Docs URLは`docs/project.md`に未設定。Docsの本文・タブは未確認で、確認日時と該当箇所も記録できない。このファイルは依頼を具体化した暫定の実装メモであり、共有Docsとの同期は未実施。
 
+Review correction for issue #38 (2026-10-08): an allowed image URL alone does not establish a usable image color. When structured color is missing, HTML color extraction may be skipped only after image color extraction succeeds. Image failure retains the existing verified HTML fallback. Image results are reused within one parse, including failures, to avoid duplicate downloads. Google Docs remains unconfigured and this correction is not reflected there.
+
 既存の[コーデ提案Spec](../room-coordination/spec.md)の候補取得境界を維持し、実EC検索・公式ページ確認・大型家具の追加と入れ替え・モデル照合・テクスチャ生成・Web描画を接続した。Google検索と画像生成はVertex AIの既存認証、または設定済みのDeveloper APIを使う。ユーザーごとの利用許可も既存Gemini設定に従う。
 
 EC取得先はIKEA・ニトリ・LOWYA・無印良品・Francfranc の日本向け公式ドメインと、Yahoo!ショッピングの商品詳細（`store.shopping.yahoo.co.jp/<ストア>/<商品コード>.html`）に限定する。店舗ごとにページ形式と取得成否は異なる。IKEAの商品詳細から価格と寸法を取得できた。ニトリの確認ページはタイムアウト、LOWYAの確認ページは必要情報がなく、候補から除外した。検索対応ドメインの全商品を取得できるとは扱わない。

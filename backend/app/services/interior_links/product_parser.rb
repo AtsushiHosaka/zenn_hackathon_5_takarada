@@ -63,6 +63,7 @@ module InteriorLinks
 
     def parse(html:, url:, store:)
       @extraction_failure = nil
+      @image_colors = {}
       @document = Nokogiri::HTML(html)
       @url = url
       @store = store
@@ -131,7 +132,7 @@ module InteriorLinks
       color_name = product["color"].to_s.presence || name
       color = COLORS.find { |pattern, _| pattern.match?(color_name) }&.last || "#bdb4a8"
       image = image_url(product)
-      image_color = (@image_color_extractor || ProductImageColor.new).call(url: image, provider: store[:provider])
+      image_color = image_color_for(product)
       color = image_color["color"] if image_color["color"]
       shape = shape_for(name, category, evidence)
       extracted_shape = product.dig("_html_extraction", "shape")
@@ -187,10 +188,14 @@ module InteriorLinks
       missing -= [ THIN_AXES[category]&.first ]
       price_for(product)
       unknown_color = product["color"].blank? && COLORS.keys.none? { |pattern| pattern.match?(product["name"].to_s) }
-      image_available = ProductImageFetcher.allowed?(image_url(product), provider: @store[:provider])
-      missing.any? || material_for(product).blank? || (unknown_color && !image_available)
+      missing.any? || material_for(product).blank? || (unknown_color && image_color_for(product)["color"].blank?)
     rescue Unverified
       true
+    end
+
+    def image_color_for(product)
+      image = image_url(product)
+      @image_colors[image] ||= (@image_color_extractor || ProductImageColor.new).call(url: image, provider: @store[:provider])
     end
 
     def merge_extraction(product, extracted)
