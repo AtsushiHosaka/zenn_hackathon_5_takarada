@@ -22,9 +22,9 @@ interface RoomViewerProps {
   view: "perspective" | "top" | "front";
   dimensions?: boolean;
   editing?: boolean;
-  onMoveItem?: (id: string, position: RoomItem["position"], supportObjectId?: string) => void;
+  onMoveItem?: (id: string, position: RoomItem["position"], supportObjectId?: string, supportSurface?: RoomItem['supportSurface']) => void;
   placementItem?: RoomItem | null;
-  onPlaceItem?: (position: RoomItem["position"], supportObjectId?: string) => void;
+  onPlaceItem?: (position: RoomItem["position"], supportObjectId?: string, supportSurface?: RoomItem['supportSurface']) => void;
   resetKey: number;
   before?: boolean;
   preview?: boolean;
@@ -516,8 +516,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   const cameraState = useRef<{ id: string; position: THREE.Vector3; target: THREE.Vector3; zoom: number; minDistance: number; view: RoomViewerProps["view"]; lastCommandSequence: number | null } | null>(null);
   const reportReady = useEffectEvent((ready: boolean) => onReady?.(ready));
   const selectItem = useEffectEvent(onSelectItem);
-  const moveItem = useEffectEvent((id: string, position: RoomItem["position"], supportObjectId?: string) => onMoveItem?.(id, position, supportObjectId));
-  const placeItem = useEffectEvent((position: RoomItem["position"], supportObjectId?: string) => onPlaceItem?.(position, supportObjectId));
+  const moveItem = useEffectEvent((id: string, position: RoomItem["position"], supportObjectId?: string, supportSurface?: RoomItem['supportSurface']) => onMoveItem?.(id, position, supportObjectId, supportSurface));
+  const placeItem = useEffectEvent((position: RoomItem["position"], supportObjectId?: string, supportSurface?: RoomItem['supportSurface']) => onPlaceItem?.(position, supportObjectId, supportSurface));
   const initialView = useEffectEvent(() => view);
   const initialBefore = useEffectEvent(() => legacyBefore);
   const initialMarkersVisible = useEffectEvent(() => !before && !preview);
@@ -961,6 +961,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       y: number;
       moved: boolean;
       supportObjectId?: string;
+      supportSurface?: RoomItem['supportSurface'];
       controlsEnabled: boolean;
     };
     let drag: FurnitureDrag | null = null;
@@ -976,7 +977,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       disposeObject(placementPreview);
       placementPreview = null;
     };
-    const pickedSurface = (item: RoomItem): { position: RoomItem['position']; supportObjectId: string } | null => {
+    const pickedSurface = (item: RoomItem): { position: RoomItem['position']; supportObjectId: string; supportSurface: NonNullable<RoomItem['supportSurface']> } | null => {
       if (!canPlaceOnFurniture(item)) return null;
       const supports = design.items.filter(candidate => candidate.id !== item.id && isFurnitureSupport(candidate));
       const targets = supports.flatMap(support => { const group = furniture.get(support.id); return group?.visible ? [group] : []; });
@@ -985,31 +986,26 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         if (!(mesh instanceof THREE.Mesh) || !hit.face) continue;
         const normal = hit.face.normal.clone().applyMatrix3(new THREE.Matrix3().getNormalMatrix(mesh.matrixWorld));
         if (normal.normalize().y < .99) continue;
-        const position = furniturePositionInRoom({...item, supportObjectId: undefined}, [hit.point.x, hit.point.y + item.size[1] / 2, hit.point.z], design);
-        if (!position || Math.abs(position[1] - item.size[1] / 2 - hit.point.y) > .001) continue;
+        let parent: THREE.Object3D | null = mesh;
+        while (parent && typeof parent.userData.itemId !== 'string') parent = parent.parent;
+        const support = supports.find(candidate => candidate.id === parent?.userData.itemId);
+        if (!support) continue;
         mesh.geometry.computeBoundingBox();
         const bounds = mesh.geometry.boundingBox;
         if (!bounds) continue;
-        const inverse = mesh.matrixWorld.clone().invert();
-        const angle = THREE.MathUtils.degToRad(item.rotation ?? 0);
-        let fits = true;
-        for (const x of [-item.size[0] / 2, item.size[0] / 2]) for (const z of [-item.size[2] / 2, item.size[2] / 2]) {
-          const corner = new THREE.Vector3(position[0] + Math.cos(angle) * x + Math.sin(angle) * z, hit.point.y, position[2] - Math.sin(angle) * x + Math.cos(angle) * z).applyMatrix4(inverse);
-          if (corner.x < bounds.min.x - .0001 || corner.x > bounds.max.x + .0001 || corner.z < bounds.min.z - .0001 || corner.z > bounds.max.z + .0001) fits = false;
-          if (mesh.geometry.type === 'CylinderGeometry') {
-            const radius = (mesh.geometry as THREE.CylinderGeometry).parameters.radiusTop;
-            if (Math.hypot(corner.x, corner.z) > radius + .0001) fits = false;
-          }
-        }
-        if (fits) {
-          let parent: THREE.Object3D | null = mesh;
-          while (parent && typeof parent.userData.itemId !== 'string') parent = parent.parent;
-          if (parent) return { position, supportObjectId: parent.userData.itemId };
-        }
+        const inverse = mesh.matrixWorld.clone().invert().elements;
+        const supportSurface: NonNullable<RoomItem['supportSurface']> = {
+          transform: [inverse[0], inverse[8], inverse[4] * hit.point.y + inverse[12], inverse[2], inverse[10], inverse[6] * hit.point.y + inverse[14]],
+          bounds: [bounds.min.x, bounds.min.z, bounds.max.x, bounds.max.z], height: hit.point.y,
+          ...(mesh.geometry.type === 'CylinderGeometry' ? {radius: (mesh.geometry as THREE.CylinderGeometry).parameters.radiusTop} : {}),
+          supportPosition: [...support.position], supportSize: [...support.size], supportRotation: support.rotation ?? 0,
+        };
+        const position = furniturePositionInRoom({...item, supportObjectId: support.id, supportSurface}, [hit.point.x, hit.point.y + item.size[1] / 2, hit.point.z], design);
+        if (position && Math.abs(position[1] - item.size[1] / 2 - hit.point.y) < .001) return {position, supportObjectId: support.id, supportSurface};
       }
       return null;
     };
-    const placementPosition = (event: DragEvent): { position: RoomItem['position']; supportObjectId?: string } | null => {
+    const placementPosition = (event: DragEvent): { position: RoomItem['position']; supportObjectId?: string; supportSurface?: RoomItem['supportSurface'] } | null => {
       const item = currentPlacement;
       if (!item || !currentEditing || !markersVisible || currentBefore || completeRoomModel) return null;
       const rect = renderer.domElement.getBoundingClientRect();
@@ -1051,7 +1047,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       event.stopPropagation();
       const placement = placementPosition(event);
       clearPlacementPreview();
-      if (placement) placeItem(placement.position, placement.supportObjectId);
+      if (placement) placeItem(placement.position, placement.supportObjectId, placement.supportSurface);
     };
     const dragLeave = (event: DragEvent) => {
       if (event.relatedTarget instanceof Node && host.contains(event.relatedTarget)) return;
@@ -1108,7 +1104,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         : new THREE.Plane(new THREE.Vector3(0, 1, 0), -item.position[1]);
       const hit = raycaster.ray.intersectPlane(plane, new THREE.Vector3());
       if (!hit) return;
-      drag = { supportObjectId: item.supportObjectId, pointerId: event.pointerId, id, itemPosition: [...item.position], position: [...item.position], group, origin: group.position.clone(), hit, plane, x: event.clientX, y: event.clientY, moved: false, controlsEnabled: controls.enabled };
+      drag = { supportSurface: item.supportSurface, supportObjectId: item.supportObjectId, pointerId: event.pointerId, id, itemPosition: [...item.position], position: [...item.position], group, origin: group.position.clone(), hit, plane, x: event.clientX, y: event.clientY, moved: false, controlsEnabled: controls.enabled };
       controls.enabled = false;
       renderer.domElement.setPointerCapture(event.pointerId);
       renderer.domElement.style.cursor = "grab";
@@ -1128,7 +1124,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         const changed = active.moved && delta.length() > .0005;
         releaseDrag(!changed);
         if (changed) {
-          moveItem(active.id, active.position, active.supportObjectId);
+          moveItem(active.id, active.position, active.supportObjectId, active.supportSurface);
         } else if (!active.moved) focusItem(active.id);
         return;
       }
@@ -1155,6 +1151,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         if (!position) return;
         drag.position = position;
         drag.supportObjectId = surface?.supportObjectId ?? (currentView === "front" ? item.supportObjectId : undefined);
+        drag.supportSurface = surface?.supportSurface ?? (currentView === "front" ? item.supportSurface : undefined);
         // Preserve the model group's origin offset while previewing the snapped position.
         drag.group.position.copy(drag.origin).add(new THREE.Vector3(position[0] - drag.itemPosition[0], position[1] - drag.itemPosition[1], position[2] - drag.itemPosition[2]));
         drag.group.updateMatrixWorld(true);
