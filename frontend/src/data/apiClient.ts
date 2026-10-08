@@ -121,17 +121,47 @@ function requestInterruption(error: unknown, signal: AbortSignal): DomainError |
   return undefined;
 }
 
+const MAX_UPLOAD_ERROR_BODY_BYTES = 16 * 1024;
+const MAX_UPLOAD_ERROR_MESSAGE_CHARS = 500;
+
+async function uploadErrorBody(response: Response): Promise<string | undefined> {
+  const reader = response.body?.getReader();
+  if (!reader) return undefined;
+  const decoder = new TextDecoder();
+  let bytes = 0;
+  let text = "";
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) return text + decoder.decode();
+      bytes += value.byteLength;
+      if (bytes > MAX_UPLOAD_ERROR_BODY_BYTES) {
+        await reader.cancel();
+        return undefined;
+      }
+      text += decoder.decode(value, { stream: true });
+    }
+  } finally {
+    reader.releaseLock();
+  }
+}
+
 // GCS returns XML errors; the local storage adapter can return JSON errors.
 async function uploadErrorMessage(response: Response, signal: AbortSignal): Promise<string> {
   let code: string | undefined;
   let message: string | undefined;
   try {
-    const text = await response.text();
+    const text = await uploadErrorBody(response);
+    if (text === undefined) return uploadStatusMessage(response.status);
     if (response.headers.get("Content-Type")?.includes("json")) {
       const body: unknown = JSON.parse(text);
       if (body && typeof body === "object") {
         const error = (body as { error?: unknown }).error;
-        if (typeof error === "string") message = error;
+        if (typeof error === "string") {
+          const confirmed = error.trim();
+          message = confirmed.length > MAX_UPLOAD_ERROR_MESSAGE_CHARS
+            ? `${confirmed.slice(0, MAX_UPLOAD_ERROR_MESSAGE_CHARS - 1)}…` : confirmed;
+        }
       }
     } else {
       const xml = new DOMParser().parseFromString(text, "application/xml");
@@ -153,7 +183,12 @@ async function uploadErrorMessage(response: Response, signal: AbortSignal): Prom
     return `${reasons[code] ?? "アップロード先からエラーが返されました。"}（${status}・${code}）もう一度お試しください。`;
   }
   if (message) return `${message}（${status}）`;
-  if (response.status === 413) return `アップロード先が送信容量を超えたため拒否しました。（${status}）画像の容量を減らしてお試しください。`;
-  if (response.status === 401 || response.status === 403) return `アップロード先が認証またはアクセスを拒否しました。（${status}）もう一度お試しください。`;
+  return uploadStatusMessage(response.status);
+}
+
+function uploadStatusMessage(responseStatus: number): string {
+  const status = `HTTP ${responseStatus}`;
+  if (responseStatus === 413) return `アップロード先が送信容量を超えたため拒否しました。（${status}）画像の容量を減らしてお試しください。`;
+  if (responseStatus === 401 || responseStatus === 403) return `アップロード先が認証またはアクセスを拒否しました。（${status}）もう一度お試しください。`;
   return `アップロード先からエラーが返されました。（${status}）詳しい原因を確認できません。少し待ってから再度お試しください。`;
 }
