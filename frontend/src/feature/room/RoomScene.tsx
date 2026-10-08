@@ -14,8 +14,8 @@ class ViewerBoundary extends Component<{children:ReactNode}, {failed:boolean}> {
 type Props = {
   design: RoomDesign; panel: boolean; before: boolean; filter: string; selectedId: string|null;
   onSelect: (id:string)=>void; onBefore:(before:boolean)=>void; onOpenPanel:()=>void; children:ReactNode;
-  onMoveItem: (id:string, position:RoomItem['position'])=>void;
-  placementItem?:RoomItem|null; onPlaceItem?:(position:RoomItem['position'])=>void;
+  onMoveItem: (id:string, position:RoomItem['position'],supportObjectId?:string)=>void;
+  placementItem?:RoomItem|null; onPlaceItem?:(position:RoomItem['position'],supportObjectId?:string)=>void;
   referenceLayout:boolean; editing:boolean; view:'perspective'|'top'|'front'; dimensions:boolean;
 };
 export default function RoomScene({design, panel, before, filter, selectedId, onSelect, onBefore, onOpenPanel, onMoveItem, placementItem, onPlaceItem, children, referenceLayout, editing, view, dimensions}:Props) {
