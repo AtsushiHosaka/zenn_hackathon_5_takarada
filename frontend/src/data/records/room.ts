@@ -1,17 +1,30 @@
+import { roomPalette } from "../../domain/roomPalette";
+import { characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
 import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
-import { furnitureCategories, isManualFurniture, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
-import type { SavedRoom } from "../../domain/roomRepository";
+import { productCategories, furnitureCategories, isManualFurniture, isImageArtwork, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
+import type { FurnitureSearchResult, SavedRoom } from "../../domain/roomRepository";
 import type { components } from "../generated/api";
 
 export type AnalysisRoomRecord = components["schemas"]["Room"];
 export type CoordinationRecord = components["schemas"]["Coordination"];
 
+export function toRoomPaletteId(value: unknown): NonNullable<CoordinationRecord["room_palette_id"]> {
+  if (!roomPalette(value)) invalid("Coordination.room_palette_id");
+  return value as NonNullable<CoordinationRecord["room_palette_id"]>;
+}
+
 export type UploadRecord = components["schemas"]["Upload"];
+
+export function toFurnitureSearch(value: unknown, baseUrl: string): FurnitureSearchResult {
+  const record = object(value, "FurnitureSearch");
+  if (!Array.isArray(record.products) || record.products.length > 24 || !Array.isArray(record.search_entry_points)) invalid("FurnitureSearch");
+  return { products: record.products.map(product => toImportedFurniture(product, baseUrl)), failures: nonnegativeInteger(record.failures, "FurnitureSearch.failures"), searchEntryPoints: record.search_entry_points.map(entry => text(entry, "search_entry_point")) };
+}
 
 export function toImportedFurniture(value: unknown, baseUrl: string): RoomItem {
   const record = object(value, "FurnitureImport");
-  const category = furnitureCategories.find(category => category === record.category);
+  const category = productCategories.find(category => category === record.category);
   if (!category) invalid("FurnitureImport.category");
   const size = sizeRecord(record.size);
   const match = record.model_match == null ? undefined : modelMatchRecord(record.model_match);
@@ -76,6 +89,7 @@ export function toCoordinationRecord(value: unknown): CoordinationRecord {
   if (record.status !== "pending" && record.status !== "processing" && record.status !== "done" && record.status !== "failed") invalid("Coordination.status");
   if (!Array.isArray(record.kept_object_ids) || record.kept_object_ids.some(id => typeof id !== "string" || !id.trim())) invalid("Coordination.kept_object_ids");
   if (!Array.isArray(record.items)) invalid("Coordination.items");
+  if (record.room_palette_id != null && !roomPalette(record.room_palette_id)) invalid("Coordination.room_palette_id");
   const createdAt = text(record.created_at, "Coordination.created_at");
   if (!Number.isFinite(Date.parse(createdAt))) invalid("Coordination.created_at");
   const totalPrice = record.total_price === null ? null : nonnegativeInteger(record.total_price, "Coordination.total_price");
@@ -84,7 +98,9 @@ export function toCoordinationRecord(value: unknown): CoordinationRecord {
     room_id: integer(record.room_id, "Coordination.room_id"),
     status: record.status,
     prompt: text(record.prompt, "Coordination.prompt"),
+    character_theme_id: record.character_theme_id == null ? undefined : characterThemeRecord(record.character_theme_id),
     budget: integer(record.budget, "Coordination.budget"),
+    room_palette_id: record.room_palette_id == null ? null : toRoomPaletteId(record.room_palette_id),
     kept_object_ids: record.kept_object_ids as string[],
     title: nullableText(record.title, "Coordination.title"),
     comment: nullableText(record.comment, "Coordination.comment"),
@@ -127,9 +143,10 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     kind: "coordination",
     id: `api-coordination-${record.id}`,
     title: record.title,
+    characterThemeId: record.character_theme_id??undefined,
     description: record.comment,
     ...(record.planned_by ? { generatedBy: record.planned_by } : {}),
-    style: record.title === "ラベンダーの推し活ルーム" ? "oshi" : record.title === "グリーンが映えるボタニカルルーム" ? "botanical" : "natural",
+    style: record.character_theme_id ? "oshi" : record.title === "ラベンダーの推し活ルーム" ? "oshi" : record.title === "グリーンが映えるボタニカルルーム" ? "botanical" : "natural",
     ...after,
     items: after.items.map(item => {
       if (item.existing) return item;
@@ -151,6 +168,7 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     backendRoomId: String(record.room_id),
     analysisInput,
     prompt: record.prompt,
+    roomPaletteId: record.room_palette_id ?? undefined,
     budget: record.budget,
     keptObjectIds: record.furniture_operations !== undefined ? record.furniture_operations.filter(operation => operation.action === "keep").map(operation => operation.object_id) : record.kept_object_ids.length > 0 ? record.kept_object_ids : record.before_scene.objects.filter(item => item.source === "existing").map(item => item.id),
     furnitureOperations: record.furniture_operations?.map(operation => ({ objectId: operation.object_id, action: operation.action })),
@@ -179,6 +197,7 @@ function sceneSnapshot(scene: components["schemas"]["Scene"], baseUrl: string): 
       position: [item.position.x - room.width / 2, item.position.y + item.size.h / 2, item.position.z - room.depth / 2],
       size: [item.size.w, item.size.h, item.size.d],
       rotation: item.rotation_y,
+      ...(item.artwork ? { artwork: { dataUrl: item.artwork.data_url } } : {}),
       marker: item.marker ?? undefined,
       productId: item.item_id === null ? undefined : String(item.item_id),
       modelUrl: item.source === "suggested" && item.texture_status === "unmatched" ? undefined : url(item.model_url, baseUrl),
@@ -307,6 +326,7 @@ function sceneProductDetails(item: components["schemas"]["SceneObject"], baseUrl
     textureUrl: url(override.texture_url, baseUrl), tileSizeM: override.tile_size_m ?? undefined, color: override.color ?? undefined,
   }]));
   return {
+    ecProductId: item.ec_product_id == null ? undefined : String(item.ec_product_id),
     materialOverrides,
     textureStatus: item.texture_status ?? undefined,
     textureSource: item.texture_source ?? undefined,
@@ -321,6 +341,18 @@ function productMetadata(value: unknown, baseUrl: string): ProductMetadata | und
   if (value == null) return undefined;
   const metadata = object(value, "product_metadata");
   const result: ProductMetadata = {};
+  if (metadata.provider != null) result.provider = text(metadata.provider, "provider");
+  if (metadata.provider_product_id != null) result.providerProductId = text(metadata.provider_product_id, "provider_product_id");
+  if (metadata.variant_id != null) result.variantId = text(metadata.variant_id, "variant_id");
+  if (metadata.official_color != null) result.officialColor = text(metadata.official_color, "official_color");
+  if (metadata.color_variants != null) {
+    if (!Array.isArray(metadata.color_variants) || metadata.color_variants.length > 24) invalid("color_variants");
+    result.colorVariants = metadata.color_variants.map(value => {
+      const variant = object(value, "color_variant");
+      if (variant.source !== "official_color_picker" && variant.source !== "official_product_group") invalid("color_variant.source");
+      return { colorName: text(variant.color_name, "color_variant.color_name"), url: url(text(variant.url, "color_variant.url"), baseUrl)!, variantId: optionalText(variant.variant_id, "color_variant.variant_id"), source: variant.source };
+    });
+  }
   if (metadata.source_url != null) result.sourceUrl = url(metadata.source_url, baseUrl);
   if (metadata.price_checked_at != null) {
     const checkedAt = text(metadata.price_checked_at, "price_checked_at");
@@ -419,6 +451,7 @@ export function toAnalyzedRoomDesign(value: unknown, baseUrl: string): RoomDesig
       position: [item.position.x - room.width / 2, item.position.y + item.size.h / 2, item.position.z - room.depth / 2],
       size: [item.size.w, item.size.h, item.size.d],
       rotation: item.rotation_y,
+      ...(item.artwork ? { artwork: { dataUrl: item.artwork.data_url } } : {}),
       productId: item.item_id === null ? undefined : String(item.item_id),
       modelUrl: url(item.model_url, baseUrl),
     })),
@@ -467,6 +500,7 @@ function analysisObject(value: unknown): components["schemas"]["SceneObject"] {
     id: text(record.id, "SceneObject.id"),
     source: record.source,
     category: text(record.category, "SceneObject.category"),
+    ...(record.artwork == null ? {} : { artwork: artworkRecord(record.artwork) }),
     label: text(record.label, "SceneObject.label"),
     size: { w: positive(size.w, "size.w"), h: positive(size.h, "size.h"), d: positive(size.d, "size.d") },
     position: { x: finite(position.x, "position.x"), y: finite(position.y, "position.y"), z: finite(position.z, "position.z") },
@@ -541,6 +575,7 @@ export function toRoomDesign(value: unknown, baseUrl: string): RoomDesign {
     modelUrl: url(record.model_url ?? record.modelUrl, baseUrl),
     modelKind,
     wallColor: wallColor(record.wallColor !== undefined ? record.wallColor : record.wall_color),
+    floorColor: wallColor(record.floorColor !== undefined ? record.floorColor : record.floor_color),
   };
 }
 
@@ -617,4 +652,16 @@ function url(value: unknown, baseUrl: string): string | undefined {
   } catch {
     return invalid("URL");
   }
+}
+
+function artworkRecord(value: unknown): components["schemas"]["ImageArtwork"] {
+  const record = object(value, "artwork");
+  if (!isImageArtwork({ dataUrl: record.data_url })) invalid("artwork.data_url");
+  return { data_url: record.data_url as string };
+}
+
+function characterThemeRecord(value: unknown): NonNullable<components["schemas"]["Coordination"]["character_theme_id"]> {
+  const theme = characterTheme(value);
+  if (!theme) invalid("character_theme_id");
+  return theme.id as NonNullable<components["schemas"]["Coordination"]["character_theme_id"]>;
 }

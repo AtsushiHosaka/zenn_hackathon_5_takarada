@@ -1,3 +1,6 @@
+import { applyRoomPalette, defaultRoomPaletteId, roomPalette } from "../../domain/roomPalette";
+import { copyFurniture } from "../../domain/furnitureCopy";
+import { applyCharacterTheme, characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
 import type { TokenStore } from "../../core/tokenStore";
 import type { RoomDesign, RoomItem, Style } from "../../domain/room";
@@ -68,10 +71,20 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
     const pending = unsavedRooms.get(userId) ?? [];
     return [...pending, ...storedRooms(userId).filter(room => !pending.some(saved => saved.id === room.id))];
   };
+  const retain = (userId: number, room: SavedRoom) => {
+    const rooms = roomsFor(userId);
+    try {
+      localStorage.setItem(`hack.dummy.rooms.v1.${userId}`, JSON.stringify([room, ...rooms.filter(saved => saved.id !== room.id)]));
+      unsavedRooms.delete(userId);
+    } catch { unsavedRooms.set(userId, [room, ...(unsavedRooms.get(userId) ?? []).filter(saved => saved.id !== room.id)]); }
+  };
   const repository: RoomRepository = {
     demo: createDemoRoom,
     async importFurniture() {
       throw new DomainError("商品リンクからの追加にはAPI接続が必要です。接続設定をAPIに切り替えてください。");
+    },
+    async searchFurniture() {
+      throw new DomainError("実商品の検索にはAPI接続が必要です。接続設定をAPIに切り替えてください。");
     },
     persistenceWarning() {
       if (!tokenStore.load()) return undefined;
@@ -93,11 +106,20 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
       if (!room?.design) throw new DomainError("部屋が見つかりません", 404);
       return room.design;
     },
+    async createFromTemplate(template, signal) {
+      const userId = currentUserId();
+      if (signal?.aborted) throw new DomainError("操作をキャンセルしました");
+      if (!isRoomDesign(template) || !template.room || !template.analysisInput || template.items.length > 100) throw new DomainError("テンプレートの内容を確認してください");
+      const design = {...structuredClone(template), items: copyFurniture(template.items), id: `dummy-room-${crypto.randomUUID()}`, source: "demo" as const, description: "保存したテンプレートから作成した部屋です。", backendRoomId: undefined};
+      retain(userId, {id: design.id, title: design.title, status: "ready", createdAt: new Date().toISOString(), design});
+      return design;
+    },
     analyze: (input, signal) => repository.generate(input, signal),
     async capabilities() {
-      return { generation: true, coordination: false, input: "dimensions", photos: false, message: "オフラインモックでは畳数と形から部屋の寸法とベッド・デスク・本棚を表示します。写真・希望・スタイルの解析と、商品生成は行いません。商品付きの提案はAPI接続で確認できます。" };
+      return { generation: true, coordination: false, input: "dimensions", photos: false, message: "オフラインモックでは畳数と形から部屋の寸法とベッド・デスク・本棚を表示します。選んだキャラクターテーマの色とモチーフを表示できます。写真・希望の解析と、商品生成は行いません。商品付きの提案はAPI接続で確認できます。" };
     },
     async generate(input, signal) {
+      input.onProgress?.("analyzing");
       const userId = currentUserId();
       if (signal?.aborted) throw new DomainError("操作をキャンセルしました");
       if (input.tatami === undefined || !Number.isFinite(input.tatami) || input.tatami < 3 || input.tatami > 30) throw new DomainError("畳数は3〜30で入力してください");
@@ -106,7 +128,9 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
       const previous = input.roomId === undefined ? undefined : rooms.find(room => room.id === input.roomId);
       if (input.roomId !== undefined && !previous) throw new DomainError("部屋が見つかりません", 404);
       const analyzed = toAnalyzedRoomDesign(createAnalyzedRoomFixture(input.tatami, input.shape), "");
-      const design: RoomDesign = {
+      if (input.roomPaletteId !== undefined && !roomPalette(input.roomPaletteId)) throw new DomainError("部屋のカラーテーマを選んでください", 422);
+      if (input.characterThemeId !== undefined && !characterTheme(input.characterThemeId)) throw new DomainError("キャラクターテーマを選んでください", 422);
+      const themedDesign: RoomDesign = applyCharacterTheme({
         ...analyzed,
         items: [...analyzed.items.map(item => input.editedItems?.find(edited => edited.id === item.id) ?? item), ...(input.editedItems ?? []).filter(isManualFurniture)],
         editedItems: input.editedItems,
@@ -117,16 +141,13 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
         prompt: input.prompt.trim() || undefined,
         budget: input.budget,
         description: "畳数と部屋の形から寸法とベッド・デスク・本棚を配置したモックです。写真・希望・スタイルの解析と、商品生成は行っていません。",
-      };
+      }, input.characterThemeId);
+      const paletteId = input.roomPaletteId ?? (input.characterThemeId ? undefined : defaultRoomPaletteId);
+      const design = paletteId ? applyRoomPalette(themedDesign, paletteId) : themedDesign;
       if (!isRoomDesign(design)) throw new DomainError("部屋の入力内容を確認してください", 422);
       const room: SavedRoom = { id: design.id, title: design.title, status: "ready", createdAt: previous?.createdAt ?? new Date().toISOString(), design };
-      try {
-        localStorage.setItem(`hack.dummy.rooms.v1.${userId}`, JSON.stringify([room, ...rooms.filter(saved => saved.id !== room.id)]));
-        unsavedRooms.delete(userId);
-      } catch {
-        // Keep only failed writes in memory; successful disk data stays authoritative.
-        unsavedRooms.set(userId, [room, ...(unsavedRooms.get(userId) ?? []).filter(saved => saved.id !== room.id)]);
-      }
+      retain(userId, room);
+      input.onProgress?.("preview");
       return design;
     },
   };

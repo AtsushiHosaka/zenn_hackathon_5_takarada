@@ -132,8 +132,15 @@ export function buildReferenceRoom(scene: THREE.Scene, design: RoomDesign): { ar
     if (!parent) continue;
     const [front, right, top] = descriptor.colors;
     const preserveWood = descriptor.id === 'bed' || descriptor.id === 'desk' || descriptor.id === 'chair' || descriptor.id === '7';
-    const colors = preserveWood ? [front, right, top] : [tint(descriptor.id, front, .88), tint(descriptor.id, right, .74), tint(descriptor.id, top)];
-    const materials = [colors[1], colors[1], colors[2], colors[2], colors[0], colors[0]].map(surface);
+    const floorColor = descriptor.id === 'architecture' && descriptor.position[1] < 0 ? design.floorColor : undefined;
+    const originalColors = preserveWood ? [front, right, top] : [tint(descriptor.id, front, .88), tint(descriptor.id, right, .74), tint(descriptor.id, top)];
+    const colors = floorColor ? [floorColor, floorColor, floorColor] : originalColors;
+    const faces = [1, 1, 2, 2, 0, 0];
+    const materials = faces.map(face => {
+      const material = surface(colors[face]);
+      if (floorColor) material.userData.beforeColor = originalColors[face];
+      return material;
+    });
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(...descriptor.size as [number, number, number]), materials);
     mesh.position.set(...descriptor.position as [number, number, number]);
     if (descriptor.id === 'chair') mesh.userData.beforeColor = '#5b5762';
@@ -179,6 +186,8 @@ export function buildReferenceRoom(scene: THREE.Scene, design: RoomDesign): { ar
   const lamp = furniture.get('6');
   if (lamp) {
     const glow = new THREE.Mesh(new THREE.SphereGeometry(.555, 24, 16), new THREE.MeshBasicMaterial({ color: tint('6', '#c8aaff'), transparent: true, opacity: .28, depthWrite: false, toneMapped: false }));
+    // This halo visualizes emitted light; it has no physical furniture volume.
+    glow.userData.nonPhysical = true;
     glow.position.set(1.7003, 1.92, -.86);
     lamp.add(glow);
   }

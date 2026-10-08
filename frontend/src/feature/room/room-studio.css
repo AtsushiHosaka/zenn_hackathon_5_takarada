@@ -41,6 +41,8 @@
 .rc-photo-heading {display:flex;align-items:baseline;justify-content:space-between;font-size:13px;font-weight:700}
 .rc-photo-heading>span+span {color:#6E6A7C;font-weight:400}
 .rc-photo-heading strong {font-family:'Bricolage Grotesque',sans-serif;font-weight:700;color:#1D1B26}
+.rc-new-composer [role="alert"] {overflow-wrap:anywhere}
+.rc-photo-requirements {margin:0;color:#6E6A7C;font-size:12px;line-height:1.7}
 .rc-photos {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .rc-photo {position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:#E9E5DF}
 .rc-photo img {width:100%;height:100%;object-fit:cover}
@@ -88,7 +90,7 @@
 .rc-followup-input button:hover {background:#F1EFF5;color:#1D1B26}
 .rc-followup-input button[type=submit] {background:#6A3CD6;color:#fff}
 .rc-followup-input button[type=submit]:hover {background:#5A2FC0}
-.rc-scene-stage {position:absolute;top:72px;bottom:84px;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:0 32px;transition:right .25s ease;container-type:size}
+.rc-scene-stage {position:absolute;top:72px;bottom:84px;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:0 32px;container-type:size}
 .rc-scene-stage.has-panel {right:calc(var(--rc-panel-width) + 16px)}
 .rc-scene {position:relative;width:min(100%,640px,calc(100cqh * 48 / 41));aspect-ratio:480/410;touch-action:none}
 .rc-scene>svg {user-select:none}
@@ -137,6 +139,8 @@
 .room-viewer {position:absolute;inset:0;height:100%;width:100%}
 .viewer-fallback {position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;background:#16141C;color:#EDEAF4;text-align:center}
 .viewer-model-notice {position:absolute;bottom:12px;left:12px;right:12px;padding:12px;border:1px solid #615176;border-radius:12px;background:#221F2CEE;color:#EDEAF4;font-size:12px;line-height:1.6}
+.viewer-selected-item {position:absolute;top:72px;left:16px;z-index:1;max-width:calc(100% - 32px);min-height:40px;padding:8px 12px;border:1px solid #B49CF0;border-radius:10px;background:#221F2CEE;color:#fff;font:inherit;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.viewer-selected-item:focus-visible {outline:3px solid #BBA5EE;outline-offset:3px}
 .rc-error {color:#A02D4A;font-size:13px;line-height:1.7;margin:0}
 .rc-analysis-settings {display:flex;flex-direction:column;gap:16px}
 .rc-analysis-settings .rc-setting {margin:0}
@@ -194,4 +198,62 @@
   .rc-new-composer {max-height:65%;overflow-y:auto}
   .rc-stage.is-empty {gap:16px;padding-top:68px;padding-bottom:20px}
   .rc-empty-art {min-height:0;flex:1;width:min(100%,400px)}
+}
+
+.rc-followup-mode {border:0;padding:0;margin:0 0 12px;display:flex;flex-wrap:wrap;gap:8px 12px;font-size:12px}
+.rc-followup-mode legend {font-weight:700;margin-bottom:8px}
+.rc-followup-mode label {display:flex;align-items:center;gap:4px}
+.rc-followup-mode input {accent-color:#7040df}
+.rc-followup-mode p {flex-basis:100%;margin:0;color:#6b6574;line-height:1.5}
+
+.rc-setup-step {display:flex;flex-direction:column;gap:12px;min-width:0}
+.rc-new-composer {transition:background-color var(--motion-control-duration) var(--motion-ease),box-shadow var(--motion-control-duration) var(--motion-ease)}
+.rc-new-composer.is-photo-drop {background:#F1ECFB;box-shadow:inset 0 0 0 2px #6A3CD6}
+.rc-photo[data-motion-state="closing"] {pointer-events:none}
+.rc-viewer-reveal {position:absolute;inset:0}
+.rc-viewer-reveal[data-readiness="loading"] {opacity:0}
+.rc-viewer-readiness-note {position:absolute;left:16px;right:16px;bottom:84px;margin:0;padding:8px 12px;border-radius:8px;background:#221F2C;font-size:12px}
+.rc-planner-floor-color {display:flex;align-items:center;gap:12px;margin-top:12px;font-size:13px}
+.rc-planner-floor-color input {width:48px;min-height:44px;border:1px solid #DDD5EE;border-radius:6px;cursor:pointer}
+
+/* Give the rendered room and its toolbar the full phone width. */
+@media(max-width:720px) {
+  .rc-workspace:not(.is-generating) {flex-direction:column}
+  .rc-workspace:not(.is-generating)>.rc-chat {flex:1;width:100%;height:auto;border-right:0;border-top:1px solid #E4E1EC}
+  .rc-workspace:not(.is-generating)>.rc-stage:not(.is-empty) {order:-1;flex:0 0 clamp(280px,45dvh,420px);width:100%;height:clamp(280px,45dvh,420px)}
+  .rc-workspace:not(.is-generating)>.rc-stage.is-empty {display:none}
+  .rc-workspace:not(.is-generating) .rc-new-composer {max-height:65%;overflow-y:auto}
+  .rc-workspace:not(.is-generating) .rc-followup-composer {max-height:100%;overflow-y:auto}
+  .rc-workspace:not(.is-generating) .rc-scene-stage.has-panel {right:0}
+}
+
+/* Short phone windows scroll the workspace while keeping navigation visible. */
+@media(max-width:720px) and (max-height:600px) {
+  .rc-workspace:not(.is-generating) {overflow-y:auto;overscroll-behavior:contain}
+  .rc-workspace:not(.is-generating)>.rc-stage:not(.is-empty) {flex-basis:260px;height:260px}
+  .rc-workspace:not(.is-generating)>.rc-chat {flex:0 0 auto;height:240px;min-height:240px}
+  .rc-workspace:not(.is-generating) .rc-scene-stage {top:64px;bottom:72px}
+}
+
+.rc-followup-input, .rc-request-box {position:relative}
+.viewer-overlap-notice:not([hidden]){position:absolute;left:16px;right:16px;bottom:54px;z-index:3;width:fit-content;max-width:calc(100% - 32px);padding:8px 12px;border:1px solid #F87171;border-radius:8px;background:#2C1724E8;color:#FFE4E6;font-size:12px;box-sizing:border-box;max-height:48px;overflow-y:auto;overflow-wrap:anywhere;pointer-events:auto}
+
+.viewer-overlap-notice:focus-visible{outline:3px solid #BBA5EE;outline-offset:2px}
+
+/* Retain only the panel; the canvas remains outside this inexpensive opacity/translate layer. */
+.rc-panel-transition {position:absolute;inset:0;pointer-events:none;z-index:4}
+.rc-panel-transition>.rc-panel {pointer-events:auto}
+.rc-panel-transition[data-panel-state=open] {animation:rc-panel-enter var(--motion-local-duration) var(--motion-ease) both}
+.rc-panel-transition[data-panel-state=closing] {animation:rc-panel-exit var(--motion-exit-duration) var(--motion-exit-ease) both;pointer-events:none}
+.rc-panel-transition[data-panel-state=closing]>.rc-panel {pointer-events:none}
+@keyframes rc-panel-enter {from{opacity:0;translate:12px 0}to{opacity:1;translate:0 0}}
+@keyframes rc-panel-exit {from{opacity:1;translate:0 0}to{opacity:0;translate:12px 0}}
+.rc-items>li {animation:motion-enter var(--motion-local-duration) var(--motion-ease) both;animation-delay:clamp(0ms,var(--motion-delay,0ms),120ms)}
+.rc-item-link {transition:background-color var(--motion-control-duration) var(--motion-ease),box-shadow var(--motion-control-duration) var(--motion-ease),color var(--motion-control-duration) var(--motion-ease)}
+.rc-pin>span {transition:background-color var(--motion-control-duration) var(--motion-ease),box-shadow var(--motion-control-duration) var(--motion-ease)}
+.rc-panel h2:focus-visible {outline:2px solid var(--motion-focus-color);outline-offset:3px}
+
+/* A translated wrapper is a fixed-position containing block: match the mobile editor viewport. */
+@media(max-width:720px) {
+  .rc-panel-transition[data-panel-mode=edit] {position:fixed;inset:0;z-index:50}
 }

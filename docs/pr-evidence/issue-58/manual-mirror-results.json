@@ -1,0 +1,32 @@
+{
+  "source": "d1c4611f49bbf5a9d83c4464c990fd6dbbfda6ac",
+  "mirror": {
+    "id": "manual-b415356e-4079-42d3-87e6-c7230810dc3d",
+    "name": "鏡",
+    "category": "mirror",
+    "existing": true,
+    "color": "#C5A582",
+    "size": [
+      1,
+      2,
+      0.08
+    ],
+    "position": [
+      -0.4,
+      1,
+      -1.4
+    ],
+    "rotation": 0
+  },
+  "categories": [
+    "sofa",
+    "bed",
+    "desk",
+    "chair",
+    "shelf",
+    "table"
+  ],
+  "readiness": "ready",
+  "pageErrors": [],
+  "verification": "Actual UI and dummy/scoped local storage; API serialization checked separately against exact adapter source, no live API/provider claim"
+}

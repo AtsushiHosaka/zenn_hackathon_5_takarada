@@ -524,6 +524,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/furniture_searches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 家具を検索し公式の色で絞り込む
+         * @description 公式商品ページを検証し、掲載されている色名で絞り込む。最大24件。色違いは公式の選択欄・ProductGroupにあるURLとSKUを返し、選択時にfurniture_importsで商品情報を再確認する。検索は最大130秒。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["FurnitureSearchInput"];
+                };
+            };
+            responses: {
+                /** @description 検索結果 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FurnitureSearchResult"];
+                    };
+                };
+                /** @description ログインが必要 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Unauthorized"];
+                    };
+                };
+                /** @description 入力または検索の確認に失敗 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ValidationErrors"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/rooms": {
         parameters: {
             query?: never;
@@ -567,7 +628,7 @@ export interface paths {
         put?: never;
         /**
          * 部屋を登録して解析を始める
-         * @description 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ
+         * @description template_sceneを指定すると、保存した配置からreadyの部屋を別IDで作成する。モデルURLは受け付けない。写真との併用は不可。省略時の解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ
          */
         post: {
             parameters: {
@@ -582,7 +643,7 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description 登録に成功 (status: analyzing) */
+                /** @description 登録に成功 (通常はanalyzing、テンプレートはready) */
                 201: {
                     headers: {
                         [name: string]: unknown;
@@ -1123,6 +1184,13 @@ export interface components {
             /** @description ドア (部屋の出入り口・クローゼットの扉)。前の床 0.8m には家具・商品を置かない。古いシーンには無い */
             doors?: components["schemas"]["Door"][];
         };
+        ImageArtwork: {
+            /**
+             * @description 最大512pxのPNG画像。透過を保持する
+             * @example data:image/png;base64,iVBORw0KGgo=
+             */
+            data_url: string;
+        };
         SceneObject: {
             /** @example bed-1 */
             id: string;
@@ -1134,6 +1202,7 @@ export interface components {
             source: "existing" | "suggested";
             /** @example bed */
             category: string;
+            artwork?: components["schemas"]["ImageArtwork"];
             /** @example ベッド */
             label: string;
             size: components["schemas"]["Size"];
@@ -1245,6 +1314,12 @@ export interface components {
              */
             upload_url: string;
         };
+        /** @description 保存した部屋の配置をコピーする。外部モデルURLは受け付けず、モデルはサーバーで選ぶ */
+        RoomTemplateScene: {
+            room: components["schemas"]["RoomShape"];
+            /** @description sourceはexisting、model_urlはnull。IDは64文字以内、家具名は100文字以内 */
+            objects: components["schemas"]["SceneObject"][];
+        };
         RoomInput: {
             room: {
                 /**
@@ -1258,6 +1333,7 @@ export interface components {
                  * @enum {string}
                  */
                 shape: "square" | "standard" | "long";
+                template_scene?: components["schemas"]["RoomTemplateScene"];
                 /**
                  * @description POST /api/v1/uploads で得た key。アップロード済みのものだけ受け付ける。省略すると写真なしで解析する
                  * @example []
@@ -1312,9 +1388,15 @@ export interface components {
              * @example chair
              * @enum {string}
              */
-            category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table";
+            category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table" | "poster" | "acrylic_stand" | "mirror";
+            artwork?: components["schemas"]["ImageArtwork"];
             /**
-             * @description 商品リンクのインポート結果のID。商品・モデル情報はサーバー側で復元する
+             * @description 手動の所有家具を置き換える購入商品のID。所有家具のec_product_idは変更しない
+             * @example 2
+             */
+            replacement_ec_product_id?: number;
+            /**
+             * @description 商品検索・インポート結果のID。元の家具と同じカテゴリの商品に限り、商品・モデル情報をサーバー側で復元する
              * @example 1
              */
             ec_product_id?: number;
@@ -1343,10 +1425,57 @@ export interface components {
         };
         FurnitureImportInput: {
             /**
+             * @description 置換用の取得では床家具以外の対応商品も返す
+             * @example replacement
+             * @enum {string}
+             */
+            purpose?: "replacement";
+            /**
+             * @description 同じ商品ページで選ぶ場合の公式バリエーションSKU
+             * @example 50337820
+             */
+            variant_id?: string;
+            /**
              * @description 対応するショップの商品詳細URL
              * @example https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/
              */
             url: string;
+        };
+        FurnitureSearchInput: {
+            /** @example 丸いサイドテーブル */
+            query: string;
+            /**
+             * @example blue
+             * @enum {string}
+             */
+            color?: "white" | "black" | "gray" | "brown" | "beige" | "green" | "blue" | "purple" | "pink" | "red" | "orange" | "yellow";
+            /**
+             * @example table
+             * @enum {string}
+             */
+            category?: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
+        };
+        FurnitureSearchResult: {
+            products: components["schemas"]["ImportedFurniture"][];
+            /** @example blue */
+            color: string | null;
+            /** @example 0 */
+            failures: number;
+            /** @example [] */
+            search_entry_points: string[];
+        };
+        ProductColorVariant: {
+            /** @example ホワイト */
+            color_name: string;
+            /** @example https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/ */
+            url: string;
+            /** @example 50337820 */
+            variant_id: string | null;
+            /**
+             * @example official_color_picker
+             * @enum {string}
+             */
+            source: "official_color_picker" | "official_product_group";
         };
         /** @description 実ページで確認した所有家具。寸法・色・モデルは近似で、推定した軸はproduct_metadataに記録する */
         ImportedFurniture: {
@@ -1358,7 +1487,7 @@ export interface components {
              * @example chair
              * @enum {string}
              */
-            category: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table";
+            category: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
             /** @example #f2efe8 */
             color: string;
             size: components["schemas"]["Size"];
@@ -1410,6 +1539,9 @@ export interface components {
             provider_product_id?: string;
             /** @example 50337820 */
             variant_id?: string;
+            /** @example ホワイト */
+            official_color?: string | null;
+            color_variants?: components["schemas"]["ProductColorVariant"][];
             /**
              * @example JPY
              * @enum {string}
@@ -1469,6 +1601,18 @@ export interface components {
         };
         CoordinationInput: {
             coordination: {
+                /**
+                 * @description 部屋のカラーテーマ。省略時は従来の配色
+                 * @example warm-ivory
+                 * @enum {string}
+                 */
+                room_palette_id?: "snow-graphite" | "porcelain" | "silver-line" | "stone-gray" | "monochrome-gallery" | "mist-smoke" | "warm-ivory" | "oatmeal" | "desert-sand" | "mushroom-taupe" | "coffee-cream" | "linen-ink" | "sage-clay" | "olive-linen" | "moss-oak" | "terracotta-fern" | "botanical-white" | "jungle-earth" | "mint-cloud" | "seafoam" | "teal-studio" | "turquoise-pop" | "celadon" | "lagoon-dusk" | "sky-white" | "powder-blue" | "coastal-blue" | "cobalt-gallery" | "denim-wood" | "ice-navy" | "lavender-milk" | "lilac-garden" | "amethyst" | "violet-pop" | "mauve-taupe" | "orchid-gold" | "blush-linen" | "rose-quartz" | "dusty-rose" | "peach-pink" | "fuchsia-pop" | "cherry-blossom" | "brick-cream" | "scarlet-pop" | "apricot" | "tangerine-studio" | "butter-yellow" | "sunflower" | "candy-pastel" | "mint-strawberry" | "lavender-lemon" | "primary-play" | "tropical-pop" | "festival" | "charcoal-silver" | "midnight-brass" | "forest-night" | "plum-velvet" | "burgundy-lounge" | "espresso-copper";
+                /**
+                 * @description 任意のキャラクターテーマ。画像や公式商品を保証しない
+                 * @example hatsune-miku
+                 * @enum {string}
+                 */
+                character_theme_id?: "hatsune-miku" | "sanrio" | "hello-kitty" | "my-melody" | "kuromi" | "cinnamoroll" | "pompompurin" | "pochacco";
                 /** @example 紫色の推し活ルームにしたい */
                 prompt: string;
                 /**
@@ -1556,6 +1700,11 @@ export interface components {
              * @enum {string}
              */
             status: "pending" | "processing" | "done" | "failed";
+            /**
+             * @example hatsune-miku
+             * @enum {string|null}
+             */
+            character_theme_id?: null | "hatsune-miku" | "sanrio" | "hello-kitty" | "my-melody" | "kuromi" | "cinnamoroll" | "pompompurin" | "pochacco";
             /** @example 紫色の推し活ルームにしたい */
             prompt: string;
             /** @example 30000 */
@@ -1593,6 +1742,11 @@ export interface components {
             items: components["schemas"]["CoordinationItem"][];
             /** @example 26840 */
             total_price: number | null;
+            /**
+             * @example warm-ivory
+             * @enum {string|null}
+             */
+            room_palette_id?: null | "snow-graphite" | "porcelain" | "silver-line" | "stone-gray" | "monochrome-gallery" | "mist-smoke" | "warm-ivory" | "oatmeal" | "desert-sand" | "mushroom-taupe" | "coffee-cream" | "linen-ink" | "sage-clay" | "olive-linen" | "moss-oak" | "terracotta-fern" | "botanical-white" | "jungle-earth" | "mint-cloud" | "seafoam" | "teal-studio" | "turquoise-pop" | "celadon" | "lagoon-dusk" | "sky-white" | "powder-blue" | "coastal-blue" | "cobalt-gallery" | "denim-wood" | "ice-navy" | "lavender-milk" | "lilac-garden" | "amethyst" | "violet-pop" | "mauve-taupe" | "orchid-gold" | "blush-linen" | "rose-quartz" | "dusty-rose" | "peach-pink" | "fuchsia-pop" | "cherry-blossom" | "brick-cream" | "scarlet-pop" | "apricot" | "tangerine-studio" | "butter-yellow" | "sunflower" | "candy-pastel" | "mint-strawberry" | "lavender-lemon" | "primary-play" | "tropical-pop" | "festival" | "charcoal-silver" | "midnight-brass" | "forest-night" | "plum-velvet" | "burgundy-lounge" | "espresso-copper";
             /**
              * @description gemini: 要望文から AI が商品を選んだ / mock: キーワードでテーマを決めたモック。生成が終わると入る
              * @example gemini
