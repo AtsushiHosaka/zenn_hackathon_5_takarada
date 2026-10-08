@@ -205,3 +205,5 @@
 .rc-followup-mode label {display:flex;align-items:center;gap:4px}
 .rc-followup-mode input {accent-color:#7040df}
 .rc-followup-mode p {flex-basis:100%;margin:0;color:#6b6574;line-height:1.5}
+
+.viewer-overlap-notice:not([hidden]){position:absolute;left:16px;right:16px;bottom:54px;z-index:3;width:fit-content;max-width:calc(100% - 32px);padding:8px 12px;border:1px solid #F87171;border-radius:8px;background:#2C1724E8;color:#FFE4E6;font-size:12px;pointer-events:none}
