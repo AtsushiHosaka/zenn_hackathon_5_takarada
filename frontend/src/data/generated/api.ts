@@ -1123,6 +1123,13 @@ export interface components {
             /** @description ドア (部屋の出入り口・クローゼットの扉)。前の床 0.8m には家具・商品を置かない。古いシーンには無い */
             doors?: components["schemas"]["Door"][];
         };
+        ImageArtwork: {
+            /**
+             * @description 最大512pxのPNG画像。透過を保持する
+             * @example data:image/png;base64,iVBORw0KGgo=
+             */
+            data_url: string;
+        };
         SceneObject: {
             /** @example bed-1 */
             id: string;
@@ -1134,6 +1141,7 @@ export interface components {
             source: "existing" | "suggested";
             /** @example bed */
             category: string;
+            artwork?: components["schemas"]["ImageArtwork"];
             /** @example ベッド */
             label: string;
             size: components["schemas"]["Size"];
@@ -1312,7 +1320,8 @@ export interface components {
              * @example chair
              * @enum {string}
              */
-            category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table";
+            category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table" | "poster" | "acrylic_stand";
+            artwork?: components["schemas"]["ImageArtwork"];
             /**
              * @description 商品リンクのインポート結果のID。商品・モデル情報はサーバー側で復元する
              * @example 1

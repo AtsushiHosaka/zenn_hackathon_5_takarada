@@ -95,3 +95,10 @@
   .rc-planner-footer {padding-left:16px;padding-right:16px}
   .rc-planner-swatches {gap:8px;flex-wrap:wrap}
 }
+
+.rc-furniture-source { flex-wrap: wrap; }
+.rc-image-goods { display: grid; gap: 10px; }
+.rc-image-goods-upload, .rc-image-goods-height { display: grid; gap: 7px; font-size: 12px; color: #6E6A7C; }
+.rc-image-goods-upload input { max-width: 100%; font-size: 12px; }
+.rc-image-goods-height input { width: 100%; padding: 8px 10px; border: 1px solid #E4E1EC; border-radius: 8px; background: #fff; color: #1D1B26; }
+.rc-image-goods-preview { background: repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 0 0 / 16px 16px; }

@@ -214,6 +214,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   function addItem(candidate:RoomItem,position?:RoomItem['position']) {
     setPlacementItem(null);
     if(!editing||placementDisabled)return;
+    if(candidate.artwork&&design.items.reduce((total,item)=>total+(item.artwork?.dataUrl.length??0),0)+candidate.artwork.dataUrl.length>1024*1024){setNotice('この部屋の推しグッズ画像は合計1MBまでです。グッズを削除してから追加してください。');return;}
     const boundedPosition=furniturePositionInRoom(candidate,position??candidate.position,design);
     if(!boundedPosition){setNotice('この寸法の家具は部屋に収まりません。寸法を小さくしてください。');return;}
     const item={...candidate,id:`manual-${crypto.randomUUID()}`,position:boundedPosition};

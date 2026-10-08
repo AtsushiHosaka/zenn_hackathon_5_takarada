@@ -26,17 +26,23 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
           manual = { "id" => "manual-8e24d3af-c12d-4567-8910-123456789abc", "label" => "今ある椅子", "category" => "chair",
                      "position" => { "x" => room.scene.dig("room", "width") / 2, "y" => 0, "z" => room.scene.dig("room", "depth") / 2 },
                      "size" => { "w" => 0.45, "h" => 0.8, "d" => 0.45 }, "rotation_y" => 0, "color" => "#bba588" }
+          artwork = { "data_url" => "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9ncAAAAASUVORK5CYII=" }
+          goods = %w[poster acrylic_stand].map.with_index do |category, index|
+            manual.merge("id" => "manual-8e24d3af-c12d-4567-8910-123456789ab#{index}", "category" => category, "label" => "推しグッズ",
+                         "size" => { "w" => 0.2, "h" => 0.3, "d" => 0.06 }, "artwork" => artwork)
+          end
           { coordination: { prompt: "紫色の推し活ルームにしたい", budget: 30_000,
-                            kept_object_ids: objects.pluck("id") + [ manual["id"] ],
-                            furniture_operations: (objects + [ manual ]).map { |object| { object_id: object["id"], action: "keep" } },
+                            kept_object_ids: objects.pluck("id") + [ manual["id"] ] + goods.pluck("id"),
+                            furniture_operations: (objects + [ manual ] + goods).map { |object| { object_id: object["id"], action: "keep" } },
                             additions: [ { category: "table" } ],
-                            edited_objects: [ objects.first.slice("id", "position", "size", "rotation_y", "color"), manual ] } }
+                            edited_objects: [ objects.first.slice("id", "position", "size", "rotation_y", "color"), manual, *goods ] } }
         end
 
         run_test! do |response|
+          expect(JSON.parse(response.body)["before_scene"]["objects"].last(2).map { |object| object.dig("artwork", "data_url") }).to all(start_with("data:image/png;base64,"))
           expect(GenerateCoordinationJob).to have_been_enqueued
           expect(JSON.parse(response.body)["additions"]).to eq([ { "category" => "table" } ])
-          expect(JSON.parse(response.body)["before_scene"]["objects"].last).to include("id" => "manual-8e24d3af-c12d-4567-8910-123456789abc", "source" => "existing", "category" => "chair", "item_id" => nil)
+          expect(JSON.parse(response.body)["before_scene"]["objects"].find { |object| object["id"] == "manual-8e24d3af-c12d-4567-8910-123456789abc" }).to include("id" => "manual-8e24d3af-c12d-4567-8910-123456789abc", "source" => "existing", "category" => "chair", "item_id" => nil)
         end
       end
 

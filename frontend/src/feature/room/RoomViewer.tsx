@@ -130,7 +130,7 @@ function plant(parent: THREE.Object3D, width: number, height: number, potColor: 
   }
 }
 
-function createFurniture(item: RoomItem, accent: string, oshi: boolean) {
+function createFurniture(item: RoomItem, accent: string, oshi: boolean, manager?: THREE.LoadingManager) {
   const group = new THREE.Group();
   group.userData.itemId = item.id;
   const [w, h, d] = item.size;
@@ -139,6 +139,26 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean) {
   const dark = "#605747";
   const color = item.color;
   switch (item.category) {
+    case "poster":
+    case "acrylic_stand": {
+      const stand = item.category === "acrylic_stand";
+      const baseHeight = stand ? Math.min(.015, h * .08) : 0;
+      if (stand) {
+        const base = box(group, [w, baseHeight, d], [0, baseHeight / 2, 0], "#e4eff5", true);
+        const surface = base.material as THREE.MeshStandardMaterial;
+        surface.transparent = true; surface.opacity = .65; surface.roughness = .2;
+      } else box(group, [w, h, d], [0, h / 2, 0], color);
+      if (item.artwork) {
+        const texture = new THREE.TextureLoader(manager).load(item.artwork.dataUrl);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        const art = new THREE.Mesh(new THREE.PlaneGeometry(stand ? w : w * .96, stand ? h - baseHeight : h * .96), new THREE.MeshBasicMaterial({
+          map: texture, transparent: stand, alphaTest: stand ? .1 : 0, side: THREE.DoubleSide, toneMapped: false,
+        }));
+        art.position.set(0, (h + baseHeight) / 2, stand ? 0 : d / 2 + .0005);
+        group.add(art);
+      }
+      break;
+    }
     case "sofa": {
       for (const x of [-w * 0.4, w * 0.4]) {
         for (const z of [-d * 0.33, d * 0.33]) {
@@ -510,7 +530,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     const loadingManager = new THREE.LoadingManager();
     loadingManager.onStart = () => { assetsReady = false; };
     loadingManager.onLoad = () => { assetsReady = true; previewNeedsRender = true; };
-    loadingManager.onError = () => { assetFailed = true; };
+    loadingManager.onError = () => { assetFailed = true; if (!disposed && textureNotice.current) textureNotice.current.hidden = false; };
     const previewDeadline = preview ? window.setTimeout(() => {
       if (!disposed && !readySent) { readySent = true; reportReady(false); }
     }, 20000) : undefined;
@@ -611,7 +631,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       // owned furniture uses the same editable primitives as measured rooms.
       const previous = furniture.get(item.id);
       if (previous) { scene.remove(previous); disposeObject(previous); }
-      const group = createFurniture(item, accent, oshi);
+      const group = createFurniture(item, accent, oshi, loadingManager);
       scene.add(group);
       furniture.set(item.id, group);
     }
@@ -919,7 +939,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       if (event.dataTransfer) event.dataTransfer.dropEffect = position ? "copy" : "none";
       if (!position) { if (placementPreview) placementPreview.visible = false; return; }
       if (!placementPreview) {
-        placementPreview = createFurniture(currentPlacement, accent, oshi);
+        placementPreview = createFurniture(currentPlacement, accent, oshi, loadingManager);
         placementPreview.traverse(object => {
           if (!(object instanceof THREE.Mesh)) return;
           object.castShadow = false;
