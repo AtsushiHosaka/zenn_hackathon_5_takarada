@@ -622,6 +622,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     let currentPlacement = initialPlacement();
     let loadedRoom: THREE.Group | null = null;
     let shellFloor: THREE.Mesh | null = null;
+    let shellFloorUnavailable = false;
     const completeRoomModel = Boolean(design.modelUrl) && design.modelKind !== "shell";
     const gridBounds = referenceRoom?.floorBounds ?? baseRoomBounds;
     const gridFloor = design.room || referenceRoom ? 0 : getFurniturePlacementBounds(design).floor;
@@ -683,6 +684,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     const updateVisibility = () => {
       if (themedDecor) themedDecor.visible = !currentBefore;
       if (shellFloor) shellFloor.visible = !currentBefore;
+      if (floorNotice.current) floorNotice.current.hidden = currentBefore || !shellFloorUnavailable;
       layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel;
       proceduralRoomVisible = currentBefore || !loadedRoom;
       architecture.visible = proceduralRoomVisible;
@@ -917,7 +919,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         if (!completeRoomModel && design.floorColor) {
           shellFloor = design.room ? createShellFloorOverlay(gltf.scene, design.room, design.floorColor) : null;
           if (shellFloor) scene.add(shellFloor);
-          else if (floorNotice.current) floorNotice.current.hidden = false;
+          else shellFloorUnavailable = true;
         }
         if (completeRoomModel) {
           for (const item of design.items) {

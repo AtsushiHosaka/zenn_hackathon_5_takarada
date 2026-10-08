@@ -5,28 +5,36 @@ const FLOOR_TOLERANCE = .03;
 const BOUND_TOLERANCE = .005;
 const MIN_FLOOR_COVERAGE = .5;
 const MAX_FLOOR_COVERAGE = 1.05;
+const MAX_TRIANGLES = 100_000;
 
 // Shells contain architecture in the room's coordinates. Match actual upward
 // floor triangles, including a floor combined with walls in one mesh; never
 // recolor the source model's shared materials or infer surfaces from their names.
 export function createShellFloorOverlay(model: THREE.Object3D, room: RoomGeometry, color: string): THREE.Mesh | null {
+  if (!Number.isFinite(room.width * room.depth) || room.width <= 0 || room.depth <= 0) return null;
   const vertices: number[] = [];
   let area = 0;
+  let inspected = 0;
+  let tooComplex = false;
   model.updateWorldMatrix(true, true);
   model.traverseVisible(object => {
-    if (!(object instanceof THREE.Mesh) || object instanceof THREE.InstancedMesh || object instanceof THREE.SkinnedMesh) return;
-    const geometry = object.geometry;
+    if (tooComplex || !(object instanceof THREE.Mesh) || object instanceof THREE.InstancedMesh || object instanceof THREE.SkinnedMesh) return;
+    const geometry: THREE.BufferGeometry = object.geometry;
     const positions = geometry.getAttribute('position');
     if (!positions) return;
-    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    const multiMaterial = Array.isArray(object.material);
+    const materials = multiMaterial ? object.material as THREE.Material[] : [object.material as THREE.Material];
+    if (geometry.groups.length > 1_000) { tooComplex = true; return; }
     const index = geometry.getIndex();
     const count = index?.count ?? positions.count;
     const start = Math.max(0, geometry.drawRange.start);
     const end = Math.min(count, start + geometry.drawRange.count);
     const normalMatrix = new THREE.Matrix3().getNormalMatrix(object.matrixWorld);
     for (let offset = start; offset + 2 < end; offset += 3) {
-      const materialIndex = geometry.groups.find(group => offset >= group.start && offset < group.start + group.count)?.materialIndex ?? 0;
-      const material = materials[materialIndex];
+      if (++inspected > MAX_TRIANGLES) { tooComplex = true; break; }
+      const group = multiMaterial ? geometry.groups.find(group => offset >= group.start && offset + 2 < group.start + group.count) : undefined;
+      if (multiMaterial && !group) continue;
+      const material = materials[group?.materialIndex ?? 0];
       if (!material?.visible || material.opacity <= 0 || !material.colorWrite) continue;
       const local = [0, 1, 2].map(vertex => new THREE.Vector3().fromBufferAttribute(positions, index ? index.getX(offset + vertex) : offset + vertex));
       const normal = new THREE.Vector3().subVectors(local[1], local[0]).cross(new THREE.Vector3().subVectors(local[2], local[0])).applyNormalMatrix(normalMatrix);
@@ -46,7 +54,7 @@ export function createShellFloorOverlay(model: THREE.Object3D, room: RoomGeometr
     }
   });
   const roomArea = room.width * room.depth;
-  if (!Number.isFinite(area) || area < roomArea * MIN_FLOOR_COVERAGE || area > roomArea * MAX_FLOOR_COVERAGE) return null;
+  if (tooComplex || !Number.isFinite(area) || area < roomArea * MIN_FLOOR_COVERAGE || area > roomArea * MAX_FLOOR_COVERAGE) return null;
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
   geometry.computeVertexNormals();
