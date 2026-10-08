@@ -55,7 +55,14 @@ echo "== 2/3 db/Schemafile を Cloud SQL に適用します"
 
 echo
 echo "== 3/3 Cloud Run を更新します"
+# Use a separator absent from the values so URL query commas remain intact.
+legal_separator="__LEGAL_DOCUMENTS__"
+while [[ "${VITE_TERMS_URL:-}${VITE_PRIVACY_URL:-}" == *"$legal_separator"* ]]; do
+  legal_separator="${legal_separator}_"
+done
+legal_env="^${legal_separator}^VITE_TERMS_URL=${VITE_TERMS_URL:-}${legal_separator}VITE_PRIVACY_URL=${VITE_PRIVACY_URL:-}"
 gcloud run services update "$api_service" \
+  --update-env-vars "$legal_env" \
   --image "$api_repo:$tag" \
   --region "$region" --project "$project_id" --quiet
 gcloud run services update "$web_service" \

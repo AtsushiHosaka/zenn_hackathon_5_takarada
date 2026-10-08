@@ -45,6 +45,8 @@ services:
       MODELS_BUCKET: ${MODELS_BUCKET:-}
       FURNITURE_MODEL_BASE_URL: ${FURNITURE_MODEL_BASE_URL:-}
       UPLOADS_BUCKET: local-uploads
+      VITE_TERMS_URL: ${VITE_TERMS_URL:-}
+      VITE_PRIVACY_URL: ${VITE_PRIVACY_URL:-}
     ports:
       - "3000:3000"
     depends_on:
