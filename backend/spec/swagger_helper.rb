@@ -280,9 +280,10 @@ RSpec.configure do |config|
               scene: { allOf: [ { "$ref" => "#/components/schemas/Scene" } ], nullable: true, description: "status が ready になると入る" },
               analyzed_by: { type: :string, nullable: true, enum: [ nil, "gemini", "mock" ], description: "gemini: 写真を AI で解析した / mock: 写真か API キーが無く、決まった家具を置いたモック。解析が終わると入る", example: "gemini" },
               error_message: { type: :string, nullable: true, example: nil },
+              latest_coordination: { allOf: [ { "$ref" => "#/components/schemas/Coordination" } ], nullable: true, description: "この部屋で最後に生成が成功した提案。提案がなければ null" },
               created_at: { type: :string, format: "date-time" }
             },
-            required: %w[id tatami shape status scene analyzed_by error_message created_at]
+            required: %w[id tatami shape status scene analyzed_by error_message latest_coordination created_at]
           },
           FurnitureEdit: {
             type: :object,

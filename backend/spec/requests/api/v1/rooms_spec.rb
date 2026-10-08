@@ -7,7 +7,7 @@ RSpec.describe "Api::V1::Rooms", type: :request do
   path "/api/v1/rooms" do
     get "本人の部屋一覧を取得する" do
       tags "Rooms"
-      description "本人の部屋をIDの降順で返す。部屋がない場合は空の配列を返す。"
+      description "本人の部屋をIDの降順で返す。部屋がない場合は空の配列を返す。解析中・失敗した部屋も含み、各部屋に最後に成功した提案を返す。"
       security [ { bearerAuth: [] } ]
       produces "application/json"
 
