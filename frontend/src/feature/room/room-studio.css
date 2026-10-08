@@ -90,7 +90,7 @@
 .rc-followup-input button:hover {background:#F1EFF5;color:#1D1B26}
 .rc-followup-input button[type=submit] {background:#6A3CD6;color:#fff}
 .rc-followup-input button[type=submit]:hover {background:#5A2FC0}
-.rc-scene-stage {position:absolute;top:72px;bottom:84px;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:0 32px;transition:right .25s ease;container-type:size}
+.rc-scene-stage {position:absolute;top:72px;bottom:84px;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:0 32px;container-type:size}
 .rc-scene-stage.has-panel {right:calc(var(--rc-panel-width) + 16px)}
 .rc-scene {position:relative;width:min(100%,640px,calc(100cqh * 48 / 41));aspect-ratio:480/410;touch-action:none}
 .rc-scene>svg {user-select:none}
@@ -223,6 +223,7 @@
   .rc-workspace:not(.is-generating)>.rc-stage:not(.is-empty) {order:-1;flex:0 0 clamp(280px,45dvh,420px);width:100%;height:clamp(280px,45dvh,420px)}
   .rc-workspace:not(.is-generating)>.rc-stage.is-empty {display:none}
   .rc-workspace:not(.is-generating) .rc-new-composer {max-height:65%;overflow-y:auto}
+  .rc-workspace:not(.is-generating) .rc-followup-composer {max-height:100%;overflow-y:auto}
   .rc-workspace:not(.is-generating) .rc-scene-stage.has-panel {right:0}
 }
 
@@ -232,10 +233,27 @@
   .rc-workspace:not(.is-generating)>.rc-stage:not(.is-empty) {flex-basis:260px;height:260px}
   .rc-workspace:not(.is-generating)>.rc-chat {flex:0 0 auto;height:240px;min-height:240px}
   .rc-workspace:not(.is-generating) .rc-scene-stage {top:64px;bottom:72px}
-  .rc-workspace:not(.is-generating) .rc-followup-composer {max-height:100%;overflow-y:auto}
 }
 
 .rc-followup-input, .rc-request-box {position:relative}
 .viewer-overlap-notice:not([hidden]){position:absolute;left:16px;right:16px;bottom:54px;z-index:3;width:fit-content;max-width:calc(100% - 32px);padding:8px 12px;border:1px solid #F87171;border-radius:8px;background:#2C1724E8;color:#FFE4E6;font-size:12px;box-sizing:border-box;max-height:48px;overflow-y:auto;overflow-wrap:anywhere;pointer-events:auto}
 
 .viewer-overlap-notice:focus-visible{outline:3px solid #BBA5EE;outline-offset:2px}
+
+/* Retain only the panel; the canvas remains outside this inexpensive opacity/translate layer. */
+.rc-panel-transition {position:absolute;inset:0;pointer-events:none;z-index:4}
+.rc-panel-transition>.rc-panel {pointer-events:auto}
+.rc-panel-transition[data-panel-state=open] {animation:rc-panel-enter var(--motion-local-duration) var(--motion-ease) both}
+.rc-panel-transition[data-panel-state=closing] {animation:rc-panel-exit var(--motion-exit-duration) var(--motion-exit-ease) both;pointer-events:none}
+.rc-panel-transition[data-panel-state=closing]>.rc-panel {pointer-events:none}
+@keyframes rc-panel-enter {from{opacity:0;translate:12px 0}to{opacity:1;translate:0 0}}
+@keyframes rc-panel-exit {from{opacity:1;translate:0 0}to{opacity:0;translate:12px 0}}
+.rc-items>li {animation:motion-enter var(--motion-local-duration) var(--motion-ease) both;animation-delay:clamp(0ms,var(--motion-delay,0ms),120ms)}
+.rc-item-link {transition:background-color var(--motion-control-duration) var(--motion-ease),box-shadow var(--motion-control-duration) var(--motion-ease),color var(--motion-control-duration) var(--motion-ease)}
+.rc-pin>span {transition:background-color var(--motion-control-duration) var(--motion-ease),box-shadow var(--motion-control-duration) var(--motion-ease)}
+.rc-panel h2:focus-visible {outline:2px solid var(--motion-focus-color);outline-offset:3px}
+
+/* A translated wrapper is a fixed-position containing block: match the mobile editor viewport. */
+@media(max-width:720px) {
+  .rc-panel-transition[data-panel-mode=edit] {position:fixed;inset:0;z-index:50}
+}

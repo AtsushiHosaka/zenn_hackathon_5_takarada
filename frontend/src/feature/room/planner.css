@@ -132,3 +132,7 @@
 @media(max-width:720px) {
   .rc-panel.rc-planner {position:fixed;z-index:50;top:calc(var(--rc-header-bottom,56px) + 12px);right:12px;bottom:max(12px,env(safe-area-inset-bottom));left:12px;width:auto;max-width:none;min-width:0}
 }
+
+.rc-planner input,.rc-planner select {transition:border-color var(--motion-control-duration) var(--motion-ease),box-shadow var(--motion-control-duration) var(--motion-ease)}
+.rc-planner input:focus-visible,.rc-planner select:focus-visible {outline:2px solid var(--motion-focus-color);outline-offset:2px}
+.rc-planner-addition {transform:none}
