@@ -28,7 +28,7 @@ function RoomStudioRoute() {
   const { id } = useParams();
   const scope = useRoomPlanScope();
   const page = <RoomStudioPage key={`${scope}:${id}`} />;
-  return loadConnection() === "dummy" || ["sample-oshi", "sample-botanical", "sample-natural", "sample-game"].includes(id ?? "")
+  return ["sample-oshi", "sample-botanical", "sample-natural", "sample-game"].includes(id ?? "")
     ? page : <RequireAuth>{page}</RequireAuth>;
 }
 

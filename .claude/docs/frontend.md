@@ -39,14 +39,14 @@ make front-sh       # web コンテナに入る
 
 | 接続先 | 中身 |
 | --- | --- |
-| `dummy` | ブラウザのメモリ上のダミーデータ (`data/dummy`)。**backend を立てなくても動く** |
+| `dummy` | ブラウザのlocalStorageに保存するダミーデータ (`data/dummy`)。**backend を立てなくても動く** |
 | `api` | 実際の API。URL は `VITE_API_ENDPOINT` |
 
 - **dev の既定は `dummy`**、本番ビルドは `api` (`core/config.ts` の `defaultConnection`)。
 - 切り替えはログイン画面 / ヘッダの「接続先」(dev のみ表示)。選択は localStorage に残り、
   切り替えると**リロードして DI ごと作り直す**。JWT は接続先ごとに別のキーで持つ。
-- ダミーは `dummyDatabase` がメモリに持つだけで、リロードすると初期状態に戻る。
-  **パスワードは検証しない**(`dummyData.ts` のメールアドレスなら誰でもログインできる)。
+- ダミーの登録ユーザーとルームはlocalStorageに保存し、再読み込み・再ログイン後も復元する。ルームは利用者IDで分ける。
+  パスワードはSHA-256の値で照合する。初期ユーザーのパスワードは `password`。実APIの認証とは異なる。
 
 ## 設定 (環境変数)
 
