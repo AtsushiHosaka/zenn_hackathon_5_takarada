@@ -8,6 +8,10 @@ import { LAYOUT_GRID_STEP, snapToLayoutGrid } from './layoutGrid';
 import { createFurnitureItem, FURNITURE_DRAG_TYPE, furnitureTemplates } from './furniturePlacement';
 import { getFurniturePlacementBounds, furniturePositionInRoom, snapFurnitureEditPosition } from './roomBounds';
 import ImageGoodsPalette from './ImageGoodsPalette';
+import ImageFurniturePalette from './ImageFurniturePalette';
+import ImportedFurniturePalette from './ImportedFurniturePalette';
+import { useImportedFurniture } from './importedFurniture';
+import { useRoomPlanScope } from './plans';
 import './planner.css';
 
 export type PlannerView = 'perspective' | 'top' | 'front';
@@ -89,7 +93,7 @@ function furnitureLink(value?: string): string | undefined {
 
 function FurniturePhoto({ item, compact = false }: { item: RoomItem; compact?: boolean }) {
   const [failed, setFailed] = useState(false);
-  const imageUrl = item.artwork?.dataUrl ?? furnitureLink(item.imageUrl);
+  const imageUrl = item.referenceImage?.dataUrl ?? item.artwork?.dataUrl ?? furnitureLink(item.imageUrl);
   return <span className={`rc-furniture-photo${compact ? ' rc-furniture-photo-compact' : ''}`}>
     {imageUrl && !failed
       ? <img src={imageUrl} alt={item.name} draggable={false} onError={() => setFailed(true)} />
@@ -107,13 +111,16 @@ function FurniturePalette({ design, disabled, hint, onAddItem, onDragItem, onVie
   view: PlannerView;
 }) {
   const { rooms } = useRepositories();
-  const [source, setSource] = useState<'link' | 'manual' | 'image'>('link');
+  const [source, setSource] = useState<'link' | 'manual' | 'image' | 'photo' | 'library'>('link');
+  const library = useImportedFurniture();
+  const [libraryError, setLibraryError] = useState('');
   const [link, setLink] = useState('');
   const submittedLink = furnitureLink(link.trim());
   const imported = useMutation({
-    mutationFn: async (url: string) => ({ url, item: await rooms.importFurniture(url) }),
+    mutationFn: async (url: string) => { const scope = library.scope; return { url, item: await rooms.importFurniture(url), scope }; },
+    onSuccess: result => { if (result.scope !== library.scope) return; try { library.register(result.item); setLibraryError(''); } catch (cause) { setLibraryError(cause instanceof Error ? cause.message : '家具を保存できませんでした。'); } },
   });
-  const linkedItem = imported.data && imported.data.url === submittedLink ? imported.data.item : undefined;
+  const linkedItem = imported.data && imported.data.scope === library.scope && imported.data.url === submittedLink ? imported.data.item : undefined;
   const linkedItemFits = linkedItem ? Boolean(furniturePositionInRoom(linkedItem, linkedItem.position, design)) : false;
   const canAddLinkedItem = Boolean(linkedItem && linkedItemFits && !disabled && !imported.isPending);
   const productLink = furnitureLink(linkedItem?.productUrl);
@@ -139,12 +146,16 @@ function FurniturePalette({ design, disabled, hint, onAddItem, onDragItem, onVie
 
   return <section className="rc-planner-section rc-furniture-palette" aria-labelledby="planner-add-label">
     <h3 id="planner-add-label">家具を追加</h3>
+    {source === 'photo' && !library.authenticated && <p className="rc-planner-note" role="status">画像から家具を取り込むにはログインしてください。</p>}
+    {libraryError && <p className="rc-planner-input-error" role="alert">{libraryError}</p>}
     <div className="rc-planner-segments rc-furniture-source" role="group" aria-label="家具の追加方法">
+      <button type="button" aria-pressed={source === 'photo'} onClick={() => setSource('photo')}>画像から家具</button>
+      <button type="button" aria-pressed={source === 'library'} onClick={() => setSource('library')}>取り込んだ家具</button>
       <button type="button" aria-pressed={source === 'link'} onClick={() => setSource('link')}>リンクから追加</button>
       <button type="button" aria-pressed={source === 'manual'} onClick={() => setSource('manual')}>リンクなしで選ぶ</button>
       <button type="button" aria-pressed={source === 'image'} onClick={() => setSource('image')}>画像から推しグッズ</button>
     </div>
-    {source === 'image' ? <ImageGoodsPalette design={design} disabled={disabled} onAddItem={onAddItem} onDragStart={startItemDrag} onDragEnd={() => onDragItem(null)} /> : source === 'link' ? <div className="rc-furniture-link-panel">
+    {source === 'photo' ? <ImageFurniturePalette disabled={disabled || !library.authenticated} onImport={item => { library.register(item); setSource('library'); setLibraryError(''); }} /> : source === 'library' ? <ImportedFurniturePalette key={library.scope} design={design} disabled={disabled} library={library} onAddItem={onAddItem} onDragStart={startItemDrag} onDragEnd={() => onDragItem(null)} /> : source === 'image' ? <ImageGoodsPalette design={design} disabled={disabled} onAddItem={onAddItem} onDragStart={startItemDrag} onDragEnd={() => onDragItem(null)} /> : source === 'link' ? <div className="rc-furniture-link-panel">
       <form className="rc-furniture-link-form" onSubmit={event => { event.preventDefault(); if (submittedLink && !disabled && !imported.isPending) imported.mutate(submittedLink); }}>
         <label htmlFor="planner-product-link">商品リンク</label>
         <input id="planner-product-link" type="url" inputMode="url" placeholder="https://…" required value={link} disabled={disabled || imported.isPending} onChange={event => setLink(event.target.value)} />
@@ -211,6 +222,7 @@ function FurnitureSizeEditor({ item, design, onChange }: { item: RoomItem; desig
 }
 
 export default function PlannerPanel({ design, selectedId, onSelect, furnitureRequests, onChange, onUndo, onRedo, canUndo, canRedo, dirty, onSave, onClose, onProducts, view, onView, dimensions, onDimensions, onAddItem, onDragItem, onRemoveItem, placementDisabled, placementHint }: PlannerPanelProps) {
+  const paletteScope = useRoomPlanScope();
   const selectableItems = [...design.items, ...(furnitureRequests?.existingItems ?? []).filter(item => !design.items.some(current => current.id === item.id))];
   const selected = selectableItems.find(item => item.id === selectedId);
   const selectedProductLink = furnitureLink(selected?.productUrl);
@@ -259,7 +271,7 @@ export default function PlannerPanel({ design, selectedId, onSelect, furnitureRe
         <button type="button" onClick={onUndo} disabled={!canUndo}><ArrowIcon />元に戻す</button>
         <button type="button" onClick={onRedo} disabled={!canRedo}><ArrowIcon redo />やり直す</button>
       </div>
-      <FurniturePalette design={design} disabled={placementDisabled || completeModel} hint={placementHint} onAddItem={onAddItem} onDragItem={onDragItem} view={view} onView={onView} />
+      <FurniturePalette key={paletteScope} design={design} disabled={placementDisabled || completeModel} hint={placementHint} onAddItem={onAddItem} onDragItem={onDragItem} view={view} onView={onView} />
       <section className="rc-planner-section" aria-labelledby="planner-view-label">
         <h3 id="planner-view-label">見え方</h3>
         <div className="rc-planner-segments" role="group" aria-label="視点を切り替える">
@@ -274,7 +286,7 @@ export default function PlannerPanel({ design, selectedId, onSelect, furnitureRe
           {selectableItems.map(item => <option key={item.id} value={item.id}>{item.name}{item.existing ? '（今ある家具）' : ''}</option>)}
         </select>
         {selected && <>
-          {selected.imageUrl && <FurniturePhoto key={selected.imageUrl} item={selected} compact />}
+          {(selected.imageUrl || selected.referenceImage) && <FurniturePhoto key={selected.imageUrl ?? selected.referenceImage?.dataUrl} item={selected} compact />}
           {selected.existing && furnitureRequests && <div className="rc-planner-operation">
             <div className="rc-planner-segments" role="group" aria-label={`${selected.name}の操作`}>
               {furnitureActions.map(([action, label]) => <button key={action} type="button" aria-pressed={(furnitureRequests.operations.find(operation => operation.objectId === selected.id)?.action ?? 'keep') === action} disabled={action === 'replace' && !furnitureCategories.some(category => category === selected.category)} onClick={() => furnitureRequests.onOperationChange(selected.id, action)}>{label}</button>)}
