@@ -1,0 +1,21 @@
+{
+  "revision": "22a4819d625208a43b54b94d4cb7d6511f4dfe97",
+  "geometryCases": [
+    "authoritativeownedgroups coverage",
+    "crossownednested actualOutlinePass isolation",
+    "sameownednested membership dedupe",
+    "ambiguousstray trustedmappingpartial notice",
+    "reflectedroot exactworld",
+    "nonuniformrotatedancestor exactworld",
+    "affineshear exactworld withoutdecompose",
+    "hiddenleaf remains hidden/unmapped",
+    "hiddenancestor subtree unchanged",
+    "nonmesh intermediate transform retained",
+    "InstancedMesh matrices/resources preserved",
+    "staticposed SkinnedMesh bind+vertex preserved",
+    "nonmesh Bone/light children world preserved",
+    "own visibility/layers/renderOrder unchanged",
+    "geometry/material identity andsinglemembership preserved"
+  ],
+  "scope": "exact source CPU/actual OutlinePass selection cache; no GPU/no app/source changes"
+}

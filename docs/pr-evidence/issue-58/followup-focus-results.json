@@ -1,0 +1,66 @@
+{
+  "source": "22a4819d625208a43b54b94d4cb7d6511f4dfe97",
+  "focus": [
+    {
+      "reducedMotion": "no-preference",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "nextPreviousFocus": true,
+      "stableNextId": true,
+      "soleImmediateAddFocus": true,
+      "soleAfterExitAddFocus": true,
+      "nativeEnterReAdd": true,
+      "singleCanvas": true
+    },
+    {
+      "reducedMotion": "reduce",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "nextPreviousFocus": true,
+      "stableNextId": true,
+      "soleImmediateAddFocus": true,
+      "soleAfterExitAddFocus": true,
+      "nativeEnterReAdd": true,
+      "singleCanvas": true
+    }
+  ],
+  "categoryChecks": [
+    {
+      "reducedMotion": "no-preference",
+      "photoCategories": [
+        "sofa",
+        "bed",
+        "desk",
+        "chair",
+        "shelf",
+        "table"
+      ],
+      "manualCatalogCount": 7,
+      "mirrorSelection": true
+    },
+    {
+      "reducedMotion": "reduce",
+      "photoCategories": [
+        "sofa",
+        "bed",
+        "desk",
+        "chair",
+        "shelf",
+        "table"
+      ],
+      "manualCatalogCount": 7,
+      "mirrorSelection": true
+    }
+  ],
+  "boundaries": [
+    "Actual application with intercepted local owner/API-room/catalog fixtures",
+    "No deployed/provider/physical touch proof"
+  ],
+  "pageErrors": 0,
+  "status": "PASS",
+  "contextClosed": true
+}
