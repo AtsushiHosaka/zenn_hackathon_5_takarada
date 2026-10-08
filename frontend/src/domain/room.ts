@@ -52,6 +52,8 @@ export type RoomItem = {
   modelUrl?: string;
   // APIのitem_id。画面内のidやmarkerから商品IDを推定しない。
   productId?: string;
+  // 商品リンクから取得したEC商品のID。再提案時も取得元を引き継ぐ。
+  ecProductId?: string;
   marker?: number;
   materialOverrides?: MaterialOverrides;
   textureStatus?: TextureStatus;
@@ -62,6 +64,10 @@ export type RoomItem = {
   replacesObjectId?: string;
   productMetadata?: ProductMetadata;
 };
+
+export function isManualFurniture(item: RoomItem): boolean {
+  return item.existing && /^manual-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
+}
 
 export type RoomSnapshot = { room: RoomGeometry; items: RoomItem[]; wallColor?: string };
 
@@ -78,6 +84,8 @@ export type RoomDesign = {
   modelKind?: "complete" | "shell";
   wallColor?: string;
   room?: RoomGeometry;
+  // Stable floor inferred for legacy designs without measured room geometry.
+  inferredRoomBounds?: { min: [number, number, number]; max: [number, number, number]; floor: number };
   analysisInput?: { tatami: number; shape: RoomShape };
   before?: RoomSnapshot;
   backendRoomId?: string;
@@ -105,6 +113,7 @@ export function isRoomDesign(value: unknown): value is RoomDesign {
   if (value.modelKind !== undefined && value.modelKind !== "complete" && value.modelKind !== "shell") return false;
   if (value.wallColor !== undefined && (typeof value.wallColor !== "string" || !/^#[0-9a-f]{6}$/i.test(value.wallColor))) return false;
   if (value.room !== undefined && !isRoomGeometry(value.room)) return false;
+  if (value.inferredRoomBounds !== undefined && !isInferredRoomBounds(value.inferredRoomBounds)) return false;
   if (value.analysisInput !== undefined && (!isRecord(value.analysisInput) || !isTatami(value.analysisInput.tatami) || !isRoomShape(value.analysisInput.shape))) return false;
   if (value.backendRoomId !== undefined && (typeof value.backendRoomId !== "string" || !/^[1-9]\d*$/.test(value.backendRoomId))) return false;
   if (value.prompt !== undefined && (!nonemptyString(value.prompt) || value.prompt.length > 500)) return false;
@@ -118,15 +127,25 @@ export function isRoomDesign(value: unknown): value is RoomDesign {
   if (value.productSource !== undefined && value.productSource !== "ec" && value.productSource !== "mock") return false;
   if (value.searchEntryPoints !== undefined && (!Array.isArray(value.searchEntryPoints) || !value.searchEntryPoints.every(nonemptyString))) return false;
   if (!optionalHttpUrl(value.modelUrl) || !Array.isArray(value.items) || !value.items.every(isRoomItem)) return false;
+  const furniture = [...new Map([
+    ...(value.before?.items ?? value.items).filter(item => item.existing && !isManualFurniture(item)),
+    ...value.items.filter(isManualFurniture),
+    ...(value.editedItems ?? []).filter(isManualFurniture),
+  ].map(item => [item.id, item])).values()];
   if (value.keptObjectIds !== undefined) {
-    const furniture = (value.before?.items ?? value.items).filter(item => item.existing);
     if (value.keptObjectIds.some(id => !furniture.some(item => item.id === id))) return false;
   }
   if (value.furnitureOperations !== undefined) {
-    const furniture = (value.before?.items ?? value.items).filter(item => item.existing);
     if (value.furnitureOperations.length !== furniture.length || value.furnitureOperations.some(operation => !furniture.some(item => item.id === operation.objectId))) return false;
   }
   return new Set(value.items.map(item => item.id)).size === value.items.length;
+}
+
+function isInferredRoomBounds(value: unknown): boolean {
+  if (!isRecord(value) || !finiteVector(value.min) || !finiteVector(value.max)) return false;
+  const maximums = value.max;
+  if (!value.min.every((minimum, axis) => minimum < maximums[axis])) return false;
+  return typeof value.floor === 'number' && Number.isFinite(value.floor) && value.floor >= value.min[1] && value.floor < value.max[1];
 }
 
 function isRoomSnapshot(value: unknown): value is RoomSnapshot {
@@ -170,6 +189,7 @@ export function isRoomItem(value: unknown): value is RoomItem {
   if (value.marker !== undefined && (typeof value.marker !== "number" || !Number.isSafeInteger(value.marker) || value.marker <= 0)) return false;
   if (value.shop !== undefined && !nonemptyString(value.shop)) return false;
   if (value.productId !== undefined && (typeof value.productId !== "string" || !/^[1-9]\d*$/.test(value.productId))) return false;
+  if (value.ecProductId !== undefined && (typeof value.ecProductId !== "string" || !/^[1-9]\d*$/.test(value.ecProductId) || !isManualFurniture(value as RoomItem))) return false;
   if (value.materialOverrides !== undefined && !isMaterialOverrides(value.materialOverrides)) return false;
   if (value.textureStatus !== undefined && !isTextureStatus(value.textureStatus)) return false;
   if (value.textureSource !== undefined && value.textureSource !== "description") return false;

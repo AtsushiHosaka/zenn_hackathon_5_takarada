@@ -77,7 +77,7 @@ export default function LoginPage() {
         <ConnectionSwitch />
         {session.status === 'loading' && <p role="status">ログイン状態を確認しています…</p>}
         {session.status === 'error' && <div><ErrorText error={session.error} /><button className="reference-auth-secondary" type="button" onClick={session.retry}>ログイン状態を再確認</button></div>}
-        <div className="reference-auth-heading"><h1>{isSignup ? 'アカウントを作成' : 'おかえりなさい'}</h1><p>{isSignup ? signupPaused ? '既存のアカウントでログインできます。' : 'メールアドレスで登録できます。' : 'ルームの続きから始めましょう。'}</p></div>
+        <div className="reference-auth-heading"><h1>{isSignup ? 'アカウントを作成' : 'おかえりなさい'}</h1></div>
         {isSignup && isDummy && <p role="status" className="reference-auth-hint">ダミーモードのデモ登録です。</p>}
         {signupPaused && <p role="alert" className="reference-auth-error">利用規約とプライバシーポリシーを公開するまで、新規登録を停止しています。</p>}
         <form className="reference-auth-form" onSubmit={submit} aria-busy={pending}>

@@ -6,14 +6,15 @@ class FurnitureProductMatcher
   # Display goods whose model choice depends on the name, not on round/rectangular topology.
   NAME_SHAPED_CATEGORIES = %w[acrylic_stand_case oshi_goods display_case tapestry neon wall_shelf vase candle].freeze
 
-  def self.call(item:, object:)
-    new(item, object).call
+  def self.call(item:, object:, allow_category_approximation: false)
+    new(item, object, allow_category_approximation: allow_category_approximation).call
   end
 
-  def initialize(item, object)
+  def initialize(item, object, allow_category_approximation: false)
     @item = item
     @object = object
     @metadata = item.fetch("product_metadata", {}).to_h
+    @allow_category_approximation = allow_category_approximation
   end
 
   def call
@@ -44,7 +45,9 @@ class FurnitureProductMatcher
     # Product search uses table as an umbrella; the model catalog separates side tables.
     categories = @item["category"] == "table" ? %w[table side_table] : @item["category"]
     candidates = FurnitureModel.available.where(category: categories)
-    candidates = candidates.where(shape: candidate_shapes)
+    shapes = candidate_shapes
+    category_approximation = shapes.nil? && @allow_category_approximation && %w[chair shelf].include?(@item["category"])
+    candidates = candidates.where(shape: shapes) unless category_approximation
     # A 6mm neon sign or tapestry differs from its model mainly in thickness; compare the face.
     face_axes = known_axes - THIN_AXES.fetch(@item["category"], [])
     ratio_axes = NAME_SHAPED_CATEGORIES.include?(@item["category"]) && face_axes.length >= 2 ? face_axes : known_axes
@@ -55,6 +58,7 @@ class FurnitureProductMatcher
 
     reason = "category_shape_ratio:#{model.category}/#{model.shape};ratio_error=#{error.round(3)}"
     reason += ";shape_source=#{@metadata['shape'].present? ? 'product_metadata' : 'product_name_approximation'}"
+    reason += ";category_size_approximation=true" if category_approximation
     reason += ";estimated_axes=#{estimated_axes.join(',')}" if estimated_axes.any?
     attributes = { furniture_model: model, managed_by: "ec_matcher", match_metadata: { reason: reason, approximate: true, product_variant: @metadata["variant_id"], shape: model.shape } }
     binding ||= FurnitureModelBinding.new(kind: "product", reference: @item["item_id"].to_s)

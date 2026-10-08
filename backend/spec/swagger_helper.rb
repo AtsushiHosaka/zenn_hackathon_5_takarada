@@ -206,6 +206,12 @@ RSpec.configure do |config|
               position: { "$ref" => "#/components/schemas/Position" },
               rotation_y: { type: :number, minimum: 0, exclusiveMaximum: true, maximum: 360, description: "度数。正面 (ローカル +z) が 0: 南, 90: 東, 180: 北, 270: 西 を向く (three.js の rotation.y と同じ)", example: 0 },
               color: { type: :string, example: "#f2f0eb" },
+              ec_product_id: { type: :integer, minimum: 1, description: "リンクから補完した所有家具のEcProduct ID", example: 1 },
+              price: { type: :integer, minimum: 1, description: "所有家具の参考価格。今回の購入商品合計には含めない", example: 7990 },
+              shop: { type: :string, example: "IKEA" },
+              url: { type: :string, example: "https://www.ikea.com/jp/ja/p/example-chair-12345678/" },
+              image_url: { type: :string, nullable: true, description: "商品ページに掲載された写真URL", example: "https://www.ikea.com/jp/ja/images/products/teodores-chair-white__0727344_pe735616_s5.jpg" },
+              product_metadata: { "$ref" => "#/components/schemas/ProductMetadata" },
               model_url: { type: :string, nullable: true, description: "GLB の URL。null なら category と size から箱などで代わりに描く", example: nil },
               slot: { type: :string, nullable: true, enum: [ nil, "bed_cover", "curtain", "rug", "wall_decor", "light", "display", "cushion", "desk_top", "floor" ], description: "suggested の置き場所の枠", example: nil },
               attach_to: { type: :string, nullable: true, description: "付けた先の家具・窓の id", example: nil },
@@ -287,9 +293,12 @@ RSpec.configure do |config|
           },
           FurnitureEdit: {
             type: :object,
-            description: "編集した家具・商品の配置。元の解析結果は変更しない",
+            description: "編集した家具・商品の配置。写真で見つからなかった所有家具はmanual-UUIDのidとlabel/categoryで補完する。元の解析結果は変更しない",
             properties: {
-              id: { type: :string, description: "元の家具またはこの部屋で採用済みの商品 id", example: "bed-1" },
+              id: { type: :string, description: "元の家具、この部屋で採用済みの商品、またはmanual-UUID形式の所有家具id", example: "bed-1" },
+              label: { type: :string, maxLength: 100, description: "手動で補完した所有家具では必須", example: "今ある椅子" },
+              category: { type: :string, enum: %w[sofa bed desk chair shelf table], description: "手動で補完した所有家具では必須", example: "chair" },
+              ec_product_id: { type: :integer, minimum: 1, description: "商品リンクのインポート結果のID。商品・モデル情報はサーバー側で復元する", example: 1 },
               position: { "$ref" => "#/components/schemas/Position" },
               size: { "$ref" => "#/components/schemas/Size" },
               rotation_y: { type: :number, minimum: 0, exclusiveMaximum: true, maximum: 360, example: 15 },
@@ -309,6 +318,32 @@ RSpec.configure do |config|
             type: :object,
             properties: { category: { type: :string, enum: %w[sofa bed desk chair shelf table], example: "sofa" } },
             required: %w[category]
+          },
+          FurnitureImportInput: {
+            type: :object,
+            properties: { url: { type: :string, maxLength: 2048, description: "対応するショップの商品詳細URL", example: "https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/" } },
+            required: %w[url]
+          },
+          ImportedFurniture: {
+            type: :object,
+            description: "実ページで確認した所有家具。寸法・色・モデルは近似で、推定した軸はproduct_metadataに記録する",
+            properties: {
+              ec_product_id: { type: :integer, minimum: 1, example: 1 },
+              name: { type: :string, example: "ホワイトチェア" },
+              category: { type: :string, enum: %w[sofa bed desk chair shelf table], example: "chair" },
+              color: { type: :string, example: "#f2efe8" },
+              size: { "$ref" => "#/components/schemas/Size" },
+              price: { type: :integer, minimum: 1, example: 7990 },
+              shop: { type: :string, example: "IKEA" },
+              url: { type: :string, example: "https://www.ikea.com/jp/ja/p/example-chair-12345678/" },
+              image_url: { type: :string, nullable: true, description: "商品ページのJSON-LDまたはog:imageで確認した写真URL。なければnull", example: "https://www.ikea.com/jp/ja/images/products/teodores-chair-white__0727344_pe735616_s5.jpg" },
+              product_metadata: { "$ref" => "#/components/schemas/ProductMetadata" },
+              model_url: { type: :string, nullable: true, example: nil },
+              model_match: { allOf: [ { "$ref" => "#/components/schemas/ModelMatch" } ], nullable: true, example: nil },
+              model_size: { allOf: [ { "$ref" => "#/components/schemas/Size" } ], nullable: true, example: nil },
+              model_fit: { type: :string, enum: [ "contain", nil ], nullable: true, example: nil }
+            },
+            required: %w[ec_product_id name category color size price shop url product_metadata model_url model_match model_size model_fit]
           },
           MaterialOverride: {
             type: :object,

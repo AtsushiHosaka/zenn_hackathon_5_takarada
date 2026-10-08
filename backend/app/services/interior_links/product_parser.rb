@@ -410,9 +410,9 @@ module InteriorLinks
     def image_url(product)
       images = product["image"].is_a?(Array) ? product["image"] : [ product["image"] ]
       candidates = images.map { |image| image.is_a?(Hash) ? image["contentUrl"] || image["url"] : image }
-      candidates += @document.css('meta[property="og:image"], meta[name="twitter:image"]').map { |node| node["content"] }
+      candidates += @document.css('meta[property="og:image"], meta[name="og:image"], meta[name="twitter:image"]').map { |node| node["content"] }
       resolved = candidates.filter_map do |value|
-        next if value.blank?
+        next unless value.is_a?(String) && value.present?
 
         target = URI.join(@url, value.to_s)
         if target.scheme == "http"

@@ -38,5 +38,6 @@ export type RoomRepository = {
   get(id: string, signal?: AbortSignal): Promise<RoomDesign>;
   analyze(input: GenerateRoomInput, signal?: AbortSignal): Promise<RoomDesign>;
   generate(input: GenerateRoomInput, signal?: AbortSignal): Promise<RoomDesign>;
+  importFurniture(url: string, signal?: AbortSignal): Promise<RoomItem>;
   capabilities(): Promise<RoomCapabilities>;
 };

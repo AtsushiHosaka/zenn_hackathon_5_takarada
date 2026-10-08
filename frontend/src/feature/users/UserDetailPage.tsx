@@ -33,7 +33,7 @@ function AccountForm({ user }: { user: User }) {
   };
   return <section className="account-page">
     <Link className="account-back" to="/rooms">← ルーム一覧へ戻る</Link>
-    <div className="account-heading"><h1>アカウント設定</h1><p>ニックネームの変更と退会ができます。</p></div>
+    <div className="account-heading"><h1>アカウント設定</h1></div>
     <form className="account-card" onSubmit={submit}>
       <h2>プロフィール</h2>
       <label className="account-field" htmlFor="account-email"><span>メールアドレス</span><input id="account-email" type="email" value={user.email} readOnly autoComplete="email" /><small>登録済みのメールアドレスです。</small></label>

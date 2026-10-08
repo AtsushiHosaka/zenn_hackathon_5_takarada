@@ -1,7 +1,7 @@
 import { DomainError } from "../../domain/error";
 import type { TokenStore } from "../../core/tokenStore";
 import type { RoomDesign, RoomItem, Style } from "../../domain/room";
-import { isRoomDesign, isRoomShape } from "../../domain/room";
+import { isManualFurniture, isRoomDesign, isRoomShape } from "../../domain/room";
 import type { RoomRepository, SavedRoom } from "../../domain/roomRepository";
 import { toAnalyzedRoomDesign } from "../records/room";
 import { demoProductReference } from "./demoProductReferences";
@@ -34,7 +34,7 @@ export function createDemoRoom(style: Style = "oshi", budget = Infinity): RoomDe
     id: `demo-${style}-${Number.isFinite(budget) ? budget : "all"}`,
     source: "demo",
     title: palette.title,
-    description: `${palette.description} 商品情報は2026年10月5日時点の参考値です。3Dの形・色・寸法・数量は近似で、商品の再現ではありません。`,
+    description: palette.description,
     style,
     items: items.filter(item => {
       if (item.existing) return true;
@@ -70,6 +70,9 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
   };
   const repository: RoomRepository = {
     demo: createDemoRoom,
+    async importFurniture() {
+      throw new DomainError("商品リンクからの追加にはAPI接続が必要です。接続設定をAPIに切り替えてください。");
+    },
     persistenceWarning() {
       if (!tokenStore.load()) return undefined;
       try {
@@ -105,7 +108,7 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
       const analyzed = toAnalyzedRoomDesign(createAnalyzedRoomFixture(input.tatami, input.shape), "");
       const design: RoomDesign = {
         ...analyzed,
-        items: analyzed.items.map(item => input.editedItems?.find(edited => edited.id === item.id) ?? item),
+        items: [...analyzed.items.map(item => input.editedItems?.find(edited => edited.id === item.id) ?? item), ...(input.editedItems ?? []).filter(isManualFurniture)],
         editedItems: input.editedItems,
         source: "demo",
         id: previous?.id ?? `dummy-room-${crypto.randomUUID()}`,
