@@ -22,6 +22,7 @@ export function mapCompleteRoomFurniture(model: THREE.Group, items: readonly Roo
   }));
   const owners = new Map<THREE.Mesh, string>();
   const wholeSubtrees = new Set<string>();
+  const trustedOwners = new Set<string>();
   const ambiguous = new Set<string>();
   model.traverseVisible(object => {
     if (!(object instanceof THREE.Mesh)) return;
@@ -31,6 +32,7 @@ export function mapCompleteRoomFurniture(model: THREE.Group, items: readonly Roo
       const explicit = items.find(item => item.id === identity);
       if (explicit) {
         owners.set(object, explicit.id);
+        trustedOwners.add(explicit.id);
         if (!(node instanceof THREE.Mesh)) wholeSubtrees.add(explicit.id);
         return;
       }
@@ -57,7 +59,7 @@ export function mapCompleteRoomFurniture(model: THREE.Group, items: readonly Roo
   });
   const groups = new Map<string, THREE.Group>();
   for (const item of items) {
-    if (ambiguous.has(item.id) || ![...owners.values()].includes(item.id)) continue;
+    if ((ambiguous.has(item.id) && !trustedOwners.has(item.id)) || ![...owners.values()].includes(item.id)) continue;
     const group = new THREE.Group();
     group.userData.itemId = item.id;
     model.add(group);
@@ -80,6 +82,6 @@ export function mapCompleteRoomFurniture(model: THREE.Group, items: readonly Roo
     unmapped: items.filter(item => !groups.has(item.id)).map(item => item.id),
     // Owning a spatially contained mesh or a tagged leaf cannot prove that all
     // other parts of that furniture were exported under the same owner.
-    partial: items.filter(item => groups.has(item.id) && !wholeSubtrees.has(item.id)).map(item => item.id),
+    partial: items.filter(item => groups.has(item.id) && (!wholeSubtrees.has(item.id) || ambiguous.has(item.id))).map(item => item.id),
   };
 }
