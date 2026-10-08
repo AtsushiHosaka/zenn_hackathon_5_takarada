@@ -20,6 +20,7 @@ export type PlannerView = 'perspective' | 'top' | 'front';
 
 type PlannerPanelProps = {
   design: RoomDesign;
+  templateEditing?: boolean;
   selectedId: string | null;
   onSelect: (id: string) => void;
   furnitureRequests?: {
@@ -224,7 +225,7 @@ function FurnitureSizeEditor({ item, design, onChange }: { item: RoomItem; desig
   </>;
 }
 
-export default function PlannerPanel({ design, selectedId, onSelect, furnitureRequests, onChange, onUndo, onRedo, canUndo, canRedo, dirty, onSave, onClose, onProducts, view, onView, dimensions, onDimensions, onAddItem, onDragItem, onRemoveItem, placementDisabled, placementHint }: PlannerPanelProps) {
+export default function PlannerPanel({ design, templateEditing=false, selectedId, onSelect, furnitureRequests, onChange, onUndo, onRedo, canUndo, canRedo, dirty, onSave, onClose, onProducts, view, onView, dimensions, onDimensions, onAddItem, onDragItem, onRemoveItem, placementDisabled, placementHint }: PlannerPanelProps) {
   const paletteScope = useRoomPlanScope();
   const selectableItems = [...design.items, ...(furnitureRequests?.existingItems ?? []).filter(item => !design.items.some(current => current.id === item.id))];
   const selected = selectableItems.find(item => item.id === selectedId);
@@ -334,9 +335,9 @@ export default function PlannerPanel({ design, selectedId, onSelect, furnitureRe
             changeItem({ position: [selected.position[0], bounds.floor + bottom + selected.size[1] / 2, selected.position[2]] });
           }} /></label>}
           {selectedProductLink && <a className="rc-furniture-product-link" href={selectedProductLink} target="_blank" rel="noopener noreferrer">商品ページを見る</a>}
-          {selected.id.startsWith('manual-') && !completeModel && <>
+          {(selected.id.startsWith('manual-') || templateEditing) && !completeModel && <>
             {!itemDisabled && <FurnitureSizeEditor key={`${selected.id}:${selected.size.join(',')}`} item={selected} design={design} onChange={changeItem} />}
-            <button className="rc-furniture-remove" type="button" onClick={() => onRemoveItem(selected.id)}>追加した家具を削除</button>
+            <button className="rc-furniture-remove" type="button" onClick={() => onRemoveItem(selected.id)}>{templateEditing?'家具を削除':'追加した家具を削除'}</button>
           </>}
         </>}
         {completeModel && <p className="rc-planner-warning">家具を含む完成モデルのため、個別の移動・回転・色変更には対応していません。視点の切り替えは利用できます。</p>}
