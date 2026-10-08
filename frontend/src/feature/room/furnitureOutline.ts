@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OBB } from 'three/examples/jsm/math/OBB.js';
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 import type { RoomItem } from '../../domain/room';
@@ -90,17 +91,19 @@ export function createFurnitureOutline(renderer: THREE.WebGLRenderer, scene: THR
 
 // Complete GLBs contain their furniture already; associate actual meshes using
 // node IDs/names, then uniquely contained geometry. Never outline hit boxes.
-export function completeFurnitureMeshes(root: THREE.Object3D, items: RoomItem[]): Map<string, THREE.Object3D[]> {
-  const result = new Map<string, THREE.Object3D[]>();
+export function completeFurnitureMeshes(root: THREE.Object3D, items: RoomItem[]) {
+  const meshes = new Map<string, THREE.Object3D[]>();
+  const wholeSubtrees = new Set<string>();
+  const ambiguous = new Set<string>();
   root.updateMatrixWorld(true);
   const names = (item: RoomItem) => {
     const modelName = item.modelUrl ? new URL(item.modelUrl).pathname.split('/').pop()?.replace(/\.glb$/i, '') : undefined;
-    return [item.id, THREE.PropertyBinding.sanitizeNodeName(item.id), THREE.PropertyBinding.sanitizeNodeName(item.name), modelName].filter(Boolean);
+    return [THREE.PropertyBinding.sanitizeNodeName(item.name), modelName].filter(Boolean);
   };
   const contains = (mesh: THREE.Mesh, item: RoomItem) => {
     mesh.geometry.computeBoundingBox();
     const bounds = mesh.geometry.boundingBox;
-    if (!bounds) return false;
+    if (!bounds || mesh instanceof THREE.InstancedMesh || mesh instanceof THREE.SkinnedMesh) return false;
     const transform = new THREE.Matrix4().compose(new THREE.Vector3(...item.position), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), (item.rotation ?? 0) * Math.PI / 180), new THREE.Vector3(1, 1, 1)).invert();
     for (const x of [bounds.min.x, bounds.max.x]) for (const y of [bounds.min.y, bounds.max.y]) for (const z of [bounds.min.z, bounds.max.z]) {
       const point = new THREE.Vector3(x, y, z).applyMatrix4(mesh.matrixWorld).applyMatrix4(transform);
@@ -108,39 +111,77 @@ export function completeFurnitureMeshes(root: THREE.Object3D, items: RoomItem[])
     }
     return true;
   };
-  root.traverse(object => {
+  root.traverseVisible(object => {
     if (!(object instanceof THREE.Mesh)) return;
+    const explicit = new Set<string>();
     const identified = new Set<string>();
     for (let ancestor: THREE.Object3D | null = object; ancestor && ancestor !== root; ancestor = ancestor.parent) {
-      const id = ancestor.userData.itemId ?? ancestor.userData.object_id ?? ancestor.userData.item_id;
-      for (const item of items) if ((id !== undefined && id !== null && String(id) === item.id) || names(item).includes(ancestor.name)) identified.add(item.id);
+      const identity = ancestor.userData.itemId ?? ancestor.userData.object_id ?? ancestor.userData.item_id;
+      for (const item of items) {
+        if ((identity !== undefined && identity !== null && String(identity) === item.id) || [item.id, THREE.PropertyBinding.sanitizeNodeName(item.id)].includes(ancestor.name)) {
+          explicit.add(item.id);
+          if (!(ancestor instanceof THREE.Mesh)) wholeSubtrees.add(item.id);
+        } else if (names(item).includes(ancestor.name)) identified.add(item.id);
+      }
     }
-    let candidates = items.filter(item => identified.has(item.id));
+    let candidates = items.filter(item => (explicit.size ? explicit : identified).has(item.id));
     if (candidates.length !== 1) candidates = (candidates.length ? candidates : items).filter(item => contains(object, item));
-    if (candidates.length !== 1) return;
+    if (candidates.length !== 1) { candidates.forEach(item => ambiguous.add(item.id)); return; }
     const id = candidates[0].id;
-    result.set(id, [...(result.get(id) ?? []), object]);
+    meshes.set(id, [...(meshes.get(id) ?? []), object]);
   });
-  return result;
+  return { meshes, unmapped: items.filter(item => !meshes.has(item.id)).map(item => item.id),
+    partial: items.filter(item => meshes.has(item.id) && (!wholeSubtrees.has(item.id) || ambiguous.has(item.id))).map(item => item.id) };
 }
 
-// A second phase checks the actual procedural/model parts, avoiding the empty
-// space under a desk top and between its legs. Joined GLBs remain conservative.
-export function renderedFurnitureBounds(objects: THREE.Object3D[]): THREE.Box3[] {
-  const result: THREE.Box3[] = [];
+// Actual leaf mesh volumes preserve leg gaps and rotated/reflected transforms.
+const CONTACT_TOLERANCE = .003;
+function meshVolume(mesh: THREE.Mesh, matrix: THREE.Matrix4): { bounds: THREE.Box3; obb: OBB } | undefined {
+  if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
+  const local = mesh.geometry.boundingBox;
+  if (!local || local.isEmpty()) return;
+  const bounds = local.clone().applyMatrix4(matrix);
+  const basis = [0, 1, 2].map(axis => new THREE.Vector3().setFromMatrixColumn(matrix, axis));
+  if (basis.some(axis => axis.lengthSq() < 1e-12)) return;
+  const scales = basis.map(axis => axis.length());
+  basis.forEach(axis => axis.normalize());
+  const sheared = Math.abs(basis[0].dot(basis[1])) > 1e-5 || Math.abs(basis[0].dot(basis[2])) > 1e-5 || Math.abs(basis[1].dot(basis[2])) > 1e-5;
+  const obb = new OBB().fromBox3(sheared ? bounds : local);
+  if (!sheared) {
+    // Build positive extents explicitly: OBB.applyMatrix4 gives negative extents
+    // for mirrored GLB nodes and does not fully transform a local box center.
+    obb.center.copy(local.getCenter(new THREE.Vector3()).applyMatrix4(matrix));
+    obb.halfSize.multiply(new THREE.Vector3(...scales));
+    obb.rotation.set(
+      basis[0].x, basis[1].x, basis[2].x,
+      basis[0].y, basis[1].y, basis[2].y,
+      basis[0].z, basis[1].z, basis[2].z,
+    );
+  }
+  obb.halfSize.subScalar(CONTACT_TOLERANCE / 2);
+  if (Math.min(obb.halfSize.x, obb.halfSize.y, obb.halfSize.z) <= 0) return;
+  return { bounds, obb };
+}
+
+export function renderedFurnitureVolumes(objects: THREE.Object3D[]): OBB[] {
+  const result: OBB[] = [];
+  const visited = new Set<THREE.Mesh>();
   for (const object of objects) {
     object.updateWorldMatrix(true, true);
     object.traverseVisible(child => {
-      if (!(child instanceof THREE.Mesh)) return;
+      if (!(child instanceof THREE.Mesh) || visited.has(child)) return;
+      visited.add(child);
       const materials = Array.isArray(child.material) ? child.material : [child.material];
-      if (!materials.some(surface => surface.visible && surface.colorWrite)) return;
-      const bounds = new THREE.Box3().setFromObject(child);
-      if (!bounds.isEmpty()) result.push(bounds);
+      if (!materials.some(surface => surface.visible && surface.opacity > 0 && surface.colorWrite)) return;
+      const add = (matrix: THREE.Matrix4) => { const volume = meshVolume(child, matrix); if (volume) result.push(volume.obb); };
+      if (child instanceof THREE.InstancedMesh) {
+        const instance = new THREE.Matrix4();
+        for (let index = 0; index < child.count; index++) { child.getMatrixAt(index, instance); add(new THREE.Matrix4().multiplyMatrices(child.matrixWorld, instance)); }
+      } else add(child.matrixWorld);
     });
   }
   return result;
 }
-export function furnitureMeshBoundsIntersect(a: THREE.Box3[], b: THREE.Box3[]) {
-  const epsilon = 1e-6;
-  return a.some(left => b.some(right => (['x', 'y', 'z'] as const).every(axis => left.min[axis] < right.max[axis] - epsilon && left.max[axis] > right.min[axis] + epsilon)));
+export function furnitureMeshVolumesIntersect(a: OBB[], b: OBB[]) {
+  return a.some(left => b.some(right => left.intersectsOBB(right)));
 }
