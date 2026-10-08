@@ -3,7 +3,7 @@ import { furnitureCategories, isFurnitureAdditions, isFurnitureOperations, isMan
 import type { GenerateRoomInput, RoomRepository } from "../../domain/roomRepository";
 import type { ApiClient } from "../apiClient";
 import { createDemoRoom } from "../dummy/dummyRoomRepository";
-import { toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toImportedFurniture, toRoomDesign, toUploadRecords } from "../records/room";
+import { toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toImportedFurniture, toRoomDesign, toSavedRoom, toSavedRooms, toUploadRecords } from "../records/room";
 import type { components } from "../generated/api";
 
 export type RoomApiConfig = {
@@ -32,6 +32,35 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
       return toImportedFurniture(await api.send<unknown>("/api/v1/furniture_imports", {
         method: "POST", body: { url: parsed.href }, signal, timeoutMs: 60_000,
       }), baseUrl);
+    },
+    async list(signal) {
+      if (config.contract === "legacy") throw new DomainError("この接続先では保存した部屋を取得できません");
+      if (!config.generationPath) throw new DomainError(unavailableMessage);
+      return toSavedRooms(await api.send<unknown>(config.generationPath, { requiresAuth: true, signal }), baseUrl);
+    },
+    async get(id, signal) {
+      if (config.contract === "legacy") throw new DomainError("この接続先では保存した部屋を取得できません");
+      const coordinationMatch = /^api-coordination-([1-9]\d*)$/.exec(id);
+      if (coordinationMatch) {
+        if (!config.coordinationJobPath.includes("{id}")) throw new DomainError("コーディネートの取得先が設定されていません");
+        const coordinationId = coordinationMatch[1];
+        const coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationJobPath.replace("{id}", coordinationId), { requiresAuth: true, signal }));
+        if (String(coordination.id) !== coordinationId) throw new DomainError("別のコーディネートを受け取りました");
+        if (coordination.status === "failed") throw new DomainError(coordination.error_message || "コーディネートに失敗しました");
+        if (coordination.status !== "done") throw new DomainError("コーディネートはまだ完了していません");
+        if (!config.jobPath.includes("{id}")) throw new DomainError("部屋の取得先が設定されていません");
+        const record = toAnalysisRoomRecord(await api.send<unknown>(config.jobPath.replace("{id}", String(coordination.room_id)), { requiresAuth: true, signal }));
+        if (record.id !== coordination.room_id) throw new DomainError("別の部屋を受け取りました");
+        return toCoordinatedRoomDesign(coordination, baseUrl, { tatami: record.tatami, shape: record.shape });
+      }
+      const roomId = /^api-room-([1-9]\d*)$/.exec(id)?.[1] ?? id;
+      if (!/^[1-9]\d*$/.test(roomId)) throw new DomainError("部屋のIDが正しくありません");
+      if (!config.jobPath.includes("{id}")) throw new DomainError("部屋の取得先が設定されていません");
+      const room = toSavedRoom(await api.send<unknown>(config.jobPath.replace("{id}", encodeURIComponent(roomId)), { requiresAuth: true, signal }), baseUrl);
+      if (room.id !== roomId) throw new DomainError("別の部屋を受け取りました");
+      if (room.status === "failed") throw new DomainError(room.errorMessage || "部屋の解析に失敗しました");
+      if (!room.design) throw new DomainError("部屋の解析はまだ完了していません");
+      return room.design;
     },
     async analyze(input, signal) {
       if (config.contract === "legacy") throw new DomainError("この接続先では畳数による部屋解析を利用できません");
