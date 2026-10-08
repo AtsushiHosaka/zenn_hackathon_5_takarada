@@ -46,12 +46,37 @@ export function isImageArtwork(value: unknown): value is ImageArtwork {
   return isRecord(value) && typeof value.dataUrl === "string" && value.dataUrl.length <= MAX_ARTWORK_DATA_LENGTH && /^data:image\/png;base64,iVBORw0KGgo[A-Za-z0-9+/]*={0,2}$/.test(value.dataUrl);
 }
 
+export type FurnitureSupportSurface = {
+  // World X/Z to the picked horizontal mesh's local X/Z.
+  transform: [number, number, number, number, number, number];
+  bounds: [number, number, number, number];
+  height: number;
+  radius?: number;
+  supportPosition: [number, number, number];
+  supportSize: [number, number, number];
+  supportRotation: number;
+};
+
+export function isFurnitureSupportSurface(value: unknown): value is FurnitureSupportSurface {
+  if (!isRecord(value) || Object.keys(value).some(key => !['transform', 'bounds', 'height', 'radius', 'supportPosition', 'supportSize', 'supportRotation'].includes(key))) return false;
+  const boundedVector = (vector: unknown, length: number) => Array.isArray(vector) && vector.length === length && vector.every(number => typeof number === 'number' && Number.isFinite(number) && Math.abs(number) <= 1e6);
+  if (!boundedVector(value.transform, 6) || !boundedVector(value.bounds, 4) || !boundedVector(value.supportPosition, 3) || !boundedVector(value.supportSize, 3)) return false;
+  const transform = value.transform as number[], bounds = value.bounds as number[];
+  if (Math.abs(transform[0] * transform[4] - transform[1] * transform[3]) < 1e-12 || bounds[0] >= bounds[2] || bounds[1] >= bounds[3]) return false;
+  if (!(value.supportSize as number[]).every(number => number > 0)) return false;
+  if (typeof value.height !== 'number' || !Number.isFinite(value.height) || Math.abs(value.height) > 1000) return false;
+  if (typeof value.supportRotation !== 'number' || !Number.isFinite(value.supportRotation) || value.supportRotation < 0 || value.supportRotation >= 360) return false;
+  return value.radius === undefined || typeof value.radius === 'number' && Number.isFinite(value.radius) && value.radius > 0 && value.radius <= 1e6;
+}
+
 export type RoomItem = {
   artwork?: ImageArtwork;
   id: string;
   name: string;
   category: string;
   existing: boolean;
+  supportObjectId?: string;
+  supportSurface?: FurnitureSupportSurface;
   price?: number;
   shop?: string;
   productUrl?: string;
@@ -199,6 +224,8 @@ function isRoomWindow(value: unknown): value is RoomWindow {
 
 export function isRoomItem(value: unknown): value is RoomItem {
   if (!isRecord(value)) return false;
+  if (value.supportObjectId !== undefined && (!nonemptyString(value.supportObjectId) || value.supportObjectId === value.id)) return false;
+  if (value.supportSurface !== undefined && (!nonemptyString(value.supportObjectId) || !isFurnitureSupportSurface(value.supportSurface))) return false;
   if (![value.id, value.name, value.category, value.color].every(nonemptyString) || typeof value.existing !== "boolean") return false;
   if (!finiteVector(value.position) || !finiteVector(value.size) || value.size.some(number => number <= 0)) return false;
   if (value.rotation !== undefined && (typeof value.rotation !== "number" || !Number.isFinite(value.rotation) || value.rotation < 0 || value.rotation >= 360)) return false;
