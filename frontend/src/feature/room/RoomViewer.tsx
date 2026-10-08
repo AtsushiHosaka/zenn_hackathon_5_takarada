@@ -10,6 +10,8 @@ import { buildReferenceRoom, usesReferenceRoom } from "./referenceRoomModel";
 import { buildCharacterThemeDecor } from "./characterThemeDecor";
 import { buildMeasuredRoom } from "./roomArchitecture";
 import { LAYOUT_GRID_STEP } from "./layoutGrid";
+import { overlappingFurnitureIds } from './furnitureOverlap';
+import { createFurnitureOutline, completeFurnitureMeshes, renderedFurnitureBounds, furnitureMeshBoundsIntersect } from './furnitureOutline';
 import { applyMaterialOverrides } from "./furnitureMaterials";
 import { canPlaceOnFurniture, furniturePositionInRoom, getFurniturePlacementBounds, isFurnitureSupport, snapFurnitureEditPosition } from './roomBounds';
 
@@ -499,6 +501,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   const fallback = useRef<HTMLDivElement>(null);
   const modelNotice = useRef<HTMLDivElement>(null);
   const textureNotice = useRef<HTMLDivElement>(null);
+  const overlapNotice = useRef<HTMLDivElement>(null);
   const runtime = useRef<ViewerRuntime | null>(null);
   const roomBounds = useRef<{ id: string; bounds: THREE.Box3 } | null>(null);
   const cameraState = useRef<{ id: string; position: THREE.Vector3; target: THREE.Vector3; zoom: number; minDistance: number; view: RoomViewerProps["view"]; lastCommandSequence: number | null } | null>(null);
@@ -560,6 +563,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     renderer.domElement.setAttribute("aria-label", "部屋の3Dプレビュー");
     renderer.domElement.setAttribute("role", "img");
     host.appendChild(renderer.domElement);
+    const furnitureOutline = createFurnitureOutline(renderer, scene, camera);
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.075;
@@ -614,6 +618,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     let clearPlacementPreview = () => {};
     let currentPlacement = initialPlacement();
     let loadedRoom: THREE.Group | null = null;
+    let completeMeshes = new Map<string, THREE.Object3D[]>();
+    let furnitureGeometryVersion = 0;
     const completeRoomModel = Boolean(design.modelUrl) && design.modelKind !== "shell";
     const gridBounds = referenceRoom?.floorBounds ?? baseRoomBounds;
     const gridFloor = design.room || referenceRoom ? 0 : getFurniturePlacementBounds(design).floor;
@@ -883,6 +889,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         for (const child of [...group.children]) { group.remove(child); disposeObject(child); }
         group.scale.set(1, 1, 1);
         group.add(gltf.scene);
+        furnitureGeometryVersion++;
         if (selectedId === item.id) updateSelection(selectedId);
       }, undefined, showModelFailure);
     }
@@ -901,6 +908,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         });
         scene.add(gltf.scene);
         loadedRoom = gltf.scene;
+        furnitureGeometryVersion++;
+        if (completeRoomModel) completeMeshes = completeFurnitureMeshes(gltf.scene, design.items);
         if (completeRoomModel) {
           for (const item of design.items) {
             const group = new THREE.Group();
@@ -1022,6 +1031,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         scene.add(placementPreview);
       }
       placementPreview.visible = true;
+      placementPreview.userData.supportObjectId = placement?.supportObjectId;
+      placementPreview.userData.supportSurface = placement?.supportSurface;
       placementPreview.position.set(position[0], position[1] - currentPlacement.size[1] / 2, position[2]);
     };
     const drop = (event: DragEvent) => {
@@ -1183,10 +1194,13 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         controls.update();
       }
       renderer.setSize(width, height);
+      furnitureOutline.resize(width, height);
     };
     const observer = new ResizeObserver(resize);
     observer.observe(host);
     resize();
+    let overlapSignature = '';
+    let overlaps = new Set<string>();
     const render = () => {
       const cameraChanged = controls.update();
       // 一覧の静止した視点は描き直さず、回転・読み込み・リサイズ時に描画する。
@@ -1217,7 +1231,33 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
           });
         }
       }
-      renderer.render(scene, camera);
+      const meshesFor = (id: string) => loadedRoom && completeRoomModel && !currentBefore ? completeMeshes.get(id) : id === currentPlacement?.id && placementPreview?.visible ? [placementPreview] : furniture.has(id) ? [furniture.get(id)!] : undefined;
+      const nextOverlapSignature = JSON.stringify([furnitureGeometryVersion, currentBefore, drag?.id, drag?.position, drag?.supportObjectId, drag?.supportSurface, currentPlacement?.id, placementPreview?.userData.supportObjectId, placementPreview?.userData.supportSurface, placementPreview?.visible && placementPreview.position.toArray()]);
+      if (nextOverlapSignature !== overlapSignature) {
+        const visibleItems = design.items.filter(item => !currentBefore || existingIds.has(item.id)).map(item => drag?.id === item.id ? { ...item, position: drag.position, supportObjectId: drag.supportObjectId, supportSurface: drag.supportSurface } : item);
+        if (currentPlacement && placementPreview?.visible) visibleItems.push({ ...currentPlacement, supportObjectId: placementPreview.userData.supportObjectId, supportSurface: placementPreview.userData.supportSurface, position: [placementPreview.position.x, placementPreview.position.y + currentPlacement.size[1] / 2, placementPreview.position.z] });
+        const bounds = new Map<string, THREE.Box3[]>();
+        const boundsFor = (id: string) => {
+          if (!bounds.has(id)) bounds.set(id, renderedFurnitureBounds(meshesFor(id) ?? []));
+          return bounds.get(id)!;
+        };
+        overlaps = overlappingFurnitureIds(visibleItems, design, (a, b) => {
+          const left = boundsFor(a.id), right = boundsFor(b.id);
+          return !left.length || !right.length || furnitureMeshBoundsIntersect(left, right);
+        });
+        overlapSignature = nextOverlapSignature;
+      }
+      const targets: THREE.Object3D[][] = [];
+      for (const id of overlaps) {
+        const meshes = meshesFor(id);
+        if (meshes?.length) targets.push(meshes);
+      }
+      if (overlapNotice.current) {
+        const text = overlaps.size ? `家具${overlaps.size}点が重なっています。${targets.length === overlaps.size ? "赤い輪郭を確認してください。" : ""}` : '';
+        if (overlapNotice.current.textContent !== text) overlapNotice.current.textContent = text;
+        overlapNotice.current.hidden = !text;
+      }
+      furnitureOutline.render(targets);
       if (preview && assetsReady && !readySent) {
         readySent = true;
         window.clearTimeout(previewDeadline);
@@ -1259,6 +1299,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       renderer.domElement.removeEventListener("webglcontextlost", contextLost);
       renderer.domElement.removeEventListener("webglcontextrestored", contextRestored);
       controls.dispose();
+      furnitureOutline.dispose();
       disposeObject(scene);
       sun.shadow.dispose();
       renderer.dispose();
@@ -1279,6 +1320,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   return (
     <div className="room-viewer">
       <div ref={canvasHost} className="viewer-canvas" style={{ position: "absolute", inset: 0 }} />
+      <div ref={overlapNotice} className="viewer-overlap-notice" hidden role="status" aria-live="polite"/>
       {selectedItem && <button type="button" className="viewer-selected-item" aria-label={`${selectedItem.name}にフォーカス`} onClick={() => runtime.current?.focus(selectedItem.id)}>選択中: {selectedItem.name}</button>}
       {dimensionItem && <div role="status" style={{ position: "absolute", left: 16, bottom: 16, padding: "8px 12px", background: "rgba(29,27,38,.88)", border: "1px solid #6e6a7c", borderRadius: 8, color: "#fff", fontSize: 12, pointerEvents: "none" }}>幅 {Math.round(dimensionItem.size[0] * 100)} × 高さ {Math.round(dimensionItem.size[1] * 100)} × 奥行き {Math.round(dimensionItem.size[2] * 100)} cm</div>}
       <div ref={fallback} className="viewer-fallback" hidden role="status">
