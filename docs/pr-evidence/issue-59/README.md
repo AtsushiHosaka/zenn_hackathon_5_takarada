@@ -1,0 +1,8 @@
+
+## Integrated shell-floor verification
+
+Verified 2026-10-09 at combined root `6b87b371ab2a4bc3e2eca701e3f82f4538c5311b`, including this PR source `396a636543e0f2c7bd09d0df1ede9e12359bae11`. Existing Chromium and Vite5173 were reused in a fresh isolated context. The application and Three.js WebGL renderer were real; saved-room and shared-material floor/wall GLTF geometry were controlled fixtures.
+
+Actual WebGL floor pixel changed `[202,167,138,255]` to `[244,251,199,255]` after the green swatch, while a wall pixel stayed `[120,97,87,255]`. Original shared material color, geometry positions and world transform remained unchanged. Undo cleared the explicit override and restored original shell pixels; redo, custom color, save and page reload preserved the edited floor. Before displayed the original room color, and After restored the edited shell. A raised-floor fixture retained its original model with the unavailable-floor notice and no overlay. The procedural measured floor also displayed the saved color. No page errors occurred.
+
+At 390×844 the panel was 366px wide, had no horizontal document overflow, and supported keyboard swatch activation, save and close. `integrated-shell-floor-desktop.png`, `integrated-floor-controls-mobile.png` and `integrated-unconfirmed-floor-notice.png` were visually inspected after loading finished. Source was unchanged during verification; temporary Scene prototype capture and GPU target sampling were confined to the owned browser context, which was closed. No permanent tests or app/container copies were added. Physical touch, native color chooser UI, mobile hardware GPU, arbitrary provider GLTF geometry and deployed paths remain unverified.
