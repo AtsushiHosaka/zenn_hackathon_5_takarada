@@ -18,6 +18,7 @@ import { furniturePositionInRoom, getFurniturePlacementBounds, furnitureSurfaceH
 import { roomDescription } from './roomDescription';
 import { roomPlanKeys as sharedRoomPlanKeys, scopedRoomPlanKeys, useRoomPlanScope, saveRoomPlan, useRoomPlan, isApiRoomAlias } from './plans';
 import ErrorText from '../shared/ErrorText';
+import { useMotionDialog } from '../shared/useMotionDialog';
 import { DomainError } from '../../domain/error';
 import CharacterThemePicker from './CharacterThemePicker';
 import { roomPhotoLimits, roomPhotoRequirements, roomPhotoValidationError } from '../../domain/roomPhoto';
@@ -71,7 +72,7 @@ export default function RoomStudioPage() {
   const {rooms}=useRepositories();
   const local=id==='new'||sample;
   const saved=useRoomPlan(id,!local,local?()=>sampleDesign(rooms.demo(id==='sample-botanical'?'botanical':id==='sample-natural'?'natural':'oshi'),id):undefined);
-  if(!saved.data||(isApiRoomAlias(id)&&(saved.isFetching||saved.isError))) return <main className="rc-missing-room">
+  if(!saved.data||(isApiRoomAlias(id)&&(saved.isFetching||saved.isError))) return <main className="rc-missing-room motion-enter">
     <Link className="rc-back" to="/rooms" aria-label="ルーム一覧に戻る"><ReferenceSvg page={3} index={0}/></Link>
     {saved.isPending||saved.isFetching?<p role="status">読み込み中…</p>:<><ErrorText error={saved.error}/><button className="rc-secondary" onClick={()=>void saved.refetch()}>再試行</button></>}
   </main>;
@@ -141,9 +142,9 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const [title,setTitle]=useState(design.title);
   const upload=useRef<HTMLInputElement>(null);
   const abort=useRef<AbortController|null>(null);
-  const renameDialog=useRef<HTMLDialogElement>(null);
+  const renameDialogRef=useRef<HTMLDialogElement>(null);
+  const renameDialog=useMotionDialog(renameDialogRef,rename,()=>setRename(false));
   useEffect(()=>()=>abort.current?.abort(),[]);
-  useEffect(()=>{if(rename)renameDialog.current?.showModal();else renameDialog.current?.close();},[rename]);
   function requireOwner():boolean {
     if(session.status==='authenticated')return true;
     navigate('/login',{state:{from:location.pathname}});
@@ -343,10 +344,10 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
         {isNew?<EmptyScene/>:<RoomScene key={design.id} design={design} panel={panel} before={before} filter={filter} selectedId={selectedId} referenceLayout={referenceLayout} editing={editing} view={view} dimensions={dimensions} onSelect={value=>{setSelectedId(value);setPanel(true);setFilter('all');const item=design.items.find(item=>item.id===value);if(analyzed||item){setEditing(true);setBefore(false);}}} onBefore={value=>{setPlacementItem(null);setBefore(value);}} onMoveItem={moveItem} placementItem={placementItem} onPlaceItem={(position,supportObjectId)=>{if(placementItem)addItem(placementItem,position,supportObjectId);}} onOpenPanel={()=>{setPanel(true);if(analyzed)setEditing(true);}}>{panel&&(editing?<PlannerPanel onAddItem={addItem} onDragItem={startPlacement} onRemoveItem={removeItem} placementDisabled={placementDisabled} placementHint={before?'Afterに切り替えると家具を追加できます。':undefined} design={design} templateEditing={isTemplate} selectedId={selectedId} onSelect={setSelectedId} furnitureRequests={selectsFurniture?{existingItems:existingFurniture,operations:furnitureOperations,additions:furnitureAdditions,onOperationChange:(objectId,action)=>setFurnitureOperations(previous=>[...previous.filter(operation=>operation.objectId!==objectId),{objectId,action}]),onAdditionsChange:setFurnitureAdditions}:undefined} onChange={editDesign} onUndo={undo} onRedo={redo} canUndo={history.past.length>0} canRedo={history.future.length>0} dirty={dirty} onSave={saveEdits} onClose={()=>{setPlacementItem(null);setEditing(false);setPanel(false);}} onProducts={()=>{setPlacementItem(null);setEditing(false);}} view={view} onView={setView} dimensions={dimensions} onDimensions={setDimensions}/>:<RecommendationPanel onEditLayout={()=>{setEditing(true);setBefore(false);}} searchEntryPoints={design.searchEntryPoints} originalItems={design.before?.items} items={additions} selectedId={selectedId} filter={filter} onSelect={setSelectedId} onFilter={setFilter} onClose={()=>setPanel(false)}/>)}</RoomScene>}
       </>}
     </div>
-    {notice&&<div className="rc-notice" role="status">{notice}<button type="button" aria-label="通知を閉じる" onClick={()=>setNotice('')}>×</button></div>}
+    {notice&&<div key={notice} className="rc-notice motion-fade" role="status">{notice}<button className="motion-control" type="button" aria-label="通知を閉じる" onClick={()=>setNotice('')}>×</button></div>}
+    {rooms.persistenceWarning?.()&&<div className="rc-notice motion-fade" role="alert">{rooms.persistenceWarning()}</div>}
     {templateWarning&&<div className="rc-notice" role="alert">{templateWarning}</div>}
-    {rooms.persistenceWarning?.()&&<div className="rc-notice" role="alert">{rooms.persistenceWarning()}</div>}
     <dialog ref={templateDialog} className="rc-dialog" onCancel={()=>setTemplateName(null)}><form onSubmit={saveAsTemplate}><div className="rc-dialog-heading"><h2>テンプレートに保存</h2><button type="button" aria-label="閉じる" onClick={()=>setTemplateName(null)}>×</button></div><label className="rc-setting">テンプレート名<input value={templateName??''} onChange={event=>setTemplateName(event.target.value)} maxLength={80} required autoFocus/></label><p>現在の配置と色を、このブラウザに保存します。元の部屋は変更しません。</p><button className="rc-primary" type="submit">保存</button></form></dialog>
-    <dialog ref={renameDialog} className="rc-dialog" onCancel={()=>setRename(false)}><form onSubmit={changeTitle}><div className="rc-dialog-heading"><h2>ルーム名を変更</h2><button type="button" aria-label="閉じる" onClick={()=>setRename(false)}>×</button></div><label className="rc-setting">ルーム名<input value={title} onChange={event=>setTitle(event.target.value)} maxLength={80} required autoFocus/></label><p/><button className="rc-primary" type="submit">保存</button></form></dialog>
+    <dialog ref={renameDialogRef} className="rc-dialog motion-dialog motion-presence" data-motion-state={renameDialog.state} tabIndex={-1} aria-labelledby="rename-room-title" onKeyDown={renameDialog.onKeyDown} onCancel={renameDialog.onCancel} onClose={renameDialog.onClose} onClick={renameDialog.onClick}><form inert={renameDialog.closing} aria-hidden={renameDialog.closing} onSubmit={changeTitle}><div className="rc-dialog-heading"><h2 id="rename-room-title">ルーム名を変更</h2><button type="button" aria-label="閉じる" onClick={()=>setRename(false)}>×</button></div><label className="rc-setting">ルーム名<input className="motion-field" value={title} onChange={event=>setTitle(event.target.value)} maxLength={80} required autoFocus/></label><p/><button className="rc-primary" type="submit">保存</button></form></dialog>
   </div>;
 }
