@@ -12,6 +12,7 @@ export function mapCompleteRoomFurniture(model: THREE.Group, items: readonly Roo
     return { item, inverse: transform.invert(), box: new THREE.Box3(half.clone().negate(), half) };
   });
   const owners = new Map<THREE.Mesh, string>();
+  const wholeSubtrees = new Set<string>();
   const ambiguous = new Set<string>();
   model.traverseVisible(object => {
     if (!(object instanceof THREE.Mesh)) return;
@@ -19,7 +20,11 @@ export function mapCompleteRoomFurniture(model: THREE.Group, items: readonly Roo
     while (node && node !== model.parent) {
       const identity = node.userData.itemId ?? node.userData.item_id ?? node.userData.object_id ?? node.name;
       const explicit = items.find(item => item.id === identity);
-      if (explicit) { owners.set(object, explicit.id); return; }
+      if (explicit) {
+        owners.set(object, explicit.id);
+        if (!(node instanceof THREE.Mesh)) wholeSubtrees.add(explicit.id);
+        return;
+      }
       node = node.parent;
     }
     if (!object.geometry.boundingBox) object.geometry.computeBoundingBox();
@@ -52,5 +57,11 @@ export function mapCompleteRoomFurniture(model: THREE.Group, items: readonly Roo
     group.add(mesh);
   }
   model.updateWorldMatrix(true, true);
-  return { groups, unmapped: items.filter(item => !groups.has(item.id)).map(item => item.id) };
+  return {
+    groups,
+    unmapped: items.filter(item => !groups.has(item.id)).map(item => item.id),
+    // Owning a spatially contained mesh or a tagged leaf cannot prove that all
+    // other parts of that furniture were exported under the same owner.
+    partial: items.filter(item => groups.has(item.id) && !wholeSubtrees.has(item.id)).map(item => item.id),
+  };
 }
