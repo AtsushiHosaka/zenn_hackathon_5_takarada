@@ -1,4 +1,4 @@
-import { useState, type DragEvent } from 'react';
+import { useRef, useState, type DragEvent } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRepositories } from '../../core/repositories';
 import { isManualFurniture, isTemplateFurniture, replacementFurnitureCategories, productCategories, type ManualFurnitureCategory, type FurnitureAddition, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
@@ -235,6 +235,7 @@ function FurnitureSizeEditor({ item, design, onChange }: { item: RoomItem; desig
 }
 
 export default function PlannerPanel({ design, templateEditing=false, selectedId, onSelect, furnitureRequests, onChange, onUndo, onRedo, canUndo, canRedo, dirty, onSave, onClose, onProducts, view, onView, dimensions, onDimensions, onAddItem, onDragItem, onRemoveItem, placementDisabled, placementHint }: PlannerPanelProps) {
+  const additionButton = useRef<HTMLButtonElement>(null);
   const paletteScope = useRoomPlanScope();
   const selectableItems = [...design.items, ...(furnitureRequests?.existingItems ?? []).filter(item => !design.items.some(current => current.id === item.id))];
   const selected = selectableItems.find(item => item.id === selectedId);
@@ -387,8 +388,8 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
       {furnitureRequests && <details className="rc-planner-section rc-planner-additions">
         <summary>家具を追加{furnitureRequests.additions.length > 0 && `（${furnitureRequests.additions.length}点）`}</summary>
         <p className="rc-planner-note">次のコーディネートで提案する家具を、最大6点指定できます。</p>
-        <FurnitureAdditionRows values={furnitureRequests.additions} onChange={furnitureRequests.onAdditionsChange}/>
-        <button type="button" className="rc-secondary" disabled={furnitureRequests.additions.length >= 6} onClick={() => furnitureRequests.onAdditionsChange([...furnitureRequests.additions, { category: 'sofa', uiId: crypto.randomUUID() }])}>家具を追加</button>
+        <FurnitureAdditionRows values={furnitureRequests.additions} onChange={furnitureRequests.onAdditionsChange} emptyFocusTarget={additionButton}/>
+        <button ref={additionButton} type="button" className="rc-secondary" disabled={furnitureRequests.additions.length >= 6} onClick={() => furnitureRequests.onAdditionsChange([...furnitureRequests.additions, { category: 'sofa', uiId: crypto.randomUUID() }])}>家具を追加</button>
       </details>}
     </div>
     <div className="rc-planner-footer">
