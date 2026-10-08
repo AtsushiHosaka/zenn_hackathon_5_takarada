@@ -1,7 +1,7 @@
 import { useState, type DragEvent } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRepositories } from '../../core/repositories';
-import { isManualFurniture, furnitureCategories, type FurnitureAddition, type FurnitureCategory, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
+import { isManualFurniture, furnitureCategories, type ManualFurnitureCategory, type FurnitureAddition, type FurnitureCategory, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
 import ErrorText from '../shared/ErrorText';
 import { downloadShoppingCsv } from './exports';
 import { LAYOUT_GRID_STEP, snapToLayoutGrid } from './layoutGrid';
@@ -62,8 +62,9 @@ function ArrowIcon({ redo = false }: { redo?: boolean }) {
   </svg>;
 }
 
-function FurnitureIcon({ category }: { category: FurnitureCategory }) {
-  const paths: Record<FurnitureCategory, string> = {
+function FurnitureIcon({ category }: { category: ManualFurnitureCategory }) {
+  const paths: Record<ManualFurnitureCategory, string> = {
+    mirror: 'M5 2h14v21H5V2m3 3h8v15H8V5m1 12 5-8m-5 3 3-5',
     sofa: 'M5 13V7h14v6M3 12h4v7h10v-7h4v9H3v-9M6 21v2m12-2v2M7 16h10',
     bed: 'M3 21V5m18 16V10H3m0 7h18M6 7h5v3H6V7m15 10v4',
     desk: 'M3 7h18v4H3V7m2 4v11m14-11v11M13 12h6v4h-6v-4',
@@ -117,7 +118,7 @@ function FurniturePalette({ design, disabled, hint, onAddItem, onDragItem, onVie
   const linkedItemFits = linkedItem ? Boolean(furniturePositionInRoom(linkedItem, linkedItem.position, design)) : false;
   const canAddLinkedItem = Boolean(linkedItem && linkedItemFits && !disabled && !imported.isPending);
   const productLink = furnitureLink(linkedItem?.productUrl);
-  const [category, setCategory] = useState<FurnitureCategory>('sofa');
+  const [category, setCategory] = useState<ManualFurnitureCategory>('sofa');
   const [values, setValues] = useState(() => sizeValues(furnitureTemplates[0].size));
   const size = parseSize(values);
   const template = furnitureTemplates.find(candidate => candidate.category === category)!;
@@ -178,6 +179,7 @@ function FurniturePalette({ design, disabled, hint, onAddItem, onDragItem, onVie
       <div>{dimensionLabels.map((label, index) => <label key={label}>{label}<input type="number" min="1" step="1" inputMode="decimal" value={values[index]} aria-invalid={Boolean(inputError)} onChange={event => setValues(previous => previous.map((value, axis) => axis === index ? event.target.value : value))} /></label>)}</div>
     </fieldset>
     {inputError && !disabled && <p className="rc-planner-input-error" role="status">{inputError}</p>}
+    {category === 'mirror' && <p className="rc-planner-note">鏡は正面の部屋を反射します。反射したい方向へ回転してください。</p>}
     <button className="rc-furniture-add" type="button" disabled={disabled || !valid} onClick={() => onAddItem(createFurnitureItem(category, size))}>＋ 部屋の中央に追加</button>
     </>}
     {hint && <p className="rc-planner-warning" role="status">{hint}</p>}

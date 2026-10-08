@@ -2,6 +2,8 @@ import { roomPalette } from "../../domain/roomPalette";
 import { characterTheme } from "../../domain/characterTheme";
 import { useEffect, useEffectEvent, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { Reflector } from "three/examples/jsm/objects/Reflector.js";
+import { createMirrorSurface, resizeMirrorSurfaces } from "./mirrorReflection";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
@@ -143,6 +145,16 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean, manager?
   const dark = "#605747";
   const color = item.color;
   switch (item.category) {
+    case "mirror": {
+      const border = Math.min(w, h) * .045;
+      box(group, [w, h, d * .6], [0, h / 2, -d * .2], color);
+      for (const x of [-w / 2 + border / 2, w / 2 - border / 2]) box(group, [border, h, d], [x, h / 2, 0], color);
+      for (const y of [border / 2, h - border / 2]) box(group, [w - border * 2, border, d], [0, y, 0], color);
+      const surface = createMirrorSurface(w - border * 2, h - border * 2);
+      surface.position.set(0, h / 2, d / 2);
+      group.add(surface);
+      break;
+    }
     case "poster":
     case "acrylic_stand": {
       const stand = item.category === "acrylic_stand";
@@ -466,6 +478,7 @@ function disposeObject(object: THREE.Object3D) {
   object.traverse((child) => {
     if (!(child instanceof THREE.Mesh || child instanceof THREE.Line || child instanceof THREE.Sprite)) return;
     if (!(child instanceof THREE.Sprite)) child.geometry.dispose();
+    if (child instanceof Reflector) { child.dispose(); return; }
     const materials = Array.isArray(child.material) ? child.material : [child.material];
     for (const mat of materials) {
       for (const value of Object.values(mat)) {
@@ -618,6 +631,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     const gridBounds = referenceRoom?.floorBounds ?? baseRoomBounds;
     const gridFloor = design.room || referenceRoom ? 0 : getFurniturePlacementBounds(design).floor;
     const layoutGrid = createLayoutGrid(gridBounds, gridFloor);
+    layoutGrid.userData.reflectionExcluded = true;
     layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel;
     scene.add(layoutGrid);
     const cutawayWalls: { object: THREE.Object3D; wall: "north" | "east" | "south" | "west" }[] = [];
@@ -992,6 +1006,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       if (!position) { if (placementPreview) placementPreview.visible = false; return; }
       if (!placementPreview) {
         placementPreview = createFurniture(currentPlacement, accent, oshi, loadingManager);
+        placementPreview.userData.reflectionExcluded = true;
         placementPreview.traverse(object => {
           if (!(object instanceof THREE.Mesh)) return;
           object.castShadow = false;
@@ -1002,6 +1017,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
           }
         });
         scene.add(placementPreview);
+        resizeMirrorSurfaces(placementPreview, renderer);
       }
       placementPreview.visible = true;
       placementPreview.position.set(position[0], position[1] - currentPlacement.size[1] / 2, position[2]);
@@ -1161,6 +1177,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         controls.update();
       }
       renderer.setSize(width, height);
+      resizeMirrorSurfaces(scene, renderer);
     };
     const observer = new ResizeObserver(resize);
     observer.observe(host);
