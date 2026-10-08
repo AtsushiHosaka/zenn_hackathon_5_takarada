@@ -234,3 +234,5 @@
   .rc-workspace:not(.is-generating) .rc-scene-stage {top:64px;bottom:72px}
   .rc-workspace:not(.is-generating) .rc-followup-composer {max-height:100%;overflow-y:auto}
 }
+
+.rc-followup-input, .rc-request-box {position:relative}
