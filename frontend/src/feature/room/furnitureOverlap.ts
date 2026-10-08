@@ -1,5 +1,10 @@
 import * as THREE from 'three';
 import { OBB } from 'three/examples/jsm/math/OBB.js';
+import type { RoomItem } from '../../domain/room';
+
+// These surface adornments intentionally occupy their host's volume. Solid
+// lamps, glass display objects, cushions and other furniture remain eligible.
+const adornments = new Set(['cover', 'bed_cover', 'rug', 'wall_decor', 'artwork', 'led', 'poster']);
 
 // Ignore contact and sub-3mm placement/mesh rounding. Use each visible mesh's
 // bounding volume, preserving the empty space between separate table/chair legs.
@@ -38,7 +43,7 @@ function furnitureVolume(id: string, group: THREE.Group): FurnitureVolume {
   const meshes: OBB[] = [];
   group.updateWorldMatrix(true, true);
   group.traverseVisible(object => {
-    if (!(object instanceof THREE.Mesh)) return;
+    if (!(object instanceof THREE.Mesh) || object.userData.nonPhysical) return;
     const surfaces = Array.isArray(object.material) ? object.material : [object.material];
     if (!surfaces.some(surface => surface.visible && surface.opacity > 0 && surface.colorWrite)) return;
     const add = (matrix: THREE.Matrix4) => {
@@ -56,8 +61,9 @@ function furnitureVolume(id: string, group: THREE.Group): FurnitureVolume {
   return { id, bounds, meshes };
 }
 
-export function findFurnitureOverlaps(groups: ReadonlyMap<string, THREE.Group>): Set<string> {
-  const volumes = [...groups].filter(([, group]) => group.visible).map(([id, group]) => furnitureVolume(id, group));
+export function findFurnitureOverlaps(groups: ReadonlyMap<string, THREE.Group>, items: readonly RoomItem[] = []): Set<string> {
+  const categories = new Map(items.map(item => [item.id, item.category]));
+  const volumes = [...groups].filter(([id, group]) => group.visible && !adornments.has(categories.get(id) ?? '')).map(([id, group]) => furnitureVolume(id, group));
   const overlaps = new Set<string>();
   for (let index = 0; index < volumes.length; index++) {
     const left = volumes[index];

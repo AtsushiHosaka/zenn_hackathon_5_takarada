@@ -11,6 +11,15 @@ export function mapCompleteRoomFurniture(model: THREE.Group, items: readonly Roo
     const half = new THREE.Vector3(...item.size).multiplyScalar(.5).addScalar(.003);
     return { item, inverse: transform.invert(), box: new THREE.Box3(half.clone().negate(), half) };
   });
+  const aliases = new Map(items.map(item => {
+    const clean = (name: string) => name.replace(/[.[\]:/]/g, '_');
+    const names = new Set([clean(item.id), clean(item.name)]);
+    if (item.modelUrl) {
+      try { names.add(clean(decodeURIComponent(new URL(item.modelUrl).pathname.split('/').pop() ?? '').replace(/\.glb$/i, ''))); }
+      catch { /* Invalid URLs are handled by the model loader. */ }
+    }
+    return [item.id, names] as const;
+  }));
   const owners = new Map<THREE.Mesh, string>();
   const wholeSubtrees = new Set<string>();
   const ambiguous = new Set<string>();
@@ -25,6 +34,15 @@ export function mapCompleteRoomFurniture(model: THREE.Group, items: readonly Roo
         if (!(node instanceof THREE.Mesh)) wholeSubtrees.add(explicit.id);
         return;
       }
+      node = node.parent;
+    }
+    node = object;
+    while (node && node !== model.parent) {
+      // Catalog-name/filename aliases are accepted only when unambiguous.
+      // They remain partial: an alias alone cannot prove export completeness.
+      const named = items.filter(item => aliases.get(item.id)?.has(node!.name));
+      if (named.length === 1) { owners.set(object, named[0].id); return; }
+      if (named.length > 1) { named.forEach(item => ambiguous.add(item.id)); return; }
       node = node.parent;
     }
     if (!object.geometry.boundingBox) object.geometry.computeBoundingBox();

@@ -969,6 +969,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     };
     let placementPreview: THREE.Group | null = null;
     clearPlacementPreview = () => {
+      overlapsDirty = true;
       if (!placementPreview) return;
       scene.remove(placementPreview);
       disposeObject(placementPreview);
@@ -1021,6 +1022,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       const position = placement?.position;
       event.preventDefault();
       if (event.dataTransfer) event.dataTransfer.dropEffect = position ? "copy" : "none";
+      overlapsDirty = true;
       if (!position) { if (placementPreview) placementPreview.visible = false; return; }
       if (!placementPreview) {
         placementPreview = createFurniture(currentPlacement, accent, oshi, loadingManager);
@@ -1048,6 +1050,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     };
     const dragLeave = (event: DragEvent) => {
       if (event.relatedTarget instanceof Node && host.contains(event.relatedTarget)) return;
+      overlapsDirty = true;
       if (placementPreview) placementPreview.visible = false;
     };
     host.addEventListener("dragover", dragOver);
@@ -1236,8 +1239,13 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       }
       if (overlapOutline && overlapsDirty) {
         overlapsDirty = false;
-        const objects = completeRoomModel && loadedRoom && !currentBefore ? completeFurniture : furniture;
-        const ids = findFurnitureOverlaps(objects);
+        const objects = new Map(completeRoomModel && loadedRoom && !currentBefore ? completeFurniture : furniture);
+        const items = [...design.items];
+        if (currentPlacement && placementPreview?.visible) {
+          objects.set(currentPlacement.id, placementPreview);
+          items.push(currentPlacement);
+        }
+        const ids = findFurnitureOverlaps(objects, items);
         overlappingObjects = [...ids].map(id => objects.get(id)!).filter(Boolean);
         if (overlapNotice.current) {
           const missing = completeRoomModel && loadedRoom && !currentBefore ? unmappedFurniture : [];
