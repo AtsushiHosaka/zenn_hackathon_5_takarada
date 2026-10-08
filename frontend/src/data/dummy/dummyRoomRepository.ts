@@ -99,6 +99,7 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
       return { generation: true, coordination: false, input: "dimensions", photos: false, message: "オフラインモックでは畳数と形から部屋の寸法とベッド・デスク・本棚を表示します。写真・希望・スタイルの解析と、商品生成は行いません。商品付きの提案はAPI接続で確認できます。" };
     },
     async generate(input, signal) {
+      input.onProgress?.("analyzing");
       const userId = currentUserId();
       if (signal?.aborted) throw new DomainError("操作をキャンセルしました");
       if (input.tatami === undefined || !Number.isFinite(input.tatami) || input.tatami < 3 || input.tatami > 30) throw new DomainError("畳数は3〜30で入力してください");
@@ -129,6 +130,7 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
         // Keep only failed writes in memory; successful disk data stays authoritative.
         unsavedRooms.set(userId, [room, ...(unsavedRooms.get(userId) ?? []).filter(saved => saved.id !== room.id)]);
       }
+      input.onProgress?.("preview");
       return design;
     },
   };
