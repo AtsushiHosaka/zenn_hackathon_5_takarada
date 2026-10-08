@@ -1,53 +1,31 @@
-# Character room themes
+# Character room themes — issue #73
 
-Source: [GitHub issue #73](https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/issues/73), read 2026-10-09. The user explicitly selected Hello Kitty, My Melody, Kuromi, Cinnamoroll and Pompompurin for individual Sanrio themes. Hatsune Miku and a common Sanrio theme come from the issue. The current issue also requests Pochacco. After an optional clarification received no answer, the root agent stated the union assumption: preserve all five user-selected characters and add Pochacco. No user selection was removed. The Google Docs URL in `docs/project.md` is unset; Docs were not read or changed.
+Source: [issue #73](https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/issues/73), read 2026-10-09. The user selected Hello Kitty, My Melody, Kuromi, Cinnamoroll and Pompompurin. The issue was subsequently edited in parallel to list Pochacco instead of My Melody. The implementation preserves all five user choices and adds Pochacco, following the union assumption stated while clarification was pending. Hatsune Miku and shared Sanrio are also required by the issue. The Google Docs URL in docs/project.md is unset; Docs were not read or changed.
 
-## Accepted scope and choices
+## Behavior
 
-A visible theme chooser supports eight IDs: `hatsune-miku`, `sanrio`, `hello-kitty`, `my-melody`, `kuromi`, `cinnamoroll`, `pompompurin` and `pochacco`. Users can also choose no character theme. Each theme includes separate room-generation directions, result title, default colors and a deterministic abstract 3D wall motif. The motifs are music notes, stars/heart, bow, hearts, sharp stars, cloud, pudding and paw, respectively. These are theme-inspired accents rather than official character images or merchandise. Poster/acrylic image import remains issue #72.
+The chooser supports eight themes and an unspecified option. Each theme has separate generation instructions, a saved identity/title, default colors and an abstract 3D motif: music notes, stars/heart, bow, hearts, sharp stars, cloud, pudding and paw. These are theme-inspired accents, not official images or merchandise. Image posters and stands are handled in #72.
 
-The chooser appears on the final creation step, before coordinating an analyzed room, and with follow-up requests for existing coordinated rooms. API analysis carries the choice locally to the later coordination step. Dummy creation renders the selected theme directly. Existing editing and saved-room behavior remain available.
+The chooser appears on the final creation step, before coordinating an analyzed room, and with later requests for coordinated rooms. API analysis carries the choice locally to coordination. Dummy creation renders colors/motifs directly and states that it does not analyze photos/free text or generate product recommendations.
 
-## Persistence and generation
+## Contract and composition
 
-`GenerateRoomInput.characterThemeId` and `RoomDesign.characterThemeId` carry the choice. Authenticated coordination input/output adds optional `character_theme_id`. The backend validates the eight IDs and persists the value in existing coordination analysis JSON, including after generation overwrites its diagnostics. No new DB column, endpoint or environment variable is required. Web types and Swagger are regenerated. Existing iOS clients may ignore the optional field; native iOS theme chooser/motif rendering is outside this Web issue.
+Optional GenerateRoomInput.characterThemeId and coordination character_theme_id carry the selected theme. The backend validates the catalogue and persists its ID in existing analysis JSON, including after generation diagnostics are written. Swagger and web types are regenerated. No migration, endpoint or environment variable is added. Native iOS picker/rendering is outside this Web change.
 
-The backend augments the planner/search prompt with the selected theme's name and design directions while keeping the original saved prompt unchanged. It preserves actual product colors, names, prices and links; it does not fabricate official products. A theme-specific result title and comment identify the selected theme even in mock mode. Default room walls/floor use the theme colors when no separate room palette is supplied. Product selection in mock mode continues to use the existing fixture catalog; theme motifs are procedural accents, not purchased items or additions to the shopping total.
+CharacterRoomTheme.prompt adds instructions and default hex colors; RoomPalette.prompt follows it, so explicit palette colors take precedence. Both coordination and furniture-operation planners receive generation_prompt. Original saved prompt and actual product names, colors, prices and links remain unchanged.
 
-Frontend and backend theme catalogues contain identical definitions because each deployment ships its own source tree. Temporary validation compared all entries. Future catalogue edits must update both files.
+Theme-only callers retain theme wall/floor colors. Explicit room palettes determine wall/floor colors and procedural accent colors; the Web chooser initializes Warm Ivory. Character result titles and motif silhouettes remain distinct. Frontend/backend catalogue copies must be changed together.
 
-## Compatibility with issue #74
+The renderer suppresses generic purple oshi primitives for character themes. Snapshot Before scenes clear current theme/palette metadata and retain the original room/item colors. Legacy Before toggles hide motifs before the first frame and on subsequent toggles. Motifs are procedural room accents, not purchased products or shopping-total additions.
 
-Character identity and the room palette are separate choices. `CharacterRoomTheme.prompt` is composed first and `RoomPalette.prompt` second in `Coordination#generation_prompt`, so explicit palette instructions have precedence. The builder's theme defaults only run if no `room_palette_id` exists; the selected palette determines wall/floor colors. Theme motifs retain their identity and silhouette under the shared palette. `applyCharacterTheme` similarly preserves a supplied `roomPaletteId`. Integration keeps the character result title when both choices are supplied and composes both transformations in dummy generation. Explicit palette accent/secondary colors also tint the character motif geometry; each character retains its distinct silhouette. Theme-only callers that omit a palette keep theme defaults. The Web chooser initializes Warm Ivory and passes it explicitly.
+This PR is stacked on #87 and includes the preceding upload, progress and current/new-room fixes. Both theme/palette choices survive current/new requests; new rooms exclude old room/base/photo/furniture references, and aborted progress updates are ignored.
 
-## Verification
+## Verification and limits
 
-Frontend lint and production build passed. The build retains the existing large-chunk warning. Full backend RuboCop passed. Swagger was generated via Rails rswag in temporary `/tmp/issue73-backend` source on the existing container with isolated `issue73_checks_test` DB; web types were generated from that contract. Existing room/coordination request specs passed, 13 examples and 0 failures. The existing successful creation contract exercises the theme ID in request/response.
+Frontend lint/build, backend RuboCop, existing coordination request examples (6), Swagger generation and web type generation passed on the final correction. The production build retains its existing large-chunk warning. No permanent tests were added.
 
-A temporary rolled-back transaction checked all seven themes via authenticated controller POST, mock generation job, and GET retrieval. It checked theme metadata/title, room colors, augmented prompt instructions, original Before colors, and rejection of unknown IDs. A temporary frontend SSR script checked all seven dummy themes through save/reload, equal frontend/backend catalogues, seven distinct motif geometries and unknown-ID rejection.
+Temporary authenticated Rails POST → mock job → GET checks covered all eight themes with/without explicit palettes, persistence, titles, default colors, character-before-palette prompt order, invalid-ID rejection and unchanged original/Before data. All 480 theme × palette dummy combinations passed generation, save and restore. Actual geometry/visibility checks confirmed distinct motifs, palette-first accents, no generic purple primitives, initial/toggled legacy Before visibility and snapshot immutability. Actual mutation-function checks covered current/new isolation and cancellation guards.
 
-Live Gemini, production and native iOS remain unverified. Browser verification is recorded below. No new permanent tests were added.
+Browser verification generated/reloaded all eight themes with Teal Studio, checked identity/title/palette persistence and a 390px chooser without horizontal overflow. The Miku Before view hid its music motif and After restored it. Screenshots in docs/pr-evidence/issue-73 show the chooser, Miku room and Kuromi room from the final source. The existing browser/server was reused with an isolated context.
 
-## Combined integration verification
-
-Stacked implementation is based on `codex/issue-74-room-palettes`, including palette UI evidence at commit `08be362`. Frontend lint/build and full backend RuboCop passed after resolving the overlaps. Existing room/coordination specs passed, 13 examples and 0 failures. Combined Swagger and web types were regenerated.
-
-A temporary rolled-back authenticated Rails POST/job/GET transaction checked all seven themes both with and without explicit palettes. It verified both persisted IDs, character title, palette wall/floor precedence, character-before-palette prompt ordering, unchanged original room/Before, followup base references and invalid-id rejection. A temporary SSR runtime check passed all 420 character/palette combinations and restored saved rooms. It verified motif colors come from the selected palette while all seven motif geometries remain distinct. No permanent tests or new running apps were created.
-
-Live provider/deployment verification remains unperformed. The authenticated temporary checks use Rails request dispatch and mock providers, not a network-hosted API or live Gemini/EC.
-
-The final branch also merges prepared palette branch `170d93d1c4def534d5f414a09084a46043ec2035`, preserving the published upload, generation-step and followup-mode ancestry. Frontend lint/build and the 420-combination dummy checks passed again after this merge. A temporary harness executed the actual extracted `RoomStudioPage` mutation function for current/new requests and confirmed both theme/palette IDs, existing-room/base references, new-room photo/furniture isolation and aborted-request progress guards. No browser was launched by this agent.
-
-Root browser verification on the final merged source generated and reloaded all seven themes with Teal Studio, retaining each character identity/title and explicit palette wall/floor colors. The 390px chooser has no horizontal overflow. Actual UI screenshots are in docs/pr-evidence/issue-73 (chooser, Miku music motif and Kuromi star motif). These screenshots show deterministic dummy rendering, not live Gemini product proposals. The existing browser/server was reused with an isolated context to avoid concurrent chat interference.
-
-## Narrow final corrections
-
-Character-only generation prompts now include the theme's default base, secondary and accent hex colors. Explicit room-palette instructions remain appended afterward and retain precedence. Both coordination and furniture-operation planners already use the composed `generation_prompt`. The theme catalogue preserves the five named by the user and adds current-issue Pochacco under the union assumption above.
-
-The renderer disables generic purple oshi primitives when a character theme is selected. Procedural accents use an explicit palette accent first, then the character accent, then the existing style fallback. Snapshot Before scenes clear theme and palette metadata and use the original room/item colors without adding current-character motifs. Legacy Before toggles hide procedural character motifs; the visibility update runs before the first render and on later toggles.
-
-Correction checks are recorded after execution below. Browser and live-provider behavior remain outside these temporary checks.
-
-The correction branch advances to verified bounded-upload ancestor `d740386511e64b035188cfe1cef7aa44b89f7eab`. Eight-theme correction checks passed: all 480 character/palette dummy combinations and save/restore; all eight themes with/without explicit palettes through authenticated mock POST/job/GET; unknown-ID rejection; unchanged original room/Before metadata; theme default colors and character-before-palette prompt ordering. Existing coordination request specs passed, 6 examples and 0 failures. Swagger and web types were regenerated. Frontend lint/build and backend RuboCop passed.
-
-Temporary checks invoked the actual furniture/room geometry builders and the extracted renderer visibility body. They verified explicit palette accent precedes character accent, character modes contain no generic purple bed/shelf/rug/sofa/architecture accents, motifs are hidden on the initial and later legacy Before toggles, and snapshot Before clears current theme/palette metadata without mutating its original data. These checks exercised geometry and runtime logic, not browser WebGL rendering. No temporary probe or permanent test file is committed.
+These checks use deterministic dummy rendering and mock API providers. Live Gemini, live EC search, production and native iOS remain unverified. No deployment was performed.
