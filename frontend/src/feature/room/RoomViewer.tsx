@@ -15,8 +15,9 @@ import { addMirrorSurface, isMirrorCategory } from "./mirrorSurface";
 import { buildMeasuredRoom } from "./roomArchitecture";
 import { createShellFloorOverlay } from "./shellFloorSurface";
 import { LAYOUT_GRID_STEP } from "./layoutGrid";
-import { overlappingFurnitureIds } from './furnitureOverlap';
-import { createFurnitureOutline, completeFurnitureMeshes, renderedFurnitureBounds, furnitureMeshBoundsIntersect } from './furnitureOutline';
+import { overlappingFurnitureIds, isFurnitureAdornment, furnitureOverlapMessage } from './furnitureOverlap';
+import { createFurnitureOutline, completeFurnitureMeshes } from './furnitureOutline';
+import { renderedFurnitureVolume, furnitureMeshVolumesIntersect, type FurnitureVolume } from './furnitureCollisionGeometry';
 import { applyMaterialOverrides } from "./furnitureMaterials";
 import { canPlaceOnFurniture, furniturePositionInRoom, getFurniturePlacementBounds, isFurnitureSupport, snapFurnitureEditPosition } from './roomBounds';
 
@@ -650,6 +651,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     let shellFloor: THREE.Mesh | null = null;
     let shellFloorUnavailable = false;
     let completeMeshes = new Map<string, THREE.Object3D[]>();
+    let incompleteFurniture = new Set<string>();
     let furnitureGeometryVersion = 0;
     const completeRoomModel = Boolean(design.modelUrl) && design.modelKind !== "shell";
     const gridBounds = referenceRoom?.floorBounds ?? baseRoomBounds;
@@ -957,7 +959,11 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
           else shellFloorUnavailable = true;
         }
         furnitureGeometryVersion++;
-        if (completeRoomModel) completeMeshes = completeFurnitureMeshes(gltf.scene, design.items);
+        if (completeRoomModel) {
+          const mapped = completeFurnitureMeshes(gltf.scene, design.items.filter(item => !isFurnitureAdornment(item)));
+          completeMeshes = mapped.meshes;
+          incompleteFurniture = new Set([...mapped.unmapped, ...mapped.partial]);
+        }
         if (completeRoomModel) {
           for (const item of design.items) {
             const group = new THREE.Group();
@@ -1069,6 +1075,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       if (!placementPreview) {
         placementPreview = createFurniture(currentPlacement, accent, oshi, loadingManager);
         placementPreview.userData.reflectionExcluded = true;
+        furnitureGeometryVersion++;
         placementPreview.traverse(object => {
           if (!(object instanceof THREE.Mesh)) return;
           object.castShadow = false;
@@ -1284,19 +1291,23 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
           });
         }
       }
-      const meshesFor = (id: string) => loadedRoom && completeRoomModel && !currentBefore ? completeMeshes.get(id) : id === currentPlacement?.id && placementPreview?.visible ? [placementPreview] : furniture.has(id) ? [furniture.get(id)!] : undefined;
+      let placementPreviewId = currentPlacement?.id;
+      while (placementPreviewId && design.items.some(item => item.id === placementPreviewId)) placementPreviewId += ':preview';
+      const meshesFor = (id: string) => loadedRoom && completeRoomModel && !currentBefore ? completeMeshes.get(id) : id === placementPreviewId && placementPreview?.visible ? [placementPreview] : furniture.has(id) ? [furniture.get(id)!] : undefined;
       const nextOverlapSignature = JSON.stringify([furnitureGeometryVersion, currentBefore, drag?.id, drag?.position, drag?.supportObjectId, drag?.supportSurface, currentPlacement?.id, placementPreview?.userData.supportObjectId, placementPreview?.userData.supportSurface, placementPreview?.visible && placementPreview.position.toArray()]);
       if (nextOverlapSignature !== overlapSignature) {
         const visibleItems = design.items.filter(item => !currentBefore || existingIds.has(item.id)).map(item => drag?.id === item.id ? { ...item, position: drag.position, supportObjectId: drag.supportObjectId, supportSurface: drag.supportSurface } : item);
-        if (currentPlacement && placementPreview?.visible) visibleItems.push({ ...currentPlacement, supportObjectId: placementPreview.userData.supportObjectId, supportSurface: placementPreview.userData.supportSurface, position: [placementPreview.position.x, placementPreview.position.y + currentPlacement.size[1] / 2, placementPreview.position.z] });
-        const bounds = new Map<string, THREE.Box3[]>();
-        const boundsFor = (id: string) => {
-          if (!bounds.has(id)) bounds.set(id, renderedFurnitureBounds(meshesFor(id) ?? []));
-          return bounds.get(id)!;
+        if (currentPlacement && placementPreview?.visible) visibleItems.push({ ...currentPlacement, id: placementPreviewId!, supportObjectId: placementPreview.userData.supportObjectId, supportSurface: placementPreview.userData.supportSurface, position: [placementPreview.position.x, placementPreview.position.y + currentPlacement.size[1] / 2, placementPreview.position.z] });
+        const volumes = new Map<string, FurnitureVolume>();
+        const volumeFor = (id: string) => {
+          const meshes = meshesFor(id);
+          if (!meshes?.length) return undefined;
+          if (!volumes.has(id)) volumes.set(id, renderedFurnitureVolume(meshes));
+          return volumes.get(id)!;
         };
         overlaps = overlappingFurnitureIds(visibleItems, design, (a, b) => {
-          const left = boundsFor(a.id), right = boundsFor(b.id);
-          return !left.length || !right.length || furnitureMeshBoundsIntersect(left, right);
+          const left = volumeFor(a.id), right = volumeFor(b.id);
+          return !left || !right || furnitureMeshVolumesIntersect(left, right);
         });
         overlapSignature = nextOverlapSignature;
       }
@@ -1306,7 +1317,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         if (meshes?.length) targets.push(meshes);
       }
       if (overlapNotice.current) {
-        const text = overlaps.size ? `家具${overlaps.size}点が重なっています。${targets.length === overlaps.size ? "赤い輪郭を確認してください。" : ""}` : '';
+        const incomplete = loadedRoom && completeRoomModel && !currentBefore ? incompleteFurniture : new Set<string>();
+        const text = furnitureOverlapMessage(currentPlacement ? [...design.items, { ...currentPlacement, id: placementPreviewId! }] : design.items, overlaps, incomplete);
         if (overlapNotice.current.textContent !== text) overlapNotice.current.textContent = text;
         overlapNotice.current.hidden = !text;
       }
@@ -1373,7 +1385,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   return (
     <div className="room-viewer">
       <div ref={canvasHost} className="viewer-canvas" style={{ position: "absolute", inset: 0 }} />
-      <div ref={overlapNotice} className="viewer-overlap-notice" hidden role="status" aria-live="polite"/>
+      <div ref={overlapNotice} className="viewer-overlap-notice" hidden role="status" aria-live="polite" tabIndex={0}/>
       {selectedItem && <button type="button" className="viewer-selected-item" aria-label={`${selectedItem.name}にフォーカス`} onClick={() => runtime.current?.focus(selectedItem.id)}>選択中: {selectedItem.name}</button>}
       <DimensionLabel item={dimensionItem}/>
       <div ref={fallback} className="viewer-fallback" hidden role="status">

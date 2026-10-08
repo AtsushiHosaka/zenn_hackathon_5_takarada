@@ -3,6 +3,7 @@ import type { RoomDesign, RoomItem } from '../../domain/room';
 
 const EPSILON = 1e-6;
 const adornments = new Set(['cover', 'bed_cover', 'rug', 'wall_decor', 'artwork', 'led', 'poster']);
+export const isFurnitureAdornment = (item: Pick<RoomItem, 'category'>) => adornments.has(item.category);
 const axes = (item: RoomItem) => {
   const angle = (item.rotation ?? 0) * Math.PI / 180;
   return [[Math.cos(angle), -Math.sin(angle)], [Math.sin(angle), Math.cos(angle)]] as const;
@@ -32,4 +33,16 @@ export function overlappingFurnitureIds(items: RoomItem[], design: RoomDesign, i
     if (furnitureVolumesOverlap(items[i], items[j], current) && (!intersects || intersects(items[i], items[j]))) { result.add(items[i].id); result.add(items[j].id); }
   }
   return result;
+}
+
+export function furnitureOverlapMessage(items: RoomItem[], overlaps: Set<string>, incomplete: Set<string>): string {
+  const names = (ids: Set<string>) => {
+    const list = items.filter(item => ids.has(item.id));
+    const labels = list.slice(0, 3).map(item => item.name.length > 40 ? `${item.name.slice(0, 40)}…` : item.name);
+    return labels.join('、') + (list.length > 3 ? `、ほか${list.length - 3}点` : '');
+  };
+  return [
+    overlaps.size ? `家具${overlaps.size}点が重なっています：${names(overlaps)}` : '',
+    incomplete.size ? `一部の家具は、重なり判定や赤い輪郭の表示が不完全です：${names(incomplete)}` : '',
+  ].filter(Boolean).join('。');
 }
