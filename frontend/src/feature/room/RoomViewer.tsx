@@ -8,7 +8,7 @@ import { buildReferenceRoom, usesReferenceRoom } from "./referenceRoomModel";
 import { buildMeasuredRoom } from "./roomArchitecture";
 import { LAYOUT_GRID_STEP, snapItemPosition } from "./layoutGrid";
 import { applyMaterialOverrides } from "./furnitureMaterials";
-import { getInferredRoomBounds } from './roomBounds';
+import { getInferredRoomBounds, snapFurnitureEditPosition } from './roomBounds';
 
 interface RoomViewerProps {
   design: RoomDesign;
@@ -1017,7 +1017,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         const delta = hit.sub(drag.hit);
         const item = design.items.find(item => item.id === drag?.id);
         if (!item) return;
-        const position = snapItemPosition(item, [drag.itemPosition[0] + delta.x, drag.itemPosition[1], drag.itemPosition[2] + delta.z], currentView === "front" ? [0] : [0, 2], design.room);
+        const position = snapFurnitureEditPosition(item, [drag.itemPosition[0] + delta.x, drag.itemPosition[1], drag.itemPosition[2] + delta.z], currentView === "front" ? [0] : [0, 2], design);
+        if (!position) return;
         drag.position = position;
         // Preserve the model group's origin offset while previewing the snapped position.
         drag.group.position.copy(drag.origin).add(new THREE.Vector3(position[0] - drag.itemPosition[0], 0, position[2] - drag.itemPosition[2]));

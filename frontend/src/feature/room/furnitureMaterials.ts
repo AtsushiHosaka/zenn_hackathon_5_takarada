@@ -54,6 +54,7 @@ export function applyMaterialOverrides(
       } else if (override.color !== undefined) {
         next.map = null;
         next.color.set(override.color);
+        if (material.name === "light" && next.emissiveIntensity > 0) next.emissive.set(override.color);
       }
       next.needsUpdate = true;
       return next;

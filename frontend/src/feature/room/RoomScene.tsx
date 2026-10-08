@@ -36,7 +36,7 @@ export default function RoomScene({design, panel, before, filter, selectedId, on
       </div>
     </div>
     <div className="rc-segment" role="group" aria-label="表示の切り替え"><button type="button" aria-pressed={before} onClick={()=>onBefore(true)}>Before</button><button type="button" aria-pressed={!before} onClick={()=>onBefore(false)}>After</button></div>
-    {!panel&&<button type="button" className="rc-open-panel" onClick={onOpenPanel}><ReferenceSvg page={5} index={14}/>おすすめアイテム<span>{additions.length}</span></button>}
+    {!panel&&<button type="button" className="rc-open-panel" onClick={onOpenPanel}><ReferenceSvg page={5} index={14}/>{design.kind==='analysis'?'家具を編集':<>おすすめアイテム<span>{additions.length}</span></>}</button>}
     <div className="rc-scene-footer"><div className="rc-toolbar" role="toolbar" aria-label="3D表示の操作">
       <button type="button" aria-label="左に回転" onClick={()=>control('left')}><ReferenceSvg page={5} index={15}/></button><button type="button" aria-label="右に回転" onClick={()=>control('right')}><ReferenceSvg page={5} index={16}/></button><span className="rc-toolbar-divider"/><button type="button" aria-label="拡大" onClick={()=>control('in')}><ReferenceSvg page={5} index={17}/></button><button type="button" aria-label="縮小" onClick={()=>control('out')}><ReferenceSvg page={5} index={18}/></button><button type="button" aria-label="視点をリセット" onClick={reset}><ReferenceSvg page={5} index={19}/></button>
     </div></div>

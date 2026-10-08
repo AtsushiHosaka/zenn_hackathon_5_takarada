@@ -22,6 +22,10 @@
 
 Beforeは元の解析結果を表示し、再生成の入力で書き換えない。床内検証と配置計算は15度単位の手動回転に対応する。
 
+## Review correction: issue #37 (2026-10-08)
+
+The effective preview color preserved by SlotLayout also controls model material overrides during regeneration. Official product color metadata remains unchanged. When the preview color differs from the product color, description-based texture generation is skipped so it cannot overwrite the user's edit. This follows the existing same-product edit requirement; the Google Docs URL is unset and this correction has not been reflected there.
+
 ## 検証結果と公開前に必要な作業
 
 フロントのlint、型チェック込みビルド、backendの既存request spec 23件、RuboCop、Swagger生成、フロントのAPI型生成に成功した。新規テストは追加していない。
