@@ -23,4 +23,6 @@ On 2026-10-08, frontend lint and the production build passed. The build reports 
 
 Browser checks on the local dummy connection confirmed that `/`, `/rooms`, new rooms, all four samples, a saved-room URL, and `/coordinate` redirect guests to login. Switching login to signup and back preserved the requested destination; successful dummy login returned to the sample with its query and fragment intact. My Room and New Room then opened directly. Logout and browser Back both kept room content behind login.
 
-Signup submission, session expiry/network-error states, and real API authentication were not exercised. Their existing session implementation is unchanged. Production release verification is pending. No new automated tests are added under the repository policy.
+The frontend-only runtime image was released to the reported Cloud Run service as revision `zenn-hackathon-web-00026-qhr`, serving 100% of traffic. In a guest browser on the exact reported origin, the same nine room entry points all redirected to `/login`. Backend services and database tasks were not deployed or run.
+
+Signup submission, session expiry/network-error states, and real API authentication were not exercised. Their existing session implementation is unchanged. No new automated tests are added under the repository policy.
