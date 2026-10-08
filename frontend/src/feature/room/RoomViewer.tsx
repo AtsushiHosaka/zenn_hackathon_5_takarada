@@ -1,3 +1,5 @@
+import { roomPalette } from "../../domain/roomPalette";
+import { characterTheme } from "../../domain/characterTheme";
 import { useEffect, useEffectEvent, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
@@ -464,6 +466,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     items: afterDesign.before.items,
     wallColor: afterDesign.before.wallColor,
     characterThemeId: undefined,
+    style: afterDesign.characterThemeId ? "natural" : afterDesign.style,
     modelUrl: undefined,
     modelKind: undefined,
   } : afterDesign, [afterDesign, before]);
@@ -557,8 +560,9 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     sun.shadow.bias = -0.0001;
     scene.add(sun);
     scene.add(sun.target);
-    const oshi = design.style === "oshi";
-    const accent = oshi ? "#bba5ee" : design.style === "natural" ? "#c2a07f" : "#819274";
+    const theme = characterTheme(design.characterThemeId);
+    const oshi = design.style === "oshi" && !theme;
+    const accent = (theme ? roomPalette(design.roomPaletteId)?.accent : undefined) ?? theme?.accent ?? (oshi ? "#bba5ee" : design.style === "natural" ? "#c2a07f" : "#819274");
     if (design.room) {
       roomBounds.current = {
         id: design.id,
@@ -644,6 +648,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       }
     };
     const updateVisibility = () => {
+      if (themedDecor) themedDecor.visible = !currentBefore;
       layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel;
       proceduralRoomVisible = currentBefore || !loadedRoom;
       architecture.visible = proceduralRoomVisible;

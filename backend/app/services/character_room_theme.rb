@@ -9,6 +9,6 @@ class CharacterRoomTheme
     theme = find(id)
     return prompt unless theme
 
-    "#{prompt}\nキャラクターテーマ: #{theme.fetch('name')}。#{theme.fetch('instructions')}\nキャラクターをイメージしたインテリアを選ぶ。公式画像や公式商品があると断定しない。部屋のカラーテーマが指定されている場合は、その配色を優先する。"
+    "#{prompt}\nキャラクターテーマ: #{theme.fetch('name')}。#{theme.fetch('instructions')}\n配色の目安: ベース色#{theme.fetch('base')}、サブ色#{theme.fetch('secondary')}、アクセント色#{theme.fetch('accent')}。\nキャラクターをイメージしたインテリアを選ぶ。公式画像や公式商品があると断定しない。部屋のカラーテーマが指定されている場合は、その配色を優先する。"
   end
 end
