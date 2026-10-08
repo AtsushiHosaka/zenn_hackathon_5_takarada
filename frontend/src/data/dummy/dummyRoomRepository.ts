@@ -1,10 +1,12 @@
 import { DomainError } from "../../domain/error";
+import type { TokenStore } from "../../core/tokenStore";
 import type { RoomDesign, RoomItem, Style } from "../../domain/room";
-import { isManualFurniture, isRoomShape } from "../../domain/room";
-import type { RoomRepository } from "../../domain/roomRepository";
+import { isManualFurniture, isRoomDesign, isRoomShape } from "../../domain/room";
+import type { RoomRepository, SavedRoom } from "../../domain/roomRepository";
 import { toAnalyzedRoomDesign } from "../records/room";
 import { demoProductReference } from "./demoProductReferences";
 import { createAnalyzedRoomFixture } from "./analyzedRoomFixture";
+import { dummyDatabase, tick } from "./dummyDatabase";
 
 const palettes: Record<Style, { color: string; title: string; description: string }> = {
   botanical: { color: "#81917a", title: "緑と暮らす、やさしい部屋", description: "今あるベッドとデスクを活かし、植物と自然素材を合わせたサンプルです。" },
@@ -43,30 +45,90 @@ export function createDemoRoom(style: Style = "oshi", budget = Infinity): RoomDe
   };
 }
 
-export function createDummyRoomRepository(): RoomRepository {
-  return {
+function storedRooms(userId: number): SavedRoom[] {
+  try {
+    const saved: unknown = JSON.parse(localStorage.getItem(`hack.dummy.rooms.v1.${userId}`) ?? "[]");
+    if (!Array.isArray(saved) || !saved.every((room: unknown) => {
+      if (typeof room !== "object" || room === null) return false;
+      const record = room as Record<string, unknown>;
+      return typeof record.id === "string" && typeof record.title === "string"
+        && typeof record.createdAt === "string" && Number.isFinite(Date.parse(record.createdAt))
+        && record.status === "ready" && isRoomDesign(record.design) && record.id === record.design.id;
+    })) throw new Error("Invalid saved rooms");
+    return saved as SavedRoom[];
+  } catch {
+    throw new DomainError("保存した部屋を読み込めません。ブラウザの保存設定を確認してください");
+  }
+}
+
+export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepository {
+  const currentUserId = () => dummyDatabase.userOf(tokenStore.load()).id;
+  const unsavedRooms = new Map<number, SavedRoom[]>();
+  const roomsFor = (userId: number) => {
+    const pending = unsavedRooms.get(userId) ?? [];
+    return [...pending, ...storedRooms(userId).filter(room => !pending.some(saved => saved.id === room.id))];
+  };
+  const repository: RoomRepository = {
     demo: createDemoRoom,
     async importFurniture() {
       throw new DomainError("商品リンクからの追加にはAPI接続が必要です。接続設定をAPIに切り替えてください。");
     },
-    analyze: (input, signal) => createDummyRoomRepository().generate(input, signal),
+    persistenceWarning() {
+      if (!tokenStore.load()) return undefined;
+      try {
+        return unsavedRooms.get(currentUserId())?.length
+          ? "ブラウザに保存できませんでした。このタブでは部屋を引き続き使えます。再読み込みすると未保存の部屋は失われます。"
+          : undefined;
+      } catch { return undefined; }
+    },
+    async list(signal) {
+      await tick();
+      if (signal?.aborted) throw new DomainError("操作をキャンセルしました");
+      return roomsFor(currentUserId());
+    },
+    async get(roomId, signal) {
+      await tick();
+      if (signal?.aborted) throw new DomainError("操作をキャンセルしました");
+      const room = roomsFor(currentUserId()).find(room => room.id === roomId);
+      if (!room?.design) throw new DomainError("部屋が見つかりません", 404);
+      return room.design;
+    },
+    analyze: (input, signal) => repository.generate(input, signal),
     async capabilities() {
       return { generation: true, coordination: false, input: "dimensions", photos: false, message: "オフラインモックでは畳数と形から部屋の寸法とベッド・デスク・本棚を表示します。写真・希望・スタイルの解析と、商品生成は行いません。商品付きの提案はAPI接続で確認できます。" };
     },
     async generate(input, signal) {
+      const userId = currentUserId();
       if (signal?.aborted) throw new DomainError("操作をキャンセルしました");
       if (input.tatami === undefined || !Number.isFinite(input.tatami) || input.tatami < 3 || input.tatami > 30) throw new DomainError("畳数は3〜30で入力してください");
       if (!isRoomShape(input.shape)) throw new DomainError("部屋の形を選んでください");
-      const design = toAnalyzedRoomDesign(createAnalyzedRoomFixture(input.tatami, input.shape), "");
-      return {
-        ...design,
-        items: [...design.items.map(item => input.editedItems?.find(edited => edited.id === item.id) ?? item), ...(input.editedItems ?? []).filter(isManualFurniture)],
+      const rooms = roomsFor(userId);
+      const previous = input.roomId === undefined ? undefined : rooms.find(room => room.id === input.roomId);
+      if (input.roomId !== undefined && !previous) throw new DomainError("部屋が見つかりません", 404);
+      const analyzed = toAnalyzedRoomDesign(createAnalyzedRoomFixture(input.tatami, input.shape), "");
+      const design: RoomDesign = {
+        ...analyzed,
+        items: [...analyzed.items.map(item => input.editedItems?.find(edited => edited.id === item.id) ?? item), ...(input.editedItems ?? []).filter(isManualFurniture)],
         editedItems: input.editedItems,
         source: "demo",
-        id: `demo-analysis-${input.tatami}-${input.shape}`,
+        id: previous?.id ?? `dummy-room-${crypto.randomUUID()}`,
         backendRoomId: undefined,
-        description: `${input.tatami}畳の部屋を作成しました。`,
+        style: input.style,
+        prompt: input.prompt.trim() || undefined,
+        budget: input.budget,
+        description: "畳数と部屋の形から寸法とベッド・デスク・本棚を配置したモックです。写真・希望・スタイルの解析と、商品生成は行っていません。",
       };
+      if (!isRoomDesign(design)) throw new DomainError("部屋の入力内容を確認してください", 422);
+      const room: SavedRoom = { id: design.id, title: design.title, status: "ready", createdAt: previous?.createdAt ?? new Date().toISOString(), design };
+      try {
+        localStorage.setItem(`hack.dummy.rooms.v1.${userId}`, JSON.stringify([room, ...rooms.filter(saved => saved.id !== room.id)]));
+        unsavedRooms.delete(userId);
+      } catch {
+        // Keep only failed writes in memory; successful disk data stays authoritative.
+        unsavedRooms.set(userId, [room, ...(unsavedRooms.get(userId) ?? []).filter(saved => saved.id !== room.id)]);
+      }
+      return design;
     },
   };
+  return repository;
 }

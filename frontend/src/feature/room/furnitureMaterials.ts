@@ -7,8 +7,9 @@ export function applyMaterialOverrides(
   overrides: MaterialOverrides,
   modelScale: number,
   onFailure: () => void,
+  manager?: THREE.LoadingManager,
 ): () => void {
-  const loader = new THREE.TextureLoader();
+  const loader = new THREE.TextureLoader(manager);
   const textures = new Set<THREE.Texture>();
   let disposed = false;
   let applied = 0;

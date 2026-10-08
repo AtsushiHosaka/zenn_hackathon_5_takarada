@@ -20,8 +20,22 @@ export type GenerateRoomInput = {
 // input: 寸法を入力させるか、写真だけで解析するか。
 export type RoomCapabilities = { generation: boolean; coordination: boolean; message: string; input: "dimensions" | "photos"; photos: boolean };
 
+export type SavedRoom = {
+  id: string;
+  title: string;
+  createdAt: string;
+  status: "analyzing" | "ready" | "failed";
+  design?: RoomDesign;
+  errorMessage?: string;
+};
+
 export type RoomRepository = {
   demo(style?: Style): RoomDesign;
+  // Non-fatal persistence status for the current owner, when supported.
+  persistenceWarning?(): string | undefined;
+  list(signal?: AbortSignal): Promise<SavedRoom[]>;
+  // 一覧のIDまたはRoomDesign.idから、保存された部屋を復元する。
+  get(id: string, signal?: AbortSignal): Promise<RoomDesign>;
   analyze(input: GenerateRoomInput, signal?: AbortSignal): Promise<RoomDesign>;
   generate(input: GenerateRoomInput, signal?: AbortSignal): Promise<RoomDesign>;
   importFurniture(url: string, signal?: AbortSignal): Promise<RoomItem>;

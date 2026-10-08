@@ -22,7 +22,7 @@ export function createRepositories(connection: Connection): Repositories {
       tokenStore,
       auth: createDummyAuthRepository(tokenStore),
       users: createDummyUserRepository(tokenStore),
-      rooms: createDummyRoomRepository(),
+      rooms: createDummyRoomRepository(tokenStore),
       furnitureModels: createDummyFurnitureModelRepository(),
     };
   }

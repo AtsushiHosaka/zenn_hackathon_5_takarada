@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link, useLocation, useNavigate, useParams } from 'react-router';
+import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router';
 import { useRepositories } from '../../core/repositories';
+import { useSession } from '../../core/session';
 import { loadConnection } from '../../core/connection';
 import { isManualFurniture, type FurnitureAddition, type FurnitureOperation, type RoomDesign, type RoomItem, type RoomShape, type Style } from '../../domain/room';
 import AccountMenu from './AccountMenu';
@@ -12,7 +13,7 @@ import RoomGenerating from './RoomGenerating';
 import PlannerPanel, { type PlannerView } from './PlannerPanel';
 import { furniturePositionInRoom, snapFurnitureEditPosition } from './roomBounds';
 import { roomDescription } from './roomDescription';
-import { roomPlanKeys as sharedRoomPlanKeys, scopedRoomPlanKeys, useRoomPlanScope, saveRoomPlan, useRoomPlans } from './plans';
+import { roomPlanKeys as sharedRoomPlanKeys, scopedRoomPlanKeys, useRoomPlanScope, saveRoomPlan, useRoomPlan, isApiRoomAlias } from './plans';
 import ErrorText from '../shared/ErrorText';
 import { DomainError } from '../../domain/error';
 import './room-studio.css';
@@ -49,19 +50,29 @@ function sampleDesign(base:RoomDesign,id:string):RoomDesign {
 }
 export default function RoomStudioPage() {
   const {id='new'}=useParams();
+  const sample=id.startsWith('sample-');
+  const {rooms}=useRepositories();
+  const local=id==='new'||sample;
+  const saved=useRoomPlan(id,!local,local?()=>sampleDesign(rooms.demo(id==='sample-botanical'?'botanical':id==='sample-natural'?'natural':'oshi'),id):undefined);
+  if(!saved.data||(isApiRoomAlias(id)&&(saved.isFetching||saved.isError))) return <main className="rc-missing-room">
+    <Link className="rc-back" to="/rooms" aria-label="ルーム一覧に戻る"><ReferenceSvg page={3} index={0}/></Link>
+    {saved.isPending||saved.isFetching?<p role="status">読み込み中…</p>:<><ErrorText error={saved.error}/><button className="rc-secondary" onClick={()=>void saved.refetch()}>再試行</button></>}
+  </main>;
+  if(saved.data && saved.data.id!==id) return <Navigate to={`/rooms/${encodeURIComponent(saved.data.id)}`} replace/>;
+  return <LoadedRoomStudioPage key={id} initialDesign={saved.data}/>;
+}
+function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
+  const {id='new'}=useParams();
   const isNew=id==='new';
   const {rooms,tokenStore}=useRepositories();
+  const session=useSession();
   const scope=useRoomPlanScope();
   const roomPlanKeys={...sharedRoomPlanKeys,...scopedRoomPlanKeys(scope)};
   const client=useQueryClient();
-  const plans=useRoomPlans();
   const location=useLocation();
   const navigate=useNavigate();
-  const inputState=location.state as {prompt?:string;photos?:File[];editing?:boolean;view?:PlannerView;selectedId?:string|null;dimensions?:boolean}|null;
-  const cached=client.getQueryData<RoomDesign>(roomPlanKeys.detail(id));
-  const validRoom=!!cached||isNew||['sample-oshi','sample-botanical','sample-natural','sample-game'].includes(id)||plans.some(plan=>plan.id===id);
-  const designQuery=useQuery({queryKey:roomPlanKeys.detail(id),queryFn:()=>plans.find(plan=>plan.id===id)??sampleDesign(rooms.demo(id==='sample-botanical'?'botanical':id==='sample-natural'?'natural':'oshi'),id),initialData:()=>validRoom?(cached??plans.find(plan=>plan.id===id)??sampleDesign(rooms.demo(id==='sample-botanical'?'botanical':id==='sample-natural'?'natural':'oshi'),id)):undefined,enabled:validRoom,staleTime:Infinity});
-  const design=designQuery.data??rooms.demo();
+  const inputState=location.state as {prompt?:string;photos?:File[];editing?:boolean;view?:PlannerView;selectedId?:string|null;dimensions?:boolean;notice?:string}|null;
+  const design=initialDesign;
   const capability=useQuery({queryKey:roomPlanKeys.capabilities,queryFn:()=>rooms.capabilities(),staleTime:Infinity});
   const analysisMode=capability.data?.input==='dimensions';
   const acceptsPhotos=capability.data?.photos===true;
@@ -86,7 +97,7 @@ export default function RoomStudioPage() {
   const [photos,setPhotos]=useState<File[]>(()=>inputState?.photos?.filter(file=>file instanceof File)??[]);
   const [samplePhotos,setSamplePhotos]=useState<number[]>(()=>loadConnection()==='dummy'?[0,1,2]:[]);
   const [photoError,setPhotoError]=useState('');
-  const [notice,setNotice]=useState('');
+  const [notice,setNotice]=useState(inputState?.notice??'');
   const [selectedId,setSelectedId]=useState<string|null>(inputState?.selectedId??design.items.find(item=>item.id==='3')?.id??design.items.find(item=>!item.existing)?.id??null);
   const [panel,setPanel]=useState(!analyzed||!!inputState?.selectedId);
   const [editing,setEditing]=useState(inputState?.editing??analyzed);
@@ -106,25 +117,34 @@ export default function RoomStudioPage() {
   const renameDialog=useRef<HTMLDialogElement>(null);
   useEffect(()=>()=>abort.current?.abort(),[]);
   useEffect(()=>{if(rename)renameDialog.current?.showModal();else renameDialog.current?.close();},[rename]);
+  function requireOwner():boolean {
+    if(session.status==='authenticated')return true;
+    navigate('/login',{state:{from:location.pathname}});
+    return false;
+  }
   const generation=useMutation({
     mutationFn:async({request,budget,targetStyle,analyzeOnly,followup=false}:{request:string;budget:number;targetStyle?:Style;analyzeOnly?:boolean;followup?:boolean})=>{
       const controller=new AbortController();abort.current=controller;
       const token=tokenStore.load();
       // 追加の指示のときは前回のコーデを渡し、指示に関係ない商品を残してもらう
       const baseCoordinationId=followup&&design.source==='api'&&design.kind==='coordination'?design.id.replace(/^api-coordination-/,''):undefined;
-      const input={baseCoordinationId,photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId:!isNew&&design.source==='api'?design.backendRoomId:undefined,keptObjectIds:selectsFurniture?existingFurniture.filter(item=>(furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep')==='keep').map(item=>item.id):undefined,furnitureOperations:selectsFurniture?existingFurniture.map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'})):undefined,furnitureAdditions:selectsFurniture?furnitureAdditions:undefined,editedItems:selectsFurniture?[...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))]:undefined};
+      const roomId=!isNew&&!id.startsWith('sample-')
+        ? design.backendRoomId??(loadConnection()==='dummy'&&design.id.startsWith('dummy-room-')?design.id:undefined)
+        : undefined;
+      const input={baseCoordinationId,photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId,keptObjectIds:selectsFurniture?existingFurniture.filter(item=>(furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep')==='keep').map(item=>item.id):undefined,furnitureOperations:selectsFurniture?existingFurniture.map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'})):undefined,furnitureAdditions:selectsFurniture?furnitureAdditions:undefined,editedItems:selectsFurniture?[...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))]:undefined};
       const result=await (analyzeOnly?rooms.analyze(input,controller.signal):rooms.generate(input,controller.signal));
       if(controller.signal.aborted||tokenStore.load()!==token) throw new DomainError("ログイン状態が変わりました。もう一度お試しください。");
       return result;
     },
     onSuccess:(result,variables)=>{
       const editedItems=(design.editedItems??[]).filter(item=>item.existing||result.items.some(current=>current.id===item.id));
-      const saved={...result,...(!variables.analyzeOnly&&editedItems.length?{editedItems}:{}),...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request.trim()||undefined,budget:variables.budget}:{}),id:result.source==='api'?result.id:isNew||id.startsWith('sample-')?`room-${crypto.randomUUID()}`:id};
-      try {saveRoomPlan(client,saved,scope);}catch{client.setQueryData(roomPlanKeys.detail(saved.id),saved);setNotice('ブラウザに保存できませんでした。保存容量を確認してください。');}
+      const saved={...result,...(!variables.analyzeOnly&&editedItems.length?{editedItems}:{}),...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request.trim()||undefined,budget:variables.budget}:{}),id:result.id};
+      let storageNotice: string|undefined;
+      try {saveRoomPlan(client,saved,scope);}catch{client.setQueryData(roomPlanKeys.detail(saved.id),saved);if(!rooms.persistenceWarning?.()){storageNotice='ブラウザに保存できませんでした。保存容量を確認してください。';setNotice(storageNotice);}}
       setSavedFingerprint(JSON.stringify(saved));setHistory({past:[],future:[]});
       setFurnitureOperations(saved.furnitureOperations??(saved.before?.items??saved.items).filter(item=>item.existing).map(item=>({objectId:item.id,action:'keep'})));
       setFurnitureAdditions(saved.furnitureAdditions??[]);
-      navigate(`/rooms/${saved.id}`,{state:{prompt:result.kind==='analysis'&&canCoordinate?variables.request:saved.prompt??(result.kind==='analysis'?analysisPrompt:variables.request),photos:result.analysisInput?[]:photos,editing:result.kind==='analysis'}});
+      navigate(`/rooms/${saved.id}`,{state:{prompt:result.kind==='analysis'&&canCoordinate?variables.request:saved.prompt??(result.kind==='analysis'?analysisPrompt:variables.request),photos:result.analysisInput?[]:photos,editing:result.kind==='analysis',notice:storageNotice}});
     },
   });
   const additions=design.items.filter(item=>!item.existing);
@@ -158,7 +178,7 @@ export default function RoomStudioPage() {
     setPhotoError('');generation.mutate({request:prompt.trim(),budget:100000});
   }
   function followup(event:FormEvent) {
-    event.preventDefault();if(!message.trim())return;
+    event.preventDefault();if(!message.trim()||!requireOwner())return;
     if(!canCoordinate){setNotice('コーディネートは利用できません。');return;}
     if(!capability.data?.generation){setNotice('コーディネートは利用できません。');return;}
     if(loadConnection()==='dummy'&&!/予算.*[2２]|落ち着いた紫|グリーン/.test(message)){setNotice('この変更はサンプルでは利用できません。');return;}
@@ -166,11 +186,12 @@ export default function RoomStudioPage() {
   }
   function coordinate(event:FormEvent) {
     event.preventDefault();
+    if(!requireOwner())return;
     if(!prompt.trim()){setPhotoError('どんな部屋にしたいかを入力してください。');return;}
     if(!Number.isSafeInteger(budget)||budget<=0){setPhotoError('予算は1円以上の整数で入力してください。');return;}
     setPhotoError('');generation.mutate({request:prompt.trim(),budget});
   }
-  function changeTitle(event:FormEvent) {event.preventDefault();const value=title.trim();if(!value)return;try{const next={...design,title:value};saveRoomPlan(client,next,scope);setSavedFingerprint(JSON.stringify(next));setRename(false);}catch{setNotice('ルーム名を保存できませんでした。');}}
+  function changeTitle(event:FormEvent) {event.preventDefault();if(!requireOwner())return;const value=title.trim();if(!value)return;try{const next={...design,title:value};saveRoomPlan(client,next,scope);setSavedFingerprint(JSON.stringify(next));setRename(false);}catch{setNotice('ルーム名を保存できませんでした。');}}
   function editDesign(next:RoomDesign) {
     if(JSON.stringify(next)===JSON.stringify(design))return;
     setBefore(false);
@@ -219,6 +240,7 @@ export default function RoomStudioPage() {
     setHistory({past:[...history.past,design].slice(-50),future:history.future.slice(1)});
   }
   function saveEdits() {
+    if(!requireOwner())return;
     const saved={...design,id:id.startsWith('sample-')?`room-${crypto.randomUUID()}`:design.id};
     try {
       saveRoomPlan(client,saved,scope);setSavedFingerprint(JSON.stringify(saved));
@@ -226,9 +248,8 @@ export default function RoomStudioPage() {
       else setNotice('保存しました。');
     }catch{setNotice('変更を保存できませんでした。ブラウザの保存容量を確認してください。');}
   }
-  if(!validRoom)return <main className="room-list-main"><h1>ルームが見つかりません</h1><p>このブラウザに保存されているルームを一覧から選んでください。</p><Link to="/rooms">マイルームへ戻る</Link></main>;
   return <div className="rc-studio">
-    <header className="rc-studio-header"><Link className="rc-back" to="/rooms"><ReferenceSvg page={3} index={0}/>マイルーム</Link><span className="rc-header-divider"/><div className={`rc-title${isNew?' is-new':''}`}><h1>{isNew?'新しいルーム':design.title}</h1>{!isNew&&<button type="button" aria-label="ルーム名を変更" onClick={()=>{setTitle(design.title);setRename(true);}}><ReferenceSvg page={5} index={1}/></button>}</div><AccountMenu onEditLayout={!isNew&&id!=='sample-game'?()=>{setEditing(true);setPanel(true);setBefore(false);}:undefined}/></header>
+    <header className="rc-studio-header"><Link className="rc-back" to="/rooms" aria-label="ルーム一覧に戻る" title="ルーム一覧"><ReferenceSvg page={3} index={0}/></Link><span className="rc-header-divider"/><div className={`rc-title${isNew?' is-new':''}`}><h1>{isNew?'新しいルーム':design.title}</h1>{!isNew&&<button type="button" aria-label="ルーム名を変更" onClick={()=>{setTitle(design.title);setRename(true);}}><ReferenceSvg page={5} index={1}/></button>}</div><AccountMenu onEditLayout={!isNew&&id!=='sample-game'?()=>{setEditing(true);setPanel(true);setBefore(false);}:undefined}/></header>
     <input ref={upload} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={event=>{addPhotos(Array.from(event.target.files??[]));event.target.value='';}}/>
     <div className="rc-workspace">
       {pending||id==='sample-game'?<RoomGenerating prompt={analysisMode&&(!canCoordinate||generation.variables?.analyzeOnly)?analysisPrompt:isNew?prompt:message||prompt} photos={acceptsPhotos?photos:[]} sample={loadConnection()==='dummy'} dimensions={analysisMode} coordination={canCoordinate&&!generation.variables?.analyzeOnly} onCancel={()=>pending?abort.current?.abort():navigate('/rooms')}/>:<>
@@ -273,6 +294,7 @@ export default function RoomStudioPage() {
       </>}
     </div>
     {notice&&<div className="rc-notice" role="status">{notice}<button type="button" aria-label="通知を閉じる" onClick={()=>setNotice('')}>×</button></div>}
+    {rooms.persistenceWarning?.()&&<div className="rc-notice" role="alert">{rooms.persistenceWarning()}</div>}
     <dialog ref={renameDialog} className="rc-dialog" onCancel={()=>setRename(false)}><form onSubmit={changeTitle}><div className="rc-dialog-heading"><h2>ルーム名を変更</h2><button type="button" aria-label="閉じる" onClick={()=>setRename(false)}>×</button></div><label className="rc-setting">ルーム名<input value={title} onChange={event=>setTitle(event.target.value)} maxLength={80} required autoFocus/></label><p/><button className="rc-primary" type="submit">保存</button></form></dialog>
   </div>;
 }
