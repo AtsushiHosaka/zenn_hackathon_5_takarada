@@ -1,90 +1,62 @@
-import { useState } from 'react';
 import { Link } from 'react-router';
-import type { RoomDesign } from '../../domain/room';
+import type { RoomDesign, RoomShape } from '../../domain/room';
 import AccountMenu from './AccountMenu';
-import { useRoomPlans } from './plans';
+import { useSavedRooms } from './plans';
 import ReferenceSvg from './ReferenceSvg';
+import RoomPreview from './RoomPreview';
+import ErrorText from '../shared/ErrorText';
 import './room-list.css';
 
-type RoomCard = {
-  id: string;
-  title: string;
-  description: string;
-  image: number;
-  count: number;
-  updated: string;
-  generating?: boolean;
-};
-
-const sampleRooms: RoomCard[] = [
-  { id: 'sample-oshi', title: '紫の推し活ルーム', description: 'ラグを140cmのラウンド型に変更しました。', image: 5, count: 8, updated: '2時間前' },
-  { id: 'sample-botanical', title: 'ボタニカルなワンルーム', description: '日当たりが弱い窓際でも育てやすい植物に入れ替えました。', image: 6, count: 11, updated: '昨日' },
-  { id: 'sample-natural', title: '白×木目のナチュラル', description: '今のローテーブルに合わせて、照明を白で揃えました。', image: 7, count: 6, updated: '3日前' },
-  { id: 'sample-game', title: 'ゲーム配信できる部屋', description: 'インテリアを選定しています…', image: 8, count: 0, updated: 'たった今', generating: true },
-];
-
-function savedRoomCard(room: RoomDesign): RoomCard {
-  return {
-    id: room.id,
-    title: room.title,
-    description: room.description,
-    image: room.style === 'oshi' ? 5 : room.style === 'botanical' ? 6 : 7,
-    count: room.items.filter(item => !item.existing).length,
-    updated: '保存済み',
-  };
+const shapes: Record<RoomShape,string> = { square: '正方形に近い', standard: 'やや縦長', long: '細長い' };
+const money = (value: number) => `¥${value.toLocaleString('ja-JP')}`;
+function productTotal(design: RoomDesign | undefined): number | undefined {
+  const additions = design?.items.filter(item => !item.existing) ?? [];
+  return design?.kind === 'coordination' && additions.length > 0 && additions.every(item => item.price !== undefined)
+    ? additions.reduce((sum,item) => sum + (item.price ?? 0),0) : undefined;
 }
 
 export default function RoomListPage() {
-  const [search, setSearch] = useState('');
-  const plans = useRoomPlans();
-  const rooms = [...plans.map(savedRoomCard), ...sampleRooms];
-  const query = search.trim().toLocaleLowerCase('ja-JP');
-  const filtered = rooms.filter(room => `${room.title} ${room.description}`.toLocaleLowerCase('ja-JP').includes(query));
-
-  return <div className="room-list-page">
+  const rooms = useSavedRooms();
+  const showsTotals = rooms.data.some(room => productTotal(room.design) !== undefined);
+  return <div className={`room-list-page${showsTotals ? ' has-product-totals' : ''}`}>
     <header className="room-list-header">
-      <Link to="/rooms" className="room-list-brand">
-        <ReferenceSvg page={2} index={0} />
-        <span>へやいろ</span>
-      </Link>
-      <AccountMenu />
+      <Link to="/rooms" className="room-list-brand"><ReferenceSvg page={2} index={0}/><span>へやいろ</span></Link>
+      <AccountMenu/>
     </header>
     <main className="room-list-main">
-      <div className="room-list-heading">
-        <div className="room-list-intro">
-          <h1>マイルーム<span>{rooms.length}</span></h1>
-          <p>部屋の情報と希望から、コーディネートを3Dで確認。</p>
-        </div>
-        <div className="room-list-actions">
-          <div className="room-list-search">
-            <label htmlFor="room-search">ルームを検索</label>
-            <ReferenceSvg page={2} index={2} />
-            <input id="room-search" type="search" placeholder="ルームを検索" value={search} onChange={event => setSearch(event.target.value)} />
-          </div>
-          <Link to="/rooms/new" className="room-list-create"><ReferenceSvg page={2} index={3} />新しいルーム</Link>
-        </div>
-      </div>
+      <h1>マイルーム</h1>
       <div className="room-list-grid">
-        <Link to="/rooms/new" className="room-list-new-card">
-          <span className="room-list-new-icon"><ReferenceSvg page={2} index={4} /></span>
-          <span className="room-list-new-title">新しいルームを作る</span>
-          <span className="room-list-new-description">部屋の情報と、どんな部屋にしたいかを入力します。</span>
+        <Link to="/rooms/new" className="room-list-new-card" aria-label="新しいルームを作る" title="新しいルームを作る">
+          <span className="room-list-new-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>
         </Link>
-        {filtered.map(room => <Link key={room.id} to={`/rooms/${encodeURIComponent(room.id)}`} className="room-list-card" aria-label={`${room.title}${room.id.startsWith('sample-') ? '（サンプル）' : ''}`}>
-          <div className={`room-list-scene${room.generating ? ' room-list-generating' : ''}`}>
-            <div className="room-list-scene-image"><ReferenceSvg page={2} index={room.image} /></div>
-            {room.generating ? <>
-              <span className="room-list-count room-list-generating-badge"><span />生成中</span>
-              <div className="room-list-progress"><div /></div>
-            </> : <span className="room-list-count">{room.count}アイテム</span>}
-          </div>
-          <div className="room-list-card-copy">
-            <div className="room-list-card-title"><span>{room.title}</span><span>{room.updated}</span></div>
-            <span className="room-list-card-description">{room.description}</span>
-          </div>
-        </Link>)}
+        {rooms.data.map(room => {
+          const design = room.design;
+          const budget = design?.budget;
+          const total = productTotal(design);
+          const card = <>
+            <div className="room-list-scene">
+              {design && <RoomPreview design={design}/>}
+              {design && <Link className="room-list-open" to={`/rooms/${encodeURIComponent(design.id)}`} aria-label={`${room.title}を開く`}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></Link>}
+              {room.status !== 'ready' && <span className="room-list-status" role="status">{room.status === 'analyzing' ? '作成中' : '作成に失敗'}</span>}
+            </div>
+            <Link to={`/rooms/${encodeURIComponent(design?.id ?? room.id)}`} className="room-list-card-copy" aria-label={room.title} aria-disabled={!design} tabIndex={design ? undefined : -1} onClick={event => { if (!design) event.preventDefault(); }}>
+              <span className="room-list-card-title">{room.title}</span>
+              {design && <div className="room-list-specs">
+                {design.analysisInput && <><span>{design.analysisInput.tatami}畳</span><span>{shapes[design.analysisInput.shape]}</span></>}
+                <span>{design.items.length}アイテム</span>
+              </div>}
+              {(budget !== undefined || total !== undefined) && <div className="room-list-finances">
+                {budget !== undefined && <span className="room-list-budget">予算 {money(budget)}</span>}
+                {total !== undefined && <span className="room-list-total">商品計 {money(total)}</span>}
+              </div>}
+            </Link>
+          </>;
+          return <div key={room.id} className={`room-list-card${design ? '' : ' is-pending'}`}>{card}</div>;
+        })}
       </div>
-      {query && filtered.length === 0 && <p className="room-list-empty" role="status">「{search}」に一致するルームはありません。</p>}
+      {rooms.isLoading && <p className="room-list-feedback" role="status">読み込み中…</p>}
+      {rooms.persistenceWarning && <p className="room-list-feedback" role="alert">{rooms.persistenceWarning}</p>}
+      {rooms.error && <div className="room-list-feedback"><ErrorText error={rooms.error}/><button className="rc-secondary" type="button" onClick={()=>void rooms.refetch()}>再試行</button></div>}
     </main>
   </div>;
 }

@@ -19,6 +19,8 @@ interface RoomViewerProps {
   onMoveItem?: (id: string, position: RoomItem["position"]) => void;
   resetKey: number;
   before?: boolean;
+  preview?: boolean;
+  onReady?: (ready: boolean) => void;
   command?: { sequence: number; action: "left" | "right" | "in" | "out" };
 }
 
@@ -471,7 +473,7 @@ function disposeObject(object: THREE.Object3D) {
   }
 }
 
-export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, view, resetKey, before = false, command, dimensions = false, editing = false, onMoveItem }: RoomViewerProps) {
+export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, view, resetKey, before = false, command, dimensions = false, editing = false, onMoveItem, preview = false, onReady }: RoomViewerProps) {
   const design = useMemo<RoomDesign>(() => before && afterDesign.before ? {
     ...afterDesign,
     room: afterDesign.before.room,
@@ -490,11 +492,12 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   const runtime = useRef<ViewerRuntime | null>(null);
   const roomBounds = useRef<{ id: string; bounds: THREE.Box3 } | null>(null);
   const cameraState = useRef<{ id: string; position: THREE.Vector3; target: THREE.Vector3; zoom: number; view: RoomViewerProps["view"]; lastCommandSequence: number | null } | null>(null);
+  const reportReady = useEffectEvent((ready: boolean) => onReady?.(ready));
   const selectItem = useEffectEvent(onSelectItem);
   const moveItem = useEffectEvent((id: string, position: RoomItem["position"]) => onMoveItem?.(id, position));
   const initialView = useEffectEvent(() => view);
   const initialBefore = useEffectEvent(() => legacyBefore);
-  const initialMarkersVisible = useEffectEvent(() => !before);
+  const initialMarkersVisible = useEffectEvent(() => !before && !preview);
   const initialEditing = useEffectEvent(() => editing && Boolean(onMoveItem) && !before);
   const dimensionItem = dimensions ? design.items.find(item => item.id === selectedItemId) : undefined;
   const canMove = editing && Boolean(onMoveItem) && !before && (!design.modelUrl || design.modelKind === "shell");
@@ -502,7 +505,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   const dragDescription = canMove
     ? view === "front" ? "家具を左右にドラッグすると10cmのマス目に沿って移動します。" : view === "top" ? "家具をドラッグすると10cmのマス目に沿って平面上を移動します。" : "家具は10cmのマス目に沿って移動し、空いている場所をドラッグすると視点が回転します。"
     : view === "perspective" ? "ドラッグで回転できます。" : "";
-  const instructions = `部屋の3Dプレビュー。${before ? "変更前の部屋。" : ""}${viewDescription}${dragDescription}ホイールで拡大縮小、家具をクリックして選択できます。`;
+  const instructions = preview ? `${design.title}の保存した3Dモデル。ドラッグで回転できます。` : `部屋の3Dプレビュー。${before ? "変更前の部屋。" : ""}${viewDescription}${dragDescription}ホイールで拡大縮小、家具をクリックして選択できます。`;
 
   useEffect(() => {
     const host = canvasHost.current;
@@ -512,12 +515,24 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     } catch {
       if (fallback.current) fallback.current.hidden = false;
+      if (preview) reportReady(false);
       return;
     }
     if (fallback.current) fallback.current.hidden = true;
     if (modelNotice.current) modelNotice.current.hidden = true;
     if (textureNotice.current) textureNotice.current.hidden = true;
     let disposed = false;
+    let assetsReady = true;
+    let assetFailed = false;
+    let readySent = false;
+    let previewNeedsRender = true;
+    const loadingManager = new THREE.LoadingManager();
+    loadingManager.onStart = () => { assetsReady = false; };
+    loadingManager.onLoad = () => { assetsReady = true; previewNeedsRender = true; };
+    loadingManager.onError = () => { assetFailed = true; };
+    const previewDeadline = preview ? window.setTimeout(() => {
+      if (!disposed && !readySent) { readySent = true; reportReady(false); }
+    }, 20000) : undefined;
     const textureCleanups: (() => void)[] = [];
     const scene = new THREE.Scene();
     const reference = !design.room && usesReferenceRoom(design);
@@ -537,6 +552,11 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.075;
+    if (preview) {
+      controls.enableZoom = false;
+      controls.enablePan = false;
+      renderer.domElement.style.touchAction = "pan-y";
+    }
     controls.maxPolarAngle = Math.PI / 2 - 0.035;
     const hemi = new THREE.HemisphereLight("#faf5ff", "#a99abb", 2.2);
     scene.add(hemi);
@@ -662,7 +682,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     };
     let currentView = initialView();
     const defaultDirections = {
-      perspective: reference ? new THREE.Vector3(1, 1, 1).normalize() : new THREE.Vector3(1, 0.84, 1.2).normalize(),
+      perspective: reference ? new THREE.Vector3(1, 1, 1).normalize() : new THREE.Vector3(preview ? -1 : 1, preview ? 1.2 : 0.84, 1.2).normalize(),
       top: new THREE.Vector3(0, 1, 0.001).normalize(),
       front: new THREE.Vector3(0, 0.03, 1).normalize(),
     };
@@ -674,7 +694,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       const size = cameraBounds.getSize(new THREE.Vector3());
       const diagonal = size.length();
       const cameraAspect = camera instanceof THREE.PerspectiveCamera ? camera.aspect : (camera.right - camera.left) / (camera.top - camera.bottom);
-      fitDistances.perspective = fittedDistance(cameraBounds, roomCenter, defaultDirections.perspective, cameraAspect, 36);
+      fitDistances.perspective = fittedDistance(cameraBounds, roomCenter, defaultDirections.perspective, cameraAspect, 36) * (preview ? .82 : 1);
       fitDistances.top = fittedDistance(cameraBounds, roomCenter, defaultDirections.top, cameraAspect, 36);
       fitDistances.front = fittedDistance(cameraBounds, roomCenter, defaultDirections.front, cameraAspect, 36);
       controls.minDistance = Math.max(0.5, diagonal * 0.24);
@@ -757,8 +777,9 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     updateVisibility();
     restoreCamera();
 
-    const loader = new GLTFLoader();
+    const loader = new GLTFLoader(loadingManager);
     const showModelFailure = () => {
+      assetFailed = true;
       if (modelNotice.current && !disposed) modelNotice.current.hidden = false;
     };
     for (const item of design.items) {
@@ -784,7 +805,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         if (!item.existing && item.materialOverrides) {
           textureCleanups.push(applyMaterialOverrides(gltf.scene, item.materialOverrides, scale, () => {
             if (!disposed && textureNotice.current) textureNotice.current.hidden = false;
-          }));
+          }, loadingManager));
         }
         for (const child of [...group.children]) { group.remove(child); disposeObject(child); }
         group.scale.set(1, 1, 1);
@@ -979,6 +1000,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     window.addEventListener("blur", pointerCancel);
     renderer.domElement.addEventListener("webglcontextlost", contextLost);
     const resize = () => {
+      previewNeedsRender = true;
       const width = Math.max(host.clientWidth, 1);
       const height = Math.max(host.clientHeight, 1);
       const aspect = width / height;
@@ -999,7 +1021,10 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     observer.observe(host);
     resize();
     const render = () => {
-      controls.update();
+      const cameraChanged = controls.update();
+      // 一覧の静止した視点は描き直さず、回転・読み込み・リサイズ時に描画する。
+      if (preview && readySent && assetsReady && !cameraChanged && !previewNeedsRender) return;
+      previewNeedsRender = false;
       const markerObjects = loadedRoom && completeRoomModel && !currentBefore ? hitTargets : furniture;
       for (const [id, marker] of markers) {
         const group = markerObjects.get(id);
@@ -1026,9 +1051,15 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         }
       }
       renderer.render(scene, camera);
+      if (preview && assetsReady && !readySent) {
+        readySent = true;
+        window.clearTimeout(previewDeadline);
+        reportReady(!assetFailed);
+      }
     };
     const contextRestored = () => {
       if (disposed) return;
+      previewNeedsRender = true;
       if (fallback.current) fallback.current.hidden = true;
       renderer.setAnimationLoop(render);
     };
@@ -1041,6 +1072,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       cancelDrag();
       cameraState.current = { id: design.id, position: camera.position.clone(), target: controls.target.clone(), zoom: camera.zoom, view: currentView, lastCommandSequence };
       disposed = true;
+      window.clearTimeout(previewDeadline);
       textureCleanups.forEach(cleanup => cleanup());
       runtime.current = null;
       observer.disconnect();
@@ -1061,12 +1093,12 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, [design]);
+  }, [design, preview]);
 
   useEffect(() => { runtime.current?.select(selectedItemId); }, [design, selectedItemId]);
   useEffect(() => { runtime.current?.setView(view); }, [design, view]);
   useEffect(() => { runtime.current?.reset(); }, [resetKey]);
-  useEffect(() => { runtime.current?.setBefore(legacyBefore, !before); }, [design, legacyBefore, before]);
+  useEffect(() => { runtime.current?.setBefore(legacyBefore, !before && !preview); }, [design, legacyBefore, before, preview]);
   useEffect(() => { runtime.current?.setEditing(editing && Boolean(onMoveItem) && !before); }, [design, editing, onMoveItem, before]);
   useEffect(() => { canvasHost.current?.querySelector("canvas")?.setAttribute("aria-label", instructions); }, [design, instructions]);
   useEffect(() => { if (command) runtime.current?.command(command); }, [design, command]);
