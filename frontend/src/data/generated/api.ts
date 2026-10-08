@@ -1375,7 +1375,12 @@ export interface components {
              */
             category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table";
             /**
-             * @description 商品リンクのインポート結果のID。商品・モデル情報はサーバー側で復元する
+             * @description 手動の所有家具を置き換える購入商品のID。所有家具のec_product_idは変更しない
+             * @example 2
+             */
+            replacement_ec_product_id?: number;
+            /**
+             * @description 商品検索・インポート結果のID。元の家具と同じカテゴリの商品に限り、商品・モデル情報をサーバー側で復元する
              * @example 1
              */
             ec_product_id?: number;
@@ -1404,6 +1409,12 @@ export interface components {
         };
         FurnitureImportInput: {
             /**
+             * @description 置換用の取得では床家具以外の対応商品も返す
+             * @example replacement
+             * @enum {string}
+             */
+            purpose?: "replacement";
+            /**
              * @description 同じ商品ページで選ぶ場合の公式バリエーションSKU
              * @example 50337820
              */
@@ -1426,7 +1437,7 @@ export interface components {
              * @example table
              * @enum {string}
              */
-            category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table";
+            category?: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "shelf" | "table" | "small_plant";
         };
         FurnitureSearchResult: {
             products: components["schemas"]["ImportedFurniture"][];
@@ -1460,7 +1471,7 @@ export interface components {
              * @example chair
              * @enum {string}
              */
-            category: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table";
+            category: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "shelf" | "table" | "small_plant";
             /** @example #f2efe8 */
             color: string;
             size: components["schemas"]["Size"];

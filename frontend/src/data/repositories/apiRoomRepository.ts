@@ -25,12 +25,12 @@ const unavailableMessage = "部屋APIの接続先が設定されていません�
 export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, baseUrl: string): RoomRepository {
   return {
     demo: createDemoRoom,
-    async importFurniture(url, signal, variantId) {
+    async importFurniture(url, signal, variantId, purpose) {
       let parsed: URL;
       try { parsed = new URL(url.trim()); } catch { throw new DomainError("商品ページのURLを入力してください"); }
       if (parsed.protocol !== "https:" || parsed.username || parsed.password || url.length > 2048) throw new DomainError("HTTPSの商品ページURLを入力してください");
       return toImportedFurniture(await api.send<unknown>("/api/v1/furniture_imports", {
-        method: "POST", body: { url: parsed.href, ...(variantId ? { variant_id: variantId } : {}) }, signal, timeoutMs: 60_000,
+        method: "POST", body: { url: parsed.href, ...(purpose ? { purpose } : {}), ...(variantId ? { variant_id: variantId } : {}) }, signal, timeoutMs: 60_000,
       }), baseUrl);
     },
     async searchFurniture(input, signal) {
@@ -170,7 +170,8 @@ function editedObjects(input: GenerateRoomInput, record: components["schemas"]["
     rotation_y: item.rotation ?? 0,
     color: item.color,
     ...(isManualFurniture(item) ? { category: item.category as typeof furnitureCategories[number], ...(!item.ecProductId ? { label: item.name } : {}) } : {}),
-    ...(isManualFurniture(item) && item.ecProductId ? { ec_product_id: Number(item.ecProductId) } : {}),
+    ...(item.ecProductId ? { ec_product_id: Number(item.ecProductId) } : {}),
+    ...(item.replacementEcProductId ? { replacement_ec_product_id: item.replacementEcProductId } : {}),
   }));
 }
 

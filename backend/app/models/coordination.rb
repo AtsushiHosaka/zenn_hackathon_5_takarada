@@ -94,7 +94,21 @@ class Coordination < ApplicationRecord
     suggested_ids = suggested_objects.pluck("id")
     objects_by_id = (existing + suggested_objects).index_by { |object| object["id"] }
     ids = edited_objects.pluck("id")
-    linked_ids_valid = edited_objects.all? { |edit| edit["ec_product_id"].nil? || (edit["id"].is_a?(String) && edit["id"].match?(MANUAL_OBJECT_ID) && objects_by_id[edit["id"]]&.fetch("ec_product_id", nil) == edit["ec_product_id"]) }
+    linked_ids_valid = edited_objects.all? do |edit|
+      next true if edit["ec_product_id"].nil? && edit["replacement_ec_product_id"].nil?
+      next false unless edit["id"].is_a?(String)
+
+      original = objects_by_id[edit["id"]]
+      if edit["id"].match?(MANUAL_OBJECT_ID)
+        owned_valid = original&.fetch("ec_product_id", nil) == edit["ec_product_id"]
+        replacement_id = edit["replacement_ec_product_id"]
+        replacement = EcProduct.find_by(id: replacement_id) if replacement_id.is_a?(Integer) && replacement_id.positive?
+        owned_valid && (replacement_id.nil? || (replacement && original && replacement.data["category"] == original["category"]))
+      else
+        product = EcProduct.find_by(id: edit["ec_product_id"]) if edit["ec_product_id"].is_a?(Integer) && edit["ec_product_id"].positive?
+        edit["replacement_ec_product_id"].nil? && original && product && product.data["category"] == original["category"]
+      end
+    end
     unless ids.uniq == ids && linked_ids_valid && (ids - existing_ids - suggested_ids).empty? && edited_objects.all? { |edit| valid_edit?(edit, objects_by_id.fetch(edit["id"])) }
       errors.add(:edited_objects, "家具の編集内容が正しくありません")
     end

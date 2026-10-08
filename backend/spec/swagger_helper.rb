@@ -298,7 +298,8 @@ RSpec.configure do |config|
               id: { type: :string, description: "元の家具、この部屋で採用済みの商品、またはmanual-UUID形式の所有家具id", example: "bed-1" },
               label: { type: :string, maxLength: 100, description: "手動で補完した所有家具では必須", example: "今ある椅子" },
               category: { type: :string, enum: %w[sofa bed desk chair shelf table], description: "手動で補完した所有家具では必須", example: "chair" },
-              ec_product_id: { type: :integer, minimum: 1, description: "商品リンクのインポート結果のID。商品・モデル情報はサーバー側で復元する", example: 1 },
+              replacement_ec_product_id: { type: :integer, minimum: 1, description: "手動の所有家具を置き換える購入商品のID。所有家具のec_product_idは変更しない", example: 2 },
+              ec_product_id: { type: :integer, minimum: 1, description: "商品検索・インポート結果のID。元の家具と同じカテゴリの商品に限り、商品・モデル情報をサーバー側で復元する", example: 1 },
               position: { "$ref" => "#/components/schemas/Position" },
               size: { "$ref" => "#/components/schemas/Size" },
               rotation_y: { type: :number, minimum: 0, exclusiveMaximum: true, maximum: 360, example: 15 },
@@ -321,7 +322,7 @@ RSpec.configure do |config|
           },
           FurnitureImportInput: {
             type: :object,
-            properties: { variant_id: { type: :string, maxLength: 120, description: "同じ商品ページで選ぶ場合の公式バリエーションSKU", example: "50337820" }, url: { type: :string, maxLength: 2048, description: "対応するショップの商品詳細URL", example: "https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/" } },
+            properties: { purpose: { type: :string, enum: %w[replacement], description: "置換用の取得では床家具以外の対応商品も返す", example: "replacement" }, variant_id: { type: :string, maxLength: 120, description: "同じ商品ページで選ぶ場合の公式バリエーションSKU", example: "50337820" }, url: { type: :string, maxLength: 2048, description: "対応するショップの商品詳細URL", example: "https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/" } },
             required: %w[url]
           },
           FurnitureSearchInput: {
@@ -329,7 +330,7 @@ RSpec.configure do |config|
             properties: {
               query: { type: :string, minLength: 1, maxLength: 200, example: "丸いサイドテーブル" },
               color: { type: :string, enum: %w[white black gray brown beige green blue purple pink red orange yellow], example: "blue" },
-              category: { type: :string, enum: %w[sofa bed desk chair shelf table], example: "table" }
+              category: { type: :string, enum: FurnitureSearch::CATEGORIES, example: "table" }
             },
             required: %w[query]
           },
@@ -359,7 +360,7 @@ RSpec.configure do |config|
             properties: {
               ec_product_id: { type: :integer, minimum: 1, example: 1 },
               name: { type: :string, example: "ホワイトチェア" },
-              category: { type: :string, enum: %w[sofa bed desk chair shelf table], example: "chair" },
+              category: { type: :string, enum: FurnitureSearch::CATEGORIES, example: "chair" },
               color: { type: :string, example: "#f2efe8" },
               size: { "$ref" => "#/components/schemas/Size" },
               price: { type: :integer, minimum: 1, example: 7990 },
