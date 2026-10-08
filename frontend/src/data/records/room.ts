@@ -3,7 +3,7 @@ import { characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
 import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
 import { furnitureCategories, isManualFurniture, isImageArtwork, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
-import type { SavedRoom } from "../../domain/roomRepository";
+import type { FurnitureSearchResult, SavedRoom } from "../../domain/roomRepository";
 import type { components } from "../generated/api";
 
 export type AnalysisRoomRecord = components["schemas"]["Room"];
@@ -15,6 +15,12 @@ export function toRoomPaletteId(value: unknown): NonNullable<CoordinationRecord[
 }
 
 export type UploadRecord = components["schemas"]["Upload"];
+
+export function toFurnitureSearch(value: unknown, baseUrl: string): FurnitureSearchResult {
+  const record = object(value, "FurnitureSearch");
+  if (!Array.isArray(record.products) || record.products.length > 24 || !Array.isArray(record.search_entry_points)) invalid("FurnitureSearch");
+  return { products: record.products.map(product => toImportedFurniture(product, baseUrl)), failures: nonnegativeInteger(record.failures, "FurnitureSearch.failures"), searchEntryPoints: record.search_entry_points.map(entry => text(entry, "search_entry_point")) };
+}
 
 export function toImportedFurniture(value: unknown, baseUrl: string): RoomItem {
   const record = object(value, "FurnitureImport");
@@ -334,6 +340,18 @@ function productMetadata(value: unknown, baseUrl: string): ProductMetadata | und
   if (value == null) return undefined;
   const metadata = object(value, "product_metadata");
   const result: ProductMetadata = {};
+  if (metadata.provider != null) result.provider = text(metadata.provider, "provider");
+  if (metadata.provider_product_id != null) result.providerProductId = text(metadata.provider_product_id, "provider_product_id");
+  if (metadata.variant_id != null) result.variantId = text(metadata.variant_id, "variant_id");
+  if (metadata.official_color != null) result.officialColor = text(metadata.official_color, "official_color");
+  if (metadata.color_variants != null) {
+    if (!Array.isArray(metadata.color_variants) || metadata.color_variants.length > 24) invalid("color_variants");
+    result.colorVariants = metadata.color_variants.map(value => {
+      const variant = object(value, "color_variant");
+      if (variant.source !== "official_color_picker" && variant.source !== "official_product_group") invalid("color_variant.source");
+      return { colorName: text(variant.color_name, "color_variant.color_name"), url: url(text(variant.url, "color_variant.url"), baseUrl)!, variantId: optionalText(variant.variant_id, "color_variant.variant_id"), source: variant.source };
+    });
+  }
   if (metadata.source_url != null) result.sourceUrl = url(metadata.source_url, baseUrl);
   if (metadata.price_checked_at != null) {
     const checkedAt = text(metadata.price_checked_at, "price_checked_at");
