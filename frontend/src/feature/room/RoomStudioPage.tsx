@@ -19,9 +19,13 @@ import { roomDescription } from './roomDescription';
 import { roomPlanKeys as sharedRoomPlanKeys, scopedRoomPlanKeys, useRoomPlanScope, saveRoomPlan, useRoomPlan, isApiRoomAlias } from './plans';
 import ErrorText from '../shared/ErrorText';
 import { DomainError } from '../../domain/error';
+import { isTemplateId } from '../../domain/roomTemplate';
+import { createTemplateSnapshot, saveRoomTemplate } from './templates';
+import { templateKeys } from './templateStorage';
 import CharacterThemePicker from './CharacterThemePicker';
 import { roomPhotoLimits, roomPhotoRequirements, roomPhotoValidationError } from '../../domain/roomPhoto';
 import './room-studio.css';
+import './room-templates.css';
 
 const initialPrompt='紫色の推し活ルームにしたい。ベッドとデスクはそのまま使いたいです。';
 const samplePrompt=`${initialPrompt}アクスタを飾れる場所もほしい！`;
@@ -77,6 +81,7 @@ export default function RoomStudioPage() {
 function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const {id='new'}=useParams();
   const isNew=id==='new';
+  const isTemplate=isTemplateId(id);
   const {rooms,tokenStore}=useRepositories();
   const session=useSession();
   const scope=useRoomPlanScope();
@@ -90,7 +95,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const analysisMode=capability.data?.input==='dimensions';
   const acceptsPhotos=capability.data?.photos===true;
   const analyzed=design.kind==='analysis';
-  const canCoordinate=capability.data?.coordination??false;
+  const canCoordinate=!isTemplate&&(capability.data?.coordination??false);
   const [tatami,setTatami]=useState(design.analysisInput?.tatami??6);
   const [shape,setShape]=useState<RoomShape>(design.analysisInput?.shape??'standard');
   const analysisPrompt=`${tatami}畳・${shapeLabel(shape)}の部屋を3Dで確認したい。`;
@@ -124,10 +129,14 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const [dimensions,setDimensions]=useState(inputState?.dimensions??false);
   const [history,setHistory]=useState<{past:RoomDesign[];future:RoomDesign[]}>({past:[],future:[]});
   const [savedFingerprint,setSavedFingerprint]=useState(()=>JSON.stringify(design));
+  const templateWarning=useQuery({queryKey:templateKeys(scope).warning,queryFn:()=>'',initialData:'',staleTime:Infinity}).data;
   const dirty=JSON.stringify(design)!==savedFingerprint;
   const [before,setBefore]=useState(false);
   const placementDisabled=before||Boolean(design.modelUrl&&design.modelKind!=='shell');
   const [filter,setFilter]=useState('all');
+  const [templateName,setTemplateName]=useState<string|null>(null);
+  const templateDialog=useRef<HTMLDialogElement>(null);
+  useEffect(()=>{if(templateName!==null)templateDialog.current?.showModal();else templateDialog.current?.close();},[templateName]);
   const [rename,setRename]=useState(false);
   const [title,setTitle]=useState(design.title);
   const upload=useRef<HTMLInputElement>(null);
@@ -213,7 +222,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
     if(!Number.isSafeInteger(budget)||budget<=0){setPhotoError('予算は1円以上の整数で入力してください。');return;}
     setPhotoError('');generation.mutate({request:prompt.trim(),budget,createNew:followupMode==='new'});
   }
-  function changeTitle(event:FormEvent) {event.preventDefault();if(!requireOwner())return;const value=title.trim();if(!value)return;try{const next={...design,title:value};saveRoomPlan(client,next,scope);setSavedFingerprint(JSON.stringify(next));setRename(false);}catch{setNotice('ルーム名を保存できませんでした。');}}
+  function changeTitle(event:FormEvent) {event.preventDefault();if(!requireOwner())return;const value=title.trim();if(!value)return;try{const next={...design,title:value};if(isTemplate)saveRoomTemplate(client,scope,next);else saveRoomPlan(client,next,scope);setSavedFingerprint(JSON.stringify(next));setRename(false);}catch{setNotice('ルーム名を保存できませんでした。');}}
   function editDesign(next:RoomDesign) {
     if(JSON.stringify(next)===JSON.stringify(design))return;
     // Preserve the rendered floor before any original furniture can move.
@@ -249,7 +258,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
     setPlacementItem(item);
   }
   function removeItem(itemId:string) {
-    if(!editing||placementDisabled||!itemId.startsWith('manual-'))return;
+    if(!editing||placementDisabled||(!isTemplate&&!itemId.startsWith('manual-')))return;
     editDesign({...design,items:design.items.filter(item=>item.id!==itemId),editedItems:(design.editedItems??[]).filter(item=>item.id!==itemId)});
     if(selectedId===itemId)setSelectedId(null);
     setPlacementItem(null);
@@ -270,13 +279,18 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
     if(!requireOwner())return;
     const saved={...design,id:id.startsWith('sample-')?`room-${crypto.randomUUID()}`:design.id};
     try {
-      saveRoomPlan(client,saved,scope);setSavedFingerprint(JSON.stringify(saved));
+      if(isTemplate)saveRoomTemplate(client,scope,saved);else saveRoomPlan(client,saved,scope);setSavedFingerprint(JSON.stringify(saved));
       if(saved.id!==id)navigate(`/rooms/${saved.id}`,{state:{prompt,photos,editing:true,view,selectedId,dimensions}});
       else setNotice('保存しました。');
     }catch{setNotice('変更を保存できませんでした。ブラウザの保存容量を確認してください。');}
   }
+  function saveAsTemplate(event:FormEvent) {
+    event.preventDefault();if(!requireOwner()||!templateName?.trim())return;
+    try {saveRoomTemplate(client,scope,createTemplateSnapshot(design,templateName));setTemplateName(null);setNotice('テンプレートを保存しました。テンプレート一覧から編集・再利用できます。');}
+    catch(error){setNotice(error instanceof Error?error.message:'テンプレートを保存できませんでした。');}
+  }
   return <div className="rc-studio">
-    <header className="rc-studio-header"><Link className="rc-back" to="/rooms" aria-label="ルーム一覧に戻る" title="ルーム一覧"><ReferenceSvg page={3} index={0}/></Link><span className="rc-header-divider"/><div className={`rc-title${isNew?' is-new':''}`}><h1>{isNew?'新しいルーム':design.title}</h1>{!isNew&&<button type="button" aria-label="ルーム名を変更" onClick={()=>{setTitle(design.title);setRename(true);}}><ReferenceSvg page={5} index={1}/></button>}</div><AccountMenu onEditLayout={!isNew&&id!=='sample-game'?()=>{setEditing(true);setPanel(true);setBefore(false);}:undefined}/></header>
+    <header className="rc-studio-header"><Link className="rc-back" to={isTemplate?'/room-templates':'/rooms'} aria-label={isTemplate?'テンプレート一覧に戻る':'ルーム一覧に戻る'} title={isTemplate?'テンプレート一覧':'ルーム一覧'}><ReferenceSvg page={3} index={0}/></Link><span className="rc-header-divider"/><div className={`rc-title${isNew?' is-new':''}`}>{isTemplate&&<span className="rc-template-badge">テンプレート</span>}<h1>{isNew?'新しいルーム':design.title}</h1>{!isNew&&<button type="button" aria-label="ルーム名を変更" onClick={()=>{setTitle(design.title);setRename(true);}}><ReferenceSvg page={5} index={1}/></button>}</div><nav className="rc-template-actions" aria-label="テンプレート"><Link className="rc-secondary" to="/room-templates">テンプレート一覧</Link>{!isNew&&!isTemplate&&<button type="button" className="rc-secondary" onClick={()=>setTemplateName(design.title)}>テンプレートに保存</button>}</nav><AccountMenu onEditLayout={!isNew&&id!=='sample-game'?()=>{setEditing(true);setPanel(true);setBefore(false);}:undefined}/></header>
     <input ref={upload} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden aria-describedby="room-photo-requirements" onChange={event=>{addPhotos(Array.from(event.target.files??[]));event.target.value='';}}/>
     <div className="rc-workspace">
       {pending||id==='sample-game'?<RoomGenerating phase={generationPhase} prompt={analysisMode&&(!canCoordinate||generation.variables?.analyzeOnly)?analysisPrompt:isNew?prompt:message||prompt} photos={acceptsPhotos?photos:[]} sample={loadConnection()==='dummy'} dimensions={analysisMode} coordination={canCoordinate&&!generation.variables?.analyzeOnly} onCancel={()=>pending?abort.current?.abort():navigate('/rooms')}/>:<>
@@ -302,7 +316,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
           </>:<>
             <div className="rc-messages">
               <div className="rc-user-message">{!design.analysisInput&&<div className="rc-user-photos">{photos.length?photos.map(file=><div key={`${file.name}-${file.lastModified}`}><PhotoImage file={file}/></div>):[3,4,5,6].map(index=><div key={index}><ReferenceSvg page={5} index={index}/></div>)}</div>}<p>{design.kind==='analysis'&&design.analysisInput?`${design.analysisInput.tatami}畳・${shapeLabel(design.analysisInput.shape)}の部屋を3Dで確認したい。`:prompt}</p></div>
-              <div className="rc-assistant"><span className="rc-assistant-icon"><ReferenceSvg page={5} index={7}/></span><div className="rc-assistant-body"><span className="rc-assistant-name">へやいろ</span><span className="rc-complete"><ReferenceSvg page={5} index={8}/>{design.source==='demo'?'サンプル':analyzed?'解析完了':'コーディネート完了'}</span><p>{referenceStory?'今あるベッドとデスクはそのままに、紫をアクセントにした推し活ルームにしました。':roomDescription(design.description)}</p>
+              <div className="rc-assistant"><span className="rc-assistant-icon"><ReferenceSvg page={5} index={7}/></span><div className="rc-assistant-body"><span className="rc-assistant-name">へやいろ</span><span className="rc-complete"><ReferenceSvg page={5} index={8}/>{isTemplate?'テンプレート':design.description==='保存したテンプレートから作成した部屋です。'?'作成完了':design.source==='demo'?'サンプル':analyzed?'解析完了':'コーディネート完了'}</span><p>{referenceStory?'今あるベッドとデスクはそのままに、紫をアクセントにした推し活ルームにしました。':roomDescription(design.description)}</p>
                 {referenceStory&&<ul className="rc-bullets"><li>壁の上部にLEDテープを回して、夜は紫の間接照明に</li><li>ベッドの足元に、アクスタを飾れるひな壇シェルフ</li><li>ラグ・クッション・ベッドカバーをラベンダー系で統一</li></ul>}
                 {!analyzed&&<div className="rc-summary"><div className="rc-summary-heading"><span>コーディネート案</span><span>{additions.length}アイテム · <span className="rc-money">{money(total)}</span></span></div><div className="rc-summary-actions"><button type="button" className="rc-primary" onClick={()=>{setEditing(false);setPanel(true);}}><ReferenceSvg page={5} index={9}/>アイテム一覧</button><button type="button" className="rc-secondary" onClick={()=>setBefore(old=>!old)}>Before / After</button></div></div>}
               </div></div>
@@ -322,14 +336,16 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
               </form>}
               <ErrorText error={generation.error}/>
             </div>
-            {canCoordinate&&analyzed?null:canCoordinate?<form className="rc-followup-composer" onSubmit={followup}><FollowupModePicker value={followupMode} onChange={setFollowupMode} canModify={canModify}/><div className="rc-followup-input">{!analysisMode&&<button type="button" aria-label="写真を追加" onClick={()=>upload.current?.click()}><ReferenceSvg page={5} index={10}/></button>}<label className="rc-sr-only" htmlFor="res-msg">メッセージ</label><textarea id="res-msg" rows={1} placeholder="変えたいところを伝えてください" value={message} maxLength={analysisMode?500:2000} onChange={event=>setMessage(event.target.value)}/><button type="submit" aria-label="送信" ><ReferenceSvg page={5} index={11}/></button></div>{photoError&&<p className="rc-error" role="alert">{photoError}</p>}</form>:<div className="rc-followup-composer rc-analysis-note">コーディネートは利用できません。</div>}
+            {canCoordinate&&analyzed?null:canCoordinate?<form className="rc-followup-composer" onSubmit={followup}><FollowupModePicker value={followupMode} onChange={setFollowupMode} canModify={canModify}/><div className="rc-followup-input">{!analysisMode&&<button type="button" aria-label="写真を追加" onClick={()=>upload.current?.click()}><ReferenceSvg page={5} index={10}/></button>}<label className="rc-sr-only" htmlFor="res-msg">メッセージ</label><textarea id="res-msg" rows={1} placeholder="変えたいところを伝えてください" value={message} maxLength={analysisMode?500:2000} onChange={event=>setMessage(event.target.value)}/><button type="submit" aria-label="送信" ><ReferenceSvg page={5} index={11}/></button></div>{photoError&&<p className="rc-error" role="alert">{photoError}</p>}</form>:<div className="rc-followup-composer rc-analysis-note">{isTemplate?'配置と色を編集し、変更を保存してください。部屋の作成はテンプレート一覧から行えます。':'コーディネートは利用できません。'}</div>}
           </>}
         </section>
-        {isNew?<EmptyScene/>:<RoomScene key={design.id} design={design} panel={panel} before={before} filter={filter} selectedId={selectedId} referenceLayout={referenceLayout} editing={editing} view={view} dimensions={dimensions} onSelect={value=>{setSelectedId(value);setPanel(true);setFilter('all');const item=design.items.find(item=>item.id===value);if(analyzed||item){setEditing(true);setBefore(false);}}} onBefore={value=>{setPlacementItem(null);setBefore(value);}} onMoveItem={moveItem} placementItem={placementItem} onPlaceItem={position=>{if(placementItem)addItem(placementItem,position);}} onOpenPanel={()=>{setPanel(true);if(analyzed)setEditing(true);}}>{panel&&(editing?<PlannerPanel onAddItem={addItem} onDragItem={startPlacement} onRemoveItem={removeItem} placementDisabled={placementDisabled} placementHint={before?'Afterに切り替えると家具を追加できます。':undefined} design={design} selectedId={selectedId} onSelect={setSelectedId} furnitureRequests={selectsFurniture?{existingItems:existingFurniture,operations:furnitureOperations,additions:furnitureAdditions,onOperationChange:(objectId,action)=>setFurnitureOperations(previous=>[...previous.filter(operation=>operation.objectId!==objectId),{objectId,action}]),onAdditionsChange:setFurnitureAdditions}:undefined} onChange={editDesign} onUndo={undo} onRedo={redo} canUndo={history.past.length>0} canRedo={history.future.length>0} dirty={dirty} onSave={saveEdits} onClose={()=>{setPlacementItem(null);setEditing(false);setPanel(false);}} onProducts={()=>{setPlacementItem(null);setEditing(false);}} view={view} onView={setView} dimensions={dimensions} onDimensions={setDimensions}/>:<RecommendationPanel onEditLayout={()=>{setEditing(true);setBefore(false);}} searchEntryPoints={design.searchEntryPoints} originalItems={design.before?.items} items={additions} selectedId={selectedId} filter={filter} onSelect={setSelectedId} onFilter={setFilter} onClose={()=>setPanel(false)}/>)}</RoomScene>}
+        {isNew?<EmptyScene/>:<RoomScene key={design.id} design={design} panel={panel} before={before} filter={filter} selectedId={selectedId} referenceLayout={referenceLayout} editing={editing} view={view} dimensions={dimensions} onSelect={value=>{setSelectedId(value);setPanel(true);setFilter('all');const item=design.items.find(item=>item.id===value);if(analyzed||item){setEditing(true);setBefore(false);}}} onBefore={value=>{setPlacementItem(null);setBefore(value);}} onMoveItem={moveItem} placementItem={placementItem} onPlaceItem={position=>{if(placementItem)addItem(placementItem,position);}} onOpenPanel={()=>{setPanel(true);if(analyzed)setEditing(true);}}>{panel&&(editing?<PlannerPanel onAddItem={addItem} onDragItem={startPlacement} onRemoveItem={removeItem} placementDisabled={placementDisabled} placementHint={before?'Afterに切り替えると家具を追加できます。':undefined} design={design} templateEditing={isTemplate} selectedId={selectedId} onSelect={setSelectedId} furnitureRequests={selectsFurniture?{existingItems:existingFurniture,operations:furnitureOperations,additions:furnitureAdditions,onOperationChange:(objectId,action)=>setFurnitureOperations(previous=>[...previous.filter(operation=>operation.objectId!==objectId),{objectId,action}]),onAdditionsChange:setFurnitureAdditions}:undefined} onChange={editDesign} onUndo={undo} onRedo={redo} canUndo={history.past.length>0} canRedo={history.future.length>0} dirty={dirty} onSave={saveEdits} onClose={()=>{setPlacementItem(null);setEditing(false);setPanel(false);}} onProducts={()=>{setPlacementItem(null);setEditing(false);}} view={view} onView={setView} dimensions={dimensions} onDimensions={setDimensions}/>:<RecommendationPanel onEditLayout={()=>{setEditing(true);setBefore(false);}} searchEntryPoints={design.searchEntryPoints} originalItems={design.before?.items} items={additions} selectedId={selectedId} filter={filter} onSelect={setSelectedId} onFilter={setFilter} onClose={()=>setPanel(false)}/>)}</RoomScene>}
       </>}
     </div>
     {notice&&<div className="rc-notice" role="status">{notice}<button type="button" aria-label="通知を閉じる" onClick={()=>setNotice('')}>×</button></div>}
+    {templateWarning&&<div className="rc-notice" role="alert">{templateWarning}</div>}
     {rooms.persistenceWarning?.()&&<div className="rc-notice" role="alert">{rooms.persistenceWarning()}</div>}
+    <dialog ref={templateDialog} className="rc-dialog" onCancel={()=>setTemplateName(null)}><form onSubmit={saveAsTemplate}><div className="rc-dialog-heading"><h2>テンプレートに保存</h2><button type="button" aria-label="閉じる" onClick={()=>setTemplateName(null)}>×</button></div><label className="rc-setting">テンプレート名<input value={templateName??''} onChange={event=>setTemplateName(event.target.value)} maxLength={80} required autoFocus/></label><p>現在の配置と色を、このブラウザに保存します。元の部屋は変更しません。</p><button className="rc-primary" type="submit">保存</button></form></dialog>
     <dialog ref={renameDialog} className="rc-dialog" onCancel={()=>setRename(false)}><form onSubmit={changeTitle}><div className="rc-dialog-heading"><h2>ルーム名を変更</h2><button type="button" aria-label="閉じる" onClick={()=>setRename(false)}>×</button></div><label className="rc-setting">ルーム名<input value={title} onChange={event=>setTitle(event.target.value)} maxLength={80} required autoFocus/></label><p/><button className="rc-primary" type="submit">保存</button></form></dialog>
   </div>;
 }
