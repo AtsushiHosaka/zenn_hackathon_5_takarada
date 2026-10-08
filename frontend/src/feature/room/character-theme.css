@@ -1,0 +1,7 @@
+.rc-character-themes { min-width: 0; margin: 16px 0; padding: 0; border: 0; }
+.rc-character-themes legend { margin: 0 0 8px; font-size: 13px; font-weight: 700; color: #1D1B26; }
+.rc-character-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.rc-character-options button { min-height: 40px; padding: 8px; border: 1px solid #E4E1EC; border-radius: 10px; background: #fff; color: #5A5768; font-size: 12px; cursor: pointer; }
+.rc-character-options button[aria-pressed=true] { border-color: #8C63DC; background: #F1EBFC; color: #6A3CD6; font-weight: 700; }
+.rc-character-options button:focus-visible { outline: 3px solid #BBA5EE; outline-offset: 2px; }
+.rc-character-description, .rc-character-note { margin: 8px 0 0; font-size: 12px; line-height: 1.6; color: #6E6A7C; }

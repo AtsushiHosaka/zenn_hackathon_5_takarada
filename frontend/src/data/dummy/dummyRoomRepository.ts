@@ -1,3 +1,5 @@
+import { applyRoomPalette, defaultRoomPaletteId, roomPalette } from "../../domain/roomPalette";
+import { applyCharacterTheme, characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
 import type { TokenStore } from "../../core/tokenStore";
 import type { RoomDesign, RoomItem, Style } from "../../domain/room";
@@ -110,9 +112,10 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
     },
     analyze: (input, signal) => repository.generate(input, signal),
     async capabilities() {
-      return { generation: true, coordination: false, input: "dimensions", photos: false, message: "オフラインモックでは畳数と形から部屋の寸法とベッド・デスク・本棚を表示します。写真・希望・スタイルの解析と、商品生成は行いません。商品付きの提案はAPI接続で確認できます。" };
+      return { generation: true, coordination: false, input: "dimensions", photos: false, message: "オフラインモックでは畳数と形から部屋の寸法とベッド・デスク・本棚を表示します。選んだキャラクターテーマの色とモチーフを表示できます。写真・希望の解析と、商品生成は行いません。商品付きの提案はAPI接続で確認できます。" };
     },
     async generate(input, signal) {
+      input.onProgress?.("analyzing");
       const userId = currentUserId();
       if (signal?.aborted) throw new DomainError("操作をキャンセルしました");
       if (input.tatami === undefined || !Number.isFinite(input.tatami) || input.tatami < 3 || input.tatami > 30) throw new DomainError("畳数は3〜30で入力してください");
@@ -121,7 +124,9 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
       const previous = input.roomId === undefined ? undefined : rooms.find(room => room.id === input.roomId);
       if (input.roomId !== undefined && !previous) throw new DomainError("部屋が見つかりません", 404);
       const analyzed = toAnalyzedRoomDesign(createAnalyzedRoomFixture(input.tatami, input.shape), "");
-      const design: RoomDesign = {
+      if (input.roomPaletteId !== undefined && !roomPalette(input.roomPaletteId)) throw new DomainError("部屋のカラーテーマを選んでください", 422);
+      if (input.characterThemeId !== undefined && !characterTheme(input.characterThemeId)) throw new DomainError("キャラクターテーマを選んでください", 422);
+      const themedDesign: RoomDesign = applyCharacterTheme({
         ...analyzed,
         items: [...analyzed.items.map(item => input.editedItems?.find(edited => edited.id === item.id) ?? item), ...(input.editedItems ?? []).filter(isManualFurniture)],
         editedItems: input.editedItems,
@@ -132,10 +137,13 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
         prompt: input.prompt.trim() || undefined,
         budget: input.budget,
         description: "畳数と部屋の形から寸法とベッド・デスク・本棚を配置したモックです。写真・希望・スタイルの解析と、商品生成は行っていません。",
-      };
+      }, input.characterThemeId);
+      const paletteId = input.roomPaletteId ?? (input.characterThemeId ? undefined : defaultRoomPaletteId);
+      const design = paletteId ? applyRoomPalette(themedDesign, paletteId) : themedDesign;
       if (!isRoomDesign(design)) throw new DomainError("部屋の入力内容を確認してください", 422);
       const room: SavedRoom = { id: design.id, title: design.title, status: "ready", createdAt: previous?.createdAt ?? new Date().toISOString(), design };
       retain(userId, room);
+      input.onProgress?.("preview");
       return design;
     },
   };
