@@ -1,6 +1,6 @@
 # Final backlog integration checks
 
-Application revision: `bcc16b27aed1ce847f0242a46382ce1623f381c7`.
+Application revision: `24223f9a` (full revision in the JSON results). Rechecked after integrating the final #109 evidence and source corrections.
 
 The actual UI ran against controlled HTTP fixtures in the existing Chromium browser. No production accounts, provider requests or production writes were used.
 
