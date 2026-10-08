@@ -1,0 +1,11 @@
+{
+  "initial": 8,
+  "afterFloorChange": 8,
+  "afterSaveReload": 8,
+  "canvas": 1,
+  "errors": [],
+  "scope": "Actual app isolated task-owned local storage/dummy mode; no production writes",
+  "baseRevision": "bc40f28936d680fa6aedad03e6e99be92f334b42",
+  "sourceChange": "Remove only !design.floorColor from referenceLayout",
+  "independentSourceProbeCases": 14
+}
