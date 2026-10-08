@@ -61,7 +61,7 @@ module InteriorLinks
       @image_color_extractor = image_color_extractor
     end
 
-    def parse(html:, url:, store:)
+    def parse(html:, url:, store:, variant_id: nil)
       @extraction_failure = nil
       @image_colors = {}
       @document = Nokogiri::HTML(html)
@@ -70,7 +70,10 @@ module InteriorLinks
       @text = @document.at_css("body")&.dup
       @text&.css("script, style, nav, footer")&.each(&:remove)
       @text = @text&.text.to_s.gsub(/[\u00a0\s]+/, " ").strip
-      product = products.find { |entry| identity_matches?(entry) }
+      product = products.find do |entry|
+        identity_matches?(entry) && (variant_id.blank? || same_sku?(entry["sku"].presence || entry["mpn"], variant_id))
+      end
+      raise Unverified, "選択した商品バリエーションを確認できません" if variant_id.present? && !product
       if needs_html_extraction?(product)
         begin
           extracted = (@extractor || HtmlProductExtractor.new(user_id: @user_id))
@@ -129,7 +132,10 @@ module InteriorLinks
       else
         product_id.to_s
       end
-      color_name = product["color"].to_s.presence || name
+      variants = ProductVariants.call(document: @document, url:, store:, product:)
+      selected_variant = variants.find { |choice| same_sku?(choice["variant_id"], product_id) } || variants.find { |choice| choice["url"] == url }
+      official_color = (product["color"].presence if product["color"].is_a?(String)) || selected_variant&.fetch("color_name")
+      color_name = official_color || name
       color = COLORS.find { |pattern, _| pattern.match?(color_name) }&.last || "#bdb4a8"
       image = image_url(product)
       image_color = image_color_for(product)
@@ -147,7 +153,7 @@ module InteriorLinks
           "estimated_axes" => estimated_axes, "estimated_values_m" => dimensions.slice(*estimated_axes),
           "estimate_basis" => estimated_axes.any? ? "category_standard_dimensions" : nil },
         "estimated_axes" => estimated_axes, "material" => material_for(product),
-        "color_name" => color_name, "color_source" => image_color["source"] || "official_color_name_approximation",
+        "official_color" => official_color, "color_variants" => variants, "color_name" => color_name, "color_source" => image_color["source"] || "official_color_name_approximation",
         "image_color" => image_color, "shape" => shape,
         "shape_source" => { "url" => url, "name" => name, "measurements" => evidence, "kind" => "category_and_official_text" },
         "availability" => availability, "price_source" => price_evidence, "tax_included" => true,
@@ -248,6 +254,12 @@ module InteriorLinks
       end
     end
 
+    def same_sku?(left, right)
+      return false if left.blank? || right.blank?
+
+      @store[:provider] == "ikea" ? left.to_s.delete(".") == right.to_s.delete(".") : left.to_s == right.to_s
+    end
+
     def identity_matches?(product)
       # Array(Hash) would split a single Offer object into key/value pairs.
       offers = product["offers"].is_a?(Array) ? product["offers"] : [ product["offers"] ]
@@ -262,9 +274,13 @@ module InteriorLinks
     def same_page?(value)
       parsed = URI.join(@url, value.to_s)
       requested = URI(@url)
-      parsed.host == requested.host && parsed.path.delete_suffix("/") == requested.path.delete_suffix("/")
-    rescue URI::InvalidURIError
+      parsed.host == requested.host && parsed.path.delete_suffix("/") == requested.path.delete_suffix("/") && identity_query(parsed) == identity_query(requested)
+    rescue URI::InvalidURIError, ArgumentError
       false
+    end
+
+    def identity_query(uri)
+      URI.decode_www_form(uri.query.to_s).reject { |key, _| key.match?(/\Autm_|\A(?:gclid|fbclid|msclkid)\z/i) }.sort
     end
 
     def category_for(name, product)

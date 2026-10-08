@@ -7,14 +7,16 @@ class FurnitureImport
                        :model_url, :model_match, :model_size, :model_fit)
   class Error < StandardError; end
 
-  def self.call(url:, user_id:)
+  def self.call(url:, user_id:, variant_id: nil)
     unless url.is_a?(String) && url.length <= 2048 && InteriorLinks::PageFetcher.store(url.strip)
       raise Error, "商品ページのURLを確認してください"
     end
 
+    raise Error, "商品バリエーションを確認してください" unless variant_id.nil? || variant_id.is_a?(String) && variant_id.length.between?(1, 120)
+
     attributes = Timeout.timeout(DEADLINE_SECONDS) do
       page = InteriorLinks::PageFetcher.new.fetch(url.strip)
-      InteriorLinks::ProductParser.new(user_id: user_id).parse(**page)
+      InteriorLinks::ProductParser.new(user_id: user_id).parse(**page, variant_id:)
     end
     unless Coordination::FLOOR_CATEGORIES.include?(attributes[:category])
       raise Error, "追加できる家具はソファ・ベッド・デスク・椅子・収納棚・テーブルです"

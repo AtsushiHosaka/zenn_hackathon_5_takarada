@@ -3,7 +3,7 @@ import { furnitureCategories, isFurnitureAdditions, isFurnitureOperations, isMan
 import type { GenerateRoomInput, RoomRepository } from "../../domain/roomRepository";
 import type { ApiClient } from "../apiClient";
 import { createDemoRoom } from "../dummy/dummyRoomRepository";
-import { toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toImportedFurniture, toRoomDesign, toSavedRoom, toSavedRooms, toUploadRecords } from "../records/room";
+import { toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toImportedFurniture, toFurnitureSearch, toRoomDesign, toSavedRoom, toSavedRooms, toUploadRecords } from "../records/room";
 import type { components } from "../generated/api";
 
 export type RoomApiConfig = {
@@ -25,12 +25,17 @@ const unavailableMessage = "部屋APIの接続先が設定されていません�
 export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, baseUrl: string): RoomRepository {
   return {
     demo: createDemoRoom,
-    async importFurniture(url, signal) {
+    async importFurniture(url, signal, variantId) {
       let parsed: URL;
       try { parsed = new URL(url.trim()); } catch { throw new DomainError("商品ページのURLを入力してください"); }
       if (parsed.protocol !== "https:" || parsed.username || parsed.password || url.length > 2048) throw new DomainError("HTTPSの商品ページURLを入力してください");
       return toImportedFurniture(await api.send<unknown>("/api/v1/furniture_imports", {
-        method: "POST", body: { url: parsed.href }, signal, timeoutMs: 60_000,
+        method: "POST", body: { url: parsed.href, ...(variantId ? { variant_id: variantId } : {}) }, signal, timeoutMs: 60_000,
+      }), baseUrl);
+    },
+    async searchFurniture(input, signal) {
+      return toFurnitureSearch(await api.send<unknown>("/api/v1/furniture_searches", {
+        method: "POST", body: input, signal, timeoutMs: 150_000,
       }), baseUrl);
     },
     async list(signal) {

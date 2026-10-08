@@ -524,6 +524,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/furniture_searches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 家具を検索し公式の色で絞り込む
+         * @description 公式商品ページを検証し、掲載されている色名で絞り込む。最大24件。色違いは公式の選択欄・ProductGroupにあるURLとSKUを返し、選択時にfurniture_importsで商品情報を再確認する。検索は最大130秒。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["FurnitureSearchInput"];
+                };
+            };
+            responses: {
+                /** @description 検索結果 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FurnitureSearchResult"];
+                    };
+                };
+                /** @description ログインが必要 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Unauthorized"];
+                    };
+                };
+                /** @description 入力または検索の確認に失敗 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ValidationErrors"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/rooms": {
         parameters: {
             query?: never;
@@ -1343,10 +1404,51 @@ export interface components {
         };
         FurnitureImportInput: {
             /**
+             * @description 同じ商品ページで選ぶ場合の公式バリエーションSKU
+             * @example 50337820
+             */
+            variant_id?: string;
+            /**
              * @description 対応するショップの商品詳細URL
              * @example https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/
              */
             url: string;
+        };
+        FurnitureSearchInput: {
+            /** @example 丸いサイドテーブル */
+            query: string;
+            /**
+             * @example blue
+             * @enum {string}
+             */
+            color?: "white" | "black" | "gray" | "brown" | "beige" | "green" | "blue" | "purple" | "pink" | "red" | "orange" | "yellow";
+            /**
+             * @example table
+             * @enum {string}
+             */
+            category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table";
+        };
+        FurnitureSearchResult: {
+            products: components["schemas"]["ImportedFurniture"][];
+            /** @example blue */
+            color: string | null;
+            /** @example 0 */
+            failures: number;
+            /** @example [] */
+            search_entry_points: string[];
+        };
+        ProductColorVariant: {
+            /** @example ホワイト */
+            color_name: string;
+            /** @example https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/ */
+            url: string;
+            /** @example 50337820 */
+            variant_id: string | null;
+            /**
+             * @example official_color_picker
+             * @enum {string}
+             */
+            source: "official_color_picker" | "official_product_group";
         };
         /** @description 実ページで確認した所有家具。寸法・色・モデルは近似で、推定した軸はproduct_metadataに記録する */
         ImportedFurniture: {
@@ -1410,6 +1512,9 @@ export interface components {
             provider_product_id?: string;
             /** @example 50337820 */
             variant_id?: string;
+            /** @example ホワイト */
+            official_color?: string | null;
+            color_variants?: components["schemas"]["ProductColorVariant"][];
             /**
              * @example JPY
              * @enum {string}

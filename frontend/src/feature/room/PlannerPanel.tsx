@@ -8,6 +8,7 @@ import { LAYOUT_GRID_STEP, snapToLayoutGrid } from './layoutGrid';
 import { createFurnitureItem, FURNITURE_DRAG_TYPE, furnitureTemplates } from './furniturePlacement';
 import { furniturePositionInRoom, snapFurnitureEditPosition } from './roomBounds';
 import './planner.css';
+import FurnitureSearchPanel from './FurnitureSearchPanel';
 
 export type PlannerView = 'perspective' | 'top' | 'front';
 
@@ -106,7 +107,7 @@ function FurniturePalette({ design, disabled, hint, onAddItem, onDragItem, onVie
   view: PlannerView;
 }) {
   const { rooms } = useRepositories();
-  const [source, setSource] = useState<'link' | 'manual'>('link');
+  const [source, setSource] = useState<'link' | 'manual' | 'search'>('link');
   const [link, setLink] = useState('');
   const submittedLink = furnitureLink(link.trim());
   const imported = useMutation({
@@ -140,9 +141,10 @@ function FurniturePalette({ design, disabled, hint, onAddItem, onDragItem, onVie
     <h3 id="planner-add-label">家具を追加</h3>
     <div className="rc-planner-segments rc-furniture-source" role="group" aria-label="家具の追加方法">
       <button type="button" aria-pressed={source === 'link'} onClick={() => setSource('link')}>リンクから追加</button>
+      <button type="button" aria-pressed={source === 'search'} onClick={() => setSource('search')}>色で探す</button>
       <button type="button" aria-pressed={source === 'manual'} onClick={() => setSource('manual')}>リンクなしで選ぶ</button>
     </div>
-    {source === 'link' ? <div className="rc-furniture-link-panel">
+    {source === 'search' ? <FurnitureSearchPanel design={design} disabled={disabled} onAddItem={onAddItem}/> : source === 'link' ? <div className="rc-furniture-link-panel">
       <form className="rc-furniture-link-form" onSubmit={event => { event.preventDefault(); if (submittedLink && !disabled && !imported.isPending) imported.mutate(submittedLink); }}>
         <label htmlFor="planner-product-link">商品リンク</label>
         <input id="planner-product-link" type="url" inputMode="url" placeholder="https://…" required value={link} disabled={disabled || imported.isPending} onChange={event => setLink(event.target.value)} />

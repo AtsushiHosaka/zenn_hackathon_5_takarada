@@ -6,7 +6,13 @@ export type FurnitureOperation = { objectId: string; action: "keep" | "replace" 
 export type FurnitureAddition = { category: FurnitureCategory };
 export type TextureStatus = "disabled" | "ready" | "failed" | "skipped" | "unmatched";
 export type MaterialOverrides = Record<string, { textureUrl?: string; tileSizeM?: number; color?: string }>;
+export type ProductColorVariant = { colorName: string; url: string; variantId?: string; source: "official_color_picker" | "official_product_group" };
 export type ProductMetadata = {
+  provider?: string;
+  providerProductId?: string;
+  variantId?: string;
+  officialColor?: string;
+  colorVariants?: ProductColorVariant[];
   sourceUrl?: string;
   priceCheckedAt?: string;
   sizeSource?: string | { url?: string; evidence?: string | string[]; kind?: string };
@@ -221,7 +227,8 @@ export function isMaterialOverrides(value: unknown): value is MaterialOverrides 
 function isProductMetadata(value: unknown): value is ProductMetadata {
   if (!isRecord(value) || !optionalHttpUrl(value.sourceUrl)) return false;
   if (value.priceCheckedAt !== undefined && (typeof value.priceCheckedAt !== "string" || !Number.isFinite(Date.parse(value.priceCheckedAt)))) return false;
-  if (![value.material, value.shape, value.availability].every(field => field === undefined || nonemptyString(field))) return false;
+  if (![value.material, value.shape, value.availability, value.provider, value.providerProductId, value.variantId, value.officialColor].every(field => field === undefined || nonemptyString(field))) return false;
+  if (value.colorVariants !== undefined && (!Array.isArray(value.colorVariants) || value.colorVariants.length > 24 || !value.colorVariants.every(variant => isRecord(variant) && nonemptyString(variant.colorName) && nonemptyString(variant.url) && optionalHttpUrl(variant.url) && (variant.variantId === undefined || nonemptyString(variant.variantId)) && (variant.source === "official_color_picker" || variant.source === "official_product_group")))) return false;
   if (value.estimatedAxes !== undefined && (!Array.isArray(value.estimatedAxes) || !value.estimatedAxes.every(axis => axis === "w" || axis === "h" || axis === "d"))) return false;
   if (value.size !== undefined && (!isRecord(value.size) || ![value.size.w, value.size.h, value.size.d].every(axis => axis === null || positiveNumber(axis)))) return false;
   if (value.imageDisplayAllowed !== undefined && typeof value.imageDisplayAllowed !== "boolean") return false;
