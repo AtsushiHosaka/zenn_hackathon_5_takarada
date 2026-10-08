@@ -225,3 +225,4 @@
   .rc-workspace:not(.is-generating) .rc-new-composer {max-height:65%;overflow-y:auto}
   .rc-workspace:not(.is-generating) .rc-scene-stage.has-panel {right:0}
 }
+.viewer-overlap-notice:not([hidden]){position:absolute;left:16px;right:16px;bottom:54px;z-index:3;width:fit-content;max-width:calc(100% - 32px);padding:8px 12px;border:1px solid #F87171;border-radius:8px;background:#2C1724E8;color:#FFE4E6;font-size:12px;pointer-events:none}
