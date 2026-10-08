@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import type { RoomDesign, RoomShape } from '../../domain/room';
 import type { SavedRoom } from '../../domain/roomRepository';
+import { motionStaggerStyle } from '../../core/motion';
 import AccountMenu from './AccountMenu';
 import { useSavedRooms } from './plans';
 import ReferenceSvg from './ReferenceSvg';
@@ -29,7 +30,7 @@ function RoomDetails({ room }: { room: SavedRoom }) {
   const additions = design?.items.filter(item => !item.existing) ?? [];
   const unknownPrices = additions.filter(item => item.price === undefined).length;
   const total = additions.reduce((sum, item) => sum + (item.price ?? 0), 0);
-  return <div className="room-list-details">
+  return <div className="room-list-details motion-enter" style={motionStaggerStyle(1)}>
     <div className="room-list-copy">
       <h2 id="selected-room-title">{room.title}</h2>
       {design ? <>
@@ -39,7 +40,7 @@ function RoomDetails({ room }: { room: SavedRoom }) {
           {design.budget !== undefined && <div><dt>予算</dt><dd>{money(design.budget)}</dd></div>}
         </dl>
         {unknownPrices > 0 && <p className="room-list-price-note">{unknownPrices}点の価格が未確認です。</p>}
-        <Link className="room-list-open" to={`/rooms/${encodeURIComponent(design.id)}`}>この部屋を開く <span aria-hidden="true">↗</span></Link>
+        <Link className="room-list-open motion-control" to={`/rooms/${encodeURIComponent(design.id)}`}>この部屋を開く <span aria-hidden="true">↗</span></Link>
       </> : <p className="room-list-feedback" role="status">{room.status === 'analyzing' ? '部屋を作成しています…' : room.errorMessage || '部屋を作成できませんでした。'}</p>}
     </div>
     {design && <RoomFloorPlan design={design}/>}
@@ -62,22 +63,22 @@ export default function RoomListPage() {
       <AccountMenu/>
     </header>
     <main className="room-list-main">
-      <div className="room-list-heading"><h1>マイルーム</h1><Link to="/rooms/new" className="room-list-new"><span aria-hidden="true">＋</span> 新しいルームを作る</Link></div>
+      <div className="room-list-heading"><h1>マイルーム</h1><Link to="/rooms/new" className="room-list-new motion-control"><span aria-hidden="true">＋</span> 新しいルームを作る</Link></div>
       {selected && <section className="room-list-carousel" aria-label="保存した部屋" aria-roledescription="カルーセル" tabIndex={0} onKeyDown={event => {
         if (event.target !== event.currentTarget) return;
         if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); move(event.key === 'ArrowLeft' ? -1 : 1); }
       }}>
         <div className="room-list-stage">
-          <button className="room-list-arrow is-previous" type="button" aria-label="前の部屋" aria-controls="selected-room" disabled={rooms.data.length < 2} onClick={() => move(-1)}><span aria-hidden="true">‹</span></button>
+          <button className="room-list-arrow is-previous motion-control" type="button" aria-label="前の部屋" aria-controls="selected-room" disabled={rooms.data.length < 2} onClick={() => move(-1)}><span aria-hidden="true">‹</span></button>
           <div className="room-list-scene" key={selected.id}>
             {selected.design ? <RoomPreview design={selected.design}/> : <p className="room-list-pending" role="status">{selected.status === 'analyzing' ? '部屋を作成しています…' : '部屋を作成できませんでした。'}</p>}
           </div>
-          <button className="room-list-arrow is-next" type="button" aria-label="次の部屋" aria-controls="selected-room" disabled={rooms.data.length < 2} onClick={() => move(1)}><span aria-hidden="true">›</span></button>
+          <button className="room-list-arrow is-next motion-control" type="button" aria-label="次の部屋" aria-controls="selected-room" disabled={rooms.data.length < 2} onClick={() => move(1)}><span aria-hidden="true">›</span></button>
           <p className="room-list-position" aria-live="polite" aria-atomic="true">{index + 1} / {rooms.data.length}<span className="room-list-sr-only"> · {selected.title}</span></p>
         </div>
-        <div id="selected-room" role="group" aria-roledescription="スライド" aria-labelledby="selected-room-title"><RoomDetails room={selected}/></div>
+        <div id="selected-room" role="group" aria-roledescription="スライド" aria-labelledby="selected-room-title"><RoomDetails key={selected.id} room={selected}/></div>
       </section>}
-      {!selected && !rooms.isLoading && !rooms.error && <div className="room-list-empty"><p>保存した部屋はまだありません。</p><Link to="/rooms/new">最初の部屋を作る</Link></div>}
+      {!selected && !rooms.isLoading && !rooms.error && <div className="room-list-empty"><p>保存した部屋はまだありません。</p><Link className="motion-control" to="/rooms/new">最初の部屋を作る</Link></div>}
       {rooms.isLoading && <p className="room-list-feedback" role="status">読み込み中…</p>}
       {rooms.persistenceWarning && <p className="room-list-feedback" role="alert">{rooms.persistenceWarning}</p>}
       {rooms.error && <div className="room-list-feedback"><ErrorText error={rooms.error}/><button className="rc-secondary" type="button" onClick={() => void rooms.refetch()}>再試行</button></div>}
