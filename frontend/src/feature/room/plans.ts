@@ -1,4 +1,4 @@
-import { useQuery, type QueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { isRoomDesign, type RoomDesign } from '../../domain/room';
 import type { SavedRoom } from '../../domain/roomRepository';
 import { useSession } from '../../core/session';
@@ -56,15 +56,29 @@ export function useSavedRooms() {
 export function useRoomPlans(): RoomDesign[] {
   return useSavedRooms().data.flatMap(room => room.design ? [room.design] : []);
 }
-export function useRoomPlan(id: string, enabled: boolean) {
+export function isApiRoomAlias(id: string): boolean {
+  return loadConnection() === 'api' && /^(?:api-room-)?[1-9]\d*$/.test(id);
+}
+export function useRoomPlan(id: string, enabled: boolean, initialDesign?: () => RoomDesign) {
   const scope = useRoomPlanScope();
   const { rooms } = useRepositories();
+  const client = useQueryClient();
+  const alias = isApiRoomAlias(id);
   return useQuery({
     queryKey: scopedRoomPlanKeys(scope).detail(id),
-    queryFn: ({ signal }) => rooms.get(id, signal),
-    initialData: () => readPlans(scope).find(plan => plan.id === id),
+    queryFn: async ({ signal }) => {
+      const result = await rooms.get(id, signal);
+      // Apply edits only after resolving the backend's canonical result ID.
+      const cached = client.getQueryData<RoomDesign>(scopedRoomPlanKeys(scope).detail(result.id));
+      return (cached?.id === result.id ? cached : undefined)
+        ?? readPlans(scope).find(plan => plan.id === result.id) ?? result;
+    },
+    initialData: () => readPlans(scope).find(plan => plan.id === id) ?? initialDesign?.(),
     enabled,
-    staleTime: Infinity,
+    staleTime: alias ? 0 : Infinity,
+    refetchOnMount: alias ? 'always' : true,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 }
 export function saveRoomPlan(client: QueryClient, design: RoomDesign, scope: string): void {
