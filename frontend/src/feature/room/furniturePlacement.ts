@@ -1,17 +1,18 @@
-import { isRoomItem, type FurnitureCategory, type RoomGeometry, type RoomItem } from '../../domain/room';
+import { isRoomItem, type ManualFurnitureCategory, type RoomGeometry, type RoomItem } from '../../domain/room';
 
 export const FURNITURE_DRAG_TYPE = 'application/x-room-furniture';
 
-export const furnitureTemplates: { category: FurnitureCategory; name: string; size: RoomItem['size']; color: string }[] = [
+export const furnitureTemplates: { category: ManualFurnitureCategory; name: string; size: RoomItem['size']; color: string }[] = [
   { category: 'sofa', name: 'ソファ', size: [1.8, 0.8, 0.85], color: '#BBA5EE' },
   { category: 'bed', name: 'ベッド', size: [1, 0.5, 2], color: '#F4EFE6' },
   { category: 'desk', name: 'デスク', size: [1.2, 0.72, 0.6], color: '#C5A582' },
   { category: 'chair', name: 'チェア', size: [0.45, 0.8, 0.45], color: '#73966C' },
   { category: 'shelf', name: '収納棚', size: [0.8, 1.2, 0.35], color: '#C5A582' },
   { category: 'table', name: 'テーブル', size: [1, 0.4, 0.6], color: '#C5A582' },
+  { category: 'mirror', name: '鏡', size: [0.8, 1.7, 0.08], color: '#C5A582' },
 ];
 
-export function createFurnitureItem(category: FurnitureCategory, size?: RoomItem['size']): RoomItem {
+export function createFurnitureItem(category: ManualFurnitureCategory, size?: RoomItem['size']): RoomItem {
   const template = furnitureTemplates.find(candidate => candidate.category === category)!;
   const dimensions: RoomItem['size'] = [...(size ?? template.size)];
   return {
