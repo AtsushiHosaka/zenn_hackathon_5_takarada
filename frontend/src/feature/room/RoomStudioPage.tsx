@@ -11,7 +11,7 @@ import RoomScene from './RoomScene';
 import RecommendationPanel from './RecommendationPanel';
 import RoomGenerating from './RoomGenerating';
 import PlannerPanel, { type PlannerView } from './PlannerPanel';
-import { roomPlanKeys as sharedRoomPlanKeys, scopedRoomPlanKeys, useRoomPlanScope, saveRoomPlan, useRoomPlan } from './plans';
+import { roomPlanKeys as sharedRoomPlanKeys, scopedRoomPlanKeys, useRoomPlanScope, saveRoomPlan, useRoomPlan, isApiRoomAlias } from './plans';
 import ErrorText from '../shared/ErrorText';
 import { DomainError } from '../../domain/error';
 import './room-studio.css';
@@ -43,15 +43,17 @@ function sampleDesign(base:RoomDesign,id:string):RoomDesign {
 export default function RoomStudioPage() {
   const {id='new'}=useParams();
   const sample=id.startsWith('sample-');
-  const saved=useRoomPlan(id,id!=='new'&&!sample);
-  if(id!=='new'&&!sample&&!saved.data) return <main className="rc-missing-room">
+  const {rooms}=useRepositories();
+  const local=id==='new'||sample;
+  const saved=useRoomPlan(id,!local,local?()=>sampleDesign(rooms.demo(id==='sample-botanical'?'botanical':id==='sample-natural'?'natural':'oshi'),id):undefined);
+  if(!saved.data||(isApiRoomAlias(id)&&(saved.isFetching||saved.isError))) return <main className="rc-missing-room">
     <Link className="rc-back" to="/rooms" aria-label="ルーム一覧に戻る"><ReferenceSvg page={3} index={0}/></Link>
-    {saved.isPending?<p role="status">読み込み中…</p>:<><ErrorText error={saved.error}/><button className="rc-secondary" onClick={()=>void saved.refetch()}>再試行</button></>}
+    {saved.isPending||saved.isFetching?<p role="status">読み込み中…</p>:<><ErrorText error={saved.error}/><button className="rc-secondary" onClick={()=>void saved.refetch()}>再試行</button></>}
   </main>;
   if(saved.data && saved.data.id!==id) return <Navigate to={`/rooms/${encodeURIComponent(saved.data.id)}`} replace/>;
   return <LoadedRoomStudioPage key={id} initialDesign={saved.data}/>;
 }
-function LoadedRoomStudioPage({initialDesign}:{initialDesign?:RoomDesign}) {
+function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const {id='new'}=useParams();
   const isNew=id==='new';
   const {rooms,tokenStore}=useRepositories();
@@ -62,9 +64,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign?:RoomDesign}) {
   const location=useLocation();
   const navigate=useNavigate();
   const inputState=location.state as {prompt?:string;photos?:File[];editing?:boolean;view?:PlannerView;selectedId?:string|null;dimensions?:boolean}|null;
-  const cached=client.getQueryData<RoomDesign>(roomPlanKeys.detail(id));
-  const designQuery=useQuery({queryKey:roomPlanKeys.detail(id),queryFn:()=>initialDesign??sampleDesign(rooms.demo(id==='sample-botanical'?'botanical':id==='sample-natural'?'natural':'oshi'),id),initialData:()=>cached??initialDesign??sampleDesign(rooms.demo(id==='sample-botanical'?'botanical':id==='sample-natural'?'natural':'oshi'),id),staleTime:Infinity});
-  const design=designQuery.data;
+  const design=initialDesign;
   const capability=useQuery({queryKey:roomPlanKeys.capabilities,queryFn:()=>rooms.capabilities(),staleTime:Infinity});
   const analysisMode=capability.data?.input==='dimensions';
   const acceptsPhotos=capability.data?.photos===true;
