@@ -40,7 +40,7 @@ export function renderedFurnitureVolume(objects: THREE.Object3D[]): FurnitureVol
   for (const root of objects) {
     root.updateWorldMatrix(true, true);
     root.traverseVisible(object => {
-      if (!(object instanceof THREE.Mesh) || visited.has(object)) return;
+      if (!(object instanceof THREE.Mesh) || object.userData.nonPhysical || visited.has(object)) return;
       visited.add(object);
       const surfaces = Array.isArray(object.material) ? object.material : [object.material];
       if (!surfaces.some(surface => surface.visible && surface.opacity > 0 && surface.colorWrite)) return;

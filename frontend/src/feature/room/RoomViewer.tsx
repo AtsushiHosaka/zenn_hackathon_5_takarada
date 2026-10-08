@@ -1025,6 +1025,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       if (!position) { if (placementPreview) placementPreview.visible = false; return; }
       if (!placementPreview) {
         placementPreview = createFurniture(currentPlacement, accent, oshi, loadingManager);
+        furnitureGeometryVersion++;
         placementPreview.traverse(object => {
           if (!(object instanceof THREE.Mesh)) return;
           object.castShadow = false;
@@ -1237,11 +1238,13 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
           });
         }
       }
-      const meshesFor = (id: string) => loadedRoom && completeRoomModel && !currentBefore ? completeMeshes.get(id) : id === currentPlacement?.id && placementPreview?.visible ? [placementPreview] : furniture.has(id) ? [furniture.get(id)!] : undefined;
+      let placementPreviewId = currentPlacement?.id;
+      while (placementPreviewId && design.items.some(item => item.id === placementPreviewId)) placementPreviewId += ':preview';
+      const meshesFor = (id: string) => loadedRoom && completeRoomModel && !currentBefore ? completeMeshes.get(id) : id === placementPreviewId && placementPreview?.visible ? [placementPreview] : furniture.has(id) ? [furniture.get(id)!] : undefined;
       const nextOverlapSignature = JSON.stringify([furnitureGeometryVersion, currentBefore, drag?.id, drag?.position, drag?.supportObjectId, drag?.supportSurface, currentPlacement?.id, placementPreview?.userData.supportObjectId, placementPreview?.userData.supportSurface, placementPreview?.visible && placementPreview.position.toArray()]);
       if (nextOverlapSignature !== overlapSignature) {
         const visibleItems = design.items.filter(item => !currentBefore || existingIds.has(item.id)).map(item => drag?.id === item.id ? { ...item, position: drag.position, supportObjectId: drag.supportObjectId, supportSurface: drag.supportSurface } : item);
-        if (currentPlacement && placementPreview?.visible) visibleItems.push({ ...currentPlacement, supportObjectId: placementPreview.userData.supportObjectId, supportSurface: placementPreview.userData.supportSurface, position: [placementPreview.position.x, placementPreview.position.y + currentPlacement.size[1] / 2, placementPreview.position.z] });
+        if (currentPlacement && placementPreview?.visible) visibleItems.push({ ...currentPlacement, id: placementPreviewId!, supportObjectId: placementPreview.userData.supportObjectId, supportSurface: placementPreview.userData.supportSurface, position: [placementPreview.position.x, placementPreview.position.y + currentPlacement.size[1] / 2, placementPreview.position.z] });
         const volumes = new Map<string, FurnitureVolume>();
         const volumeFor = (id: string) => {
           const meshes = meshesFor(id);
@@ -1262,7 +1265,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       }
       if (overlapNotice.current) {
         const incomplete = loadedRoom && completeRoomModel && !currentBefore ? incompleteFurniture : new Set<string>();
-        const text = furnitureOverlapMessage(currentPlacement ? [...design.items, currentPlacement] : design.items, overlaps, incomplete);
+        const text = furnitureOverlapMessage(currentPlacement ? [...design.items, { ...currentPlacement, id: placementPreviewId! }] : design.items, overlaps, incomplete);
         if (overlapNotice.current.textContent !== text) overlapNotice.current.textContent = text;
         overlapNotice.current.hidden = !text;
       }
