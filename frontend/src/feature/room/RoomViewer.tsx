@@ -32,6 +32,7 @@ interface RoomViewerProps {
 
 type ViewerRuntime = {
   select: (id: string | null) => void;
+  focus: (id: string) => void;
   setView: (view: RoomViewerProps["view"]) => void;
   reset: () => void;
   setBefore: (before: boolean, markersVisible: boolean) => void;
@@ -500,7 +501,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   const textureNotice = useRef<HTMLDivElement>(null);
   const runtime = useRef<ViewerRuntime | null>(null);
   const roomBounds = useRef<{ id: string; bounds: THREE.Box3 } | null>(null);
-  const cameraState = useRef<{ id: string; position: THREE.Vector3; target: THREE.Vector3; zoom: number; view: RoomViewerProps["view"]; lastCommandSequence: number | null } | null>(null);
+  const cameraState = useRef<{ id: string; position: THREE.Vector3; target: THREE.Vector3; zoom: number; minDistance: number; view: RoomViewerProps["view"]; lastCommandSequence: number | null } | null>(null);
   const reportReady = useEffectEvent((ready: boolean) => onReady?.(ready));
   const selectItem = useEffectEvent(onSelectItem);
   const moveItem = useEffectEvent((id: string, position: RoomItem["position"]) => onMoveItem?.(id, position));
@@ -511,8 +512,9 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   const initialEditing = useEffectEvent(() => editing && Boolean(onMoveItem) && !before);
   const initialPlacement = useEffectEvent(() => !before && onPlaceItem ? placementItem : null);
   const dimensionItem = dimensions ? design.items.find(item => item.id === selectedItemId) : undefined;
+  const selectedItem = !preview ? design.items.find(item => item.id === selectedItemId) : undefined;
   const viewDescription = view === "top" ? "真上からの表示。" : view === "front" ? "正面からの表示。" : "立体表示。";
-  const instructions = preview ? `${design.title}の保存した3Dモデル。` : `部屋の3Dプレビュー。${before ? "変更前の部屋。" : ""}${viewDescription}`;
+  const instructions = preview ? `${design.title}の保存した3Dモデル。` : `部屋の3Dプレビュー。${before ? "変更前の部屋。" : ""}${viewDescription}${selectedItem ? `選択中: ${selectedItem.name}。` : ''}`;
 
   useEffect(() => {
     const host = canvasHost.current;
@@ -664,7 +666,9 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       if (object) {
         selection = new THREE.BoxHelper(object, "#b49cf0");
         selection.material.transparent = true;
-        selection.material.opacity = 0.7;
+        selection.material.opacity = 1;
+        selection.material.depthTest = false;
+        selection.renderOrder = 10;
         scene.add(selection);
       }
     };
@@ -732,6 +736,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       sun.shadow.camera.updateProjectionMatrix();
     };
     const reset = () => {
+      controls.minDistance = Math.max(0.5, cameraBounds.getSize(new THREE.Vector3()).length() * 0.24);
       controls.target.copy(roomCenter);
       camera.position.copy(roomCenter).addScaledVector(defaultDirections[currentView], fitDistances[currentView]);
       if (camera instanceof THREE.OrthographicCamera) { camera.zoom = 1; camera.updateProjectionMatrix(); }
@@ -749,6 +754,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       if (!savedCamera || savedCamera.view !== currentView) { reset(); return; }
       controls.target.copy(savedCamera.target);
       camera.position.copy(savedCamera.position);
+      controls.minDistance = savedCamera.minDistance;
       camera.zoom = savedCamera.zoom;
       camera.updateProjectionMatrix();
       controls.enableRotate = currentView === "perspective";
@@ -757,9 +763,45 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       controls.update();
       controls.enableDamping = damping;
     };
+    const focusItem = (id: string) => {
+      if (preview || drag) return;
+      const objects = loadedRoom && completeRoomModel && !currentBefore ? hitTargets : furniture;
+      const object = objects.get(id);
+      if (!object?.visible) return;
+      const bounds = new THREE.Box3().setFromObject(object);
+      if (bounds.isEmpty()) return;
+      const target = bounds.getCenter(new THREE.Vector3());
+      const direction = camera.position.clone().sub(controls.target).normalize();
+      if (direction.lengthSq() < 0.5) direction.copy(defaultDirections[currentView]);
+      const aspect = camera instanceof THREE.PerspectiveCamera ? camera.aspect : (camera.right - camera.left) / (camera.top - camera.bottom);
+      const distance = Math.max(0.4, fittedDistance(bounds, target, direction, aspect, 36) * 1.25);
+      const damping = controls.enableDamping;
+      controls.enableDamping = false;
+      controls.update();
+      controls.minDistance = 0.25;
+      controls.target.copy(target);
+      camera.position.copy(target).addScaledVector(direction, distance);
+      if (camera instanceof THREE.OrthographicCamera) {
+        const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), direction).normalize();
+        const up = new THREE.Vector3().crossVectors(direction, right).normalize();
+        let halfWidth = 0, halfHeight = 0;
+        for (const x of [bounds.min.x, bounds.max.x]) for (const y of [bounds.min.y, bounds.max.y]) for (const z of [bounds.min.z, bounds.max.z]) {
+          const offset = new THREE.Vector3(x, y, z).sub(target);
+          halfWidth = Math.max(halfWidth, Math.abs(offset.dot(right)));
+          halfHeight = Math.max(halfHeight, Math.abs(offset.dot(up)));
+        }
+        camera.zoom = THREE.MathUtils.clamp(Math.min((camera.right - camera.left) / Math.max(halfWidth * 2.5, 0.1), (camera.top - camera.bottom) / Math.max(halfHeight * 2.5, 0.1)), 0.25, 4);
+        camera.updateProjectionMatrix();
+      }
+      controls.update();
+      controls.enableDamping = damping;
+      updateSelection(id);
+      previewNeedsRender = true;
+    };
     let lastCommandSequence: number | null = savedCamera?.lastCommandSequence ?? null;
     runtime.current = {
       select: updateSelection,
+      focus: focusItem,
       reset: () => { cancelDrag(); clearPlacementPreview(); lastCommandSequence = null; reset(); },
       setBefore: (nextBefore, nextMarkersVisible) => { if (nextBefore !== currentBefore) cancelDrag(); clearPlacementPreview(); currentBefore = nextBefore; markersVisible = nextMarkersVisible; updateVisibility(); },
       setEditing: (nextEditing) => { if (nextEditing !== currentEditing) cancelDrag(); if (!nextEditing) clearPlacementPreview(); currentEditing = nextEditing; layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel; },
@@ -1048,14 +1090,14 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         releaseDrag(!changed);
         if (changed) {
           moveItem(active.id, active.position);
-        }
+        } else if (!active.moved) focusItem(active.id);
         return;
       }
       const start = pointerStart;
       pointerStart = null;
       if (!start || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 5 || performance.now() - start.time > 600) return;
       const id = findItem(event);
-      if (id) selectItem(id);
+      if (id) { focusItem(id); selectItem(id); }
     };
     const pointerMove = (event: PointerEvent) => {
       if (drag?.pointerId === event.pointerId) {
@@ -1175,7 +1217,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     return () => {
       cancelDrag();
       clearPlacementPreview();
-      cameraState.current = { id: design.id, position: camera.position.clone(), target: controls.target.clone(), zoom: camera.zoom, view: currentView, lastCommandSequence };
+      cameraState.current = { id: design.id, position: camera.position.clone(), target: controls.target.clone(), zoom: camera.zoom, minDistance: controls.minDistance, view: currentView, lastCommandSequence };
       disposed = true;
       window.clearTimeout(previewDeadline);
       textureCleanups.forEach(cleanup => cleanup());
@@ -1216,6 +1258,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   return (
     <div className="room-viewer">
       <div ref={canvasHost} className="viewer-canvas" style={{ position: "absolute", inset: 0 }} />
+      {selectedItem && <button type="button" className="viewer-selected-item" aria-label={`${selectedItem.name}にフォーカス`} onClick={() => runtime.current?.focus(selectedItem.id)}>選択中: {selectedItem.name}</button>}
       {dimensionItem && <div role="status" style={{ position: "absolute", left: 16, bottom: 16, padding: "8px 12px", background: "rgba(29,27,38,.88)", border: "1px solid #6e6a7c", borderRadius: 8, color: "#fff", fontSize: 12, pointerEvents: "none" }}>幅 {Math.round(dimensionItem.size[0] * 100)} × 高さ {Math.round(dimensionItem.size[1] * 100)} × 奥行き {Math.round(dimensionItem.size[2] * 100)} cm</div>}
       <div ref={fallback} className="viewer-fallback" hidden role="status">
         <strong>この環境では3Dを表示できません</strong>
