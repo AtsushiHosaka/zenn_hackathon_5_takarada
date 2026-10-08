@@ -1,9 +1,14 @@
 import * as THREE from 'three';
 import { OBB } from 'three/examples/jsm/math/OBB.js';
+import type { RoomDesign, RoomItem } from '../../domain/room';
+import { furnitureSurfaceHeight } from './roomBounds';
 
 // Ignore contact and sub-3mm placement/mesh rounding. Use each visible mesh's
 // bounding volume, preserving the empty space between separate table/chair legs.
 const CONTACT_TOLERANCE = 0.003;
+const adornments = new Set(['cover', 'bed_cover', 'rug', 'wall_decor', 'artwork', 'led', 'poster']);
+const supportedContact = (item: RoomItem, support: RoomItem, design: RoomDesign) =>
+  item.supportObjectId === support.id && furnitureSurfaceHeight(item, item.position, design) !== null;
 type FurnitureVolume = { id: string; bounds: THREE.Box3; meshes: OBB[] };
 
 function meshVolume(mesh: THREE.Mesh, matrix: THREE.Matrix4): { bounds: THREE.Box3; obb: OBB } | undefined {
@@ -56,12 +61,15 @@ function furnitureVolume(id: string, group: THREE.Group): FurnitureVolume {
   return { id, bounds, meshes };
 }
 
-export function findFurnitureOverlaps(groups: ReadonlyMap<string, THREE.Group>): Set<string> {
-  const volumes = [...groups].filter(([, group]) => group.visible).map(([id, group]) => furnitureVolume(id, group));
+export function findFurnitureOverlaps(groups: ReadonlyMap<string, THREE.Group>, design?: RoomDesign): Set<string> {
+  const items = new Map(design?.items.map(item => [item.id, item]) ?? []);
+  const volumes = [...groups].filter(([id, group]) => group.visible && !adornments.has(items.get(id)?.category ?? '')).map(([id, group]) => furnitureVolume(id, group));
   const overlaps = new Set<string>();
   for (let index = 0; index < volumes.length; index++) {
     const left = volumes[index];
     for (const right of volumes.slice(index + 1)) {
+      const firstItem = items.get(left.id), secondItem = items.get(right.id);
+      if (design && firstItem && secondItem && (supportedContact(firstItem, secondItem, design) || supportedContact(secondItem, firstItem, design))) continue;
       if (!left.bounds.intersectsBox(right.bounds)) continue;
       if (left.meshes.some(first => right.meshes.some(second => first.intersectsOBB(second)))) {
         overlaps.add(left.id);
