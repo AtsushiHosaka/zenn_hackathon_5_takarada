@@ -3,6 +3,7 @@ import type { FurnitureAddition, FurnitureOperation, RoomDesign, RoomItem, RoomS
 export type RoomGenerationPhase = "uploading" | "analyzing" | "coordinating" | "preview";
 
 export type GenerateRoomInput = {
+  characterThemeId?: string;
   onProgress?: (phase: RoomGenerationPhase) => void;
   photos: File[];
   prompt: string;
