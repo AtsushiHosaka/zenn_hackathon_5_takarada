@@ -728,7 +728,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         if (object instanceof THREE.Mesh || object instanceof THREE.Line) {
           for (const surface of Array.isArray(object.material) ? object.material : [object.material]) {
             const original = surface.userData.beforeColor ?? object.userData.beforeColor;
-            if (!original || !('color' in surface)) continue;
+            if (original === undefined || original === null || !('color' in surface)) continue;
             const colored = surface as THREE.MeshStandardMaterial;
             if (colored.userData.afterColor === undefined) colored.userData.afterColor = colored.color.getHex();
             colored.color.set(currentBefore ? original : colored.userData.afterColor);
