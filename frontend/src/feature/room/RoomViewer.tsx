@@ -9,7 +9,7 @@ import { isManualFurniture, type RoomDesign, type RoomItem } from "../../domain/
 import { buildReferenceRoom, usesReferenceRoom } from "./referenceRoomModel";
 import { buildCharacterThemeDecor } from "./characterThemeDecor";
 import { Reflector } from "three/examples/jsm/objects/Reflector.js";
-import { addMirrorSurface } from "./mirrorSurface";
+import { addMirrorSurface, isMirrorCategory } from "./mirrorSurface";
 import { buildMeasuredRoom } from "./roomArchitecture";
 import { LAYOUT_GRID_STEP } from "./layoutGrid";
 import { applyMaterialOverrides } from "./furnitureMaterials";
@@ -145,6 +145,7 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean, manager?
   const dark = "#605747";
   const color = item.color;
   switch (item.category) {
+    case "wall_mirror":
     case "mirror":
       box(group, [w, h, d], [0, h / 2, 0], color, true);
       addMirrorSurface(group, item);
@@ -895,7 +896,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         group.scale.set(1, 1, 1);
         // Capture normalized model bounds before the furniture transform makes
         // them world-space; the reflection plane is a child in local space.
-        const mirrorBounds = item.category === "mirror" ? new THREE.Box3().setFromObject(gltf.scene) : undefined;
+        const mirrorBounds = isMirrorCategory(item.category) ? new THREE.Box3().setFromObject(gltf.scene) : undefined;
         group.add(gltf.scene);
         if (mirrorBounds) addMirrorSurface(group, item, mirrorBounds);
         if (selectedId === item.id) updateSelection(selectedId);
@@ -931,7 +932,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
             );
             hitTarget.position.y = item.size[1] / 2;
             group.add(hitTarget);
-            if (item.category === "mirror") addMirrorSurface(group, item);
+            if (isMirrorCategory(item.category)) addMirrorSurface(group, item);
             hitTargets.set(item.id, group);
             scene.add(group);
           }

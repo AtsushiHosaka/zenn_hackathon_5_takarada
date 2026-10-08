@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
 import type { RoomItem } from '../../domain/room';
 
+export function isMirrorCategory(category: string) {
+  return category === 'wall_mirror' || category === 'mirror';
+}
+
 const reflectingScenes = new WeakSet<THREE.Scene>();
 
 // Reflectors use a reflected camera and an oblique clip plane. Keep auxiliary
