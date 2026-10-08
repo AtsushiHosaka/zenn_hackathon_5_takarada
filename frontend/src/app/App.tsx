@@ -7,6 +7,7 @@ import LoginPage from "../feature/auth/LoginPage";
 import UserDetailPage from "../feature/users/UserDetailPage";
 import AppLayout from "../feature/shared/AppLayout";
 import RequireAuth from "../feature/shared/RequireAuth";
+import RoomTemplatePage from "../feature/room/RoomTemplatePage";
 import RoomListPage from '../feature/room/RoomListPage';
 import RoomStudioPage from "../feature/room/RoomStudioPage";
 import { useRoomPlanScope } from "../feature/room/plans";
@@ -38,6 +39,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/rooms" replace />} />
             <Route path="/rooms" element={<RequireAuth><RoomListPage /></RequireAuth>} />
+            <Route path="/room-templates" element={<RequireAuth><RoomTemplatePage /></RequireAuth>} />
             <Route path="/coordinate" element={<Navigate to="/rooms/new" replace />} />
             <Route path="/rooms/:id" element={<RequireAuth><RoomStudioRoute /></RequireAuth>} />
             <Route path="/login" element={<LoginPage />} />

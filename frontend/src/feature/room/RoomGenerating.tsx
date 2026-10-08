@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
+import type { RoomGenerationPhase } from '../../domain/roomRepository';
 import ReferenceSvg from './ReferenceSvg';
 import './generating.css';
 
 type RoomGeneratingProps = {
+  phase?: RoomGenerationPhase;
   prompt: string;
   photos: File[];
   sample: boolean;
@@ -10,22 +12,6 @@ type RoomGeneratingProps = {
   coordination?: boolean;
   onCancel: () => void;
 };
-
-const sampleSteps = [
-  { title: '部屋を準備', state: 'done' },
-  { title: '家具を準備', state: 'done' },
-  { title: '表示を準備', state: 'active' },
-  { title: '商品リンクの例を表示', state: 'pending' },
-  { title: '3Dプレビューを表示', state: 'pending' },
-];
-
-const apiSteps = [
-  { title: '生成中', state: 'active' },
-  { title: '部屋と家具の解析結果を受信', state: 'pending' },
-  { title: 'コーディネート結果を受信', state: 'pending' },
-  { title: '3Dモデルと商品リンクを受信', state: 'pending' },
-  { title: 'プレビューを表示', state: 'pending' },
-];
 
 const furnitureLabels = [
   { name: 'ベッド', left: '44.23%', top: '40.98%' },
@@ -46,29 +32,32 @@ function PhotoPreview({ file }: { file: File }) {
   return <img ref={image} alt={file.name} />;
 }
 
-export default function RoomGenerating({ prompt, photos, sample, dimensions = false, coordination = true, onCancel }: RoomGeneratingProps) {
-  const steps = dimensions ? [
-    { title: '部屋を準備', state: 'active' },
-    ...(coordination ? [{ title: 'コーディネートを受信', state: 'pending' }] : []),
-    { title: '3Dプレビューを表示', state: 'pending' },
-  ] : sample ? sampleSteps : apiSteps;
+export default function RoomGenerating({ phase = 'analyzing', prompt, photos, sample, dimensions = false, coordination = true, onCancel }: RoomGeneratingProps) {
+  const stages: {phase:RoomGenerationPhase;title:string}[] = [
+    ...(photos.length && dimensions && !sample ? [{phase:'uploading' as const,title:'写真を送信'}] : []),
+    {phase:'analyzing',title:sample?'部屋を準備':dimensions?'部屋を解析':'生成結果を待機'},
+    ...(coordination && dimensions && !sample ? [{phase:'coordinating' as const,title:'コーディネートを受信'}] : []),
+    {phase:'preview',title:'3Dプレビューを準備'},
+  ];
+  const activeIndex = Math.max(0, stages.findIndex(stage => stage.phase === phase));
+  const steps = stages.map((stage,index)=>({...stage,state:index<activeIndex?'done':index===activeIndex?'active':'pending'}));
   return <>
     <section aria-label="チャット" className="room-generating-chat">
       <div className="room-generating-chat-scroll">
-        <div className="room-generating-user">
+        <div className="room-generating-user motion-enter">
           <div className="room-generating-photos">
-            {photos.length > 0 ? photos.map((file, index) => <div key={`${file.name}-${file.lastModified}-${index}`}><PhotoPreview file={file} /></div>) : sample && !dimensions && [2, 3, 4, 5].map(index => <div key={index}><ReferenceSvg page={4} index={index} /></div>)}
+            {photos.length > 0 ? photos.map(file => <div key={`${file.name}-${file.size}-${file.lastModified}`}><PhotoPreview file={file} /></div>) : sample && !dimensions && [2, 3, 4, 5].map(index => <div key={index}><ReferenceSvg page={4} index={index} /></div>)}
           </div>
           <p>{prompt}</p>
           <span>{sample ? 'サンプル' : '送信済み'}</span>
         </div>
-        <div className="room-generating-assistant">
+        <div className="room-generating-assistant motion-enter">
           <span className="room-generating-assistant-icon"><ReferenceSvg page={4} index={6} /></span>
           <div className="room-generating-assistant-content">
             <span className="room-generating-assistant-name">へやいろ</span>
             <ol className="room-generating-steps" aria-label={sample ? 'サンプルの準備状況' : 'APIへのリクエスト状況'}>
-              {steps.map((step, index) => <li key={step.title} className={`room-generating-step room-generating-step-${step.state}`}>
-                <span className="room-generating-step-icon">{step.state === 'done' && <ReferenceSvg page={4} index={index === 0 ? 7 : 8} />}</span>
+              {steps.map((step, index) => <li key={step.title} aria-current={step.state==='active'?'step':undefined} className={`room-generating-step room-generating-step-${step.state}`}>
+                <span aria-hidden="true" className="room-generating-step-icon">{step.state === 'done' && <ReferenceSvg page={4} index={index === 0 ? 7 : 8} />}</span>
                 <div><span>{step.title}</span></div>
               </li>)}
             </ol>
@@ -96,9 +85,9 @@ export default function RoomGenerating({ prompt, photos, sample, dimensions = fa
           </>}
         </div>
       </div>
-      <div className="room-generating-status" role="status" aria-live="polite">
-        <div><span>{sample ? 'サンプル準備中' : '生成中'}</span><span>{sample && !dimensions ? <><strong>3</strong> / 5 ステップ</> : '処理状況を確認中'}</span></div>
-        <div className="room-generating-progress" role="progressbar" aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={sample && !dimensions ? 3 : undefined} aria-label={sample ? 'サンプルの準備状況' : 'APIからの応答待ち'}><div className={sample && !dimensions ? undefined : 'room-generating-progress-waiting'} /></div>
+      <div className="room-generating-status motion-fade" role="status" aria-live="polite">
+        <div><span>{sample ? 'サンプル準備中' : '生成中'} · {stages[activeIndex].title}</span><span><><strong>{activeIndex+1}</strong> / {steps.length} ステップ</></span></div>
+        <div className="room-generating-progress" role="progressbar" aria-label={sample ? 'サンプルの準備状況' : 'APIからの応答待ち'}><div className="room-generating-progress-waiting" /></div>
       </div>
     </section>
   </>;

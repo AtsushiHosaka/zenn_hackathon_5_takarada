@@ -1,0 +1,36 @@
+{
+  "source": "ded51452183d9da8f4e5b2e1a59981089a5b6f49",
+  "status": "PASS",
+  "products": "panel/canvas identity, stable filtering and capped stagger, pointer/keyboard selection, native popup, focus and scroll, rapid reopen",
+  "planner": "stable legacy additions, dimensions/transform, edit/undo/redo, swatches/view/BeforeAfter, actual snapped drag within bounds, saved/quota failures, CSV, reduced motion, mobile viewport editor",
+  "screenshots": [
+    "products.png",
+    "planner.png",
+    "mobile-planner-reduced.png",
+    "mobile-planner-no-preference.png",
+    "mobile-planner-reduce.png"
+  ],
+  "furnitureRequestFocus": {
+    "source": "actual combined RoomStudioPage and PlannerPanel",
+    "normalAndReducedDesktop": {
+      "nextPreviousSelect": true,
+      "soleAddImmediate": true,
+      "soleAddAfterExit": true,
+      "nativeEnterReAdd": true
+    }
+  },
+  "mobile390x844": {
+    "normalAndReduced": true,
+    "headerHitTest": true,
+    "singleCanvasAcrossCloseOpenProductsEdit": true,
+    "horizontalOverflow": false
+  },
+  "pageErrors": 0,
+  "excessWebGLWarnings": 0,
+  "contextClosed": true,
+  "boundaries": [
+    "Local owner, API room and catalog fixtures",
+    "External native-link destination intercepted",
+    "No deployed/provider/cloud DB proof"
+  ]
+}

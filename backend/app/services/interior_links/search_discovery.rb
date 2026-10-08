@@ -27,7 +27,8 @@ module InteriorLinks
     SKIPPED_DISCOVERY_HOSTS = %w[www.nitori-net.jp].freeze
     BATCH_PRIORITY_PATHS = [ STORE_PATHS.values_at(0, 1), STORE_PATHS.values_at(2, 3, 4), STORE_PATHS ].freeze
     CATEGORY_NAMES = { "sofa" => "ソファ", "bed" => "ベッド", "desk" => "デスク", "chair" => "椅子",
-                       "shelf" => "本棚・収納棚", "table" => "テーブル" }.freeze
+                       "shelf" => "本棚・収納棚", "table" => "テーブル",
+                       "storage" => "収納家具・チェスト", "tv_stand" => "テレビ台", "wardrobe" => "ワードローブ" }.freeze
     class Error < StandardError
       attr_reader :diagnostics
 

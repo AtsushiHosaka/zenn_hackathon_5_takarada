@@ -1,12 +1,26 @@
+import { roomPalette } from "./roomPalette";
+
+import { characterTheme } from "./characterTheme";
 export type Style = "botanical" | "oshi" | "natural";
 export type RoomShape = "square" | "standard" | "long";
 export const furnitureCategories = ["sofa", "bed", "desk", "chair", "shelf", "table"] as const;
+export const replacementFurnitureCategories = [...furnitureCategories, "storage", "tv_stand", "wardrobe"] as const;
+export const productCategories = [...replacementFurnitureCategories, "bed_cover", "curtain", "rug", "cushion", "floor_lamp", "desk_lamp", "plant", "small_plant", "wall_art", "wall_mirror", "wall_planter", "wall_shelf", "display_case", "acrylic_stand_case", "oshi_goods", "tapestry", "neon", "vase", "candle"] as const;
+export type ProductCategory = typeof productCategories[number];
 export type FurnitureCategory = typeof furnitureCategories[number];
+export const manualFurnitureCategories = [...furnitureCategories, "mirror"] as const;
+export type ManualFurnitureCategory = typeof manualFurnitureCategories[number];
 export type FurnitureOperation = { objectId: string; action: "keep" | "replace" | "remove" };
-export type FurnitureAddition = { category: FurnitureCategory };
+export type FurnitureAddition = { category: FurnitureCategory; uiId?: string };
 export type TextureStatus = "disabled" | "ready" | "failed" | "skipped" | "unmatched";
 export type MaterialOverrides = Record<string, { textureUrl?: string; tileSizeM?: number; color?: string }>;
+export type ProductColorVariant = { colorName: string; url: string; variantId?: string; source: "official_color_picker" | "official_product_group" };
 export type ProductMetadata = {
+  provider?: string;
+  providerProductId?: string;
+  variantId?: string;
+  officialColor?: string;
+  colorVariants?: ProductColorVariant[];
   sourceUrl?: string;
   priceCheckedAt?: string;
   sizeSource?: string | { url?: string; evidence?: string | string[]; kind?: string };
@@ -34,11 +48,48 @@ export type RoomGeometry = {
   windows: RoomWindow[];
 };
 
+export const imageGoodsCategories = ["poster", "acrylic_stand"] as const;
+export type ImageGoodsCategory = typeof imageGoodsCategories[number];
+export type ImageArtwork = { dataUrl: string };
+export const MAX_ARTWORK_DATA_LENGTH = 262144;
+
+export function isImageArtwork(value: unknown): value is ImageArtwork {
+  return isRecord(value) && typeof value.dataUrl === "string" && value.dataUrl.length <= MAX_ARTWORK_DATA_LENGTH && /^data:image\/png;base64,iVBORw0KGgo[A-Za-z0-9+/]*={0,2}$/.test(value.dataUrl);
+}
+
+export type FurnitureSupportSurface = {
+  // World X/Z to the picked horizontal mesh's local X/Z.
+  transform: [number, number, number, number, number, number];
+  bounds: [number, number, number, number];
+  height: number;
+  radius?: number;
+  supportPosition: [number, number, number];
+  supportSize: [number, number, number];
+  supportRotation: number;
+};
+
+export function isFurnitureSupportSurface(value: unknown): value is FurnitureSupportSurface {
+  if (!isRecord(value) || Object.keys(value).some(key => !['transform', 'bounds', 'height', 'radius', 'supportPosition', 'supportSize', 'supportRotation'].includes(key))) return false;
+  const boundedVector = (vector: unknown, length: number) => Array.isArray(vector) && vector.length === length && vector.every(number => typeof number === 'number' && Number.isFinite(number) && Math.abs(number) <= 1e6);
+  if (!boundedVector(value.transform, 6) || !boundedVector(value.bounds, 4) || !boundedVector(value.supportPosition, 3) || !boundedVector(value.supportSize, 3)) return false;
+  const transform = value.transform as number[], bounds = value.bounds as number[];
+  if (Math.abs(transform[0] * transform[4] - transform[1] * transform[3]) < 1e-12 || bounds[0] >= bounds[2] || bounds[1] >= bounds[3]) return false;
+  if (!(value.supportSize as number[]).every(number => number > 0)) return false;
+  if (typeof value.height !== 'number' || !Number.isFinite(value.height) || Math.abs(value.height) > 1000) return false;
+  if (typeof value.supportRotation !== 'number' || !Number.isFinite(value.supportRotation) || value.supportRotation < 0 || value.supportRotation >= 360) return false;
+  return value.radius === undefined || typeof value.radius === 'number' && Number.isFinite(value.radius) && value.radius > 0 && value.radius <= 1e6;
+}
+
 export type RoomItem = {
+  // Browser-local source photo; category models provide its editable 3D representation.
+  referenceImage?: ImageArtwork;
+  artwork?: ImageArtwork;
   id: string;
   name: string;
   category: string;
   existing: boolean;
+  supportObjectId?: string;
+  supportSurface?: FurnitureSupportSurface;
   price?: number;
   shop?: string;
   productUrl?: string;
@@ -69,20 +120,28 @@ export function isManualFurniture(item: RoomItem): boolean {
   return item.existing && /^manual-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
 }
 
+// Template objects belong to a copied base scene, so they must not be appended as manual input.
+export function isTemplateFurniture(item: RoomItem): boolean {
+  return item.existing && /^template-object-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
+}
+
 export type RoomSnapshot = { room: RoomGeometry; items: RoomItem[]; wallColor?: string };
 
 export type RoomDesign = {
+  characterThemeId?: string;
   kind?: "analysis" | "coordination";
   source: "demo" | "api";
   id: string;
   title: string;
   description: string;
   style: Style;
+  roomPaletteId?: string;
   items: RoomItem[];
   modelUrl?: string;
   // modelUrlがある場合、未指定なら家具を含む完成モデルとして扱う。
   modelKind?: "complete" | "shell";
   wallColor?: string;
+  floorColor?: string;
   room?: RoomGeometry;
   // Stable floor inferred for legacy designs without measured room geometry.
   inferredRoomBounds?: { min: [number, number, number]; max: [number, number, number]; floor: number };
@@ -106,12 +165,15 @@ export type RoomDesign = {
 // ブラウザに保存されたデータも、復元時には信頼しない。
 export function isRoomDesign(value: unknown): value is RoomDesign {
   if (!isRecord(value)) return false;
+  if (value.characterThemeId !== undefined && !characterTheme(value.characterThemeId)) return false;
   if (value.source !== "demo" && value.source !== "api") return false;
   if (value.kind !== undefined && value.kind !== "analysis" && value.kind !== "coordination") return false;
   if (value.style !== "botanical" && value.style !== "oshi" && value.style !== "natural") return false;
   if (!nonemptyString(value.id) || !nonemptyString(value.title) || !nonemptyString(value.description)) return false;
+  if (value.roomPaletteId !== undefined && !roomPalette(value.roomPaletteId)) return false;
   if (value.modelKind !== undefined && value.modelKind !== "complete" && value.modelKind !== "shell") return false;
   if (value.wallColor !== undefined && (typeof value.wallColor !== "string" || !/^#[0-9a-f]{6}$/i.test(value.wallColor))) return false;
+  if (value.floorColor !== undefined && (typeof value.floorColor !== "string" || !/^#[0-9a-f]{6}$/i.test(value.floorColor))) return false;
   if (value.room !== undefined && !isRoomGeometry(value.room)) return false;
   if (value.inferredRoomBounds !== undefined && !isInferredRoomBounds(value.inferredRoomBounds)) return false;
   if (value.analysisInput !== undefined && (!isRecord(value.analysisInput) || !isTatami(value.analysisInput.tatami) || !isRoomShape(value.analysisInput.shape))) return false;
@@ -127,8 +189,10 @@ export function isRoomDesign(value: unknown): value is RoomDesign {
   if (value.productSource !== undefined && value.productSource !== "ec" && value.productSource !== "mock") return false;
   if (value.searchEntryPoints !== undefined && (!Array.isArray(value.searchEntryPoints) || !value.searchEntryPoints.every(nonemptyString))) return false;
   if (!optionalHttpUrl(value.modelUrl) || !Array.isArray(value.items) || !value.items.every(isRoomItem)) return false;
+  const currentItems = value.items as RoomItem[];
+  const editedItems = value.editedItems as RoomItem[] | undefined;
   const furniture = [...new Map([
-    ...(value.before?.items ?? value.items).filter(item => item.existing && !isManualFurniture(item)),
+    ...(value.before?.items ?? value.items).filter(item => item.existing && (!isManualFurniture(item) || currentItems.some(current => current.id === item.id || current.replacesObjectId === item.id) || editedItems?.some(current => current.id === item.id))),
     ...value.items.filter(isManualFurniture),
     ...(value.editedItems ?? []).filter(isManualFurniture),
   ].map(item => [item.id, item])).values()];
@@ -182,6 +246,8 @@ function isRoomWindow(value: unknown): value is RoomWindow {
 
 export function isRoomItem(value: unknown): value is RoomItem {
   if (!isRecord(value)) return false;
+  if (value.supportObjectId !== undefined && (!nonemptyString(value.supportObjectId) || value.supportObjectId === value.id)) return false;
+  if (value.supportSurface !== undefined && (!nonemptyString(value.supportObjectId) || !isFurnitureSupportSurface(value.supportSurface))) return false;
   if (![value.id, value.name, value.category, value.color].every(nonemptyString) || typeof value.existing !== "boolean") return false;
   if (!finiteVector(value.position) || !finiteVector(value.size) || value.size.some(number => number <= 0)) return false;
   if (value.rotation !== undefined && (typeof value.rotation !== "number" || !Number.isFinite(value.rotation) || value.rotation < 0 || value.rotation >= 360)) return false;
@@ -189,7 +255,9 @@ export function isRoomItem(value: unknown): value is RoomItem {
   if (value.marker !== undefined && (typeof value.marker !== "number" || !Number.isSafeInteger(value.marker) || value.marker <= 0)) return false;
   if (value.shop !== undefined && !nonemptyString(value.shop)) return false;
   if (value.productId !== undefined && (typeof value.productId !== "string" || !/^[1-9]\d*$/.test(value.productId))) return false;
-  if (value.ecProductId !== undefined && (typeof value.ecProductId !== "string" || !/^[1-9]\d*$/.test(value.ecProductId) || !isManualFurniture(value as RoomItem))) return false;
+  if (value.ecProductId !== undefined && (typeof value.ecProductId !== "string" || !/^[1-9]\d*$/.test(value.ecProductId))) return false;
+  if (value.referenceImage !== undefined && (!(isManualFurniture(value as RoomItem) || isTemplateFurniture(value as RoomItem)) || !furnitureCategories.some(category => category === value.category) || !isImageArtwork(value.referenceImage))) return false;
+  if (value.artwork !== undefined && (!(isManualFurniture(value as RoomItem) || isTemplateFurniture(value as RoomItem)) || !imageGoodsCategories.some(category => category === value.category) || !isImageArtwork(value.artwork))) return false;
   if (value.materialOverrides !== undefined && !isMaterialOverrides(value.materialOverrides)) return false;
   if (value.textureStatus !== undefined && !isTextureStatus(value.textureStatus)) return false;
   if (value.textureSource !== undefined && value.textureSource !== "description") return false;
@@ -207,7 +275,7 @@ export function isFurnitureOperations(value: unknown): value is FurnitureOperati
 }
 
 export function isFurnitureAdditions(value: unknown): value is FurnitureAddition[] {
-  return Array.isArray(value) && value.length <= 6 && value.every(addition => isRecord(addition) && furnitureCategories.some(category => category === addition.category));
+  return Array.isArray(value) && value.length <= 6 && value.every(addition => isRecord(addition) && furnitureCategories.some(category => category === addition.category) && (addition.uiId === undefined || typeof addition.uiId === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(addition.uiId)));
 }
 
 export function isTextureStatus(value: unknown): value is TextureStatus {
@@ -221,7 +289,8 @@ export function isMaterialOverrides(value: unknown): value is MaterialOverrides 
 function isProductMetadata(value: unknown): value is ProductMetadata {
   if (!isRecord(value) || !optionalHttpUrl(value.sourceUrl)) return false;
   if (value.priceCheckedAt !== undefined && (typeof value.priceCheckedAt !== "string" || !Number.isFinite(Date.parse(value.priceCheckedAt)))) return false;
-  if (![value.material, value.shape, value.availability].every(field => field === undefined || nonemptyString(field))) return false;
+  if (![value.material, value.shape, value.availability, value.provider, value.providerProductId, value.variantId, value.officialColor].every(field => field === undefined || nonemptyString(field))) return false;
+  if (value.colorVariants !== undefined && (!Array.isArray(value.colorVariants) || value.colorVariants.length > 24 || !value.colorVariants.every(variant => isRecord(variant) && nonemptyString(variant.colorName) && nonemptyString(variant.url) && optionalHttpUrl(variant.url) && (variant.variantId === undefined || nonemptyString(variant.variantId)) && (variant.source === "official_color_picker" || variant.source === "official_product_group")))) return false;
   if (value.estimatedAxes !== undefined && (!Array.isArray(value.estimatedAxes) || !value.estimatedAxes.every(axis => axis === "w" || axis === "h" || axis === "d"))) return false;
   if (value.size !== undefined && (!isRecord(value.size) || ![value.size.w, value.size.h, value.size.d].every(axis => axis === null || positiveNumber(axis)))) return false;
   if (value.imageDisplayAllowed !== undefined && typeof value.imageDisplayAllowed !== "boolean") return false;

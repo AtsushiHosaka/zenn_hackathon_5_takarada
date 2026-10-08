@@ -2,6 +2,9 @@
 class Coordination < ApplicationRecord
   STATUSES = %w[pending processing done failed].freeze
   FLOOR_CATEGORIES = %w[sofa bed desk chair shelf table].freeze
+  REPLACEMENT_CATEGORIES = %w[sofa bed desk chair shelf table storage tv_stand wardrobe].freeze
+  IMAGE_GOODS_CATEGORIES = %w[poster acrylic_stand].freeze
+  MANUAL_CATEGORIES = (FLOOR_CATEGORIES + IMAGE_GOODS_CATEGORIES + %w[mirror]).freeze
   MANUAL_OBJECT_ID = /\Amanual-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i
 
   belongs_to :room
@@ -11,15 +14,38 @@ class Coordination < ApplicationRecord
   validates :prompt, presence: true, length: { maximum: 500 }
   validates :budget, numericality: { only_integer: true, greater_than: 0 }
   validates :status, inclusion: { in: STATUSES }
+  validates :character_theme_id, inclusion: { in: ->(_) { CharacterRoomTheme::CATALOGUE.keys } }, allow_nil: true
   validate :valid_furniture_input
   validate :valid_operations, on: :create
   validate :valid_base_coordination
+  validates :room_palette_id, inclusion: { in: ->(_) { RoomPalette::CATALOGUE.keys } }, allow_nil: true
 
   # 写真で見つからなかった所有家具も、今回の提案の元の部屋に含める。
   def input_scene
     scene = room.scene.deep_dup
     scene["objects"] += manual_objects
     scene
+  end
+
+  # Keep generation options in existing persisted analysis metadata.
+  def room_palette_id
+    analysis&.dig("room_palette_id")
+  end
+
+  def room_palette_id=(value)
+    self.analysis = (analysis || {}).merge("room_palette_id" => value)
+  end
+
+  def character_theme_id
+    analysis&.dig("character_theme_id")
+  end
+
+  def character_theme_id=(value)
+    self.analysis = (analysis || {}).merge("character_theme_id" => value)
+  end
+
+  def generation_prompt
+    RoomPalette.prompt(CharacterRoomTheme.prompt(prompt, character_theme_id), room_palette_id)
   end
 
   private
@@ -32,9 +58,12 @@ class Coordination < ApplicationRecord
       product_id = edit["ec_product_id"]
       product = EcProduct.find_by(id: product_id) if product_id.is_a?(Integer) && product_id.positive?
       next if product_id && (!product || !FLOOR_CATEGORIES.include?(product.data["category"]))
-      next unless product || (FLOOR_CATEGORIES.include?(edit["category"]) && edit["label"].is_a?(String) && edit["label"].strip.present? && edit["label"].length <= 100)
+      next unless product || (MANUAL_CATEGORIES.include?(edit["category"]) && edit["label"].is_a?(String) && edit["label"].strip.present? && edit["label"].length <= 100)
 
-      trusted = product ? FurnitureImport.scene_attributes(product).compact.merge(edit.slice("position", "size", "rotation_y", "color")) : edit.slice("label", "category", "position", "size", "rotation_y", "color")
+      next if IMAGE_GOODS_CATEGORIES.include?(edit["category"]) && !ImageArtwork.valid?(edit["artwork"])
+      next if edit["artwork"] && !IMAGE_GOODS_CATEGORIES.include?(edit["category"])
+
+      trusted = product ? FurnitureImport.scene_attributes(product).compact.merge(edit.slice("position", "size", "rotation_y", "color")) : edit.slice("label", "category", "position", "size", "rotation_y", "color", "artwork")
       trusted.merge(
         "id" => edit["id"],
         "source" => "existing", "slot" => nil, "attach_to" => nil, "item_id" => nil, "marker" => nil, "model_url" => trusted["model_url"]
@@ -55,7 +84,7 @@ class Coordination < ApplicationRecord
         ids = furniture_operations.pluck("object_id")
         valid = ids.uniq == ids && ids.sort == existing.pluck("id").sort
         valid &&= furniture_operations.all? do |operation|
-          operation["action"] != "replace" || FLOOR_CATEGORIES.include?(existing.find { |object| object["id"] == operation["object_id"] }&.fetch("category", nil))
+          operation["action"] != "replace" || REPLACEMENT_CATEGORIES.include?(existing.find { |object| object["id"] == operation["object_id"] }&.fetch("category", nil))
         end
         keep_ids = furniture_operations.select { |operation| operation["action"] == "keep" }.pluck("object_id")
         valid &&= kept_object_ids == [] || (kept_object_ids.is_a?(Array) && kept_object_ids.sort == keep_ids.sort)
@@ -88,13 +117,40 @@ class Coordination < ApplicationRecord
       return
     end
 
+    artwork_valid = edited_objects.all? do |edit|
+      edit["artwork"].nil? || (edit["id"].is_a?(String) && edit["id"].match?(MANUAL_OBJECT_ID) &&
+        IMAGE_GOODS_CATEGORIES.include?(edit["category"]) && ImageArtwork.valid?(edit["artwork"]))
+    end
+    unless artwork_valid
+      errors.add(:edited_objects, "推しグッズには最大512pxのPNG画像を指定してください")
+      return
+    end
+    if edited_objects.sum { |edit| edit.dig("artwork", "data_url").to_s.bytesize } > 2 * 1024 * 1024
+      errors.add(:edited_objects, "推しグッズの画像は合計2MB以内にしてください")
+      return
+    end
+
     suggested_objects = room.coordinations.where(status: "done").pluck(:after_scene).flat_map do |scene|
       (scene&.fetch("objects", []) || []).select { |object| object["source"] == "suggested" }
     end
     suggested_ids = suggested_objects.pluck("id")
     objects_by_id = (existing + suggested_objects).index_by { |object| object["id"] }
     ids = edited_objects.pluck("id")
-    linked_ids_valid = edited_objects.all? { |edit| edit["ec_product_id"].nil? || (edit["id"].is_a?(String) && edit["id"].match?(MANUAL_OBJECT_ID) && objects_by_id[edit["id"]]&.fetch("ec_product_id", nil) == edit["ec_product_id"]) }
+    linked_ids_valid = edited_objects.all? do |edit|
+      next true if edit["ec_product_id"].nil? && edit["replacement_ec_product_id"].nil?
+      next false unless edit["id"].is_a?(String)
+
+      original = objects_by_id[edit["id"]]
+      if edit["id"].match?(MANUAL_OBJECT_ID)
+        owned_valid = original&.fetch("ec_product_id", nil) == edit["ec_product_id"]
+        replacement_id = edit["replacement_ec_product_id"]
+        replacement = EcProduct.find_by(id: replacement_id) if replacement_id.is_a?(Integer) && replacement_id.positive?
+        owned_valid && (replacement_id.nil? || (replacement && original && replacement.data["category"] == original["category"]))
+      else
+        product = EcProduct.find_by(id: edit["ec_product_id"]) if edit["ec_product_id"].is_a?(Integer) && edit["ec_product_id"].positive?
+        edit["replacement_ec_product_id"].nil? && original && product && product.data["category"] == original["category"]
+      end
+    end
     unless ids.uniq == ids && linked_ids_valid && (ids - existing_ids - suggested_ids).empty? && edited_objects.all? { |edit| valid_edit?(edit, objects_by_id.fetch(edit["id"])) }
       errors.add(:edited_objects, "家具の編集内容が正しくありません")
     end
