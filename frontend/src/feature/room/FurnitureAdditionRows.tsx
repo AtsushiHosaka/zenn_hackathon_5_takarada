@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { furnitureCategories, type FurnitureAddition } from '../../domain/room';
 import { motionStaggerStyle } from '../../core/motion';
 import { useMotionPresence } from '../shared/useMotionPresence';
@@ -16,10 +16,18 @@ function AdditionRow({row,index,currentIndex,onExit,onChange,onRemove}:RowProps)
     <button type="button" className="rc-secondary" aria-label={`追加家具${currentIndex+1}を削除`} onClick={onRemove}>削除</button>
   </div>:null;
 }
-export default function FurnitureAdditionRows({values,onChange}:{values:FurnitureAddition[];onChange:(values:FurnitureAddition[])=>void}) {
+export default function FurnitureAdditionRows({values,onChange,emptyFocusTarget}:{values:FurnitureAddition[];onChange:(values:FurnitureAddition[])=>void;emptyFocusTarget:RefObject<HTMLButtonElement|null>}) {
   const [previous,setPrevious] = useState(values);
   const [rows,setRows] = useState<Row[]>(()=>values.map(value=>({value,active:true})));
   const host = useRef<HTMLDivElement>(null);
+  const focusEmpty = useRef(false);
+  useLayoutEffect(() => {
+    if (!focusEmpty.current) return;
+    focusEmpty.current = false;
+    // The removed row is now inert (or gone with reduced motion). Restore
+    // focus before paint without waiting for its cosmetic exit to complete.
+    if (!values.length) emptyFocusTarget.current?.focus({preventScroll:true});
+  }, [values,emptyFocusTarget]);
   if (previous !== values) {
     setPrevious(values);
     const current = new Map(values.map(value=>[value.uiId,value]));
@@ -32,6 +40,7 @@ export default function FurnitureAdditionRows({values,onChange}:{values:Furnitur
   function remove(id:string|undefined) {
     const index = values.findIndex(value=>value.uiId===id);
     const focus = values[index+1]??values[index-1];
+    focusEmpty.current = !focus;
     onChange(values.filter(value=>value.uiId!==id));
     if (focus) host.current?.querySelector<HTMLSelectElement>(`[data-addition-id="${focus.uiId}"] select`)?.focus({preventScroll:true});
   }
