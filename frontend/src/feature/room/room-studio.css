@@ -215,3 +215,13 @@
 .rc-viewer-reveal {position:absolute;inset:0}
 .rc-viewer-reveal[data-readiness="loading"] {opacity:0}
 .rc-viewer-readiness-note {position:absolute;left:16px;right:16px;bottom:84px;margin:0;padding:8px 12px;border-radius:8px;background:#221F2C;font-size:12px}
+
+/* Give the rendered room and its toolbar the full phone width. */
+@media(max-width:720px) {
+  .rc-workspace:not(.is-generating) {flex-direction:column}
+  .rc-workspace:not(.is-generating)>.rc-chat {flex:1;width:100%;height:auto;border-right:0;border-top:1px solid #E4E1EC}
+  .rc-workspace:not(.is-generating)>.rc-stage:not(.is-empty) {order:-1;flex:0 0 clamp(280px,45dvh,420px);width:100%;height:clamp(280px,45dvh,420px)}
+  .rc-workspace:not(.is-generating)>.rc-stage.is-empty {display:none}
+  .rc-workspace:not(.is-generating) .rc-new-composer {max-height:65%;overflow-y:auto}
+  .rc-workspace:not(.is-generating) .rc-scene-stage.has-panel {right:0}
+}
