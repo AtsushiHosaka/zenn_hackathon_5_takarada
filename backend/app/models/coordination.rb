@@ -2,6 +2,8 @@
 class Coordination < ApplicationRecord
   STATUSES = %w[pending processing done failed].freeze
   FLOOR_CATEGORIES = %w[sofa bed desk chair shelf table].freeze
+  IMAGE_GOODS_CATEGORIES = %w[poster acrylic_stand].freeze
+  MANUAL_CATEGORIES = (FLOOR_CATEGORIES + IMAGE_GOODS_CATEGORIES).freeze
   MANUAL_OBJECT_ID = /\Amanual-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i
 
   belongs_to :room
@@ -55,9 +57,12 @@ class Coordination < ApplicationRecord
       product_id = edit["ec_product_id"]
       product = EcProduct.find_by(id: product_id) if product_id.is_a?(Integer) && product_id.positive?
       next if product_id && (!product || !FLOOR_CATEGORIES.include?(product.data["category"]))
-      next unless product || (FLOOR_CATEGORIES.include?(edit["category"]) && edit["label"].is_a?(String) && edit["label"].strip.present? && edit["label"].length <= 100)
+      next unless product || (MANUAL_CATEGORIES.include?(edit["category"]) && edit["label"].is_a?(String) && edit["label"].strip.present? && edit["label"].length <= 100)
 
-      trusted = product ? FurnitureImport.scene_attributes(product).compact.merge(edit.slice("position", "size", "rotation_y", "color")) : edit.slice("label", "category", "position", "size", "rotation_y", "color")
+      next if IMAGE_GOODS_CATEGORIES.include?(edit["category"]) && !ImageArtwork.valid?(edit["artwork"])
+      next if edit["artwork"] && !IMAGE_GOODS_CATEGORIES.include?(edit["category"])
+
+      trusted = product ? FurnitureImport.scene_attributes(product).compact.merge(edit.slice("position", "size", "rotation_y", "color")) : edit.slice("label", "category", "position", "size", "rotation_y", "color", "artwork")
       trusted.merge(
         "id" => edit["id"],
         "source" => "existing", "slot" => nil, "attach_to" => nil, "item_id" => nil, "marker" => nil, "model_url" => trusted["model_url"]
@@ -108,6 +113,19 @@ class Coordination < ApplicationRecord
 
     unless edited_objects.is_a?(Array) && edited_objects.size <= 100 && edited_objects.all? { |edit| edit.is_a?(Hash) }
       errors.add(:edited_objects, "家具の編集内容が正しくありません")
+      return
+    end
+
+    artwork_valid = edited_objects.all? do |edit|
+      edit["artwork"].nil? || (edit["id"].is_a?(String) && edit["id"].match?(MANUAL_OBJECT_ID) &&
+        IMAGE_GOODS_CATEGORIES.include?(edit["category"]) && ImageArtwork.valid?(edit["artwork"]))
+    end
+    unless artwork_valid
+      errors.add(:edited_objects, "推しグッズには最大512pxのPNG画像を指定してください")
+      return
+    end
+    if edited_objects.sum { |edit| edit.dig("artwork", "data_url").to_s.bytesize } > 2 * 1024 * 1024
+      errors.add(:edited_objects, "推しグッズの画像は合計2MB以内にしてください")
       return
     end
 

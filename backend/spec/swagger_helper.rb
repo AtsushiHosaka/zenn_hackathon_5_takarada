@@ -195,12 +195,18 @@ RSpec.configure do |config|
             },
             required: %w[width depth height wall_color floor_color windows]
           },
+          ImageArtwork: {
+            type: :object,
+            properties: { data_url: { type: :string, maxLength: 262144, pattern: "^data:image/png;base64,", description: "最大512pxのPNG画像。透過を保持する", example: "data:image/png;base64,iVBORw0KGgo=" } },
+            required: %w[data_url]
+          },
           SceneObject: {
             type: :object,
             properties: {
               id: { type: :string, example: "bed-1" },
               source: { type: :string, enum: %w[existing suggested], description: "existing: 今ある家具, suggested: AI の追加提案", example: "existing" },
               category: { type: :string, example: "bed" },
+              artwork: { "$ref" => "#/components/schemas/ImageArtwork" },
               label: { type: :string, example: "ベッド" },
               size: { "$ref" => "#/components/schemas/Size" },
               position: { "$ref" => "#/components/schemas/Position" },
@@ -297,7 +303,8 @@ RSpec.configure do |config|
             properties: {
               id: { type: :string, description: "元の家具、この部屋で採用済みの商品、またはmanual-UUID形式の所有家具id", example: "bed-1" },
               label: { type: :string, maxLength: 100, description: "手動で補完した所有家具では必須", example: "今ある椅子" },
-              category: { type: :string, enum: %w[sofa bed desk chair shelf table], description: "手動で補完した所有家具では必須", example: "chair" },
+              category: { type: :string, enum: %w[sofa bed desk chair shelf table poster acrylic_stand], description: "手動で補完した所有家具では必須", example: "chair" },
+              artwork: { "$ref" => "#/components/schemas/ImageArtwork" },
               ec_product_id: { type: :integer, minimum: 1, description: "商品リンクのインポート結果のID。商品・モデル情報はサーバー側で復元する", example: 1 },
               position: { "$ref" => "#/components/schemas/Position" },
               size: { "$ref" => "#/components/schemas/Size" },

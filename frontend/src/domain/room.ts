@@ -37,7 +37,17 @@ export type RoomGeometry = {
   windows: RoomWindow[];
 };
 
+export const imageGoodsCategories = ["poster", "acrylic_stand"] as const;
+export type ImageGoodsCategory = typeof imageGoodsCategories[number];
+export type ImageArtwork = { dataUrl: string };
+export const MAX_ARTWORK_DATA_LENGTH = 262144;
+
+export function isImageArtwork(value: unknown): value is ImageArtwork {
+  return isRecord(value) && typeof value.dataUrl === "string" && value.dataUrl.length <= MAX_ARTWORK_DATA_LENGTH && /^data:image\/png;base64,iVBORw0KGgo[A-Za-z0-9+/]*={0,2}$/.test(value.dataUrl);
+}
+
 export type RoomItem = {
+  artwork?: ImageArtwork;
   id: string;
   name: string;
   category: string;
@@ -197,6 +207,7 @@ export function isRoomItem(value: unknown): value is RoomItem {
   if (value.shop !== undefined && !nonemptyString(value.shop)) return false;
   if (value.productId !== undefined && (typeof value.productId !== "string" || !/^[1-9]\d*$/.test(value.productId))) return false;
   if (value.ecProductId !== undefined && (typeof value.ecProductId !== "string" || !/^[1-9]\d*$/.test(value.ecProductId) || !isManualFurniture(value as RoomItem))) return false;
+  if (value.artwork !== undefined && (!isManualFurniture(value as RoomItem) || !imageGoodsCategories.some(category => category === value.category) || !isImageArtwork(value.artwork))) return false;
   if (value.materialOverrides !== undefined && !isMaterialOverrides(value.materialOverrides)) return false;
   if (value.textureStatus !== undefined && !isTextureStatus(value.textureStatus)) return false;
   if (value.textureSource !== undefined && value.textureSource !== "description") return false;
