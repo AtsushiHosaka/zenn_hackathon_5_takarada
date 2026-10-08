@@ -28,6 +28,8 @@ IDは `manual-UUID` とし、既存の `edited_objects` に家具名の `label` 
 
 DB変更は不要。追加フィールドは省略可能とし、既存クライアントの入力を維持する。SwaggerとWebのAPI型は生成コマンドで更新する。
 
+Review correction for issue #39 (2026-10-08): manual originals absent from After because of replace/remove operations remain in the editable input records. Unrelated color/layout edits preserve those originals and their operations. Explicit deletion removes the original from both current items and edit records, preventing resurrection; undo restores the earlier design. This clarifies existing retention/deletion requirements and is not reflected in the unconfigured Google Docs.
+
 ## 商品写真を表示し、不要な説明を省く
 
 追加のユーザー依頼により、商品リンクカードには取得したEC商品の写真を表示する。写真URLを取得できなかった場合や画像の読み込みに失敗した場合は、家具のアイコンを表示する。実物写真の代わりに別商品の写真を表示しない。
