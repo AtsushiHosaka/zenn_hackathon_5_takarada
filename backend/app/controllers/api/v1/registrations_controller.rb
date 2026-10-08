@@ -8,6 +8,8 @@ module Api
       skip_before_action :authenticate_identity!, only: :create
 
       def create
+        return render json: { errors: [ SignupPolicy::MESSAGE ] }, status: :service_unavailable unless SignupPolicy.allowed?
+
         user = User.new(
           name: signup_params[:name],
           identity_attributes: {
