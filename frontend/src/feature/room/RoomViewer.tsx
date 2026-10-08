@@ -1,3 +1,5 @@
+import { roomPalette } from "../../domain/roomPalette";
+import { characterTheme } from "../../domain/characterTheme";
 import { useEffect, useEffectEvent, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
@@ -5,6 +7,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { isManualFurniture, type RoomDesign, type RoomItem } from "../../domain/room";
 import { buildReferenceRoom, usesReferenceRoom } from "./referenceRoomModel";
+import { buildCharacterThemeDecor } from "./characterThemeDecor";
 import { buildMeasuredRoom } from "./roomArchitecture";
 import { LAYOUT_GRID_STEP, snapItemPosition } from "./layoutGrid";
 import { applyMaterialOverrides } from "./furnitureMaterials";
@@ -130,7 +133,7 @@ function plant(parent: THREE.Object3D, width: number, height: number, potColor: 
   }
 }
 
-function createFurniture(item: RoomItem, accent: string, oshi: boolean) {
+function createFurniture(item: RoomItem, accent: string, oshi: boolean, manager?: THREE.LoadingManager) {
   const group = new THREE.Group();
   group.userData.itemId = item.id;
   const [w, h, d] = item.size;
@@ -139,6 +142,26 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean) {
   const dark = "#605747";
   const color = item.color;
   switch (item.category) {
+    case "poster":
+    case "acrylic_stand": {
+      const stand = item.category === "acrylic_stand";
+      const baseHeight = stand ? Math.min(.015, h * .08) : 0;
+      if (stand) {
+        const base = box(group, [w, baseHeight, d], [0, baseHeight / 2, 0], "#e4eff5", true);
+        const surface = base.material as THREE.MeshStandardMaterial;
+        surface.transparent = true; surface.opacity = .65; surface.roughness = .2;
+      } else box(group, [w, h, d], [0, h / 2, 0], color);
+      if (item.artwork) {
+        const texture = new THREE.TextureLoader(manager).load(item.artwork.dataUrl);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        const art = new THREE.Mesh(new THREE.PlaneGeometry(stand ? w : w * .96, stand ? h - baseHeight : h * .96), new THREE.MeshBasicMaterial({
+          map: texture, transparent: true, alphaTest: stand ? .1 : 0, side: THREE.DoubleSide, toneMapped: false,
+        }));
+        art.position.set(0, (h + baseHeight) / 2, stand ? 0 : d / 2 + .0005);
+        group.add(art);
+      }
+      break;
+    }
     case "sofa": {
       for (const x of [-w * 0.4, w * 0.4]) {
         for (const z of [-d * 0.33, d * 0.33]) {
@@ -462,6 +485,9 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     room: afterDesign.before.room,
     items: afterDesign.before.items,
     wallColor: afterDesign.before.wallColor,
+    characterThemeId: undefined,
+    roomPaletteId: undefined,
+    style: afterDesign.characterThemeId ? "natural" : afterDesign.style,
     modelUrl: undefined,
     modelKind: undefined,
   } : afterDesign, [afterDesign, before]);
@@ -510,12 +536,14 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     const loadingManager = new THREE.LoadingManager();
     loadingManager.onStart = () => { assetsReady = false; };
     loadingManager.onLoad = () => { assetsReady = true; previewNeedsRender = true; };
-    loadingManager.onError = () => { assetFailed = true; };
+    loadingManager.onError = () => { assetFailed = true; if (!disposed && textureNotice.current) textureNotice.current.hidden = false; };
     const previewDeadline = preview ? window.setTimeout(() => {
       if (!disposed && !readySent) { readySent = true; reportReady(false); }
     }, 20000) : undefined;
     const textureCleanups: (() => void)[] = [];
     const scene = new THREE.Scene();
+    const themedDecor = buildCharacterThemeDecor(design);
+    if (themedDecor) scene.add(themedDecor);
     const reference = !design.room && usesReferenceRoom(design);
     const aspect = Math.max(host.clientWidth, 1) / Math.max(host.clientHeight, 1);
     const referenceHeight = 410 / (50 * Math.sqrt(1.5));
@@ -553,8 +581,9 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     sun.shadow.bias = -0.0001;
     scene.add(sun);
     scene.add(sun.target);
-    const oshi = design.style === "oshi";
-    const accent = oshi ? "#bba5ee" : design.style === "natural" ? "#c2a07f" : "#819274";
+    const theme = characterTheme(design.characterThemeId);
+    const oshi = design.style === "oshi" && !theme;
+    const accent = roomPalette(design.roomPaletteId)?.accent ?? theme?.accent ?? (oshi ? "#bba5ee" : design.style === "natural" ? "#c2a07f" : "#819274");
     if (design.room) {
       roomBounds.current = {
         id: design.id,
@@ -611,7 +640,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       // owned furniture uses the same editable primitives as measured rooms.
       const previous = furniture.get(item.id);
       if (previous) { scene.remove(previous); disposeObject(previous); }
-      const group = createFurniture(item, accent, oshi);
+      const group = createFurniture(item, accent, oshi, loadingManager);
       scene.add(group);
       furniture.set(item.id, group);
     }
@@ -640,6 +669,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       }
     };
     const updateVisibility = () => {
+      if (themedDecor) themedDecor.visible = !currentBefore;
       layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel;
       proceduralRoomVisible = currentBefore || !loadedRoom;
       architecture.visible = proceduralRoomVisible;
@@ -919,7 +949,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       if (event.dataTransfer) event.dataTransfer.dropEffect = position ? "copy" : "none";
       if (!position) { if (placementPreview) placementPreview.visible = false; return; }
       if (!placementPreview) {
-        placementPreview = createFurniture(currentPlacement, accent, oshi);
+        placementPreview = createFurniture(currentPlacement, accent, oshi, loadingManager);
         placementPreview.traverse(object => {
           if (!(object instanceof THREE.Mesh)) return;
           object.castShadow = false;

@@ -1,0 +1,482 @@
+[
+  {
+    "id": "snow-graphite",
+    "family": "White & gray",
+    "name": "Snow & Graphite",
+    "base": "#F6F7F8",
+    "secondary": "#D8DEE3",
+    "accent": "#39414A"
+  },
+  {
+    "id": "porcelain",
+    "family": "White & gray",
+    "name": "Porcelain",
+    "base": "#F5F4F1",
+    "secondary": "#DCDAD4",
+    "accent": "#6E6E6E"
+  },
+  {
+    "id": "silver-line",
+    "family": "White & gray",
+    "name": "Silver Line",
+    "base": "#EEF0F3",
+    "secondary": "#B9C0C9",
+    "accent": "#4B5665"
+  },
+  {
+    "id": "stone-gray",
+    "family": "White & gray",
+    "name": "Stone Gray",
+    "base": "#E6E3DE",
+    "secondary": "#A7A59E",
+    "accent": "#414440"
+  },
+  {
+    "id": "monochrome-gallery",
+    "family": "White & gray",
+    "name": "Monochrome Gallery",
+    "base": "#F3F3F3",
+    "secondary": "#C7C7C7",
+    "accent": "#202020"
+  },
+  {
+    "id": "mist-smoke",
+    "family": "White & gray",
+    "name": "Mist & Smoke",
+    "base": "#E4E8E9",
+    "secondary": "#8F9CA3",
+    "accent": "#48565F"
+  },
+  {
+    "id": "warm-ivory",
+    "family": "Warm neutrals",
+    "name": "Warm Ivory",
+    "base": "#F4EDE0",
+    "secondary": "#D3BDA1",
+    "accent": "#806854"
+  },
+  {
+    "id": "oatmeal",
+    "family": "Warm neutrals",
+    "name": "Oatmeal",
+    "base": "#EEE4D4",
+    "secondary": "#C4AD90",
+    "accent": "#77634D"
+  },
+  {
+    "id": "desert-sand",
+    "family": "Warm neutrals",
+    "name": "Desert Sand",
+    "base": "#ECDCC2",
+    "secondary": "#C69D6C",
+    "accent": "#8E6547"
+  },
+  {
+    "id": "mushroom-taupe",
+    "family": "Warm neutrals",
+    "name": "Mushroom Taupe",
+    "base": "#E7DFD7",
+    "secondary": "#B1A094",
+    "accent": "#6E6058"
+  },
+  {
+    "id": "coffee-cream",
+    "family": "Warm neutrals",
+    "name": "Coffee & Cream",
+    "base": "#F0E7DC",
+    "secondary": "#A38167",
+    "accent": "#503A2E"
+  },
+  {
+    "id": "linen-ink",
+    "family": "Warm neutrals",
+    "name": "Linen & Ink",
+    "base": "#EEE9DD",
+    "secondary": "#BEAF97",
+    "accent": "#30322E"
+  },
+  {
+    "id": "sage-clay",
+    "family": "Earth & natural",
+    "name": "Sage & Clay",
+    "base": "#F0EEE4",
+    "secondary": "#A9B394",
+    "accent": "#B26E52"
+  },
+  {
+    "id": "olive-linen",
+    "family": "Earth & natural",
+    "name": "Olive & Linen",
+    "base": "#EAE5D4",
+    "secondary": "#7B8656",
+    "accent": "#D3A363"
+  },
+  {
+    "id": "moss-oak",
+    "family": "Earth & natural",
+    "name": "Moss & Oak",
+    "base": "#E5E5D6",
+    "secondary": "#6F7A4F",
+    "accent": "#A77B52"
+  },
+  {
+    "id": "terracotta-fern",
+    "family": "Earth & natural",
+    "name": "Terracotta & Fern",
+    "base": "#E8D5C3",
+    "secondary": "#A95E46",
+    "accent": "#5E775E"
+  },
+  {
+    "id": "botanical-white",
+    "family": "Earth & natural",
+    "name": "Botanical White",
+    "base": "#F2F0E8",
+    "secondary": "#638A64",
+    "accent": "#D7AE70"
+  },
+  {
+    "id": "jungle-earth",
+    "family": "Earth & natural",
+    "name": "Jungle Earth",
+    "base": "#E3E0CB",
+    "secondary": "#385C43",
+    "accent": "#B08551"
+  },
+  {
+    "id": "mint-cloud",
+    "family": "Green & teal",
+    "name": "Mint Cloud",
+    "base": "#F0F6F2",
+    "secondary": "#B6DCCF",
+    "accent": "#428B79"
+  },
+  {
+    "id": "seafoam",
+    "family": "Green & teal",
+    "name": "Seafoam",
+    "base": "#E5F2EC",
+    "secondary": "#8ABFB2",
+    "accent": "#2D766F"
+  },
+  {
+    "id": "teal-studio",
+    "family": "Green & teal",
+    "name": "Teal Studio",
+    "base": "#E2ECEA",
+    "secondary": "#3D9994",
+    "accent": "#D8B069"
+  },
+  {
+    "id": "turquoise-pop",
+    "family": "Green & teal",
+    "name": "Turquoise Pop",
+    "base": "#EAF5F2",
+    "secondary": "#2CC9C3",
+    "accent": "#405364"
+  },
+  {
+    "id": "celadon",
+    "family": "Green & teal",
+    "name": "Celadon",
+    "base": "#E9EFE4",
+    "secondary": "#B0C7AC",
+    "accent": "#607D73"
+  },
+  {
+    "id": "lagoon-dusk",
+    "family": "Green & teal",
+    "name": "Lagoon Dusk",
+    "base": "#DCECEE",
+    "secondary": "#447F85",
+    "accent": "#2D475C"
+  },
+  {
+    "id": "sky-white",
+    "family": "Blue",
+    "name": "Sky & White",
+    "base": "#EFF4F8",
+    "secondary": "#ACD2EC",
+    "accent": "#547FA4"
+  },
+  {
+    "id": "powder-blue",
+    "family": "Blue",
+    "name": "Powder Blue",
+    "base": "#E7EDF6",
+    "secondary": "#B7CBE5",
+    "accent": "#7C8BA8"
+  },
+  {
+    "id": "coastal-blue",
+    "family": "Blue",
+    "name": "Coastal Blue",
+    "base": "#F0EDE3",
+    "secondary": "#72A8C1",
+    "accent": "#255F82"
+  },
+  {
+    "id": "cobalt-gallery",
+    "family": "Blue",
+    "name": "Cobalt Gallery",
+    "base": "#EDEFF4",
+    "secondary": "#3265BC",
+    "accent": "#E1AC4C"
+  },
+  {
+    "id": "denim-wood",
+    "family": "Blue",
+    "name": "Denim & Wood",
+    "base": "#E9E2D8",
+    "secondary": "#55738F",
+    "accent": "#B58B60"
+  },
+  {
+    "id": "ice-navy",
+    "family": "Blue",
+    "name": "Ice & Navy",
+    "base": "#E3F0F5",
+    "secondary": "#90BECD",
+    "accent": "#243B5C"
+  },
+  {
+    "id": "lavender-milk",
+    "family": "Purple",
+    "name": "Lavender Milk",
+    "base": "#F1EDF6",
+    "secondary": "#CAB8E0",
+    "accent": "#8D74AD"
+  },
+  {
+    "id": "lilac-garden",
+    "family": "Purple",
+    "name": "Lilac Garden",
+    "base": "#EEE9F2",
+    "secondary": "#B4A1CA",
+    "accent": "#8CA986"
+  },
+  {
+    "id": "amethyst",
+    "family": "Purple",
+    "name": "Amethyst",
+    "base": "#EAE5F0",
+    "secondary": "#8B67B0",
+    "accent": "#C5AC76"
+  },
+  {
+    "id": "violet-pop",
+    "family": "Purple",
+    "name": "Violet Pop",
+    "base": "#ECE9F7",
+    "secondary": "#7551CB",
+    "accent": "#E58EB7"
+  },
+  {
+    "id": "mauve-taupe",
+    "family": "Purple",
+    "name": "Mauve & Taupe",
+    "base": "#E8DEDF",
+    "secondary": "#AC879D",
+    "accent": "#7C716B"
+  },
+  {
+    "id": "orchid-gold",
+    "family": "Purple",
+    "name": "Orchid & Gold",
+    "base": "#EFE7EF",
+    "secondary": "#B87AAD",
+    "accent": "#CFAC56"
+  },
+  {
+    "id": "blush-linen",
+    "family": "Pink",
+    "name": "Blush Linen",
+    "base": "#F5EAE6",
+    "secondary": "#E4B7B2",
+    "accent": "#A57872"
+  },
+  {
+    "id": "rose-quartz",
+    "family": "Pink",
+    "name": "Rose Quartz",
+    "base": "#F2E2E7",
+    "secondary": "#D7A1B4",
+    "accent": "#987385"
+  },
+  {
+    "id": "dusty-rose",
+    "family": "Pink",
+    "name": "Dusty Rose",
+    "base": "#EBDCDD",
+    "secondary": "#BA7F88",
+    "accent": "#705D62"
+  },
+  {
+    "id": "peach-pink",
+    "family": "Pink",
+    "name": "Peach Pink",
+    "base": "#F6E5DE",
+    "secondary": "#E6AB9B",
+    "accent": "#B86767"
+  },
+  {
+    "id": "fuchsia-pop",
+    "family": "Pink",
+    "name": "Fuchsia Pop",
+    "base": "#F3E9EF",
+    "secondary": "#D83F8C",
+    "accent": "#4D6B76"
+  },
+  {
+    "id": "cherry-blossom",
+    "family": "Pink",
+    "name": "Cherry Blossom",
+    "base": "#F9EEF0",
+    "secondary": "#EAAFC8",
+    "accent": "#899E83"
+  },
+  {
+    "id": "brick-cream",
+    "family": "Red, orange & yellow",
+    "name": "Brick & Cream",
+    "base": "#EFE3D5",
+    "secondary": "#AC544A",
+    "accent": "#6A574C"
+  },
+  {
+    "id": "scarlet-pop",
+    "family": "Red, orange & yellow",
+    "name": "Scarlet Pop",
+    "base": "#F5EDE6",
+    "secondary": "#D53D39",
+    "accent": "#334C68"
+  },
+  {
+    "id": "apricot",
+    "family": "Red, orange & yellow",
+    "name": "Apricot",
+    "base": "#F6E7D6",
+    "secondary": "#E9B78D",
+    "accent": "#AB784F"
+  },
+  {
+    "id": "tangerine-studio",
+    "family": "Red, orange & yellow",
+    "name": "Tangerine Studio",
+    "base": "#F4E5D7",
+    "secondary": "#E9813D",
+    "accent": "#3D7C82"
+  },
+  {
+    "id": "butter-yellow",
+    "family": "Red, orange & yellow",
+    "name": "Butter Yellow",
+    "base": "#F8F1D9",
+    "secondary": "#E9D389",
+    "accent": "#8F9C80"
+  },
+  {
+    "id": "sunflower",
+    "family": "Red, orange & yellow",
+    "name": "Sunflower",
+    "base": "#F6EED5",
+    "secondary": "#E7BC30",
+    "accent": "#566B7B"
+  },
+  {
+    "id": "candy-pastel",
+    "family": "Multicolor",
+    "name": "Candy Pastel",
+    "base": "#F6EFF3",
+    "secondary": "#C5D9EF",
+    "accent": "#EBC49A"
+  },
+  {
+    "id": "mint-strawberry",
+    "family": "Multicolor",
+    "name": "Mint & Strawberry",
+    "base": "#EDF5ED",
+    "secondary": "#ADD8C1",
+    "accent": "#E8A4B7"
+  },
+  {
+    "id": "lavender-lemon",
+    "family": "Multicolor",
+    "name": "Lavender & Lemon",
+    "base": "#F4F0E3",
+    "secondary": "#C4B3DF",
+    "accent": "#E4D272"
+  },
+  {
+    "id": "primary-play",
+    "family": "Multicolor",
+    "name": "Primary Play",
+    "base": "#F4F0E8",
+    "secondary": "#3478BF",
+    "accent": "#E24A44"
+  },
+  {
+    "id": "tropical-pop",
+    "family": "Multicolor",
+    "name": "Tropical Pop",
+    "base": "#E4EEE7",
+    "secondary": "#32A593",
+    "accent": "#ED795A"
+  },
+  {
+    "id": "festival",
+    "family": "Multicolor",
+    "name": "Festival",
+    "base": "#EDE4F2",
+    "secondary": "#9650AD",
+    "accent": "#ECA93A"
+  },
+  {
+    "id": "charcoal-silver",
+    "family": "Dark & moody",
+    "name": "Charcoal & Silver",
+    "base": "#2C3137",
+    "secondary": "#626D78",
+    "accent": "#C3CBD2"
+  },
+  {
+    "id": "midnight-brass",
+    "family": "Dark & moody",
+    "name": "Midnight & Brass",
+    "base": "#1F2C43",
+    "secondary": "#53647A",
+    "accent": "#C4A468"
+  },
+  {
+    "id": "forest-night",
+    "family": "Dark & moody",
+    "name": "Forest Night",
+    "base": "#263D32",
+    "secondary": "#617565",
+    "accent": "#C9AD7B"
+  },
+  {
+    "id": "plum-velvet",
+    "family": "Dark & moody",
+    "name": "Plum Velvet",
+    "base": "#3D2D44",
+    "secondary": "#836589",
+    "accent": "#D6ACB4"
+  },
+  {
+    "id": "burgundy-lounge",
+    "family": "Dark & moody",
+    "name": "Burgundy Lounge",
+    "base": "#4D2931",
+    "secondary": "#98626C",
+    "accent": "#C8A675"
+  },
+  {
+    "id": "espresso-copper",
+    "family": "Dark & moody",
+    "name": "Espresso & Copper",
+    "base": "#362B27",
+    "secondary": "#81695A",
+    "accent": "#C68D65"
+  }
+]
