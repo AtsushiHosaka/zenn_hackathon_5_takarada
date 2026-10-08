@@ -349,7 +349,7 @@ function fittedDistance(bounds: THREE.Box3, target: THREE.Vector3, direction: TH
   return distance * 1.1;
 }
 
-function buildRoom(scene: THREE.Scene, accent: string, bounds: THREE.Box3, oshi: boolean, wallColor?: string) {
+function buildRoom(scene: THREE.Scene, accent: string, bounds: THREE.Box3, oshi: boolean, wallColor?: string, floorColor?: string) {
   const size = bounds.getSize(new THREE.Vector3());
   const center = bounds.getCenter(new THREE.Vector3());
   const width = size.x;
@@ -362,7 +362,8 @@ function buildRoom(scene: THREE.Scene, accent: string, bounds: THREE.Box3, oshi:
   scene.add(architecture);
   const podium = cylinder(architecture, 0.5, 0.5, 0.08, [0, -0.25, 0], "#29253a");
   podium.scale.set(width * 1.48, 1, depth * 1.48);
-  box(architecture, [width, 0.16, depth], [0, -0.1, 0], "#ac8866");
+  const floor = box(architecture, [width, 0.16, depth], [0, -0.1, 0], floorColor ?? "#ac8866");
+  floor.userData.beforeColor = "#ac8866";
   const rows = Math.min(40, Math.ceil(depth / 0.3));
   const columns = Math.min(20, Math.ceil(width / 1.65));
   const plankWidth = width / columns;
@@ -370,7 +371,9 @@ function buildRoom(scene: THREE.Scene, accent: string, bounds: THREE.Box3, oshi:
   for (let row = 0; row < rows; row += 1) {
     for (let column = 0; column < columns; column += 1) {
       const colors = ["#d9bf99", "#d4b58c", "#dfc8a6", "#d8ba92"];
-      box(architecture, [plankWidth - 0.008, 0.025, plankDepth - 0.008], [-width / 2 + plankWidth * (column + 0.5), -0.009, -depth / 2 + plankDepth * (row + 0.5)], colors[(row + column) % 4]);
+      const original = colors[(row + column) % 4];
+      const plank = box(architecture, [plankWidth - 0.008, 0.025, plankDepth - 0.008], [-width / 2 + plankWidth * (column + 0.5), -0.009, -depth / 2 + plankDepth * (row + 0.5)], floorColor ? new THREE.Color(floorColor).multiplyScalar([1, .96, 1.04, .98][(row + column) % 4]) : original);
+      plank.userData.beforeColor = original;
     }
   }
   const leftWall = box(architecture, [0.13, height, depth], [left, height / 2, 0], wallColor ?? (oshi ? "#d4c8ea" : "#eeeade"));
@@ -486,6 +489,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     room: afterDesign.before.room,
     items: afterDesign.before.items,
     wallColor: afterDesign.before.wallColor,
+    floorColor: afterDesign.before.room.floorColor,
     characterThemeId: undefined,
     roomPaletteId: undefined,
     style: afterDesign.characterThemeId ? "natural" : afterDesign.style,
@@ -603,8 +607,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     const savedCamera = cameraState.current?.id === design.id ? cameraState.current : null;
     const referenceRoom = reference ? buildReferenceRoom(scene, design) : null;
     const architecture = design.room
-      ? buildMeasuredRoom(scene, design.room, design.wallColor ?? "#f5f1e8")
-      : referenceRoom?.architecture ?? buildRoom(scene, accent, baseRoomBounds, oshi, design.wallColor);
+      ? buildMeasuredRoom(scene, {...design.room, floorColor: design.floorColor ?? design.room.floorColor}, design.wallColor ?? "#f5f1e8")
+      : referenceRoom?.architecture ?? buildRoom(scene, accent, baseRoomBounds, oshi, design.wallColor, design.floorColor);
     if (referenceRoom) cameraBounds.copy(referenceRoom.bounds);
     let proceduralRoomVisible = true;
     let currentBefore = initialBefore();
@@ -695,10 +699,14 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       for (const marker of markers.values()) marker.visible = markersVisible;
       architecture.traverse(object => {
         if (object.userData.afterAccent) object.visible = !currentBefore;
-        if (object instanceof THREE.Mesh && object.userData.beforeColor) {
-          const surface = object.material as THREE.MeshStandardMaterial;
-          if (!surface.userData.afterColor) surface.userData.afterColor = surface.color.getHex();
-          surface.color.set(currentBefore ? object.userData.beforeColor : surface.userData.afterColor);
+        if (object instanceof THREE.Mesh) {
+          for (const surface of Array.isArray(object.material) ? object.material : [object.material]) {
+            const original = surface.userData.beforeColor ?? object.userData.beforeColor;
+            if (!original || !('color' in surface)) continue;
+            const colored = surface as THREE.MeshStandardMaterial;
+            if (colored.userData.afterColor === undefined) colored.userData.afterColor = colored.color.getHex();
+            colored.color.set(currentBefore ? original : colored.userData.afterColor);
+          }
         }
       });
       updateSelection(selectedId);
