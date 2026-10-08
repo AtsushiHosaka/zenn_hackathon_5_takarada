@@ -43,7 +43,7 @@ export function getFurniturePlacementBounds(design: RoomDesign): RoomBounds & { 
 type PlacementItem = Pick<RoomItem, 'size' | 'rotation'> & Partial<Pick<RoomItem, 'id' | 'category' | 'supportObjectId' | 'supportSurface'>>;
 
 export function canPlaceOnFurniture(item: PlacementItem) {
-  return Boolean(item.category && !['sofa', 'bed', 'desk', 'chair', 'shelf', 'table', 'storage', 'tv_stand', 'display', 'display_case', 'wall_shelf', 'poster', 'rug', 'mirror'].includes(item.category)
+  return Boolean(item.category && !['sofa', 'bed', 'desk', 'chair', 'shelf', 'table', 'storage', 'tv_stand', 'display', 'display_case', 'wall_shelf', 'poster', 'rug', 'mirror', 'wall_mirror'].includes(item.category)
     && item.size.every(value => Number.isFinite(value) && value > 0 && value <= .8));
 }
 
