@@ -9,3 +9,7 @@ Local saved-room storage validates the override and preserves it across reload. 
 No API, DB or environment contract changes. API room geometry already includes floor_color. Template reuse of measured scenes uses that existing color.
 
 Verification pending frontend lint/build, desktop/mobile browser screenshots and save/reload/undo/Before/After checks.
+
+Shell GLBs apply an explicit saved floorColor only to confirmed upward horizontal floor triangles in the supplied room bounds, within 3cm of Y=0 and covering 50–105% of the floor area. A thin 1mm overlay preserves original wall/furniture/model materials and coordinates. Missing geometry or insufficient/duplicated coverage retains the model and reports that its floor could not be identified. No semantic mesh/material names are assumed. Before and clearing the override remove the overlay; existing scene cleanup disposes it. Instanced/skinned shell geometry is not classified as a floor.
+
+Shell follow-up verification: frontend lint/build and exact-source Three.js checks pass separate/combined floor-wall meshes, 0/90/180/270-degree and reflected roots, preserved original materials, upward winding, geometry/material disposal, and raised/tiny/out-of-bounds/duplicated/no-floor rejection. The overlay only follows explicit saved overrides; Before/clear/no-match notice wiring was checked in source. Actual GLB pixels and UI persistence need browser evidence at the final integrated head. No permanent tests added.
