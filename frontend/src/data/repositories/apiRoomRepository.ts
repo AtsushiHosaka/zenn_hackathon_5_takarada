@@ -69,6 +69,19 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
       if (!room.design) throw new DomainError("部屋の解析はまだ完了していません");
       return room.design;
     },
+    async createFromTemplate(template, signal) {
+      if (config.contract === "legacy" || !config.generationPath) throw new DomainError("この接続先ではテンプレートから部屋を作成できません");
+      const snapshot = structuredClone(template);
+      // Newly added manual furniture is already part of this copied base scene.
+      snapshot.items = snapshot.items.map(item => ({...item, id: `template-object-${crypto.randomUUID()}`, existing: true,
+        marker: undefined, productId: undefined, ecProductId: undefined, replacesObjectId: undefined}));
+      const record = toAnalysisRoomRecord(await api.send<unknown>(config.generationPath, {
+        method: "POST", body: templateRequest(snapshot), requiresAuth: true, signal,
+      }));
+      const created = toAnalyzedRoomDesign(record, baseUrl);
+      return {...snapshot, id: created.id, source: "api", backendRoomId: created.backendRoomId,
+        description: "保存したテンプレートから作成した部屋です。", before: undefined, editedItems: []};
+    },
     async analyze(input, signal) {
       if (config.contract === "legacy") throw new DomainError("この接続先では畳数による部屋解析を利用できません");
       const design = await createApiRoomRepository(api, { ...config, contract: "analysis" }, baseUrl).generate(input, signal);
@@ -259,4 +272,15 @@ function pause(ms: number, signal: AbortSignal): Promise<void> {
 
 function abortError(signal: AbortSignal): DomainError {
   return new DomainError(signal.reason instanceof DOMException && signal.reason.name === "TimeoutError" ? "生成に時間がかかっています。少し待ってから再度お試しください" : "操作をキャンセルしました");
+}
+
+function templateRequest(template: import("../../domain/room").RoomDesign): components["schemas"]["RoomInput"] {
+  const {room,analysisInput} = template;
+  if (!room || !analysisInput || template.items.length > 100) throw new DomainError("テンプレートの内容を確認してください");
+  return {room: {...analysisInput, template_scene: {
+    room: {width: room.width, depth: room.depth, height: room.height, wall_color: template.wallColor ?? "#F0ECE5", floor_color: room.floorColor, windows: room.windows},
+    objects: template.items.map(item => ({id: item.id, source: "existing", category: item.category, label: item.name,
+      size: {w: item.size[0], h: item.size[1], d: item.size[2]}, position: {x: item.position[0] + room.width / 2, y: item.position[1] - item.size[1] / 2, z: item.position[2] + room.depth / 2},
+      rotation_y: item.rotation ?? 0, color: item.color, model_url: null, slot: null, attach_to: null, item_id: null, marker: null}))
+  }}};
 }

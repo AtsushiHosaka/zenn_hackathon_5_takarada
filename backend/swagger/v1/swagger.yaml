@@ -343,14 +343,14 @@ paths:
       summary: 部屋を登録して解析を始める
       tags:
       - Rooms
-      description: 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と
-        Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ
+      description: template_sceneを指定すると、保存した配置からreadyの部屋を別IDで作成する。モデルURLは受け付けない。写真との併用は不可。省略時の解析は非同期。GET
+        /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ
       security:
       - bearerAuth: []
       parameters: []
       responses:
         '201':
-          description: '登録に成功 (status: analyzing)'
+          description: 登録に成功 (通常はanalyzing、テンプレートはready)
           content:
             application/json:
               schema:
@@ -1097,6 +1097,21 @@ components:
       required:
       - key
       - upload_url
+    RoomTemplateScene:
+      type: object
+      description: 保存した部屋の配置をコピーする。外部モデルURLは受け付けず、モデルはサーバーで選ぶ
+      properties:
+        room:
+          "$ref": "#/components/schemas/RoomShape"
+        objects:
+          type: array
+          maxItems: 100
+          items:
+            "$ref": "#/components/schemas/SceneObject"
+          description: sourceはexisting、model_urlはnull。IDは64文字以内、家具名は100文字以内
+      required:
+      - room
+      - objects
     RoomInput:
       type: object
       properties:
@@ -1118,6 +1133,8 @@ components:
               description: '部屋の形。square: 正方形に近い (1:1.15), standard: やや縦長 (3:4), long:
                 細長い (1:2)'
               example: standard
+            template_scene:
+              "$ref": "#/components/schemas/RoomTemplateScene"
             photo_keys:
               type: array
               items:

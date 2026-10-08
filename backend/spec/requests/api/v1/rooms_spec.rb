@@ -36,13 +36,13 @@ RSpec.describe "Api::V1::Rooms", type: :request do
 
     post "部屋を登録して解析を始める" do
       tags "Rooms"
-      description "解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ"
+      description "template_sceneを指定すると、保存した配置からreadyの部屋を別IDで作成する。モデルURLは受け付けない。写真との併用は不可。省略時の解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ"
       security [ { bearerAuth: [] } ]
       consumes "application/json"
       produces "application/json"
       parameter name: :params, in: :body, schema: { "$ref" => "#/components/schemas/RoomInput" }
 
-      response "201", "登録に成功 (status: analyzing)" do
+      response "201", "登録に成功 (通常はanalyzing、テンプレートはready)" do
         schema "$ref" => "#/components/schemas/Room"
 
         let(:params) { { room: { tatami: 6, shape: "standard" } } }
