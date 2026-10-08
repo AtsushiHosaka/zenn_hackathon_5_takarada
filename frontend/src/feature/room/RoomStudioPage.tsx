@@ -176,9 +176,10 @@ export default function RoomStudioPage() {
     if(JSON.stringify(next)===JSON.stringify(design))return;
     setBefore(false);
     setHistory(previous=>({past:[...previous.past,design].slice(-50),future:[]}));
-    const edits=new Map((design.editedItems??[]).map(item=>[item.id,item]));
+    // Explicit deletion updates next.editedItems; replacement keeps the original.
+    const edits=new Map((next.editedItems??[]).map(item=>[item.id,item]));
     next.items.forEach(item=>{const previous=design.items.find(value=>value.id===item.id);if(!previous||JSON.stringify([item.position,item.rotation??0,item.size,item.color])!==JSON.stringify([previous.position,previous.rotation??0,previous.size,previous.color]))edits.set(item.id,item);});
-    const editedItems=[...edits.values()].filter(item=>!isManualFurniture(item)||next.items.some(current=>current.id===item.id));
+    const editedItems=[...edits.values()];
     const operations=existingItems({...next,editedItems}).map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep' as const}));
     client.setQueryData(roomPlanKeys.detail(id),{...next,editedItems,...(design.furnitureOperations?{furnitureOperations:operations,keptObjectIds:operations.filter(operation=>operation.action==='keep').map(operation=>operation.objectId)}:{})});
   }
