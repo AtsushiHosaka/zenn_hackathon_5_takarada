@@ -28,7 +28,7 @@ Rails.application.routes.draw do
       get "assets/*key", to: "assets#show", format: false
 
       resources :furniture_models, only: %i[index show]
-      resources :rooms, only: %i[create show] do
+      resources :rooms, only: %i[index create show] do
         resources :coordinations, only: :create
       end
       resources :coordinations, only: :show
