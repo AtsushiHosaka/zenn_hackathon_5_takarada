@@ -81,8 +81,8 @@ export default function RoomListPage() {
       </section>}
       {!selected && !rooms.isLoading && !rooms.error && <div className="room-list-empty"><p>保存した部屋はまだありません。</p><Link className="motion-control" to="/rooms/new">最初の部屋を作る</Link></div>}
       {rooms.isLoading && <p className="room-list-feedback" role="status">読み込み中…</p>}
-      {rooms.persistenceWarning && <p className="room-list-feedback" role="alert">{rooms.persistenceWarning}</p>}
-      {rooms.error && <div className="room-list-feedback"><ErrorText error={rooms.error}/><button className="rc-secondary" type="button" onClick={() => void rooms.refetch()}>再試行</button></div>}
+      {rooms.persistenceWarning && <p className="room-list-feedback motion-fade" role="alert">{rooms.persistenceWarning}</p>}
+      {rooms.error && <div className="room-list-feedback"><ErrorText error={rooms.error}/><button className="rc-secondary" type="button" onClick={()=>void rooms.refetch()}>再試行</button></div>}
     </main>
   </div>;
 }
