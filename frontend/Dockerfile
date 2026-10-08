@@ -16,6 +16,8 @@ COPY . .
 # VITE_ で始まる値は**ビルド時にバンドルへ埋め込まれる**。秘密は渡さない
 ARG VITE_API_ENDPOINT
 ARG VITE_CONNECTION=api
+ARG VITE_TERMS_URL
+ARG VITE_PRIVACY_URL
 RUN npm run build
 
 # 配信。SPA なので存在しないパスは index.html に落とす

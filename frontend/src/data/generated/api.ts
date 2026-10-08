@@ -94,6 +94,15 @@ export interface paths {
                         "application/json": components["schemas"]["ValidationErrors"];
                     };
                 };
+                /** @description 正式文書の未設定により新規登録を停止中 */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ValidationErrors"];
+                    };
+                };
             };
         };
         delete?: never;
