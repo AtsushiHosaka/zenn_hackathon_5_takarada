@@ -56,6 +56,8 @@ export function isImageArtwork(value: unknown): value is ImageArtwork {
 }
 
 export type RoomItem = {
+  // Browser-local source photo; category models provide its editable 3D representation.
+  referenceImage?: ImageArtwork;
   artwork?: ImageArtwork;
   id: string;
   name: string;
@@ -218,6 +220,7 @@ export function isRoomItem(value: unknown): value is RoomItem {
   if (value.shop !== undefined && !nonemptyString(value.shop)) return false;
   if (value.productId !== undefined && (typeof value.productId !== "string" || !/^[1-9]\d*$/.test(value.productId))) return false;
   if (value.ecProductId !== undefined && (typeof value.ecProductId !== "string" || !/^[1-9]\d*$/.test(value.ecProductId))) return false;
+  if (value.referenceImage !== undefined && (!isManualFurniture(value as RoomItem) || !furnitureCategories.some(category => category === value.category) || !isImageArtwork(value.referenceImage))) return false;
   if (value.artwork !== undefined && (!isManualFurniture(value as RoomItem) || !imageGoodsCategories.some(category => category === value.category) || !isImageArtwork(value.artwork))) return false;
   if (value.materialOverrides !== undefined && !isMaterialOverrides(value.materialOverrides)) return false;
   if (value.textureStatus !== undefined && !isTextureStatus(value.textureStatus)) return false;
