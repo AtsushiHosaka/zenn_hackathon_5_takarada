@@ -321,8 +321,37 @@ RSpec.configure do |config|
           },
           FurnitureImportInput: {
             type: :object,
-            properties: { url: { type: :string, maxLength: 2048, description: "対応するショップの商品詳細URL", example: "https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/" } },
+            properties: { variant_id: { type: :string, maxLength: 120, description: "同じ商品ページで選ぶ場合の公式バリエーションSKU", example: "50337820" }, url: { type: :string, maxLength: 2048, description: "対応するショップの商品詳細URL", example: "https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/" } },
             required: %w[url]
+          },
+          FurnitureSearchInput: {
+            type: :object,
+            properties: {
+              query: { type: :string, minLength: 1, maxLength: 200, example: "丸いサイドテーブル" },
+              color: { type: :string, enum: %w[white black gray brown beige green blue purple pink red orange yellow], example: "blue" },
+              category: { type: :string, enum: %w[sofa bed desk chair shelf table], example: "table" }
+            },
+            required: %w[query]
+          },
+          FurnitureSearchResult: {
+            type: :object,
+            properties: {
+              products: { type: :array, maxItems: 24, items: { "$ref" => "#/components/schemas/ImportedFurniture" } },
+              color: { type: :string, nullable: true, example: "blue" },
+              failures: { type: :integer, minimum: 0, example: 0 },
+              search_entry_points: { type: :array, items: { type: :string }, example: [] }
+            },
+            required: %w[products color failures search_entry_points]
+          },
+          ProductColorVariant: {
+            type: :object,
+            properties: {
+              color_name: { type: :string, example: "ホワイト" },
+              url: { type: :string, example: "https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/" },
+              variant_id: { type: :string, nullable: true, example: "50337820" },
+              source: { type: :string, enum: %w[official_color_picker official_product_group], example: "official_color_picker" }
+            },
+            required: %w[color_name url variant_id source]
           },
           ImportedFurniture: {
             type: :object,
@@ -369,6 +398,8 @@ RSpec.configure do |config|
               provider: { type: :string, example: "ikea" },
               provider_product_id: { type: :string, example: "50337820" },
               variant_id: { type: :string, example: "50337820" },
+              official_color: { type: :string, nullable: true, example: "ホワイト" },
+              color_variants: { type: :array, maxItems: 24, items: { "$ref" => "#/components/schemas/ProductColorVariant" } },
               currency: { type: :string, enum: %w[JPY], example: "JPY" },
               source_url: { type: :string, example: "https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/" },
               price_checked_at: { type: :string, format: "date-time", example: "2026-10-05T04:00:00Z" },

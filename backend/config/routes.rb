@@ -29,6 +29,7 @@ Rails.application.routes.draw do
 
       resources :furniture_models, only: %i[index show]
       resources :furniture_imports, only: :create
+      resources :furniture_searches, only: :create
       resources :rooms, only: %i[index create show] do
         resources :coordinations, only: :create
       end
