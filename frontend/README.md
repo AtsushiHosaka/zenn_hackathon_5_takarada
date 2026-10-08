@@ -21,7 +21,7 @@ npm run dev
 
 | URL | 画面 |
 | --- | --- |
-| `/` | `/rooms/sample-oshi` の結果サンプルへ移動 |
+| `/` | `/rooms` のマイルームへ移動 |
 | `/rooms` | ルーム一覧・検索 |
 | `/rooms/new` | 畳数・部屋の形を入力して解析。商品提案API接続では活かす家具を選び、希望・予算を入力 |
 | `/rooms/:id` | ルームの結果、生成中の表示、追加の指示 |
@@ -87,7 +87,7 @@ APIの新規作成では、解析後に表示された既存家具から活か�
 
 ルーム画面右上のアカウントメニューから`/account`へ進みます。メールアドレスは表示のみ、ニックネームは50文字以内で変更できます。`PATCH /api/v1/users/:id`の成功後は画面とヘッダーの名前を更新します。退会は確認後に`DELETE /api/v1/users/:id`を呼び、成功時だけトークンとキャッシュを消します。他人のIDを指定した画面には編集フォームを出しません。
 
-ログインが必要な画面へ直接入ると、ログイン後に元の画面へ戻ります。認証APIの401はトークンを破棄し、通信失敗はトークンを保持して再試行を表示します。別タブのログイン・ログアウトにも追従します。パスワード再設定、メール変更、正式な利用規約・プライバシーポリシーはAPIまたは原稿が未提供です。
+部屋一覧・サンプル・新規入力・保存済みルームは、モック接続でも認証が必要です。未ログイン時はログイン画面へ移動し、ログイン・新規登録後に元の画面へ戻ります。認証APIの401はトークンを破棄し、通信失敗はトークンを保持して再試行を表示します。別タブのログイン・ログアウトにも追従します。パスワード再設定、メール変更、正式な利用規約・プライバシーポリシーはAPIまたは原稿が未提供です。
 
 開発は`VITE_CONNECTION=api`を指定するか、ログイン画面でAPIを選びます。本番ビルドは常にAPI接続です。`npm run preview`も同じ中継設定を使います。Dockerのruntimeでは`API_UPSTREAM_ORIGIN`を起動時に指定でき、nginxがTLS証明書を検証して中継します。`VITE_API_ENDPOINT`は空欄でビルドしてください。静的ホスティングでは別途同一オリジンの中継設定、またはAPI側のCORS対応が必要です。
 
@@ -107,7 +107,7 @@ API_UPSTREAM_ORIGIN=http://127.0.0.1:13000 VITE_CONNECTION=api npm run dev
 
 ## 部屋解析と商品提案のAPIをつなぐ
 
-正式契約は`backend/swagger/v1/swagger.yaml`、変換は`src/data/records/room.ts`、通信は`src/data/repositories/apiRoomRepository.ts`です。画面は`RoomRepository`だけに依存します。部屋・商品提案のエンドポイントは公開で、ログインを必要としません。
+正式契約は`backend/swagger/v1/swagger.yaml`、変換は`src/data/records/room.ts`、通信は`src/data/repositories/apiRoomRepository.ts`です。画面は`RoomRepository`だけに依存します。部屋・商品提案のエンドポイントは認証を要求し、本人のデータだけを扱います。
 
 1. `POST /api/v1/rooms`へ`{ room: { tatami, shape } }`をJSONで送ります。`GET /api/v1/rooms/{id}`で`analyzing`から`ready`になるまで待ちます。
 2. 解析Sceneの家具から活かすものを選び、希望と予算を入力します。
