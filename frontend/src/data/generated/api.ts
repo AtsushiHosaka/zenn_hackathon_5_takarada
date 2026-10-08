@@ -472,7 +472,7 @@ export interface paths {
         };
         /**
          * 本人の部屋一覧を取得する
-         * @description 本人の部屋をIDの降順で返す。部屋がない場合は空の配列を返す。
+         * @description 本人の部屋をIDの降順で返す。部屋がない場合は空の配列を返す。解析中・失敗した部屋も含み、各部屋に最後に成功した提案を返す。
          */
         get: {
             parameters: {
@@ -1209,6 +1209,8 @@ export interface components {
             analyzed_by: null | "gemini" | "mock";
             /** @example null */
             error_message: string | null;
+            /** @description この部屋で最後に生成が成功した提案。提案がなければ null */
+            latest_coordination: components["schemas"]["Coordination"] | null;
             /** Format: date-time */
             created_at: string;
         };

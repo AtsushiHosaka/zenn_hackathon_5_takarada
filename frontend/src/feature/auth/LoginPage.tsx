@@ -37,7 +37,7 @@ export default function LoginPage() {
   const location = useLocation();
   const mode = location.pathname === '/signup' ? 'signup' : 'login';
   const from: unknown = location.state?.from;
-  const destination = typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') && !/^\/(login|signup)([/?#]|$)/.test(from) ? from : '/rooms';
+  const destination = typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') && !/^\/(login|signup)([/?#]|$)/.test(from) ? from : '/rooms/new';
   const isSignup = mode === 'signup';
   const isDummy = loadConnection() === 'dummy';
   const signupPaused = isSignup && !isDummy && (!appConfig.legal.termsUrl || !appConfig.legal.privacyUrl);

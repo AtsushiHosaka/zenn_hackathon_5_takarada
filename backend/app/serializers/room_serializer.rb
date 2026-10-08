@@ -2,6 +2,7 @@ class RoomSerializer
   include Alba::Resource
 
   attributes :id, :shape, :status, :analyzed_by, :error_message
+  has_one :latest_coordination, resource: CoordinationSerializer
 
   attribute(:scene) { |room| ModelResolver.call(room.scene) }
   attribute(:tatami) { |room| room.tatami.to_f }

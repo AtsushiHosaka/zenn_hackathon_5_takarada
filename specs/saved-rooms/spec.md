@@ -1,0 +1,47 @@
+# 保存したルームを一覧から開く
+
+## 目的と根拠
+
+2026年10月8日のユーザー依頼に基づく。作ったルームをユーザーに紐付けて保存し、一覧から再び開けるようにする。既存の部屋画面と配色を保ち、一覧の文字は画像・タイトル・予算を中心に絞る。追加カードとルームカードの全高を揃え、背景は部屋画面の暗い色に合わせる。
+
+Google Docs URLは `docs/project.md` に未設定のため未確認。今回の変更はGoogle Docsには未反映。
+
+## 受け入れ条件
+
+- APIで作った部屋は本人のDBレコードとして保存し、再読み込み・再ログイン後も本人の一覧から取得できる。他人の部屋は表示・取得できない。
+- 一覧では最新の成功したコーディネートを開く。解析中・失敗した部屋も一覧に残し、解析中は定期的に状態を取得する。
+- ルームの直接URLからも保存結果を復元する。最新コーデに切り替わる場合はそのURLへ移動し、タイトル変更や配置編集のキャッシュを一致させる。
+- 一覧はPCで3列、幅800px以下で2列。カード幅は最大220pxとし、800px以下は200px、420px以下は160pxまでに抑える。左上の追加カードは＋だけを表示する。
+- カードは保存した部屋の3Dモデル、タイトル、保存結果に予算がある場合の金額を表示する。広さ・部屋の形・アイテム数を小さく表示し、商品付き提案では価格がすべて保存されている場合に商品計を表示する。説明文・検索・一覧全体の件数・サンプルカードは置かない。
+- 部屋画面の左上に小さな戻る矢印を置き、一覧へ戻る。
+- 通常のログイン・登録直後は新規ルーム画面を開く。ログイン前に保存ルームのURLを開いていた場合はその部屋へ戻る。
+- ダミー接続でもユーザー別にルームを保存する。同じ条件で作った別ルームは別IDになり、既存ルームの更新ではIDを維持する。登録ユーザーもタブを閉じた後に再ログインできる。
+- 保存容量の不足や一覧取得の失敗は画面に表示する。保存容量が不足しても、そのセッションの生成結果は一覧・部屋画面に残す。
+
+## 実装と保存範囲
+
+Integration with reviewed PR #49 (2026-10-08): room lists retain its ID-descending order and existing ownership/authentication contract. The single GET rooms contract includes the latest successful coordination. Every room route, including samples, follows the authentication gate now on main. Google Docs remains unset and this integration is not reflected there.
+
+Review correction requested on 2026-10-08: the saved-room index and detail preload only the latest completed coordination for each requested room. PostgreSQL selects one row per room using `DISTINCT ON`, ordered by creation time descending and then ID descending; later pending/failed proposals do not replace the latest successful result. This bounds loaded coordination records by the number of rooms without changing the response contract. Google Docs URL remains unset, so Docs was not checked or updated.
+
+Correction validation: the existing room/coordination request suites passed all 13 examples, and changed Rails files passed RuboCop. A temporary check using the installed ActiveRecord 8.0.5.1 and PostgreSQL 16 loaded exactly two coordination records from 44 completed history rows. It verified creation-time ordering, ID ties, pending/failed exclusion, null when no successful proposal exists, owner isolation, association inverses and index/detail serialization agreement. The fixture transaction was rolled back in an isolated database using the existing API container. OpenAPI and frontend types were regenerated after consolidating the GET rooms contract; frontend lint, type checks and production build passed, with the existing chunk-size warning. No new tests were committed; browser integration and CI were not rerun for this correction.
+
+Review correction for issue #41 (2026-10-08): failed dummy room writes retain valid generated results in the repository session, separated by owner. List/get and later generation reuse those pending results, including analyze calls. Studio/list show the current owner's persistence warning; a subsequent successful write saves pending rooms and clears the warning. Reloading loses pending memory, and malformed stored rooms remain a reported read error. Google Docs remains unconfigured and this correction is not reflected there.
+
+Review correction for issue #40 (2026-10-08): API room aliases are revalidated on opening, including when a local analysis is cached. The backend resolves the latest canonical result before matching local edits are applied. Alias loading/errors are shown instead of presenting an unverified cached analysis. The studio has one detail-query owner; sample/new-room initialization and query-cache edits continue through that owner. Google Docs remains unconfigured and this correction is not reflected there.
+
+既存のAPI作成処理はすでに本人の部屋をDBへ保存していた。Webがブラウザ内の保存結果だけを一覧に使っていたため、本人の部屋を返すGET一覧APIを追加し、最新の成功した提案を一覧・詳細応答に含める。解析が終わる前に画面を離れた場合も、DBに保存した部屋を一覧から確認できる。
+
+Webのタイトル変更・配置・色の手動編集は従来どおり接続先・API origin・利用者ID別のブラウザ保存。別端末へ同期するのはAPIで生成された部屋と提案であり、手動編集は同期しない。ダミーとサンプルから保存したルームもそのブラウザ内だけに保存する。ゲストがサンプルを保存するときは先にログインを求め、ゲストの保存結果を次の利用者へ割り当てない。
+
+一覧は部屋画面と同じRoomViewerで保存した3Dを直接描画する。保存した部屋形状・家具の配置・色・GLBモデル・生成テクスチャを使い、カメラを近づけて家具を見やすくする。ドラッグで回転でき、右上の矢印と情報欄から部屋画面へ移動する。画面内のカードだけモデルを読み込み、画面外や一覧を離れたときにWebGLを破棄する。視点が止まっている間は再描画せず、回転・読み込み・リサイズ時に描画する。モデル取得失敗や作成中のカードはサンプル画像で埋めない。
+
+## 検証
+
+Railsの既存request specと最小一覧契約13件、RuboCop、Webのlint・本番ビルドが成功。SwaggerとフロントのAPI型を再生成した。本番ビルドには既存のチャンクサイズ警告がある。新規の網羅的テストは追加していない。
+
+既存APIコンテナは別worktreeを参照していたため、同コンテナ内の一時コピーで今回のbackendを検証した。別worktreeのアプリやコンテナは変更していない。ダミー接続では、利用者別隔離、再ログイン、再読み込み、同条件の別ID、既存ID更新を確認した。ブラウザでも2部屋の作成・復元、保存した壁色の反映、3D回転を確認した。390px幅は2列で横スクロールがなく、追加カードを含む全カードの高さが一致した。
+
+変更済みのローカル実APIへ接続し、検証用に本人所有の部屋1件と提案1件を作成した。DBの所有者・完了状態と、一覧・詳細の応答が一致することを確認した。保存した家具ID・配置・寸法・色からAPIがカタログのGLB URL8点を復元し、8点ともHTTP 200とGLB形式を確認した。ブラウザでその3D表示、ドラッグ回転、再読み込み後の復元、詳細への移動と一覧復帰を確認した。別ユーザーの一覧には出ず、詳細取得は404。console errorは0件。旧匿名ルーム14件は変更していない。
+
+既存の匿名ルームは所有者を判定できないため、次のログインユーザーへ割り当てない。クラウドの接続先は一覧APIが404で、今回の変更はまだデプロイしていない。写真解析・実AI生成・実EC検索・非同期workerを含む通し確認は未実施。検証時の提案生成と商品データはモックで、API・DB・GLB取得と3D描画は実動作を使った。
