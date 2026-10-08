@@ -225,3 +225,12 @@
   .rc-workspace:not(.is-generating) .rc-new-composer {max-height:65%;overflow-y:auto}
   .rc-workspace:not(.is-generating) .rc-scene-stage.has-panel {right:0}
 }
+
+/* Short phone windows scroll the workspace while keeping navigation visible. */
+@media(max-width:720px) and (max-height:600px) {
+  .rc-workspace:not(.is-generating) {overflow-y:auto;overscroll-behavior:contain}
+  .rc-workspace:not(.is-generating)>.rc-stage:not(.is-empty) {flex-basis:260px;height:260px}
+  .rc-workspace:not(.is-generating)>.rc-chat {flex:0 0 auto;height:240px;min-height:240px}
+  .rc-workspace:not(.is-generating) .rc-scene-stage {top:64px;bottom:72px}
+  .rc-workspace:not(.is-generating) .rc-followup-composer {max-height:100%;overflow-y:auto}
+}
