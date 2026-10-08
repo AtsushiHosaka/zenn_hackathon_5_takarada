@@ -16,3 +16,11 @@ Mobile 390×844 with reduced motion:
 Verified setup back/forward values/focus; typing/preset DOM identity and entrance stability; mixed valid/invalid files; inert exit retention, URL revoke and count limit; initial/coordinator/chat HTTP failure/held response/stop/fast retry; submitted text, input/focus restoration, single-canvas maximum; reduced-motion loop removal; navigation cleanup; stalled assets and unavailable WebGL fallbacks. Direct native drag/drop, physical touch, production authentication/provider behavior and deployed performance were not exercised. No new permanent tests.
 
 A first instant canvas-count assertion caught a transient zero during existing API-alias refetch, not multiple viewers; a maximum-count observer and settled readiness check passed. A first stalled-asset attempt used an older persisted scene; a fresh API reload requested the intended GLB and passed. Two HTTP 500 responses and WebGL errors were injected intentionally. An old held route also timed out in the temporary fixture harness after navigation; this was not an application failure.
+
+## Independent focus correction: integrated browser evidence
+
+`sample-removal-focus-integrated.png` was captured from the combined local source `932393544fba444d9e87ad99bbe8f336c569f58b`, which contains correction `75aeb0315db5aa5ddde1b7728865a73c6b24e74a` and other reviewed feature branches. It is combined-source evidence, not a screenshot of the PR branch alone.
+
+The default dummy repository hides the photo step. This bounded component-state check therefore used a browser response fixture enabling its photo capability, while retaining the actual RoomStudioPage, photo tiles and corrected focus effect. Keyboard Enter on the first sample's Remove button left two active samples, removed the inert exit tile, and focused Add Photo. The fixture was removed afterward; no production/provider behavior is established. Existing Chrome and Vite were reused in one isolated context, which was closed after the check. The screenshot was visually inspected.
+
+Existing lint/build and the temporary exact-source effect probe passed before publishing the correction.
