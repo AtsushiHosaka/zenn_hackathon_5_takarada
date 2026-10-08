@@ -26,3 +26,9 @@ Existing frontend lint/build and browser checks are recorded in the PR. Browser 
 - Signed PUT fixture: XML `AccessDenied` / HTTP 403 shows filename, confirmed access reason and code. Unknown HTTP 500 shows the status and states that the detailed cause cannot be confirmed, without claiming size overflow.
 - Desktop 1440×1000 and mobile 390×844 screenshots inspected. Alerts remain visible; the mobile document has no horizontal overflow (`scrollWidth: 390`). Evidence is saved under `docs/pr-evidence/issue-65/`.
 - Not verified: live backend, production GCS, Gemini/provider processing or the original failure report. The exact-limit fixture verifies file metadata validation, not decoding/uploading a real image at that size.
+
+## Bounded error responses
+
+Signed-upload error bodies are read from the response stream with a 16 KiB limit before JSON/XML parsing. Larger bodies cancel the reader and use the confirmed HTTP-status fallback; their truncated content is never parsed as a storage error. Confirmed local JSON messages are trimmed and capped at 500 characters. XML error codes retain their existing 80-character allowlist. Network, cancellation and timeout messages remain distinct, and an unknown failure does not claim a photo-size error.
+
+Frontend lint/build passed for this followup. A temporary VM harness checked the exact 16 KiB boundary, stream cancellation before oversized XML parsing, capped local JSON messages, UTF-8 characters split across chunks, known code mapping with a parser stub, and status/network/cancel/timeout distinctions. Native DOMParser/browser and live GCS were not rerun; previously captured ordinary short-error screenshots retain the same visible messages. No permanent tests were added.

@@ -1650,6 +1650,7 @@ components:
               - kuromi
               - cinnamoroll
               - pompompurin
+              - pochacco
               description: 任意のキャラクターテーマ。画像や公式商品を保証しない
               example: hatsune-miku
             prompt:
@@ -1796,6 +1797,7 @@ components:
           - kuromi
           - cinnamoroll
           - pompompurin
+          - pochacco
           example: hatsune-miku
         prompt:
           type: string

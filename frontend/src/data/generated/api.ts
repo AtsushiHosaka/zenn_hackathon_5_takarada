@@ -1594,7 +1594,7 @@ export interface components {
                  * @example hatsune-miku
                  * @enum {string}
                  */
-                character_theme_id?: "hatsune-miku" | "sanrio" | "hello-kitty" | "my-melody" | "kuromi" | "cinnamoroll" | "pompompurin";
+                character_theme_id?: "hatsune-miku" | "sanrio" | "hello-kitty" | "my-melody" | "kuromi" | "cinnamoroll" | "pompompurin" | "pochacco";
                 /** @example 紫色の推し活ルームにしたい */
                 prompt: string;
                 /**
@@ -1686,7 +1686,7 @@ export interface components {
              * @example hatsune-miku
              * @enum {string|null}
              */
-            character_theme_id?: null | "hatsune-miku" | "sanrio" | "hello-kitty" | "my-melody" | "kuromi" | "cinnamoroll" | "pompompurin";
+            character_theme_id?: null | "hatsune-miku" | "sanrio" | "hello-kitty" | "my-melody" | "kuromi" | "cinnamoroll" | "pompompurin" | "pochacco";
             /** @example 紫色の推し活ルームにしたい */
             prompt: string;
             /** @example 30000 */

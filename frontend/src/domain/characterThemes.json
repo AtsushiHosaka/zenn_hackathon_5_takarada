@@ -68,5 +68,15 @@
     "base": "#FFF7DC",
     "secondary": "#EAD59A",
     "accent": "#A47848"
+  },
+  {
+    "id": "pochacco",
+    "name": "ポチャッコ",
+    "title": "ポチャッコの爽やかなルーム",
+    "instructions": "グリーンと白を合わせた爽やかな部屋。足跡のモチーフと、グッズを飾れる収納を合わせる。",
+    "motif": "paw",
+    "base": "#F1F6EA",
+    "secondary": "#D0DFC5",
+    "accent": "#4F7754"
   }
 ]
