@@ -5,6 +5,8 @@ Source: [issue #79](https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/i
 ## Acceptance
 
 - Clicking furniture in the room opens its editor and a search limited to the same category.
+- Retail replacement search is offered only for parser-supported product categories, including legacy category aliases. Uploaded posters and acrylic stands retain their image editing controls without an unsupported retail search.
+- At phone widths up to 720px, the furniture editor opens below the header with 12px viewport gutters. Its content scrolls while the close control and save footer remain available. Desktop panel geometry is unchanged.
 - Selecting a freshly verified actual product replaces that object and updates the 3D view, dimensions, color, model information, product URL, and purchase price.
 - The category remains unchanged, such as chair A to chair B. Server validation rejects nonexistent products and products from another category.
 
@@ -21,3 +23,5 @@ Source: [issue #79](https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/i
 ## Verification
 
 See [review evidence](../../docs/pr-evidence/issue-79/README.md). Real Gemini, retailer availability, and production were not verified.
+
+The mobile editor follow-up passes frontend lint/build and an exact-source category guard check (supported aliases accepted; poster/acrylic_stand rejected). The actual frontend at 390 × 844 passes replacement, original undo, redo, save/reload, close, and the selected-SKU coordination request with controlled API fixtures. The panel measures 366px wide with 12px gutters and no horizontal page overflow. The final screenshot is in the review evidence.
