@@ -130,5 +130,5 @@
 .rc-imported-furniture .rc-furniture-imported-card span:last-child {overflow-wrap:anywhere}
 
 @media(max-width:720px) {
-  .rc-panel.rc-planner {position:fixed;z-index:50;top:68px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));left:12px;width:auto;max-width:none;min-width:0}
+  .rc-panel.rc-planner {position:fixed;z-index:50;top:calc(var(--rc-header-bottom,56px) + 12px);right:12px;bottom:max(12px,env(safe-area-inset-bottom));left:12px;width:auto;max-width:none;min-width:0}
 }

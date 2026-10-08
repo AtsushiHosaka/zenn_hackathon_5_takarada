@@ -1,5 +1,5 @@
-import { remapTemplateItems } from "../../domain/roomTemplate";
 import { characterTheme } from "../../domain/characterTheme";
+import { copyFurniture } from "../../domain/furnitureCopy";
 import { DomainError } from "../../domain/error";
 import { roomPhotoLimits, roomPhotoValidationError } from "../../domain/roomPhoto";
 import { furnitureCategories, imageGoodsCategories, isFurnitureAdditions, isFurnitureOperations, isManualFurniture, isRoomItem, isRoomShape } from "../../domain/room";
@@ -74,7 +74,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
       if (config.contract === "legacy" || !config.generationPath) throw new DomainError("この接続先ではテンプレートから部屋を作成できません");
       const snapshot = structuredClone(template);
       // Newly added manual furniture is already part of this copied base scene.
-      snapshot.items = remapTemplateItems(snapshot.items).map(item => ({...item, existing: true,
+      snapshot.items = copyFurniture(snapshot.items).map(item => ({...item, existing: true,
         marker: undefined, productId: undefined, ecProductId: undefined, replacesObjectId: undefined}));
       const record = toAnalysisRoomRecord(await api.send<unknown>(config.generationPath, {
         method: "POST", body: templateRequest(snapshot), requiresAuth: true, signal,
