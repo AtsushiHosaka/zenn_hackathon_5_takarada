@@ -1229,6 +1229,7 @@ components:
           - table
           - poster
           - acrylic_stand
+          - mirror
           description: 手動で補完した所有家具では必須
           example: chair
         artwork:

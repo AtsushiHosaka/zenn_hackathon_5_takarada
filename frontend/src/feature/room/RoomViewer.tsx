@@ -2,13 +2,14 @@ import { roomPalette } from "../../domain/roomPalette";
 import { characterTheme } from "../../domain/characterTheme";
 import { useEffect, useEffectEvent, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { Reflector } from "three/examples/jsm/objects/Reflector.js";
+import { resizeMirrorSurfaces } from "./mirrorReflection";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { isManualFurniture, type RoomDesign, type RoomItem } from "../../domain/room";
 import { buildReferenceRoom, usesReferenceRoom } from "./referenceRoomModel";
 import { buildCharacterThemeDecor } from "./characterThemeDecor";
-import { Reflector } from "three/examples/jsm/objects/Reflector.js";
 import { addMirrorSurface, isMirrorCategory } from "./mirrorSurface";
 import { buildMeasuredRoom } from "./roomArchitecture";
 import { createShellFloorOverlay } from "./shellFloorSurface";
@@ -645,6 +646,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     const gridBounds = referenceRoom?.floorBounds ?? baseRoomBounds;
     const gridFloor = design.room || referenceRoom ? 0 : getFurniturePlacementBounds(design).floor;
     const layoutGrid = createLayoutGrid(gridBounds, gridFloor);
+    layoutGrid.userData.reflectionExcluded = true;
     layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel;
     scene.add(layoutGrid);
     const cutawayWalls: { object: THREE.Object3D; wall: "north" | "east" | "south" | "west" }[] = [];
@@ -920,7 +922,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         // them world-space; the reflection plane is a child in local space.
         const mirrorBounds = isMirrorCategory(item.category) ? new THREE.Box3().setFromObject(gltf.scene) : undefined;
         group.add(gltf.scene);
-        if (mirrorBounds) addMirrorSurface(group, item, mirrorBounds);
+        if (mirrorBounds) { addMirrorSurface(group, item, mirrorBounds); resizeMirrorSurfaces(group, renderer); }
         furnitureGeometryVersion++;
         if (selectedId === item.id) updateSelection(selectedId);
       }, undefined, showModelFailure);
@@ -962,7 +964,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
             );
             hitTarget.position.y = item.size[1] / 2;
             group.add(hitTarget);
-            if (isMirrorCategory(item.category)) addMirrorSurface(group, item);
+            if (isMirrorCategory(item.category)) { addMirrorSurface(group, item); resizeMirrorSurfaces(group, renderer); }
             hitTargets.set(item.id, group);
             scene.add(group);
           }
@@ -1057,6 +1059,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       if (!position) { if (placementPreview) placementPreview.visible = false; return; }
       if (!placementPreview) {
         placementPreview = createFurniture(currentPlacement, accent, oshi, loadingManager);
+        placementPreview.userData.reflectionExcluded = true;
         placementPreview.traverse(object => {
           if (!(object instanceof THREE.Mesh)) return;
           object.castShadow = false;
@@ -1067,6 +1070,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
           }
         });
         scene.add(placementPreview);
+        resizeMirrorSurfaces(placementPreview, renderer);
       }
       placementPreview.visible = true;
       placementPreview.userData.supportObjectId = placement?.supportObjectId;
@@ -1234,6 +1238,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       }
       renderer.setSize(width, height);
       furnitureOutline.resize(width, height);
+      resizeMirrorSurfaces(scene, renderer);
     };
     const observer = new ResizeObserver(resize);
     observer.observe(host);

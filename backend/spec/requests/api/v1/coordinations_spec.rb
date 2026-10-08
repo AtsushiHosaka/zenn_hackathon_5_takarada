@@ -26,20 +26,22 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
           manual = { "id" => "manual-8e24d3af-c12d-4567-8910-123456789abc", "label" => "今ある椅子", "category" => "chair",
                      "position" => { "x" => room.scene.dig("room", "width") / 2, "y" => 0, "z" => room.scene.dig("room", "depth") / 2 },
                      "size" => { "w" => 0.45, "h" => 0.8, "d" => 0.45 }, "rotation_y" => 0, "color" => "#bba588" }
+          mirror = manual.merge("id" => "manual-8e24d3af-c12d-4567-8910-123456789abd", "category" => "mirror", "label" => "鏡", "size" => { "w" => 0.8, "h" => 1.7, "d" => 0.08 })
           artwork = { "data_url" => "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9ncAAAAASUVORK5CYII=" }
           goods = %w[poster acrylic_stand].map.with_index do |category, index|
             manual.merge("id" => "manual-8e24d3af-c12d-4567-8910-123456789ab#{index}", "category" => category, "label" => "推しグッズ",
                          "size" => { "w" => 0.2, "h" => 0.3, "d" => 0.06 }, "artwork" => artwork)
           end
           { coordination: { prompt: "音楽を楽しむ部屋にしたい", character_theme_id: "hatsune-miku", room_palette_id: "warm-ivory", budget: 30_000,
-                            kept_object_ids: objects.pluck("id") + [ manual["id"] ] + goods.pluck("id"),
-                            furniture_operations: (objects + [ manual ] + goods).map { |object| { object_id: object["id"], action: "keep" } },
+                            kept_object_ids: objects.pluck("id") + [ manual["id"], mirror["id"] ] + goods.pluck("id"),
+                            furniture_operations: (objects + [ manual, mirror ] + goods).map { |object| { object_id: object["id"], action: "keep" } },
                             additions: [ { category: "table" } ],
-                            edited_objects: [ objects.first.slice("id", "position", "size", "rotation_y", "color"), manual, *goods ] } }
+                            edited_objects: [ objects.first.slice("id", "position", "size", "rotation_y", "color"), manual, mirror, *goods ] } }
         end
 
         run_test! do |response|
           expect(JSON.parse(response.body)["before_scene"]["objects"].last(2).map { |object| object.dig("artwork", "data_url") }).to all(start_with("data:image/png;base64,"))
+          expect(JSON.parse(response.body)["before_scene"]["objects"].find { |object| object["category"] == "mirror" }).to include("label" => "鏡", "source" => "existing")
           expect(JSON.parse(response.body)["character_theme_id"]).to eq("hatsune-miku")
           expect(GenerateCoordinationJob).to have_been_enqueued
           expect(JSON.parse(response.body)["additions"]).to eq([ { "category" => "table" } ])
