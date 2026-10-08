@@ -4,7 +4,7 @@ class Coordination < ApplicationRecord
   FLOOR_CATEGORIES = %w[sofa bed desk chair shelf table].freeze
   REPLACEMENT_CATEGORIES = %w[sofa bed desk chair shelf table storage tv_stand wardrobe].freeze
   IMAGE_GOODS_CATEGORIES = %w[poster acrylic_stand].freeze
-  MANUAL_CATEGORIES = (FLOOR_CATEGORIES + IMAGE_GOODS_CATEGORIES).freeze
+  MANUAL_CATEGORIES = (FLOOR_CATEGORIES + IMAGE_GOODS_CATEGORIES + %w[mirror]).freeze
   MANUAL_OBJECT_ID = /\Amanual-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i
 
   belongs_to :room
