@@ -1,0 +1,8 @@
+.rc-room-palette { border: 0; padding: 0; margin: 16px 0; min-width: 0; }
+.rc-room-palette legend { font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+.rc-room-palette-swatches { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.rc-room-palette-swatches label { position: relative; cursor: pointer; height: 36px; }
+.rc-room-palette-swatches input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; }
+.rc-room-palette-swatches span { display: block; height: 100%; border: 1px solid #d8d5df; border-radius: 7px; pointer-events: none; }
+.rc-room-palette-swatches input:checked + span { outline: 2px solid #755ac8; outline-offset: 2px; }
+.rc-room-palette-swatches input:focus-visible + span { outline: 3px solid #292535; outline-offset: 3px; }
