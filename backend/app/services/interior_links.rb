@@ -9,7 +9,7 @@
 # 認証と利用許可がある場合は実EC検索、未設定時はMockClientへ切り替える。
 module InteriorLinks
   SLOTS = %w[bed_cover curtain rug wall_decor light display cushion desk_top floor].freeze
-  FLOOR_CATEGORIES = %w[sofa bed desk chair shelf table].freeze
+  FLOOR_CATEGORIES = %w[sofa bed desk chair shelf table storage tv_stand wardrobe].freeze
 
   # カテゴリごとの標準寸法 (メートル)。EC から寸法が取れない商品に使う (Item.build)
   DEFAULT_SIZES = {

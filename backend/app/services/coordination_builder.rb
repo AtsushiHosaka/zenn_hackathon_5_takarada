@@ -219,6 +219,7 @@ class CoordinationBuilder
 
   def selected_product_items
     @selected_product_items ||= begin
+      @selected_products_by_edit = {}
       base = @coordination.base_coordination
       originals = Array(base&.after_scene&.fetch("objects", [])) + @coordination.input_scene.fetch("objects")
       @coordination.edited_objects.filter_map do |edit|
@@ -226,6 +227,7 @@ class CoordinationBuilder
         product_id = edit["replacement_ec_product_id"] || edit["ec_product_id"]
         product = EcProduct.find_by(id: product_id) if product_id.is_a?(Integer)
         next unless original && product
+        next if original["id"].match?(Coordination::MANUAL_OBJECT_ID) && edit["replacement_ec_product_id"].nil?
 
         next if original["source"] == "existing" && @coordination.furniture_operations.any? { |operation| operation["object_id"] == original["id"] && operation["action"] != "replace" }
 
@@ -235,17 +237,17 @@ class CoordinationBuilder
         if original["source"] == "existing"
           metadata = metadata.merge("group_id" => "replace:#{original['id']}", "replaces_object_id" => original["id"], "preferred_position" => edit["position"], "preferred_rotation" => edit["rotation_y"], "target_size" => original["size"])
         end
-        InteriorLinks::Item.build(id: product.product_id, **data, slot: original["slot"] || "floor", metadata:)
+        item = InteriorLinks::Item.build(id: product.product_id, **data, slot: original["slot"] || "floor", metadata:)
+        @selected_products_by_edit[edit["id"]] = item
+        item
       end
     end
   end
 
   def layout_edits
-    base = @coordination.base_coordination
-    originals = Array(base&.after_scene&.fetch("objects", [])) + @coordination.input_scene.fetch("objects")
+    selected_product_items
     @coordination.edited_objects.map do |edit|
-      original = originals.find { |object| object["id"] == edit["id"] }
-      product = selected_product_items.find { |item| item.id == EcProduct::PUBLIC_ID_OFFSET + (edit["replacement_ec_product_id"] || edit["ec_product_id"]).to_i } if original && (edit["replacement_ec_product_id"] || edit["ec_product_id"])
+      product = @selected_products_by_edit[edit["id"]]
       product ? edit.merge("id" => SlotLayout.object_id_for(product)) : edit
     end
   end

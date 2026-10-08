@@ -1,7 +1,7 @@
 import { useState, type DragEvent } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRepositories } from '../../core/repositories';
-import { isManualFurniture, furnitureCategories, type FurnitureAddition, type FurnitureCategory, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
+import { isManualFurniture, furnitureCategories, replacementFurnitureCategories, type FurnitureAddition, type FurnitureCategory, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
 import ErrorText from '../shared/ErrorText';
 import { downloadShoppingCsv } from './exports';
 import { LAYOUT_GRID_STEP, snapToLayoutGrid } from './layoutGrid';
@@ -288,7 +288,7 @@ export default function PlannerPanel({ design, selectedId, onSelect, furnitureRe
           {selected.imageUrl && <FurniturePhoto key={selected.imageUrl} item={selected} compact />}
           {selected.existing && furnitureRequests && <div className="rc-planner-operation">
             <div className="rc-planner-segments" role="group" aria-label={`${selected.name}の操作`}>
-              {furnitureActions.map(([action, label]) => <button key={action} type="button" aria-pressed={(furnitureRequests.operations.find(operation => operation.objectId === selected.id)?.action ?? 'keep') === action} disabled={action === 'replace' && !furnitureCategories.some(category => category === selected.category)} onClick={() => furnitureRequests.onOperationChange(selected.id, action)}>{label}</button>)}
+              {furnitureActions.map(([action, label]) => <button key={action} type="button" aria-pressed={(furnitureRequests.operations.find(operation => operation.objectId === selected.id)?.action ?? 'keep') === action} disabled={action === 'replace' && !replacementFurnitureCategories.some(category => category === selected.category)} onClick={() => furnitureRequests.onOperationChange(selected.id, action)}>{label}</button>)}
             </div>
           </div>}
           <dl className="rc-planner-size">

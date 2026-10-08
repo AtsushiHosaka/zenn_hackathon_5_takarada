@@ -2,7 +2,7 @@ import type { RoomDesign, RoomItem } from '../../domain/room';
 import { furniturePositionInRoom, getFurniturePlacementBounds } from './roomBounds';
 
 export function productReplacementPosition(product: RoomItem, item: RoomItem, design: RoomDesign): RoomItem['position'] | undefined {
-  const floorCategory = ['sofa', 'bed', 'desk', 'chair', 'shelf', 'table', 'rug', 'floor_lamp', 'plant', 'display_case'].includes(product.category);
+  const floorCategory = ['sofa', 'bed', 'desk', 'chair', 'shelf', 'table', 'rug', 'floor_lamp', 'plant', 'display_case', 'storage', 'tv_stand', 'wardrobe'].includes(product.category);
   const bounds = getFurniturePlacementBounds(design);
   const floor = item.position[1] - item.size[1] / 2;
   const position: RoomItem['position'] = [item.position[0], floorCategory ? product.size[1] / 2 + bounds.floor : floor + product.size[1] / 2, item.position[2]];
