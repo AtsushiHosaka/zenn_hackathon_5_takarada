@@ -236,3 +236,6 @@
 }
 
 .rc-followup-input, .rc-request-box {position:relative}
+.viewer-overlap-notice:not([hidden]){position:absolute;left:16px;right:16px;bottom:54px;z-index:3;width:fit-content;max-width:calc(100% - 32px);padding:8px 12px;border:1px solid #F87171;border-radius:8px;background:#2C1724E8;color:#FFE4E6;font-size:12px;box-sizing:border-box;max-height:48px;overflow-y:auto;overflow-wrap:anywhere;pointer-events:auto}
+
+.viewer-overlap-notice:focus-visible{outline:3px solid #BBA5EE;outline-offset:2px}
