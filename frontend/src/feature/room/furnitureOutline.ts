@@ -90,9 +90,11 @@ export function createFurnitureOutline(renderer: THREE.WebGLRenderer, scene: THR
 
 // Complete GLBs contain their furniture already; associate actual meshes using
 // node IDs/names, then uniquely contained geometry. Never outline hit boxes.
-export function completeFurnitureMeshes(root: THREE.Object3D, items: RoomItem[]): Map<string, THREE.Object3D[]> {
+export function completeFurnitureMeshes(root: THREE.Object3D, items: RoomItem[]) {
   const result = new Map<string, THREE.Object3D[]>();
-  root.updateMatrixWorld(true);
+  const wholeSubtrees = new Set<string>();
+  const ambiguous = new Set<string>();
+  root.updateWorldMatrix(true, true);
   const names = (item: RoomItem) => {
     const modelName = item.modelUrl ? new URL(item.modelUrl).pathname.split('/').pop()?.replace(/\.glb$/i, '') : undefined;
     return [item.id, THREE.PropertyBinding.sanitizeNodeName(item.id), THREE.PropertyBinding.sanitizeNodeName(item.name), modelName].filter(Boolean);
@@ -100,7 +102,7 @@ export function completeFurnitureMeshes(root: THREE.Object3D, items: RoomItem[])
   const contains = (mesh: THREE.Mesh, item: RoomItem) => {
     mesh.geometry.computeBoundingBox();
     const bounds = mesh.geometry.boundingBox;
-    if (!bounds) return false;
+    if (!bounds || mesh instanceof THREE.InstancedMesh || mesh instanceof THREE.SkinnedMesh) return false;
     const transform = new THREE.Matrix4().compose(new THREE.Vector3(...item.position), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), (item.rotation ?? 0) * Math.PI / 180), new THREE.Vector3(1, 1, 1)).invert();
     for (const x of [bounds.min.x, bounds.max.x]) for (const y of [bounds.min.y, bounds.max.y]) for (const z of [bounds.min.z, bounds.max.z]) {
       const point = new THREE.Vector3(x, y, z).applyMatrix4(mesh.matrixWorld).applyMatrix4(transform);
@@ -108,39 +110,30 @@ export function completeFurnitureMeshes(root: THREE.Object3D, items: RoomItem[])
     }
     return true;
   };
-  root.traverse(object => {
+  root.traverseVisible(object => {
     if (!(object instanceof THREE.Mesh)) return;
-    const identified = new Set<string>();
-    for (let ancestor: THREE.Object3D | null = object; ancestor && ancestor !== root; ancestor = ancestor.parent) {
-      const id = ancestor.userData.itemId ?? ancestor.userData.object_id ?? ancestor.userData.item_id;
-      for (const item of items) if ((id !== undefined && id !== null && String(id) === item.id) || names(item).includes(ancestor.name)) identified.add(item.id);
+    let explicit: RoomItem | undefined;
+    for (let ancestor: THREE.Object3D | null = object; ancestor && ancestor !== root.parent; ancestor = ancestor.parent) {
+      const identity = ancestor.userData.itemId ?? ancestor.userData.object_id ?? ancestor.userData.item_id;
+      const ids = identity === undefined || identity === null ? [] : items.filter(item => item.id === String(identity));
+      const matches = ids.length ? ids : items.filter(item => names(item).includes(ancestor.name));
+      if (matches.length === 1) {
+        explicit = matches[0];
+        if (!(ancestor instanceof THREE.Mesh)) wholeSubtrees.add(explicit.id);
+        break;
+      }
     }
-    let candidates = items.filter(item => identified.has(item.id));
-    if (candidates.length !== 1) candidates = (candidates.length ? candidates : items).filter(item => contains(object, item));
+    const candidates = explicit ? [explicit] : items.filter(item => contains(object, item));
+    if (candidates.length > 1) candidates.forEach(item => ambiguous.add(item.id));
     if (candidates.length !== 1) return;
     const id = candidates[0].id;
     result.set(id, [...(result.get(id) ?? []), object]);
   });
-  return result;
-}
-
-// A second phase checks the actual procedural/model parts, avoiding the empty
-// space under a desk top and between its legs. Joined GLBs remain conservative.
-export function renderedFurnitureBounds(objects: THREE.Object3D[]): THREE.Box3[] {
-  const result: THREE.Box3[] = [];
-  for (const object of objects) {
-    object.updateWorldMatrix(true, true);
-    object.traverseVisible(child => {
-      if (!(child instanceof THREE.Mesh)) return;
-      const materials = Array.isArray(child.material) ? child.material : [child.material];
-      if (!materials.some(surface => surface.visible && surface.colorWrite)) return;
-      const bounds = new THREE.Box3().setFromObject(child);
-      if (!bounds.isEmpty()) result.push(bounds);
-    });
-  }
-  return result;
-}
-export function furnitureMeshBoundsIntersect(a: THREE.Box3[], b: THREE.Box3[]) {
-  const epsilon = 1e-6;
-  return a.some(left => b.some(right => (['x', 'y', 'z'] as const).every(axis => left.min[axis] < right.max[axis] - epsilon && left.max[axis] > right.min[axis] + epsilon)));
+  // Keep source nodes/transforms intact. A tagged leaf or uniquely contained
+  // part cannot establish ownership of every other part of that furniture.
+  return {
+    meshes: result,
+    unmapped: items.filter(item => !result.has(item.id)).map(item => item.id),
+    partial: items.filter(item => result.has(item.id) && (!wholeSubtrees.has(item.id) || ambiguous.has(item.id))).map(item => item.id),
+  };
 }
