@@ -31,8 +31,8 @@ const roomShapes: {value:RoomShape;label:string}[]=[{value:'square',label:'正�
 const shapeLabel=(shape:RoomShape)=>roomShapes.find(item=>item.value===shape)?.label??shape;
 function existingItems(design:RoomDesign):RoomItem[] {
   const edits=design.editedItems??[];
-  const source=(design.before?.items??design.items).filter(item=>item.existing&&(!isManualFurniture(item)||design.items.some(current=>current.id===item.id)||edits.some(current=>current.id===item.id)));
-  const furniture=new Map(source.map(item=>[item.id,design.items.find(current=>current.id===item.id)??edits.find(current=>current.id===item.id)??item]));
+  const source=(design.before?.items??design.items).filter(item=>item.existing&&(!isManualFurniture(item)||design.items.some(current=>current.id===item.id||current.replacesObjectId===item.id)||edits.some(current=>current.id===item.id)));
+  const furniture=new Map(source.map(item=>[item.id,design.items.find(current=>current.id===item.id&&current.existing)??edits.find(current=>current.id===item.id&&current.existing)??item]));
   [...design.items,...edits].filter(item=>isManualFurniture(item)).forEach(item=>{if(!furniture.has(item.id))furniture.set(item.id,item);});
   return [...furniture.values()];
 }
@@ -146,12 +146,12 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
       setGenerationPhase(photos.length&&isNew&&!createNew?'uploading':'analyzing');
       const token=tokenStore.load();
       // 追加の指示のときは前回のコーデを渡し、指示に関係ない商品を残してもらう
-      const baseCoordinationId=!createNew&&followup&&design.source==='api'&&design.kind==='coordination'?design.id.replace(/^api-coordination-/,''):undefined;
+      const baseCoordinationId=!createNew&&(followup||design.editedItems?.some(item=>item.ecProductId&&!item.existing))&&design.source==='api'&&design.kind==='coordination'?design.id.replace(/^api-coordination-/,''):undefined;
       const roomId=!createNew&&!isNew&&!id.startsWith('sample-')
         ? design.backendRoomId??(loadConnection()==='dummy'&&design.id.startsWith('dummy-room-')?design.id:undefined)
         : undefined;
       const useCurrentFurniture=selectsFurniture&&!createNew;
-      const input={characterThemeId,roomPaletteId,onProgress:(phase:RoomGenerationPhase)=>{if(!controller.signal.aborted)setGenerationPhase(phase);},baseCoordinationId,photos:createNew?[]:photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId,keptObjectIds:useCurrentFurniture?existingFurniture.filter(item=>(furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep')==='keep').map(item=>item.id):undefined,furnitureOperations:useCurrentFurniture?existingFurniture.map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'})):undefined,furnitureAdditions:useCurrentFurniture?furnitureAdditions:undefined,editedItems:useCurrentFurniture?[...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))]:undefined};
+      const input={characterThemeId,roomPaletteId,onProgress:(phase:RoomGenerationPhase)=>{if(!controller.signal.aborted)setGenerationPhase(phase);},baseCoordinationId,photos:createNew?[]:photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId,keptObjectIds:useCurrentFurniture?existingFurniture.filter(item=>(furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep')==='keep').map(item=>item.id):undefined,furnitureOperations:useCurrentFurniture?existingFurniture.map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'})):undefined,furnitureAdditions:useCurrentFurniture?furnitureAdditions:undefined,editedItems:useCurrentFurniture?[...new Map([...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))].map(item=>{const original=existingFurniture.find(value=>value.id===item.id);return [item.id,original&&isManualFurniture(original)&&!item.existing?{...original,position:item.position,size:item.size,rotation:item.rotation,color:item.color,replacementEcProductId:Number(item.ecProductId)}:item] as const;})).values()]:undefined};
       const result=await (analyzeOnly?rooms.analyze(input,controller.signal):rooms.generate(input,controller.signal));
       if(controller.signal.aborted||tokenStore.load()!==token) throw new DomainError("ログイン状態が変わりました。もう一度お試しください。");
       return result;
@@ -220,10 +220,10 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
     setHistory(previous=>({past:[...previous.past,design].slice(-50),future:[]}));
     // Explicit deletion updates next.editedItems; replacement keeps the original.
     const edits=new Map((next.editedItems??[]).map(item=>[item.id,item]));
-    next.items.forEach(item=>{const previous=design.items.find(value=>value.id===item.id);if(!previous||JSON.stringify([item.position,item.rotation??0,item.size,item.color])!==JSON.stringify([previous.position,previous.rotation??0,previous.size,previous.color]))edits.set(item.id,item);});
+    next.items.forEach(item=>{const previous=design.items.find(value=>value.id===item.id);if(!previous||JSON.stringify(item)!==JSON.stringify(previous))edits.set(item.id,item);});
     const editedItems=[...edits.values()];
-    const operations=existingItems({...next,editedItems}).map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep' as const}));
-    client.setQueryData(roomPlanKeys.detail(id),{...next,editedItems,...(design.furnitureOperations?{furnitureOperations:operations,keptObjectIds:operations.filter(operation=>operation.action==='keep').map(operation=>operation.objectId)}:{})});
+    const operations=existingItems({...next,editedItems}).map(item=>({objectId:item.id,action:(next.furnitureOperations??furnitureOperations).find(operation=>operation.objectId===item.id)?.action??'keep' as const}));
+    client.setQueryData(roomPlanKeys.detail(id),{...next,editedItems,...((next.furnitureOperations||design.furnitureOperations)?{furnitureOperations:operations,keptObjectIds:operations.filter(operation=>operation.action==='keep').map(operation=>operation.objectId)}:{})});
   }
   function moveItem(itemId:string, position:RoomItem['position']) {
     if(!editing||before||(design.modelUrl&&design.modelKind!=='shell'))return;
@@ -255,11 +255,13 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   function undo() {
     const previous=history.past.at(-1);if(!previous)return;
     client.setQueryData(roomPlanKeys.detail(id),previous);
+    setFurnitureOperations(previous.furnitureOperations??existingItems(previous).map(item=>({objectId:item.id,action:'keep'})));
     setHistory({past:history.past.slice(0,-1),future:[design,...history.future]});
   }
   function redo() {
     const next=history.future[0];if(!next)return;
     client.setQueryData(roomPlanKeys.detail(id),next);
+    setFurnitureOperations(next.furnitureOperations??existingItems(next).map(item=>({objectId:item.id,action:'keep'})));
     setHistory({past:[...history.past,design].slice(-50),future:history.future.slice(1)});
   }
   function saveEdits() {
@@ -321,7 +323,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
             {canCoordinate&&analyzed?null:canCoordinate?<form className="rc-followup-composer" onSubmit={followup}><FollowupModePicker value={followupMode} onChange={setFollowupMode} canModify={canModify}/><div className="rc-followup-input">{!analysisMode&&<button type="button" aria-label="写真を追加" onClick={()=>upload.current?.click()}><ReferenceSvg page={5} index={10}/></button>}<label className="rc-sr-only" htmlFor="res-msg">メッセージ</label><textarea id="res-msg" rows={1} placeholder="変えたいところを伝えてください" value={message} maxLength={analysisMode?500:2000} onChange={event=>setMessage(event.target.value)}/><button type="submit" aria-label="送信" ><ReferenceSvg page={5} index={11}/></button></div>{photoError&&<p className="rc-error" role="alert">{photoError}</p>}</form>:<div className="rc-followup-composer rc-analysis-note">コーディネートは利用できません。</div>}
           </>}
         </section>
-        {isNew?<EmptyScene/>:<RoomScene key={design.id} design={design} panel={panel} before={before} filter={filter} selectedId={selectedId} referenceLayout={referenceLayout} editing={editing} view={view} dimensions={dimensions} onSelect={value=>{setSelectedId(value);setPanel(true);setFilter('all');const item=design.items.find(item=>item.id===value);if(analyzed||item?.existing){setEditing(true);setBefore(false);}}} onBefore={value=>{setPlacementItem(null);setBefore(value);}} onMoveItem={moveItem} placementItem={placementItem} onPlaceItem={position=>{if(placementItem)addItem(placementItem,position);}} onOpenPanel={()=>{setPanel(true);if(analyzed)setEditing(true);}}>{panel&&(editing?<PlannerPanel onAddItem={addItem} onDragItem={startPlacement} onRemoveItem={removeItem} placementDisabled={placementDisabled} placementHint={before?'Afterに切り替えると家具を追加できます。':undefined} design={design} selectedId={selectedId} onSelect={setSelectedId} furnitureRequests={selectsFurniture?{existingItems:existingFurniture,operations:furnitureOperations,additions:furnitureAdditions,onOperationChange:(objectId,action)=>setFurnitureOperations(previous=>[...previous.filter(operation=>operation.objectId!==objectId),{objectId,action}]),onAdditionsChange:setFurnitureAdditions}:undefined} onChange={editDesign} onUndo={undo} onRedo={redo} canUndo={history.past.length>0} canRedo={history.future.length>0} dirty={dirty} onSave={saveEdits} onClose={()=>{setPlacementItem(null);setEditing(false);setPanel(false);}} onProducts={()=>{setPlacementItem(null);setEditing(false);}} view={view} onView={setView} dimensions={dimensions} onDimensions={setDimensions}/>:<RecommendationPanel onEditLayout={()=>{setEditing(true);setBefore(false);}} searchEntryPoints={design.searchEntryPoints} originalItems={design.before?.items} items={additions} selectedId={selectedId} filter={filter} onSelect={setSelectedId} onFilter={setFilter} onClose={()=>setPanel(false)}/>)}</RoomScene>}
+        {isNew?<EmptyScene/>:<RoomScene key={design.id} design={design} panel={panel} before={before} filter={filter} selectedId={selectedId} referenceLayout={referenceLayout} editing={editing} view={view} dimensions={dimensions} onSelect={value=>{setSelectedId(value);setPanel(true);setFilter('all');const item=design.items.find(item=>item.id===value);if(analyzed||item){setEditing(true);setBefore(false);}}} onBefore={value=>{setPlacementItem(null);setBefore(value);}} onMoveItem={moveItem} placementItem={placementItem} onPlaceItem={position=>{if(placementItem)addItem(placementItem,position);}} onOpenPanel={()=>{setPanel(true);if(analyzed)setEditing(true);}}>{panel&&(editing?<PlannerPanel onAddItem={addItem} onDragItem={startPlacement} onRemoveItem={removeItem} placementDisabled={placementDisabled} placementHint={before?'Afterに切り替えると家具を追加できます。':undefined} design={design} selectedId={selectedId} onSelect={setSelectedId} furnitureRequests={selectsFurniture?{existingItems:existingFurniture,operations:furnitureOperations,additions:furnitureAdditions,onOperationChange:(objectId,action)=>setFurnitureOperations(previous=>[...previous.filter(operation=>operation.objectId!==objectId),{objectId,action}]),onAdditionsChange:setFurnitureAdditions}:undefined} onChange={editDesign} onUndo={undo} onRedo={redo} canUndo={history.past.length>0} canRedo={history.future.length>0} dirty={dirty} onSave={saveEdits} onClose={()=>{setPlacementItem(null);setEditing(false);setPanel(false);}} onProducts={()=>{setPlacementItem(null);setEditing(false);}} view={view} onView={setView} dimensions={dimensions} onDimensions={setDimensions}/>:<RecommendationPanel onEditLayout={()=>{setEditing(true);setBefore(false);}} searchEntryPoints={design.searchEntryPoints} originalItems={design.before?.items} items={additions} selectedId={selectedId} filter={filter} onSelect={setSelectedId} onFilter={setFilter} onClose={()=>setPanel(false)}/>)}</RoomScene>}
       </>}
     </div>
     {notice&&<div className="rc-notice" role="status">{notice}<button type="button" aria-label="通知を閉じる" onClick={()=>setNotice('')}>×</button></div>}

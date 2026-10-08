@@ -1,7 +1,7 @@
 import { useState, type DragEvent } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRepositories } from '../../core/repositories';
-import { isManualFurniture, furnitureCategories, type FurnitureAddition, type FurnitureCategory, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
+import { isManualFurniture, furnitureCategories, replacementFurnitureCategories, productCategories, type FurnitureAddition, type FurnitureCategory, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
 import ErrorText from '../shared/ErrorText';
 import { downloadShoppingCsv } from './exports';
 import { LAYOUT_GRID_STEP, snapToLayoutGrid } from './layoutGrid';
@@ -10,8 +10,14 @@ import { getFurniturePlacementBounds, furniturePositionInRoom, snapFurnitureEdit
 import ImageGoodsPalette from './ImageGoodsPalette';
 import './planner.css';
 import FurnitureSearchPanel from './FurnitureSearchPanel';
+import { productReplacementPosition } from './productReplacement';
 
 export type PlannerView = 'perspective' | 'top' | 'front';
+
+function isProductCategory(category: string) {
+  const aliases: Record<string, string> = { lamp: 'floor_lamp', artwork: 'wall_art', cover: 'bed_cover' };
+  return productCategories.some(value => value === (aliases[category] ?? category));
+}
 
 type PlannerPanelProps = {
   design: RoomDesign;
@@ -276,10 +282,21 @@ export default function PlannerPanel({ design, selectedId, onSelect, furnitureRe
           {selectableItems.map(item => <option key={item.id} value={item.id}>{item.name}{item.existing ? '（今ある家具）' : ''}</option>)}
         </select>
         {selected && <>
+          {isProductCategory(selected.category) && <FurnitureSearchPanel key={`${selected.id}:${selected.productMetadata?.variantId ?? selected.productUrl ?? selected.name}`} replacementTarget={selected} design={design} disabled={itemDisabled} onAddItem={product => {
+            const position = productReplacementPosition(product, selected, design);
+            if (!position) return;
+            const { ecProductId, ...details } = product;
+            const replacement: RoomItem = { ...details, id: selected.id, existing: false, position, rotation: selected.rotation, marker: selected.marker, ...((selected.replacesObjectId || selected.existing) ? { replacesObjectId: selected.replacesObjectId ?? selected.id } : {}), ecProductId, ...(!isManualFurniture(selected) ? { productId: String(1_000_000_000 + Number(ecProductId)) } : {}) };
+            const originalId = selected.replacesObjectId ?? (selected.existing ? selected.id : undefined);
+            if (originalId && furnitureRequests) furnitureRequests.onOperationChange(originalId, 'replace');
+            const operations = design.furnitureOperations ?? furnitureRequests?.operations ?? (design.before?.items ?? design.items).filter(item => item.existing).map(item => ({ objectId: item.id, action: 'keep' as const }));
+            const nextOperations: FurnitureOperation[] = originalId ? [...operations.filter(operation => operation.objectId !== originalId), { objectId: originalId, action: 'replace' }] : operations;
+            onChange({ ...design, ...(selected.existing && !design.before && design.room ? { before: { room: design.room, items: design.items, wallColor: design.wallColor } } : {}), items: design.items.map(item => item.id === selected.id ? replacement : item), ...(originalId ? { furnitureOperations: nextOperations, keptObjectIds: nextOperations.filter(operation => operation.action === 'keep').map(operation => operation.objectId) } : {}) });
+          }} />}
           {selected.imageUrl && <FurniturePhoto key={selected.imageUrl} item={selected} compact />}
           {selected.existing && furnitureRequests && <div className="rc-planner-operation">
             <div className="rc-planner-segments" role="group" aria-label={`${selected.name}の操作`}>
-              {furnitureActions.map(([action, label]) => <button key={action} type="button" aria-pressed={(furnitureRequests.operations.find(operation => operation.objectId === selected.id)?.action ?? 'keep') === action} disabled={action === 'replace' && !furnitureCategories.some(category => category === selected.category)} onClick={() => furnitureRequests.onOperationChange(selected.id, action)}>{label}</button>)}
+              {furnitureActions.map(([action, label]) => <button key={action} type="button" aria-pressed={(furnitureRequests.operations.find(operation => operation.objectId === selected.id)?.action ?? 'keep') === action} disabled={action === 'replace' && !replacementFurnitureCategories.some(category => category === selected.category)} onClick={() => furnitureRequests.onOperationChange(selected.id, action)}>{label}</button>)}
             </div>
           </div>}
           <dl className="rc-planner-size">
@@ -313,11 +330,12 @@ export default function PlannerPanel({ design, selectedId, onSelect, furnitureRe
         {selected && <p className="rc-planner-coordinate">現在の角度 {selected.rotation ?? 0}°</p>}
       </fieldset>
       <fieldset className="rc-planner-section" disabled={itemDisabled}>
-        <legend>家具の色</legend>
+        <legend>3Dプレビューの家具の色</legend>
         <div className="rc-planner-swatches" role="group" aria-label="家具の色を選ぶ">
           {itemColors.map(([color, label]) => <button key={color} type="button" aria-label={`家具を${label}にする`} title={label} aria-pressed={selected?.color.toUpperCase() === color.toUpperCase()} style={{ backgroundColor: color }} onClick={() => changeItem({ color })} />)}
         </div>
       </fieldset>
+      {selected?.productUrl && <p className="rc-planner-note">プレビューの色変更は販売中の色違いを選ぶ操作ではありません。商品の色違いは上の検索で選んでください。</p>}
       <fieldset className="rc-planner-section" disabled={completeModel}>
         <legend>壁の色</legend>
         <div className="rc-planner-swatches" role="group" aria-label="壁の色を選ぶ">
@@ -338,7 +356,7 @@ export default function PlannerPanel({ design, selectedId, onSelect, furnitureRe
     </div>
     <div className="rc-planner-footer">
       <button type="button" className="rc-primary" disabled={!dirty} onClick={onSave}>変更を保存</button>
-      {design.kind !== 'analysis' && <div><button type="button" className="rc-secondary" onClick={onProducts}>アイテムを見る</button><button type="button" className="rc-secondary" onClick={() => downloadShoppingCsv(design.items, design.title)}>購入リストCSV</button></div>}
+      {(design.kind !== 'analysis' || design.items.some(item => !item.existing)) && <div><button type="button" className="rc-secondary" onClick={onProducts}>アイテムを見る</button><button type="button" className="rc-secondary" onClick={() => downloadShoppingCsv(design.items, design.title)}>購入リストCSV</button></div>}
     </div>
   </aside>;
 }
