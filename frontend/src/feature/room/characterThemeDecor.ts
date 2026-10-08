@@ -38,6 +38,10 @@ export function buildCharacterThemeDecor(design: RoomDesign): THREE.Group | unde
     addShape(new THREE.ShapeGeometry(shape), x, y);
   };
   switch (theme.motif) {
+    case 'paw':
+      circle(.16, 0, -.09);
+      for (const [x, y] of [[-.2, .07], [-.075, .2], [.075, .2], [.2, .07]]) circle(.065, x, y);
+      break;
     case 'music':
       for (const x of [-.23, .23]) {
         circle(.075, x - .06, -.12);
