@@ -16,7 +16,7 @@ function AdditionRow({row,index,currentIndex,onExit,onChange,onRemove}:RowProps)
     <button type="button" className="rc-secondary" aria-label={`追加家具${currentIndex+1}を削除`} onClick={onRemove}>削除</button>
   </div>:null;
 }
-export default function FurnitureAdditionRows({values,onChange}:{values:FurnitureAddition[];onChange:(values:FurnitureAddition[])=>void}) {
+export default function FurnitureAdditionRows({values,onChange,onEmptyRemove}:{values:FurnitureAddition[];onChange:(values:FurnitureAddition[])=>void;onEmptyRemove:()=>void}) {
   const [previous,setPrevious] = useState(values);
   const [rows,setRows] = useState<Row[]>(()=>values.map(value=>({value,active:true})));
   const host = useRef<HTMLDivElement>(null);
@@ -34,6 +34,7 @@ export default function FurnitureAdditionRows({values,onChange}:{values:Furnitur
     const focus = values[index+1]??values[index-1];
     onChange(values.filter(value=>value.uiId!==id));
     if (focus) host.current?.querySelector<HTMLSelectElement>(`[data-addition-id="${focus.uiId}"] select`)?.focus({preventScroll:true});
+    else onEmptyRemove();
   }
   return <div ref={host}>{rows.map((row,index)=><AdditionRow key={row.value.uiId} row={row} index={index} currentIndex={values.findIndex(value=>value.uiId===row.value.uiId)} onExit={removeExited}
     onChange={category=>onChange(values.map(value=>value.uiId===row.value.uiId?{...value,category:furnitureCategories.find(candidate=>candidate===category)??value.category}:value))} onRemove={()=>remove(row.value.uiId)}/>)}</div>;
