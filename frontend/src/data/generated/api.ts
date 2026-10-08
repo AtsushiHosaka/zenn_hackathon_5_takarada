@@ -567,7 +567,7 @@ export interface paths {
         put?: never;
         /**
          * 部屋を登録して解析を始める
-         * @description 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ
+         * @description template_sceneを指定すると、保存した配置からreadyの部屋を別IDで作成する。モデルURLは受け付けない。写真との併用は不可。省略時の解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ
          */
         post: {
             parameters: {
@@ -582,7 +582,7 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description 登録に成功 (status: analyzing) */
+                /** @description 登録に成功 (通常はanalyzing、テンプレートはready) */
                 201: {
                     headers: {
                         [name: string]: unknown;
@@ -1245,6 +1245,12 @@ export interface components {
              */
             upload_url: string;
         };
+        /** @description 保存した部屋の配置をコピーする。外部モデルURLは受け付けず、モデルはサーバーで選ぶ */
+        RoomTemplateScene: {
+            room: components["schemas"]["RoomShape"];
+            /** @description sourceはexisting、model_urlはnull。IDは64文字以内、家具名は100文字以内 */
+            objects: components["schemas"]["SceneObject"][];
+        };
         RoomInput: {
             room: {
                 /**
@@ -1258,6 +1264,7 @@ export interface components {
                  * @enum {string}
                  */
                 shape: "square" | "standard" | "long";
+                template_scene?: components["schemas"]["RoomTemplateScene"];
                 /**
                  * @description POST /api/v1/uploads で得た key。アップロード済みのものだけ受け付ける。省略すると写真なしで解析する
                  * @example []
