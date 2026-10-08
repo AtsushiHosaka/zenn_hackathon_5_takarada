@@ -18,7 +18,7 @@ function SavedRoomViewer({ design }: { design: RoomDesign }) {
   if (models.error || ready === false) return <PreviewPlaceholder failed/>;
   return <>
     {(models.loading || ready === null) && <PreviewPlaceholder/>}
-    {!models.loading && <div className={`room-list-live-model${ready ? ' is-ready' : ''}`}><Suspense fallback={null}>
+    {!models.loading && <div className={`room-list-live-model${ready ? ' is-ready motion-fade' : ''}`}><Suspense fallback={null}>
       <RoomViewer design={models.design} selectedItemId={null} onSelectItem={ignoreSelection} view="perspective" resetKey={0} preview onReady={setReady}/>
     </Suspense></div>}
   </>;
