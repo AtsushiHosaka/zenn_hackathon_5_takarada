@@ -1,7 +1,7 @@
 import { useState, type DragEvent } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRepositories } from '../../core/repositories';
-import { isManualFurniture, isTemplateFurniture, replacementFurnitureCategories, productCategories, type ManualFurnitureCategory, type FurnitureAddition, type FurnitureCategory, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
+import { isManualFurniture, isTemplateFurniture, replacementFurnitureCategories, productCategories, type ManualFurnitureCategory, type FurnitureAddition, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
 import ErrorText from '../shared/ErrorText';
 import FurnitureAdditionRows from './FurnitureAdditionRows';
 import { downloadShoppingCsv } from './exports';
