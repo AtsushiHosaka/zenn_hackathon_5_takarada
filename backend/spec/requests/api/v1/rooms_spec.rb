@@ -5,20 +5,25 @@ RSpec.describe "Api::V1::Rooms", type: :request do
   let(:Authorization) { bearer_token_for(current) }
 
   path "/api/v1/rooms" do
-    get "本人の保存済みの部屋を一覧で取得する" do
+    get "本人の部屋一覧を取得する" do
       tags "Rooms"
-      description "作成日時の降順。解析中・失敗した部屋も含み、各部屋に最後に成功した提案を返す"
+      description "本人の部屋をIDの降順で返す。部屋がない場合は空の配列を返す。解析中・失敗した部屋も含み、各部屋に最後に成功した提案を返す。"
       security [ { bearerAuth: [] } ]
       produces "application/json"
 
-      response "200", "本人の部屋一覧" do
+      response "200", "部屋一覧" do
         schema type: :array, items: { "$ref" => "#/components/schemas/Room" }
 
-        let!(:room) { current.rooms.create!(tatami: 6, shape: "standard") }
-        before { create(:user).rooms.create!(tatami: 8, shape: "square") }
+        let!(:older_room) { current.rooms.create!(tatami: 6, shape: "standard") }
+        let!(:newer_room) { current.rooms.create!(tatami: 8, shape: "square") }
+
+        before do
+          create(:user).rooms.create!(tatami: 6, shape: "standard")
+          Room.create!(tatami: 6, shape: "standard")
+        end
 
         run_test! do |response|
-          expect(JSON.parse(response.body).pluck("id")).to eq([ room.id ])
+          expect(JSON.parse(response.body).map { |room| room.fetch("id") }).to eq([ newer_room.id, older_room.id ])
         end
       end
 
