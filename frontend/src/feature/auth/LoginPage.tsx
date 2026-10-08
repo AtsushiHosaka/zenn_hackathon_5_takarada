@@ -69,7 +69,7 @@ export default function LoginPage() {
         <ConnectionSwitch />
         {session.status === 'loading' && <p role="status">ログイン状態を確認しています…</p>}
         {session.status === 'error' && <div><ErrorText error={session.error} /><button className="reference-auth-secondary" type="button" onClick={session.retry}>ログイン状態を再確認</button></div>}
-        <div className="reference-auth-heading"><h1>{isSignup ? 'アカウントを作成' : 'おかえりなさい'}</h1><p>{isSignup ? 'メールアドレスで登録できます。' : 'ルームの続きから始めましょう。'}</p></div>
+        <div className="reference-auth-heading"><h1>{isSignup ? 'アカウントを作成' : 'おかえりなさい'}</h1></div>
         <form className="reference-auth-form" onSubmit={submit} aria-busy={pending}>
           {isSignup && <div className="reference-auth-field"><label htmlFor="su-name">ニックネーム</label><input id="su-name" type="text" autoComplete="nickname" placeholder="ルームに表示される名前" value={name} onChange={(event) => { setName(event.target.value); setValidation(null); signup.reset(); }} disabled={pending} required maxLength={50} /></div>}
           <div className="reference-auth-field"><label htmlFor={`${id}-email`}>メールアドレス</label><input id={`${id}-email`} type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(event) => { setEmail(event.target.value); resetAuth(); }} disabled={pending} required /></div>

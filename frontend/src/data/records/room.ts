@@ -1,12 +1,38 @@
 import { DomainError } from "../../domain/error";
 import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
-import { furnitureCategories, isRoomDesign, isRoomShape, isTextureStatus } from "../../domain/room";
+import { furnitureCategories, isManualFurniture, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
 import type { components } from "../generated/api";
 
 export type AnalysisRoomRecord = components["schemas"]["Room"];
 export type CoordinationRecord = components["schemas"]["Coordination"];
 
 export type UploadRecord = components["schemas"]["Upload"];
+
+export function toImportedFurniture(value: unknown, baseUrl: string): RoomItem {
+  const record = object(value, "FurnitureImport");
+  const category = furnitureCategories.find(category => category === record.category);
+  if (!category) invalid("FurnitureImport.category");
+  const size = sizeRecord(record.size);
+  const match = record.model_match == null ? undefined : modelMatchRecord(record.model_match);
+  const item: RoomItem = {
+    id: `manual-${crypto.randomUUID()}`, existing: true,
+    ecProductId: String(integer(record.ec_product_id, "ec_product_id")),
+    name: text(record.name, "FurnitureImport.name"), category,
+    color: hexColor(record.color, "FurnitureImport.color"),
+    size: [size.w, size.h, size.d], position: [0, size.h / 2, 0], rotation: 0,
+    price: nonnegativeInteger(record.price, "FurnitureImport.price"),
+    shop: text(record.shop, "FurnitureImport.shop"),
+    productUrl: url(text(record.url, "FurnitureImport.url"), baseUrl),
+    imageUrl: url(record.image_url, baseUrl),
+    productMetadata: productMetadata(record.product_metadata, baseUrl),
+    modelUrl: url(record.model_url, baseUrl),
+    modelMatch: match && { modelId: String(match.model_id), reason: match.reason, approximate: match.approximate },
+    modelSize: record.model_size == null ? undefined : sizeRecord(record.model_size),
+    modelFit: record.model_fit == null ? undefined : containFit(record.model_fit),
+  };
+  if (!isRoomItem(item)) invalid("FurnitureImport");
+  return item;
+}
 
 // 発行されたアップロード先。枚数が合わないとFileとkeyの対応が崩れるので数も見る
 export function toUploadRecords(value: unknown, expected: number): UploadRecord[] {
@@ -69,12 +95,13 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
   const record = toCoordinationRecord(value);
   if (record.status !== "done" || !record.before_scene || !record.after_scene || !record.title || !record.comment) throw new DomainError("コーディネートはまだ完了していません");
   const after = sceneSnapshot(record.after_scene, baseUrl);
+  const before = sceneSnapshot(record.before_scene, baseUrl);
   const design: RoomDesign = {
     source: "api",
     kind: "coordination",
     id: `api-coordination-${record.id}`,
     title: record.title,
-    description: `${record.comment} ${record.product_source === "ec" ? "ECで確認した商品の参考価格です。商品価格の合計は送料別です。" : "商品情報は静的な参考データです。"} 価格・在庫・仕様は購入先でご確認ください。3Dの形・色・寸法は近似で、通路や扉の開閉は未確認です。`,
+    description: record.comment,
     ...(record.planned_by ? { generatedBy: record.planned_by } : {}),
     style: record.title === "ラベンダーの推し活ルーム" ? "oshi" : record.title === "グリーンが映えるボタニカルルーム" ? "botanical" : "natural",
     ...after,
@@ -89,11 +116,12 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
         price: product.price,
         shop: productShopLabel(product.shop, product.url),
         productUrl: url(product.url, baseUrl),
-        imageUrl: record.product_source === "ec" && !metadata?.imageDisplayAllowed ? undefined : url(product.image_url, baseUrl),
+        imageUrl: url(product.image_url, baseUrl),
         productMetadata: metadata,
       };
     }),
-    before: sceneSnapshot(record.before_scene, baseUrl),
+    before,
+    editedItems: before.items.filter(isManualFurniture),
     backendRoomId: String(record.room_id),
     analysisInput,
     prompt: record.prompt,
@@ -240,8 +268,15 @@ function materialOverridesRecord(value: unknown) {
 }
 
 function sceneProductDetails(item: components["schemas"]["SceneObject"], baseUrl: string): Partial<RoomItem> {
-  // Beforeと既存家具には商品の生成素材を適用しない。
-  if (item.source === "existing") return {};
+  // リンクから追加した家具は出典と近似モデルをBeforeにも引き継ぐ。
+  if (item.source === "existing") return item.ec_product_id == null ? {} : {
+    ecProductId: String(item.ec_product_id),
+    price: item.price ?? undefined, shop: item.shop ?? undefined,
+    productUrl: url(item.url, baseUrl), productMetadata: productMetadata(item.product_metadata, baseUrl),
+    imageUrl: url(item.image_url, baseUrl),
+    modelMatch: item.model_match == null ? undefined : { modelId: String(item.model_match.model_id), reason: item.model_match.reason, approximate: item.model_match.approximate },
+    modelSize: item.model_size ?? undefined, modelFit: item.model_fit ?? undefined,
+  };
   const materialOverrides: MaterialOverrides | undefined = item.material_overrides == null ? undefined : Object.fromEntries(Object.entries(item.material_overrides).map(([name, override]) => [name, {
     textureUrl: url(override.texture_url, baseUrl), tileSizeM: override.tile_size_m ?? undefined, color: override.color ?? undefined,
   }]));
@@ -339,9 +374,7 @@ export function toAnalyzedRoomDesign(value: unknown, baseUrl: string): RoomDesig
     kind: "analysis",
     id: `api-room-${record.id}`,
     title: `${record.tatami}畳の部屋`,
-    description: record.analyzed_by === "gemini"
-      ? "写真をAI (Gemini) で解析し、家具の種類・色・おおよその位置を読み取りました。部屋の寸法は畳数と形から作っています。"
-      : "畳数と形から作成した部屋の解析モックです。写真の解析は行っていません。",
+    description: `${record.tatami}畳の部屋を作成しました。`,
     ...(record.analyzed_by ? { generatedBy: record.analyzed_by } : {}),
     style: "natural",
     wallColor: room.wall_color,
@@ -422,6 +455,12 @@ function analysisObject(value: unknown): components["schemas"]["SceneObject"] {
     model_size: record.model_size == null ? undefined : sizeRecord(record.model_size),
     model_fit: record.model_fit == null ? undefined : containFit(record.model_fit),
     replaces_object_id: record.replaces_object_id == null ? undefined : text(record.replaces_object_id, "SceneObject.replaces_object_id"),
+    ec_product_id: record.ec_product_id == null ? undefined : integer(record.ec_product_id, "SceneObject.ec_product_id"),
+    price: record.price == null ? undefined : nonnegativeInteger(record.price, "SceneObject.price"),
+    shop: record.shop == null ? undefined : text(record.shop, "SceneObject.shop"),
+    url: record.url == null ? undefined : text(record.url, "SceneObject.url"),
+    image_url: record.image_url == null ? undefined : text(record.image_url, "SceneObject.image_url"),
+    product_metadata: record.product_metadata == null ? undefined : object(record.product_metadata, "SceneObject.product_metadata"),
   };
 }
 

@@ -12,15 +12,15 @@ type RoomGeneratingProps = {
 };
 
 const sampleSteps = [
-  { title: 'サンプルの部屋モデルを準備', detail: '約6畳の洋室の配置例', state: 'done' },
-  { title: 'サンプルの家具を準備', detail: 'ベッド、デスク、チェア、モニター、ローテーブルの配置例', state: 'done' },
-  { title: 'サンプルの表示を準備しています', detail: '「推し活 × パープル」のコーディネート例', state: 'active' },
+  { title: '部屋を準備', state: 'done' },
+  { title: '家具を準備', state: 'done' },
+  { title: '表示を準備', state: 'active' },
   { title: '商品リンクの例を表示', state: 'pending' },
-  { title: 'サンプルの3Dプレビューを表示', state: 'pending' },
+  { title: '3Dプレビューを表示', state: 'pending' },
 ];
 
 const apiSteps = [
-  { title: 'APIからの応答を待っています', detail: '処理状況はまだ届いていません', state: 'active' },
+  { title: '生成中', state: 'active' },
   { title: '部屋と家具の解析結果を受信', state: 'pending' },
   { title: 'コーディネート結果を受信', state: 'pending' },
   { title: '3Dモデルと商品リンクを受信', state: 'pending' },
@@ -48,9 +48,9 @@ function PhotoPreview({ file }: { file: File }) {
 
 export default function RoomGenerating({ prompt, photos, sample, dimensions = false, coordination = true, onCancel }: RoomGeneratingProps) {
   const steps = dimensions ? [
-    { title: sample ? '部屋のモックを準備しています' : '部屋の解析結果を待っています', detail: sample ? '畳数と部屋の形から、実寸のシーンを作ります' : '写真があればAIが家具を読み取り、畳数と形から実寸のシーンを作ります', state: 'active' },
-    ...(coordination ? [{ title: '希望と予算に合わせた提案を受信', detail: sample ? '商品選定はモックです' : 'AIが希望文に合う商品を選びます', state: 'pending' }] : []),
-    { title: '家具と窓を3Dプレビューに表示', detail: sample ? '写真の解析は行いません' : '家具の位置はおおよそです', state: 'pending' },
+    { title: '部屋を準備', state: 'active' },
+    ...(coordination ? [{ title: 'コーディネートを受信', state: 'pending' }] : []),
+    { title: '3Dプレビューを表示', state: 'pending' },
   ] : sample ? sampleSteps : apiSteps;
   return <>
     <section aria-label="チャット" className="room-generating-chat">
@@ -66,11 +66,10 @@ export default function RoomGenerating({ prompt, photos, sample, dimensions = fa
           <span className="room-generating-assistant-icon"><ReferenceSvg page={4} index={6} /></span>
           <div className="room-generating-assistant-content">
             <span className="room-generating-assistant-name">へやいろ</span>
-            <p>{dimensions ? sample ? '畳数と形から、部屋のモックを準備しています。' : '部屋の広さと形を送信しました。APIからの結果を待っています。' : sample ? 'サンプルルームを準備しています。写真の解析は行っていません。' : 'リクエストを送信しました。APIからの結果を待っています。'}</p>
             <ol className="room-generating-steps" aria-label={sample ? 'サンプルの準備状況' : 'APIへのリクエスト状況'}>
               {steps.map((step, index) => <li key={step.title} className={`room-generating-step room-generating-step-${step.state}`}>
                 <span className="room-generating-step-icon">{step.state === 'done' && <ReferenceSvg page={4} index={index === 0 ? 7 : 8} />}</span>
-                <div><span>{step.title}</span>{step.detail && <span>{step.detail}</span>}</div>
+                <div><span>{step.title}</span></div>
               </li>)}
             </ol>
           </div>
@@ -79,7 +78,7 @@ export default function RoomGenerating({ prompt, photos, sample, dimensions = fa
       <form className="room-generating-composer" onSubmit={event => event.preventDefault()}>
         <div>
           <label htmlFor="gen-msg">メッセージ</label>
-          <textarea id="gen-msg" rows={1} disabled placeholder={sample ? '準備が終わると、続けて相談できます' : '生成が終わると、続けて相談できます'} />
+          <textarea id="gen-msg" rows={1} disabled placeholder="生成中" />
           <button type="button" onClick={onCancel}><ReferenceSvg page={4} index={9} />停止</button>
         </div>
       </form>
@@ -87,7 +86,6 @@ export default function RoomGenerating({ prompt, photos, sample, dimensions = fa
     <section aria-label="3Dプレビュー" className="room-generating-stage">
       <div className="room-generating-stage-tags">
         <span><ReferenceSvg page={4} index={10} />{sample ? 'サンプルルーム' : 'プレビュー例'}</span>
-        {sample && !dimensions && <span>家具5点の配置例</span>}
       </div>
       <div className="room-generating-scene-wrap">
         <div className="room-generating-scene">
@@ -99,7 +97,7 @@ export default function RoomGenerating({ prompt, photos, sample, dimensions = fa
         </div>
       </div>
       <div className="room-generating-status" role="status" aria-live="polite">
-        <div><span>{sample ? 'サンプル準備中' : 'APIの応答を待っています'}</span><span>{sample && !dimensions ? <><strong>3</strong> / 5 ステップ</> : '処理状況を確認中'}</span></div>
+        <div><span>{sample ? 'サンプル準備中' : '生成中'}</span><span>{sample && !dimensions ? <><strong>3</strong> / 5 ステップ</> : '処理状況を確認中'}</span></div>
         <div className="room-generating-progress" role="progressbar" aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={sample && !dimensions ? 3 : undefined} aria-label={sample ? 'サンプルの準備状況' : 'APIからの応答待ち'}><div className={sample && !dimensions ? undefined : 'room-generating-progress-waiting'} /></div>
       </div>
     </section>

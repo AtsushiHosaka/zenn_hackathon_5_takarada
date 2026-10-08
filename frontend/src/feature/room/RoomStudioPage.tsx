@@ -3,13 +3,15 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { useRepositories } from '../../core/repositories';
 import { loadConnection } from '../../core/connection';
-import { furnitureCategories, type FurnitureAddition, type FurnitureCategory, type FurnitureOperation, type RoomDesign, type RoomItem, type RoomShape, type Style } from '../../domain/room';
+import { isManualFurniture, furnitureCategories, type FurnitureAddition, type FurnitureCategory, type FurnitureOperation, type RoomDesign, type RoomItem, type RoomShape, type Style } from '../../domain/room';
 import AccountMenu from './AccountMenu';
 import ReferenceSvg from './ReferenceSvg';
 import RoomScene from './RoomScene';
 import RecommendationPanel from './RecommendationPanel';
 import RoomGenerating from './RoomGenerating';
 import PlannerPanel, { type PlannerView } from './PlannerPanel';
+import { furniturePositionInRoom } from './roomBounds';
+import { roomDescription } from './roomDescription';
 import { roomPlanKeys as sharedRoomPlanKeys, scopedRoomPlanKeys, useRoomPlanScope, saveRoomPlan, useRoomPlans } from './plans';
 import ErrorText from '../shared/ErrorText';
 import { DomainError } from '../../domain/error';
@@ -22,6 +24,13 @@ const presets=[{label:'紫色の推し活ルーム',style:'oshi',prompt:initialP
 const roomShapes: {value:RoomShape;label:string}[]=[{value:'square',label:'正方形に近い'},{value:'standard',label:'やや縦長'},{value:'long',label:'細長い'}];
 const furnitureLabels: Record<FurnitureCategory,string> = {sofa:'ソファ',bed:'ベッド',desk:'デスク',chair:'チェア',shelf:'収納棚',table:'テーブル'};
 const shapeLabel=(shape:RoomShape)=>roomShapes.find(item=>item.value===shape)?.label??shape;
+function existingItems(design:RoomDesign):RoomItem[] {
+  const edits=design.editedItems??[];
+  const source=(design.before?.items??design.items).filter(item=>item.existing&&(!isManualFurniture(item)||design.items.some(current=>current.id===item.id)||edits.some(current=>current.id===item.id)));
+  const furniture=new Map(source.map(item=>[item.id,design.items.find(current=>current.id===item.id)??edits.find(current=>current.id===item.id)??item]));
+  [...design.items,...edits].filter(item=>isManualFurniture(item)).forEach(item=>{if(!furniture.has(item.id))furniture.set(item.id,item);});
+  return [...furniture.values()];
+}
 function PhotoImage({file}:{file:File}) {
   const image=useRef<HTMLImageElement>(null);
   useEffect(()=>{const url=URL.createObjectURL(file);if(image.current)image.current.src=url;return()=>URL.revokeObjectURL(url);},[file]);
@@ -31,10 +40,10 @@ type InputStep = 'tatami' | 'shape' | 'photos' | 'request';
 const stepLabels: Record<InputStep,string> = {tatami:'広さ',shape:'形',photos:'写真',request:'希望'};
 function Intro({step,analysis}:{step:InputStep|undefined;analysis:boolean}) {
   return <div className="rc-assistant"><span className="rc-assistant-icon"><ReferenceSvg page={3} index={2}/></span><div className="rc-assistant-body" aria-live="polite"><span className="rc-assistant-name">へやいろ</span>
-    {step==='tatami'?<><p>まず、お部屋は何畳くらいですか？</p><p>広さから、一つずつ教えてください。</p></>:step==='shape'?<><p>次に、お部屋の形を教えてください。</p><p>近いものを選んでください。</p></>:step==='photos'?<><p>{analysis?'お部屋の写真はありますか？':'まず、お部屋の写真を追加してください。'}</p>{analysis&&<p>写真なしでも進められます。</p>}<div className="rc-tips"><span>撮影のコツ</span><ul className="rc-bullets"><li>部屋の四隅から、3〜4枚</li><li>床と壁の境目が写るように</li><li>照明をつけた明るい状態で</li></ul></div></>:step==='request'?<><p>どんなお部屋にしたいですか？</p><p>好みの雰囲気や、変えたいところを教えてください。</p></>:<p>入力できる項目を確認しています。</p>}
+    {step==='tatami'?<p>お部屋は何畳くらいですか？</p>:step==='shape'?<p>お部屋の形を教えてください。</p>:step==='photos'?<p>{analysis?'お部屋の写真はありますか？':'お部屋の写真を追加してください。'}</p>:step==='request'?<p>どんなお部屋にしたいですか？</p>:<p>入力できる項目を確認しています。</p>}
   </div></div>;
 }
-function EmptyScene({analysis}:{analysis:boolean}) {return <section className="rc-stage is-empty" aria-label="3Dプレビュー"><span className="rc-stage-tag"><ReferenceSvg page={3} index={11}/>3Dプレビュー</span><div className="rc-empty-art"><ReferenceSvg page={3} index={12}/></div><div className="rc-empty-copy"><p>{analysis?'広さと形を選ぶと、ここに部屋が立ち上がります':'写真を送ると、ここに部屋が立ち上がります'}</p><p>ドラッグで回転、ホイールで拡大して確認できます</p></div><ol className="rc-process">{(analysis?['広さと形を選択','部屋のモックを作成','3Dで配置を調整']:['部屋を3D化','家具を認識','アイテムを選定','部屋に配置して合成']).map((label,index)=><li key={label}><span>{index+1}</span>{label}</li>)}</ol></section>;}
+function EmptyScene() {return <section className="rc-stage is-empty" aria-label="3Dプレビュー"><span className="rc-stage-tag"><ReferenceSvg page={3} index={11}/>3Dプレビュー</span><div className="rc-empty-art"><ReferenceSvg page={3} index={12}/></div></section>;}
 function sampleDesign(base:RoomDesign,id:string):RoomDesign {
   const style:Style=id==='sample-botanical'?'botanical':id==='sample-natural'?'natural':'oshi';
   return {...base,id,style,title:style==='botanical'?'ボタニカルなワンルーム':style==='natural'?'白×木目のナチュラル':'紫の推し活ルーム',items:base.items};
@@ -64,10 +73,9 @@ export default function RoomStudioPage() {
   const analysisPrompt=`${tatami}畳・${shapeLabel(shape)}の部屋を3Dで確認したい。`;
   const [prompt,setPrompt]=useState(inputState?.prompt??(isNew?'':design.prompt??(analyzed?'':samplePrompt)));
   const [budget,setBudget]=useState(design.budget??30000);
-  const existingFurniture=(design.before?.items??design.items).filter(item=>item.existing).map(item=>design.items.find(current=>current.id===item.id)??design.editedItems?.find(edited=>edited.id===item.id)??item);
+  const existingFurniture=existingItems(design);
   const [furnitureOperations,setFurnitureOperations]=useState<FurnitureOperation[]>(()=>design.furnitureOperations??existingFurniture.map(item=>({objectId:item.id,action:'keep'})));
   const [furnitureAdditions,setFurnitureAdditions]=useState<FurnitureAddition[]>(()=>design.furnitureAdditions??[]);
-  const keptObjectIds=furnitureOperations.filter(operation=>operation.action==='keep').map(operation=>operation.objectId);
   const selectsFurniture=analysisMode&&canCoordinate&&!isNew&&design.source==='api'&&!!design.backendRoomId;
   const [message,setMessage]=useState('');
   const [style,setStyle]=useState<Style>(isNew?'oshi':design.style);
@@ -84,11 +92,13 @@ export default function RoomStudioPage() {
   const [panel,setPanel]=useState(true);
   const [editing,setEditing]=useState(inputState?.editing??analyzed);
   const [view,setView]=useState<PlannerView>(inputState?.view??'perspective');
+  const [placementItem,setPlacementItem]=useState<RoomItem|null>(null);
   const [dimensions,setDimensions]=useState(inputState?.dimensions??false);
   const [history,setHistory]=useState<{past:RoomDesign[];future:RoomDesign[]}>({past:[],future:[]});
   const [savedFingerprint,setSavedFingerprint]=useState(()=>JSON.stringify(design));
   const dirty=JSON.stringify(design)!==savedFingerprint;
   const [before,setBefore]=useState(false);
+  const placementDisabled=before||Boolean(design.modelUrl&&design.modelKind!=='shell');
   const [filter,setFilter]=useState('all');
   const [rename,setRename]=useState(false);
   const [title,setTitle]=useState(design.title);
@@ -103,7 +113,7 @@ export default function RoomStudioPage() {
       const token=tokenStore.load();
       // 追加の指示のときは前回のコーデを渡し、指示に関係ない商品を残してもらう
       const baseCoordinationId=followup&&design.source==='api'&&design.kind==='coordination'?design.id.replace(/^api-coordination-/,''):undefined;
-      const input={baseCoordinationId,photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId:!isNew&&design.source==='api'?design.backendRoomId:undefined,keptObjectIds:selectsFurniture?keptObjectIds:undefined,furnitureOperations:selectsFurniture?existingFurniture.map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'})):undefined,furnitureAdditions:selectsFurniture?furnitureAdditions:undefined,editedItems:selectsFurniture?[...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))]:undefined};
+      const input={baseCoordinationId,photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId:!isNew&&design.source==='api'?design.backendRoomId:undefined,keptObjectIds:selectsFurniture?existingFurniture.filter(item=>(furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep')==='keep').map(item=>item.id):undefined,furnitureOperations:selectsFurniture?existingFurniture.map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'})):undefined,furnitureAdditions:selectsFurniture?furnitureAdditions:undefined,editedItems:selectsFurniture?[...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))]:undefined};
       const result=await (analyzeOnly?rooms.analyze(input,controller.signal):rooms.generate(input,controller.signal));
       if(controller.signal.aborted||tokenStore.load()!==token) throw new DomainError("ログイン状態が変わりました。もう一度お試しください。");
       return result;
@@ -115,7 +125,7 @@ export default function RoomStudioPage() {
       setSavedFingerprint(JSON.stringify(saved));setHistory({past:[],future:[]});
       setFurnitureOperations(saved.furnitureOperations??(saved.before?.items??saved.items).filter(item=>item.existing).map(item=>({objectId:item.id,action:'keep'})));
       setFurnitureAdditions(saved.furnitureAdditions??[]);
-      navigate(`/rooms/${saved.id}`,{state:{prompt:result.kind==='analysis'&&canCoordinate?variables.request:saved.prompt??(result.kind==='analysis'?analysisPrompt:variables.request),photos:result.analysisInput?[]:photos,editing:result.kind==='analysis'&&!canCoordinate}});
+      navigate(`/rooms/${saved.id}`,{state:{prompt:result.kind==='analysis'&&canCoordinate?variables.request:saved.prompt??(result.kind==='analysis'?analysisPrompt:variables.request),photos:result.analysisInput?[]:photos,editing:result.kind==='analysis'}});
     },
   });
   const additions=design.items.filter(item=>!item.existing);
@@ -150,9 +160,9 @@ export default function RoomStudioPage() {
   }
   function followup(event:FormEvent) {
     event.preventDefault();if(!message.trim())return;
-    if(!canCoordinate){setNotice('希望に合わせたコーディネートと商品提案は、APIの提供待ちです。');return;}
-    if(!capability.data?.generation){setNotice('追加のコーディネートは、生成APIの提供待ちです。');return;}
-    if(loadConnection()==='dummy'&&!/予算.*[2２]|落ち着いた紫|グリーン/.test(message)){setNotice('サンプルでは、用意したスタイルと予算の変更を試せます。自由な指示での生成はAPIの提供待ちです。');return;}
+    if(!canCoordinate){setNotice('コーディネートは利用できません。');return;}
+    if(!capability.data?.generation){setNotice('コーディネートは利用できません。');return;}
+    if(loadConnection()==='dummy'&&!/予算.*[2２]|落ち着いた紫|グリーン/.test(message)){setNotice('この変更はサンプルでは利用できません。');return;}
     generation.mutate({request:`${prompt}\n${message}`,targetStyle:/グリーン/.test(message)?'botanical':style,budget:/予算.*[2２]|2万円|２万円/.test(message)?20000:budget,followup:true});
   }
   function coordinate(event:FormEvent) {
@@ -167,13 +177,35 @@ export default function RoomStudioPage() {
     setBefore(false);
     setHistory(previous=>({past:[...previous.past,design].slice(-50),future:[]}));
     const edits=new Map((design.editedItems??[]).map(item=>[item.id,item]));
-    next.items.forEach(item=>{const previous=design.items.find(value=>value.id===item.id);if(previous&&JSON.stringify([item.position,item.rotation??0,item.size,item.color])!==JSON.stringify([previous.position,previous.rotation??0,previous.size,previous.color]))edits.set(item.id,item);});
-    client.setQueryData(roomPlanKeys.detail(id),{...next,editedItems:[...edits.values()]});
+    next.items.forEach(item=>{const previous=design.items.find(value=>value.id===item.id);if(!previous||JSON.stringify([item.position,item.rotation??0,item.size,item.color])!==JSON.stringify([previous.position,previous.rotation??0,previous.size,previous.color]))edits.set(item.id,item);});
+    const editedItems=[...edits.values()].filter(item=>!isManualFurniture(item)||next.items.some(current=>current.id===item.id));
+    const operations=existingItems({...next,editedItems}).map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep' as const}));
+    client.setQueryData(roomPlanKeys.detail(id),{...next,editedItems,...(design.furnitureOperations?{furnitureOperations:operations,keptObjectIds:operations.filter(operation=>operation.action==='keep').map(operation=>operation.objectId)}:{})});
   }
   function moveItem(itemId:string, position:RoomItem['position']) {
     if(!editing||before||(design.modelUrl&&design.modelKind!=='shell'))return;
     const item=design.items.find(item=>item.id===itemId);if(!item)return;
     editDesign({...design,items:design.items.map(value=>value.id===itemId?{...value,position:[position[0],item.position[1],position[2]]}:value)});
+  }
+  function addItem(candidate:RoomItem,position?:RoomItem['position']) {
+    setPlacementItem(null);
+    if(!editing||placementDisabled)return;
+    const boundedPosition=furniturePositionInRoom(candidate,position??candidate.position,design);
+    if(!boundedPosition){setNotice('この寸法の家具は部屋に収まりません。寸法を小さくしてください。');return;}
+    const item={...candidate,id:`manual-${crypto.randomUUID()}`,position:boundedPosition};
+    editDesign({...design,items:[...design.items,item]});
+    setSelectedId(item.id);setBefore(false);
+  }
+  function startPlacement(item:RoomItem|null) {
+    if(item&&(!editing||placementDisabled))return;
+    if(item&&view==='front')setView('top');
+    setPlacementItem(item);
+  }
+  function removeItem(itemId:string) {
+    if(!editing||placementDisabled||!itemId.startsWith('manual-'))return;
+    editDesign({...design,items:design.items.filter(item=>item.id!==itemId),editedItems:(design.editedItems??[]).filter(item=>item.id!==itemId)});
+    if(selectedId===itemId)setSelectedId(null);
+    setPlacementItem(null);
   }
   function undo() {
     const previous=history.past.at(-1);if(!previous)return;
@@ -190,7 +222,7 @@ export default function RoomStudioPage() {
     try {
       saveRoomPlan(client,saved,scope);setSavedFingerprint(JSON.stringify(saved));
       if(saved.id!==id)navigate(`/rooms/${saved.id}`,{state:{prompt,photos,editing:true,view,selectedId,dimensions}});
-      else setNotice('家具の配置と色を、このブラウザに保存しました。');
+      else setNotice('保存しました。');
     }catch{setNotice('変更を保存できませんでした。ブラウザの保存容量を確認してください。');}
   }
   if(!validRoom)return <main className="room-list-main"><h1>ルームが見つかりません</h1><p>このブラウザに保存されているルームを一覧から選んでください。</p><Link to="/rooms">マイルームへ戻る</Link></main>;
@@ -204,49 +236,49 @@ export default function RoomStudioPage() {
             <div className="rc-messages is-new">{stepIndex>0&&<div className="rc-input-summary">{inputSteps.slice(0,stepIndex).map(step=><p key={step}>{step==='tatami'?`${tatami}畳`:step==='shape'?shapeLabel(shape):step==='photos'?`写真 ${photos.length||samplePhotos.length}枚`:prompt}</p>)}</div>}<Intro step={inputStep} analysis={analysisMode}/></div>
             <form className="rc-new-composer" onSubmit={start} onDragOver={event=>event.preventDefault()} onDrop={event=>{event.preventDefault();if(inputStep==='photos')addPhotos(Array.from(event.dataTransfer.files));}}>
               {inputSteps.length>0&&<ol className="rc-input-progress" aria-label="部屋の入力手順">{inputSteps.map((step,index)=><li key={step} aria-current={index===stepIndex?'step':undefined} className={index<stepIndex?'is-complete':''}><span>{index+1}</span>{stepLabels[step]}</li>)}</ol>}
-              {inputStep==='tatami'&&<div className="rc-analysis-settings"><label className="rc-setting" htmlFor="room-tatami">部屋の広さ<span className="rc-tatami-input"><input id="room-tatami" type="number" min={3} max={30} step="0.5" value={Number.isNaN(tatami)?'':tatami} onChange={event=>setTatami(event.target.valueAsNumber)} required/>畳</span></label><p className="rc-setting-note">3〜30畳で入力してください。</p></div>}
+              {inputStep==='tatami'&&<div className="rc-analysis-settings"><label className="rc-setting" htmlFor="room-tatami">部屋の広さ<span className="rc-tatami-input"><input id="room-tatami" type="number" min={3} max={30} step="0.5" value={Number.isNaN(tatami)?'':tatami} onChange={event=>setTatami(event.target.valueAsNumber)} required/>畳</span></label></div>}
               {inputStep==='shape'&&<div className="rc-analysis-settings"><fieldset><legend>部屋の形</legend><div className="rc-shape-options">{roomShapes.map(item=><button key={item.value} type="button" aria-pressed={shape===item.value} onClick={()=>setShape(item.value)}>{item.label}</button>)}</div></fieldset></div>}
-              {inputStep==='photos'&&<><div className="rc-photo-heading" title={samplePhotos.length?'サンプル写真です。追加すると選んだ写真に置き換わります。':''}><span>部屋の写真{analysisMode&&'（任意）'}</span><span><strong>{photos.length||samplePhotos.length}</strong> / 4枚</span></div>
+              {inputStep==='photos'&&<><div className="rc-photo-heading"><span>部屋の写真{analysisMode&&'（任意）'}</span><span><strong>{photos.length||samplePhotos.length}</strong> / 4枚</span></div>
               <div className="rc-photos">{photos.length?photos.map((file,index)=><div className="rc-photo" key={`${file.name}-${file.lastModified}`}><PhotoImage file={file}/><button type="button" className="rc-photo-remove" aria-label={`写真${index+1}を削除`} onClick={()=>setPhotos(old=>old.filter((_,i)=>i!==index))}><ReferenceSvg page={3} index={4}/></button></div>):samplePhotos.map(index=><div className="rc-photo" key={index} aria-label={`サンプル写真${index+1}`}><ReferenceSvg page={3} index={3+index*2}/><button type="button" className="rc-photo-remove" aria-label={`写真${index+1}を削除`} onClick={()=>setSamplePhotos(old=>old.filter(i=>i!==index))}><ReferenceSvg page={3} index={4}/></button></div>)}{(photos.length||samplePhotos.length)<4&&<button type="button" className="rc-photo-add" aria-label="写真を追加（撮影またはライブラリ）" onClick={()=>upload.current?.click()}><ReferenceSvg page={3} index={9}/>追加</button>}</div>
               </>}
               {inputStep==='request'&&<><div className="rc-presets">{presets.map((item,index)=><button type="button" key={item.label} aria-pressed={preset===index} onClick={()=>{setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</div><div className="rc-request-box"><label className="rc-sr-only" htmlFor="new-request">どんな部屋にしたいか</label><textarea id="new-request" rows={3} placeholder="例：紫色の推し活ルームにしたい" value={prompt} maxLength={2000} onChange={event=>setPrompt(event.target.value)} required/></div></>}
-              <div className="rc-input-actions">{stepIndex>0&&<button type="button" className="rc-secondary" onClick={()=>changeStep(stepIndex-1)}>戻る</button>}<button type="submit" className="rc-primary" disabled={!inputStep}>{!lastInputStep?'次へ':analysisMode?canCoordinate?'部屋を解析する':'部屋のモックを表示':'コーディネートを始める'}<ReferenceSvg page={3} index={10}/></button></div>
-              {lastInputStep&&<p className="rc-setting-note">{capability.data?.message}</p>}
+              <div className="rc-input-actions">{stepIndex>0&&<button type="button" className="rc-secondary" onClick={()=>changeStep(stepIndex-1)}>戻る</button>}<button type="submit" className="rc-primary" disabled={!inputStep}>{!lastInputStep?'次へ':analysisMode?canCoordinate?'部屋を解析する':'部屋を作成する':'コーディネートを始める'}<ReferenceSvg page={3} index={10}/></button></div>
+
               <ErrorText error={capability.error}/>
               {photoError&&<p className="rc-error" role="alert">{photoError}</p>}<ErrorText error={generation.error}/>
             </form>
           </>:<>
             <div className="rc-messages">
               <div className="rc-user-message">{!design.analysisInput&&<div className="rc-user-photos">{photos.length?photos.map(file=><div key={`${file.name}-${file.lastModified}`}><PhotoImage file={file}/></div>):[3,4,5,6].map(index=><div key={index}><ReferenceSvg page={5} index={index}/></div>)}</div>}<p>{design.kind==='analysis'&&design.analysisInput?`${design.analysisInput.tatami}畳・${shapeLabel(design.analysisInput.shape)}の部屋を3Dで確認したい。`:prompt}</p></div>
-              <div className="rc-assistant"><span className="rc-assistant-icon"><ReferenceSvg page={5} index={7}/></span><div className="rc-assistant-body"><span className="rc-assistant-name">へやいろ</span><span className="rc-complete"><ReferenceSvg page={5} index={8}/>{analyzed?design.generatedBy==='gemini'?'AIが写真から解析した部屋です':'部屋の解析モックです':design.source==='demo'?'サンプルのコーディネートです':design.generatedBy==='gemini'?'AI (Gemini) のコーディネートです':'モックAPIのコーディネートです'}</span><p>{referenceStory?'今あるベッドとデスクはそのままに、紫をアクセントにした推し活ルームにしました。':design.description}</p>
+              <div className="rc-assistant"><span className="rc-assistant-icon"><ReferenceSvg page={5} index={7}/></span><div className="rc-assistant-body"><span className="rc-assistant-name">へやいろ</span><span className="rc-complete"><ReferenceSvg page={5} index={8}/>{design.source==='demo'?'サンプル':analyzed?'解析完了':'コーディネート完了'}</span><p>{referenceStory?'今あるベッドとデスクはそのままに、紫をアクセントにした推し活ルームにしました。':roomDescription(design.description)}</p>
                 {referenceStory&&<ul className="rc-bullets"><li>壁の上部にLEDテープを回して、夜は紫の間接照明に</li><li>ベッドの足元に、アクスタを飾れるひな壇シェルフ</li><li>ラグ・クッション・ベッドカバーをラベンダー系で統一</li></ul>}
                 <div className="rc-summary"><div className="rc-summary-heading"><span>{analyzed?'今ある家具':'コーディネート案'}</span><span>{analyzed?`${design.items.length}点`:<>{additions.length}アイテム · <span className="rc-money">{money(total)}</span></>}</span></div><div className="rc-summary-actions"><button type="button" className="rc-primary" onClick={()=>{setEditing(analyzed);setPanel(true);}}><ReferenceSvg page={5} index={9}/>{analyzed?'家具の配置を編集':'アイテム一覧'}</button><button type="button" className="rc-secondary" onClick={()=>setBefore(old=>!old)}>Before / After</button></div></div>
               </div></div>
               {canCoordinate&&!analyzed&&<div className="rc-followups">{['もう少し落ち着いた紫に','予算を2万円以内に','グリーンも足したい'].map(text=><button type="button" key={text} onClick={()=>setMessage(text)}>{text}</button>)}</div>}
               {selectsFurniture&&<fieldset className="rc-kept-furniture">
                 <legend>今ある家具をどうするか</legend>
-                <p>残す家具の配置を保ち、入れ替える家具に合う商品を探します。収まらない場合は元の家具を残します。</p>
+
                 <div className="rc-kept-options">{existingFurniture.map(item=><label key={item.id}>
                   <span>{item.name}</span>
                   <select aria-label={`${item.name}の操作`} value={furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'} onChange={event=>{const action=event.target.value==='replace'?'replace':event.target.value==='remove'?'remove':'keep';setFurnitureOperations(previous=>[...previous.filter(operation=>operation.objectId!==item.id),{objectId:item.id,action}]);setPhotoError('');}}><option value="keep">残す</option><option value="replace" disabled={!furnitureCategories.some(category=>category===item.category)}>入れ替える</option><option value="remove">外す</option></select>
                 </label>)}</div>
                 <div className="rc-setting"><span>追加したい家具（最大6点）</span>{furnitureAdditions.map((addition,index)=><div key={index}><select aria-label={`追加家具${index+1}の種類`} value={addition.category} onChange={event=>setFurnitureAdditions(previous=>previous.map((value,i)=>i===index?{category:furnitureCategories.find(category=>category===event.target.value)??value.category}:value))}>{Object.entries(furnitureLabels).map(([category,label])=><option key={category} value={category}>{label}</option>)}</select><button type="button" onClick={()=>setFurnitureAdditions(previous=>previous.filter((_,i)=>i!==index))} aria-label={`追加家具${index+1}を削除`}>削除</button></div>)}<button type="button" className="rc-secondary" disabled={furnitureAdditions.length>=6} onClick={()=>setFurnitureAdditions(previous=>[...previous,{category:'sofa'}])}>家具を追加</button></div>
-                {!analyzed&&<p className="rc-setting-note">追加の提案にも、編集した家具の配置・角度・色を引き継ぎます。同じ商品を採用する場合は、調整した配置を保ちます。</p>}
+
               </fieldset>}
               {canCoordinate&&analyzed&&<form className="rc-coordinate-form" onSubmit={coordinate}>
                 <div className="rc-presets">{presets.map((item,index)=><button type="button" key={item.label} aria-pressed={preset===index} onClick={()=>{setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</div>
                 <label className="rc-setting" htmlFor="coordinate-request">どんな部屋にしたいか<textarea id="coordinate-request" rows={3} value={prompt} maxLength={500} onChange={event=>setPrompt(event.target.value)} required/></label>
                 <label className="rc-setting" htmlFor="coordinate-budget">入れ替え・追加商品の予算（送料別）<span className="rc-tatami-input"><input id="coordinate-budget" type="number" min={1} step={1} value={Number.isNaN(budget)?'':budget} onChange={event=>setBudget(event.target.valueAsNumber)} required/>円</span></label>
                 <button type="submit" className="rc-primary" >この家具でコーディネート</button>
-                <p className="rc-setting-note">家具の配置・角度・色を調整してからコーディネートできます。編集した配置に合わせて、入れ替え・追加の商品を提案します。</p>
+
                 {photoError&&<p className="rc-error" role="alert">{photoError}</p>}
               </form>}
               <ErrorText error={generation.error}/>
             </div>
-            {canCoordinate&&analyzed?<div className="rc-followup-composer rc-analysis-note">家具を選び、希望と予算を確認してコーディネートしてください。</div>:canCoordinate?<form className="rc-followup-composer" onSubmit={followup}><div className="rc-followup-input">{!analysisMode&&<button type="button" aria-label="写真を追加" onClick={()=>upload.current?.click()}><ReferenceSvg page={5} index={10}/></button>}<label className="rc-sr-only" htmlFor="res-msg">メッセージ</label><textarea id="res-msg" rows={1} placeholder="変えたいところを伝えてください" value={message} maxLength={analysisMode?500:2000} onChange={event=>setMessage(event.target.value)}/><button type="submit" aria-label="送信" ><ReferenceSvg page={5} index={11}/></button></div>{photoError&&<p className="rc-error" role="alert">{photoError}</p>}</form>:<div className="rc-followup-composer rc-analysis-note">{loadConnection()==='dummy'?'商品付きの提案は、右上メニューでAPI接続に切り替えて試せます。':'希望文からの提案は、コーディネートAPIの提供後に利用できます。'}</div>}
+            {canCoordinate&&analyzed?null:canCoordinate?<form className="rc-followup-composer" onSubmit={followup}><div className="rc-followup-input">{!analysisMode&&<button type="button" aria-label="写真を追加" onClick={()=>upload.current?.click()}><ReferenceSvg page={5} index={10}/></button>}<label className="rc-sr-only" htmlFor="res-msg">メッセージ</label><textarea id="res-msg" rows={1} placeholder="変えたいところを伝えてください" value={message} maxLength={analysisMode?500:2000} onChange={event=>setMessage(event.target.value)}/><button type="submit" aria-label="送信" ><ReferenceSvg page={5} index={11}/></button></div>{photoError&&<p className="rc-error" role="alert">{photoError}</p>}</form>:<div className="rc-followup-composer rc-analysis-note">コーディネートは利用できません。</div>}
           </>}
         </section>
-        {isNew?<EmptyScene analysis={analysisMode}/>:<RoomScene key={design.id} design={design} panel={panel} before={before} filter={filter} selectedId={selectedId} referenceLayout={referenceLayout} editing={editing} view={view} dimensions={dimensions} onSelect={value=>{setSelectedId(value);setPanel(true);setFilter('all');const item=design.items.find(item=>item.id===value);if(item?.existing&&!editing)setNotice(`${item.name}は、今ある家具をそのまま使います。`);}} onBefore={setBefore} onMoveItem={moveItem} onOpenPanel={()=>setPanel(true)}>{panel&&(editing?<PlannerPanel design={design} selectedId={selectedId} onSelect={setSelectedId} onChange={editDesign} onUndo={undo} onRedo={redo} canUndo={history.past.length>0} canRedo={history.future.length>0} dirty={dirty} onSave={saveEdits} onClose={()=>{setEditing(false);setPanel(false);}} onProducts={()=>setEditing(false)} view={view} onView={setView} dimensions={dimensions} onDimensions={setDimensions}/>:<RecommendationPanel searchEntryPoints={design.searchEntryPoints} originalItems={design.before?.items} items={additions} selectedId={selectedId} filter={filter} onSelect={setSelectedId} onFilter={setFilter} onClose={()=>setPanel(false)}/>)}</RoomScene>}
+        {isNew?<EmptyScene/>:<RoomScene key={design.id} design={design} panel={panel} before={before} filter={filter} selectedId={selectedId} referenceLayout={referenceLayout} editing={editing} view={view} dimensions={dimensions} onSelect={value=>{setSelectedId(value);setPanel(true);setFilter('all');}} onBefore={value=>{setPlacementItem(null);setBefore(value);}} onMoveItem={moveItem} placementItem={placementItem} onPlaceItem={position=>{if(placementItem)addItem(placementItem,position);}} onOpenPanel={()=>setPanel(true)}>{panel&&(editing?<PlannerPanel onAddItem={addItem} onDragItem={startPlacement} onRemoveItem={removeItem} placementDisabled={placementDisabled} placementHint={before?'Afterに切り替えると家具を追加できます。':undefined} design={design} selectedId={selectedId} onSelect={setSelectedId} onChange={editDesign} onUndo={undo} onRedo={redo} canUndo={history.past.length>0} canRedo={history.future.length>0} dirty={dirty} onSave={saveEdits} onClose={()=>{setPlacementItem(null);setEditing(false);setPanel(false);}} onProducts={()=>{setPlacementItem(null);setEditing(false);}} view={view} onView={setView} dimensions={dimensions} onDimensions={setDimensions}/>:<RecommendationPanel onEditLayout={()=>{setEditing(true);setBefore(false);}} searchEntryPoints={design.searchEntryPoints} originalItems={design.before?.items} items={additions} selectedId={selectedId} filter={filter} onSelect={setSelectedId} onFilter={setFilter} onClose={()=>setPanel(false)}/>)}</RoomScene>}
       </>}
     </div>
     {notice&&<div className="rc-notice" role="status">{notice}<button type="button" aria-label="通知を閉じる" onClick={()=>setNotice('')}>×</button></div>}

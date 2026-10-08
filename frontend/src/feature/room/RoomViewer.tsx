@@ -3,11 +3,12 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
-import type { RoomDesign, RoomItem } from "../../domain/room";
+import { isManualFurniture, type RoomDesign, type RoomItem } from "../../domain/room";
 import { buildReferenceRoom, usesReferenceRoom } from "./referenceRoomModel";
 import { buildMeasuredRoom } from "./roomArchitecture";
 import { LAYOUT_GRID_STEP, snapItemPosition } from "./layoutGrid";
 import { applyMaterialOverrides } from "./furnitureMaterials";
+import { getInferredRoomBounds } from './roomBounds';
 
 interface RoomViewerProps {
   design: RoomDesign;
@@ -17,6 +18,8 @@ interface RoomViewerProps {
   dimensions?: boolean;
   editing?: boolean;
   onMoveItem?: (id: string, position: RoomItem["position"]) => void;
+  placementItem?: RoomItem | null;
+  onPlaceItem?: (position: RoomItem["position"]) => void;
   resetKey: number;
   before?: boolean;
   command?: { sequence: number; action: "left" | "right" | "in" | "out" };
@@ -28,6 +31,7 @@ type ViewerRuntime = {
   reset: () => void;
   setBefore: (before: boolean, markersVisible: boolean) => void;
   setEditing: (editing: boolean) => void;
+  setPlacement: (item: RoomItem | null) => void;
   command: (command: NonNullable<RoomViewerProps["command"]>) => void;
 };
 
@@ -301,27 +305,6 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean) {
   return group;
 }
 
-function getRoomBounds(items: RoomItem[]) {
-  const bounds = new THREE.Box3();
-  for (const item of items) {
-    const center = new THREE.Vector3(...item.position);
-    const halfSize = new THREE.Vector3(...item.size).multiplyScalar(0.5);
-    bounds.expandByPoint(center.clone().sub(halfSize));
-    bounds.expandByPoint(center.clone().add(halfSize));
-  }
-  if (bounds.isEmpty()) bounds.set(new THREE.Vector3(-2.6, 0, -2.1), new THREE.Vector3(2.6, 2.7, 2.1));
-  const center = bounds.getCenter(new THREE.Vector3());
-  const size = bounds.getSize(new THREE.Vector3());
-  const width = Math.max(5.2, size.x + 0.6);
-  const depth = Math.max(4.2, size.z + 0.6);
-  const floor = Math.min(0, bounds.min.y);
-  const height = Math.max(2.7, bounds.max.y - floor + 0.25);
-  return new THREE.Box3(
-    new THREE.Vector3(center.x - width / 2, floor - 0.18, center.z - depth / 2),
-    new THREE.Vector3(center.x + width / 2, floor + height, center.z + depth / 2),
-  );
-}
-
 function fittedDistance(bounds: THREE.Box3, target: THREE.Vector3, direction: THREE.Vector3, aspect: number, fov: number) {
   const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), direction).normalize();
   const up = new THREE.Vector3().crossVectors(direction, right).normalize();
@@ -471,7 +454,7 @@ function disposeObject(object: THREE.Object3D) {
   }
 }
 
-export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, view, resetKey, before = false, command, dimensions = false, editing = false, onMoveItem }: RoomViewerProps) {
+export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, view, resetKey, before = false, command, dimensions = false, editing = false, onMoveItem, placementItem = null, onPlaceItem }: RoomViewerProps) {
   const design = useMemo<RoomDesign>(() => before && afterDesign.before ? {
     ...afterDesign,
     room: afterDesign.before.room,
@@ -492,17 +475,15 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   const cameraState = useRef<{ id: string; position: THREE.Vector3; target: THREE.Vector3; zoom: number; view: RoomViewerProps["view"]; lastCommandSequence: number | null } | null>(null);
   const selectItem = useEffectEvent(onSelectItem);
   const moveItem = useEffectEvent((id: string, position: RoomItem["position"]) => onMoveItem?.(id, position));
+  const placeItem = useEffectEvent((position: RoomItem["position"]) => onPlaceItem?.(position));
   const initialView = useEffectEvent(() => view);
   const initialBefore = useEffectEvent(() => legacyBefore);
   const initialMarkersVisible = useEffectEvent(() => !before);
   const initialEditing = useEffectEvent(() => editing && Boolean(onMoveItem) && !before);
+  const initialPlacement = useEffectEvent(() => !before && onPlaceItem ? placementItem : null);
   const dimensionItem = dimensions ? design.items.find(item => item.id === selectedItemId) : undefined;
-  const canMove = editing && Boolean(onMoveItem) && !before && (!design.modelUrl || design.modelKind === "shell");
   const viewDescription = view === "top" ? "真上からの表示。" : view === "front" ? "正面からの表示。" : "立体表示。";
-  const dragDescription = canMove
-    ? view === "front" ? "家具を左右にドラッグすると10cmのマス目に沿って移動します。" : view === "top" ? "家具をドラッグすると10cmのマス目に沿って平面上を移動します。" : "家具は10cmのマス目に沿って移動し、空いている場所をドラッグすると視点が回転します。"
-    : view === "perspective" ? "ドラッグで回転できます。" : "";
-  const instructions = `部屋の3Dプレビュー。${before ? "変更前の部屋。" : ""}${viewDescription}${dragDescription}ホイールで拡大縮小、家具をクリックして選択できます。`;
+  const instructions = `部屋の3Dプレビュー。${before ? "変更前の部屋。" : ""}${viewDescription}`;
 
   useEffect(() => {
     const host = canvasHost.current;
@@ -531,7 +512,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = reference ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
-    renderer.domElement.setAttribute("aria-label", "部屋の3Dプレビュー。ドラッグで回転、スクロールで拡大縮小。家具をクリックして商品を選択できます。");
+    renderer.domElement.setAttribute("aria-label", "部屋の3Dプレビュー");
     renderer.domElement.setAttribute("role", "img");
     host.appendChild(renderer.domElement);
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -563,7 +544,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         ),
       };
     } else if (roomBounds.current?.id !== design.id) {
-      roomBounds.current = { id: design.id, bounds: getRoomBounds(design.items) };
+      const inferred = getInferredRoomBounds(design.before?.items ?? design.items);
+      roomBounds.current = { id: design.id, bounds: new THREE.Box3(new THREE.Vector3(...inferred.min), new THREE.Vector3(...inferred.max)) };
     }
     const baseRoomBounds = roomBounds.current.bounds.clone();
     const cameraBounds = baseRoomBounds.clone();
@@ -578,6 +560,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     let markersVisible = initialMarkersVisible();
     let currentEditing = initialEditing();
     let cancelDrag = () => {};
+    let clearPlacementPreview = () => {};
+    let currentPlacement = initialPlacement();
     let loadedRoom: THREE.Group | null = null;
     const completeRoomModel = Boolean(design.modelUrl) && design.modelKind !== "shell";
     const gridBounds = referenceRoom?.floorBounds ?? baseRoomBounds;
@@ -601,7 +585,12 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     const hitTargets = new Map<string, THREE.Group>();
     const markers = new Map<string, THREE.Sprite>();
     const existingIds = new Set(design.items.filter(item => item.existing).map(item => item.id));
-    for (const item of reference ? [] : design.items) {
+    for (const item of design.items) {
+      if (reference && !isManualFurniture(item)) continue;
+      // The reference drawing only contains its fixed original furniture. New
+      // owned furniture uses the same editable primitives as measured rooms.
+      const previous = furniture.get(item.id);
+      if (previous) { scene.remove(previous); disposeObject(previous); }
       const group = createFurniture(item, accent, oshi);
       scene.add(group);
       furniture.set(item.id, group);
@@ -721,13 +710,15 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     let lastCommandSequence: number | null = savedCamera?.lastCommandSequence ?? null;
     runtime.current = {
       select: updateSelection,
-      reset: () => { cancelDrag(); lastCommandSequence = null; reset(); },
-      setBefore: (nextBefore, nextMarkersVisible) => { if (nextBefore !== currentBefore) cancelDrag(); currentBefore = nextBefore; markersVisible = nextMarkersVisible; updateVisibility(); },
-      setEditing: (nextEditing) => { if (nextEditing !== currentEditing) cancelDrag(); currentEditing = nextEditing; layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel; },
+      reset: () => { cancelDrag(); clearPlacementPreview(); lastCommandSequence = null; reset(); },
+      setBefore: (nextBefore, nextMarkersVisible) => { if (nextBefore !== currentBefore) cancelDrag(); clearPlacementPreview(); currentBefore = nextBefore; markersVisible = nextMarkersVisible; updateVisibility(); },
+      setEditing: (nextEditing) => { if (nextEditing !== currentEditing) cancelDrag(); if (!nextEditing) clearPlacementPreview(); currentEditing = nextEditing; layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel; },
+      setPlacement: (item) => { if (item !== currentPlacement) clearPlacementPreview(); currentPlacement = item; },
       command: (nextCommand) => {
         if (lastCommandSequence === nextCommand.sequence) return;
         lastCommandSequence = nextCommand.sequence;
         cancelDrag();
+        clearPlacementPreview();
         if (currentView !== "perspective" && (nextCommand.action === "left" || nextCommand.action === "right")) return;
         const damping = controls.enableDamping;
         controls.enableDamping = false;
@@ -749,6 +740,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       setView: (nextView) => {
         if (currentView === nextView) return;
         cancelDrag();
+        clearPlacementPreview();
         currentView = nextView;
         reset();
       },
@@ -779,7 +771,16 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         const center = bounds.getCenter(new THREE.Vector3());
         gltf.scene.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale);
         gltf.scene.traverse((object) => {
-          if (object instanceof THREE.Mesh) { object.castShadow = true; object.receiveShadow = true; }
+          if (!(object instanceof THREE.Mesh)) return;
+          object.castShadow = true;
+          object.receiveShadow = true;
+          // Imported owned furniture uses a catalog approximation; keep its
+          // measured dimensions and the product/edited color from the room item.
+          if (isManualFurniture(item)) {
+            for (const surface of Array.isArray(object.material) ? object.material : [object.material]) {
+              if ("color" in surface && surface.color instanceof THREE.Color) surface.color.set(item.color);
+            }
+          }
         });
         if (!item.existing && item.materialOverrides) {
           textureCleanups.push(applyMaterialOverrides(gltf.scene, item.materialOverrides, scale, () => {
@@ -852,11 +853,82 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       controlsEnabled: boolean;
     };
     let drag: FurnitureDrag | null = null;
-    const setRay = (event: PointerEvent) => {
+    const setRay = (event: Pick<PointerEvent, "clientX" | "clientY">) => {
       const rect = renderer.domElement.getBoundingClientRect();
       pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
       raycaster.setFromCamera(pointer, camera);
     };
+    let placementPreview: THREE.Group | null = null;
+    clearPlacementPreview = () => {
+      if (!placementPreview) return;
+      scene.remove(placementPreview);
+      disposeObject(placementPreview);
+      placementPreview = null;
+    };
+    const placementPosition = (event: DragEvent): RoomItem["position"] | null => {
+      const item = currentPlacement;
+      if (!item || !currentEditing || !markersVisible || currentBefore || completeRoomModel) return null;
+      const rect = renderer.domElement.getBoundingClientRect();
+      if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) return null;
+      setRay(event);
+      const hit = raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -gridFloor), new THREE.Vector3());
+      if (!hit || hit.x < gridBounds.min.x || hit.x > gridBounds.max.x || hit.z < gridBounds.min.z || hit.z > gridBounds.max.z) return null;
+      const angle = THREE.MathUtils.degToRad(item.rotation ?? 0);
+      const halfWidth = (Math.abs(Math.cos(angle)) * item.size[0] + Math.abs(Math.sin(angle)) * item.size[2]) / 2;
+      const halfDepth = (Math.abs(Math.sin(angle)) * item.size[0] + Math.abs(Math.cos(angle)) * item.size[2]) / 2;
+      if (halfWidth * 2 > gridBounds.max.x - gridBounds.min.x || halfDepth * 2 > gridBounds.max.z - gridBounds.min.z) return null;
+      if (item.size[1] > (design.room?.height ?? baseRoomBounds.max.y - gridFloor)) return null;
+      const position = snapItemPosition(item, [hit.x, item.position[1], hit.z], [0, 2], design.room);
+      // Inferred/demo rooms may be offset from the origin; constrain their bounds
+      // while retaining the same 10 cm grid used for moving existing furniture.
+      for (const [axis, halfSize] of [[0, halfWidth], [2, halfDepth]] as const) {
+        const name = axis === 0 ? "x" : "z";
+        const minimum = Math.ceil((gridBounds.min[name] + halfSize - 1e-9) / LAYOUT_GRID_STEP) / 10;
+        const maximum = Math.floor((gridBounds.max[name] - halfSize + 1e-9) / LAYOUT_GRID_STEP) / 10;
+        if (minimum > maximum) return null;
+        position[axis] = Math.max(minimum, Math.min(maximum, position[axis]));
+      }
+      position[1] = gridFloor + item.size[1] / 2;
+      return position;
+    };
+    const dragOver = (event: DragEvent) => {
+      if (!currentPlacement) return;
+      const position = placementPosition(event);
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = position ? "copy" : "none";
+      if (!position) { if (placementPreview) placementPreview.visible = false; return; }
+      if (!placementPreview) {
+        placementPreview = createFurniture(currentPlacement, accent, oshi);
+        placementPreview.traverse(object => {
+          if (!(object instanceof THREE.Mesh)) return;
+          object.castShadow = false;
+          for (const surface of Array.isArray(object.material) ? object.material : [object.material]) {
+            surface.transparent = true;
+            surface.opacity = 0.55;
+            surface.depthWrite = false;
+          }
+        });
+        scene.add(placementPreview);
+      }
+      placementPreview.visible = true;
+      placementPreview.position.set(position[0], position[1] - currentPlacement.size[1] / 2, position[2]);
+    };
+    const drop = (event: DragEvent) => {
+      if (!currentPlacement) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const position = placementPosition(event);
+      clearPlacementPreview();
+      if (position) placeItem(position);
+    };
+    const dragLeave = (event: DragEvent) => {
+      if (event.relatedTarget instanceof Node && host.contains(event.relatedTarget)) return;
+      if (placementPreview) placementPreview.visible = false;
+    };
+    host.addEventListener("dragover", dragOver);
+    host.addEventListener("drop", drop);
+    host.addEventListener("dragleave", dragLeave);
+    window.addEventListener("dragend", clearPlacementPreview);
     const findItem = (event: PointerEvent) => {
       setRay(event);
       const objects = loadedRoom && completeRoomModel && !currentBefore ? hitTargets : furniture;
@@ -1039,11 +1111,16 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     renderer.setAnimationLoop(render);
     return () => {
       cancelDrag();
+      clearPlacementPreview();
       cameraState.current = { id: design.id, position: camera.position.clone(), target: controls.target.clone(), zoom: camera.zoom, view: currentView, lastCommandSequence };
       disposed = true;
       textureCleanups.forEach(cleanup => cleanup());
       runtime.current = null;
       observer.disconnect();
+      host.removeEventListener("dragover", dragOver);
+      host.removeEventListener("drop", drop);
+      host.removeEventListener("dragleave", dragLeave);
+      window.removeEventListener("dragend", clearPlacementPreview);
       renderer.setAnimationLoop(null);
       renderer.domElement.removeEventListener("pointerdown", pointerDown, true);
       renderer.domElement.removeEventListener("pointerup", pointerUp, true);
@@ -1068,6 +1145,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   useEffect(() => { runtime.current?.reset(); }, [resetKey]);
   useEffect(() => { runtime.current?.setBefore(legacyBefore, !before); }, [design, legacyBefore, before]);
   useEffect(() => { runtime.current?.setEditing(editing && Boolean(onMoveItem) && !before); }, [design, editing, onMoveItem, before]);
+  useEffect(() => { runtime.current?.setPlacement(!before && onPlaceItem ? placementItem : null); }, [design, placementItem, onPlaceItem, before]);
   useEffect(() => { canvasHost.current?.querySelector("canvas")?.setAttribute("aria-label", instructions); }, [design, instructions]);
   useEffect(() => { if (command) runtime.current?.command(command); }, [design, command]);
 
@@ -1077,13 +1155,12 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       {dimensionItem && <div role="status" style={{ position: "absolute", left: 16, bottom: 16, padding: "8px 12px", background: "rgba(29,27,38,.88)", border: "1px solid #6e6a7c", borderRadius: 8, color: "#fff", fontSize: 12, pointerEvents: "none" }}>幅 {Math.round(dimensionItem.size[0] * 100)} × 高さ {Math.round(dimensionItem.size[1] * 100)} × 奥行き {Math.round(dimensionItem.size[2] * 100)} cm</div>}
       <div ref={fallback} className="viewer-fallback" hidden role="status">
         <strong>この環境では3Dを表示できません</strong>
-        <p>アイテム一覧から家具の詳細や購入先をご覧いただけます。</p>
       </div>
       <div ref={modelNotice} className="viewer-model-notice" hidden role="status">
-        3Dモデルを読み込めなかったため、家具の形と配置を簡易表示しています。
+        3Dモデルを読み込めませんでした。
       </div>
       <div ref={textureNotice} className="viewer-model-notice" style={{bottom:84}} hidden role="status">
-        一部の生成テクスチャを読み込めなかったため、単色で表示しています。
+        一部の素材を読み込めませんでした。
       </div>
     </div>
   );
