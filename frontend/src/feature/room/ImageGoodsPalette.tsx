@@ -47,11 +47,11 @@ export default function ImageGoodsPalette({ design, disabled, onAddItem, onDragS
     </div>
     <label className="rc-image-goods-upload">グッズに使う画像<input type="file" accept="image/jpeg,image/png,image/webp" disabled={disabled} onChange={event => { void selectFile(event.target.files?.[0]); }} /></label>
     <p className="rc-planner-note">JPEG・PNG・WebP、1枚10MBまで。保存用に最大512pxへ縮小します。</p>
-    {kind === 'acrylic_stand' && <p className="rc-planner-note">透過画像は背景を透かして表示します。背景の自動切り抜きは行いません。</p>}
+    {kind === 'acrylic_stand' && <p className="rc-planner-note">棚・机・テーブルへドラッグすると上面に合わせます。透過画像は背景を透かして表示します。背景の自動切り抜きは行いません。</p>}
     {pending && <p className="rc-planner-note" role="status">画像を取り込み中…</p>}
     {error && <p className="rc-planner-input-error" role="alert">{error}</p>}
     {image && item && <>
-      <button type="button" className="rc-furniture-imported-card" disabled={!available} draggable={available} aria-label={`${labels[kind]}を床へドラッグ、またはクリックして中央に追加`} onClick={() => { if (available) onAddItem(item); }} onDragStart={event => { if (available) onDragStart(event, item); else event.preventDefault(); }} onDragEnd={onDragEnd}>
+      <button type="button" className="rc-furniture-imported-card" disabled={!available} draggable={available} aria-label={`${labels[kind]}を部屋へドラッグ、またはクリックして中央に追加`} onClick={() => { if (available) onAddItem(item); }} onDragStart={event => { if (available) onDragStart(event, item); else event.preventDefault(); }} onDragEnd={onDragEnd}>
         <span className="rc-furniture-photo rc-image-goods-preview"><img src={image.artwork.dataUrl} alt={image.name} draggable={false} /></span><span>{labels[kind]}</span>
       </button>
       <label className="rc-image-goods-height">高さ（cm）<input type="number" min="1" step="1" disabled={disabled} value={heightCm} onChange={event => setHeightCm(event.target.value)} /></label>
