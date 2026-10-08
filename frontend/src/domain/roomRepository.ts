@@ -34,6 +34,9 @@ export type SavedRoom = {
   errorMessage?: string;
 };
 
+export type FurnitureSearchInput = { query: string; color?: string; category?: string };
+export type FurnitureSearchResult = { products: RoomItem[]; failures: number; searchEntryPoints: string[] };
+
 export type RoomRepository = {
   demo(style?: Style): RoomDesign;
   // Non-fatal persistence status for the current owner, when supported.
@@ -43,6 +46,7 @@ export type RoomRepository = {
   get(id: string, signal?: AbortSignal): Promise<RoomDesign>;
   analyze(input: GenerateRoomInput, signal?: AbortSignal): Promise<RoomDesign>;
   generate(input: GenerateRoomInput, signal?: AbortSignal): Promise<RoomDesign>;
-  importFurniture(url: string, signal?: AbortSignal): Promise<RoomItem>;
+  importFurniture(url: string, signal?: AbortSignal, variantId?: string): Promise<RoomItem>;
+  searchFurniture(input: FurnitureSearchInput, signal?: AbortSignal): Promise<FurnitureSearchResult>;
   capabilities(): Promise<RoomCapabilities>;
 };
