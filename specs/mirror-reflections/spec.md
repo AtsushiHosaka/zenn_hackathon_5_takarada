@@ -22,3 +22,5 @@ Primary API reference: https://threejs.org/docs/pages/Reflector.html; installed 
 ## Verification
 
 Frontend lint and production build passed. Existing build chunk-size warning remains. Reflection runtime and screenshot evidence are pending.
+
+Trusted wall_mirror and legacy mirror categories are accepted for procedural, imported and complete-model paths. Independent temporary exact-source Three.js probes verify both categories, translated four-way fitted-model poses, target disposal, and recursion/override-material suppression with controlled render hooks. Frontend lint/build pass; reflected pixels and view changes require the author's final browser evidence. No permanent tests added.
