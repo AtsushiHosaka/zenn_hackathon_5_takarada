@@ -1,3 +1,5 @@
+import { roomPalette } from "./roomPalette";
+
 export type Style = "botanical" | "oshi" | "natural";
 export type RoomShape = "square" | "standard" | "long";
 export const furnitureCategories = ["sofa", "bed", "desk", "chair", "shelf", "table"] as const;
@@ -78,6 +80,7 @@ export type RoomDesign = {
   title: string;
   description: string;
   style: Style;
+  roomPaletteId?: string;
   items: RoomItem[];
   modelUrl?: string;
   // modelUrlがある場合、未指定なら家具を含む完成モデルとして扱う。
@@ -110,6 +113,7 @@ export function isRoomDesign(value: unknown): value is RoomDesign {
   if (value.kind !== undefined && value.kind !== "analysis" && value.kind !== "coordination") return false;
   if (value.style !== "botanical" && value.style !== "oshi" && value.style !== "natural") return false;
   if (!nonemptyString(value.id) || !nonemptyString(value.title) || !nonemptyString(value.description)) return false;
+  if (value.roomPaletteId !== undefined && !roomPalette(value.roomPaletteId)) return false;
   if (value.modelKind !== undefined && value.modelKind !== "complete" && value.modelKind !== "shell") return false;
   if (value.wallColor !== undefined && (typeof value.wallColor !== "string" || !/^#[0-9a-f]{6}$/i.test(value.wallColor))) return false;
   if (value.room !== undefined && !isRoomGeometry(value.room)) return false;

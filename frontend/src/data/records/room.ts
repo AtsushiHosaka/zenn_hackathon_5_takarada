@@ -1,3 +1,4 @@
+import { roomPalette } from "../../domain/roomPalette";
 import { DomainError } from "../../domain/error";
 import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
 import { furnitureCategories, isManualFurniture, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
@@ -6,6 +7,11 @@ import type { components } from "../generated/api";
 
 export type AnalysisRoomRecord = components["schemas"]["Room"];
 export type CoordinationRecord = components["schemas"]["Coordination"];
+
+export function toRoomPaletteId(value: unknown): NonNullable<CoordinationRecord["room_palette_id"]> {
+  if (!roomPalette(value)) invalid("Coordination.room_palette_id");
+  return value as NonNullable<CoordinationRecord["room_palette_id"]>;
+}
 
 export type UploadRecord = components["schemas"]["Upload"];
 
@@ -76,6 +82,7 @@ export function toCoordinationRecord(value: unknown): CoordinationRecord {
   if (record.status !== "pending" && record.status !== "processing" && record.status !== "done" && record.status !== "failed") invalid("Coordination.status");
   if (!Array.isArray(record.kept_object_ids) || record.kept_object_ids.some(id => typeof id !== "string" || !id.trim())) invalid("Coordination.kept_object_ids");
   if (!Array.isArray(record.items)) invalid("Coordination.items");
+  if (record.room_palette_id != null && !roomPalette(record.room_palette_id)) invalid("Coordination.room_palette_id");
   const createdAt = text(record.created_at, "Coordination.created_at");
   if (!Number.isFinite(Date.parse(createdAt))) invalid("Coordination.created_at");
   const totalPrice = record.total_price === null ? null : nonnegativeInteger(record.total_price, "Coordination.total_price");
@@ -85,6 +92,7 @@ export function toCoordinationRecord(value: unknown): CoordinationRecord {
     status: record.status,
     prompt: text(record.prompt, "Coordination.prompt"),
     budget: integer(record.budget, "Coordination.budget"),
+    room_palette_id: record.room_palette_id == null ? null : toRoomPaletteId(record.room_palette_id),
     kept_object_ids: record.kept_object_ids as string[],
     title: nullableText(record.title, "Coordination.title"),
     comment: nullableText(record.comment, "Coordination.comment"),
@@ -151,6 +159,7 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     backendRoomId: String(record.room_id),
     analysisInput,
     prompt: record.prompt,
+    roomPaletteId: record.room_palette_id ?? undefined,
     budget: record.budget,
     keptObjectIds: record.furniture_operations !== undefined ? record.furniture_operations.filter(operation => operation.action === "keep").map(operation => operation.object_id) : record.kept_object_ids.length > 0 ? record.kept_object_ids : record.before_scene.objects.filter(item => item.source === "existing").map(item => item.id),
     furnitureOperations: record.furniture_operations?.map(operation => ({ objectId: operation.object_id, action: operation.action })),

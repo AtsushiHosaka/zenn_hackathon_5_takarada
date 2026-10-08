@@ -26,7 +26,7 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
           manual = { "id" => "manual-8e24d3af-c12d-4567-8910-123456789abc", "label" => "今ある椅子", "category" => "chair",
                      "position" => { "x" => room.scene.dig("room", "width") / 2, "y" => 0, "z" => room.scene.dig("room", "depth") / 2 },
                      "size" => { "w" => 0.45, "h" => 0.8, "d" => 0.45 }, "rotation_y" => 0, "color" => "#bba588" }
-          { coordination: { prompt: "紫色の推し活ルームにしたい", budget: 30_000,
+          { coordination: { room_palette_id: "warm-ivory", prompt: "紫色の推し活ルームにしたい", budget: 30_000,
                             kept_object_ids: objects.pluck("id") + [ manual["id"] ],
                             furniture_operations: (objects + [ manual ]).map { |object| { object_id: object["id"], action: "keep" } },
                             additions: [ { category: "table" } ],
@@ -78,7 +78,7 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
         schema "$ref" => "#/components/schemas/Coordination"
 
         let(:coordination) do
-          room.coordinations.create!(prompt: "紫色の推し活ルームにしたい", budget: 30_000).tap do |c|
+          room.coordinations.create!(room_palette_id: "warm-ivory", prompt: "紫色の推し活ルームにしたい", budget: 30_000).tap do |c|
             c.update!(status: "done", **CoordinationBuilder.call(c).to_h)
           end
         end

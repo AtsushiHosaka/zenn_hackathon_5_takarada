@@ -14,12 +14,26 @@ class Coordination < ApplicationRecord
   validate :valid_furniture_input
   validate :valid_operations, on: :create
   validate :valid_base_coordination
+  validates :room_palette_id, inclusion: { in: ->(_) { RoomPalette::CATALOGUE.keys } }, allow_nil: true
 
   # 写真で見つからなかった所有家具も、今回の提案の元の部屋に含める。
   def input_scene
     scene = room.scene.deep_dup
     scene["objects"] += manual_objects
     scene
+  end
+
+  # Keep generation options in existing persisted analysis metadata.
+  def room_palette_id
+    analysis&.dig("room_palette_id")
+  end
+
+  def room_palette_id=(value)
+    self.analysis = (analysis || {}).merge("room_palette_id" => value)
+  end
+
+  def generation_prompt
+    RoomPalette.prompt(prompt, room_palette_id)
   end
 
   private

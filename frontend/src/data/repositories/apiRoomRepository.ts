@@ -4,7 +4,7 @@ import { furnitureCategories, isFurnitureAdditions, isFurnitureOperations, isMan
 import type { GenerateRoomInput, RoomRepository } from "../../domain/roomRepository";
 import type { ApiClient } from "../apiClient";
 import { createDemoRoom } from "../dummy/dummyRoomRepository";
-import { toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toImportedFurniture, toRoomDesign, toSavedRoom, toSavedRooms, toUploadRecords } from "../records/room";
+import { toRoomPaletteId, toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toImportedFurniture, toRoomDesign, toSavedRoom, toSavedRooms, toUploadRecords } from "../records/room";
 import type { components } from "../generated/api";
 
 export type RoomApiConfig = {
@@ -108,7 +108,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
             if (input.furnitureOperations !== undefined && (!isFurnitureOperations(input.furnitureOperations) || input.furnitureOperations.length !== existingIds.length || input.furnitureOperations.some(operation => !existingIds.includes(operation.objectId)))) throw new DomainError("各家具について残すか入れ替えるかを選んでください");
             const keptObjectIds = input.furnitureOperations?.filter(operation => operation.action === "keep").map(operation => operation.objectId) ?? input.keptObjectIds ?? [];
             if (!Array.isArray(keptObjectIds) || keptObjectIds.some(id => typeof id !== "string" || !existingIds.includes(id)) || new Set(keptObjectIds).size !== keptObjectIds.length) throw new DomainError("活かす家具の選択が正しくありません");
-            const request: components["schemas"]["CoordinationInput"] = { coordination: { prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: edits, ...(input.baseCoordinationId && /^[1-9]\d*$/.test(input.baseCoordinationId) ? { base_coordination_id: Number(input.baseCoordinationId) } : {}), ...(input.furnitureOperations === undefined ? {} : { furniture_operations: input.furnitureOperations.map(operation => ({ object_id: operation.objectId, action: operation.action })) }), ...(input.furnitureAdditions === undefined ? {} : { additions: input.furnitureAdditions }) } };
+            const request: components["schemas"]["CoordinationInput"] = { coordination: { room_palette_id: input.roomPaletteId === undefined ? undefined : toRoomPaletteId(input.roomPaletteId), prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: edits, ...(input.baseCoordinationId && /^[1-9]\d*$/.test(input.baseCoordinationId) ? { base_coordination_id: Number(input.baseCoordinationId) } : {}), ...(input.furnitureOperations === undefined ? {} : { furniture_operations: input.furnitureOperations.map(operation => ({ object_id: operation.objectId, action: operation.action })) }), ...(input.furnitureAdditions === undefined ? {} : { additions: input.furnitureAdditions }) } };
             input.onProgress?.("coordinating");
             let coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationPath.replace("{id}", String(record.id)), { method: "POST", body: request, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 270_000 }));
             const coordinationId = coordination.id;
@@ -134,6 +134,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
       input.photos.forEach(photo => request.append(config.photoField, photo, photo.name));
       request.append(config.promptField, input.prompt.trim());
       request.append(config.styleField, input.style);
+      if (input.roomPaletteId) request.append("room_palette_id", input.roomPaletteId);
       request.append(config.budgetField, String(input.budget));
       // ジョブ全体は最大120秒。通信と待機の両方を同じsignalで止める。
       const jobSignal = boundedSignal(signal);
