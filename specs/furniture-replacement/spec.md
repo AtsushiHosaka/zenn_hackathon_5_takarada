@@ -24,4 +24,4 @@ Source: [issue #79](https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/i
 
 See [review evidence](../../docs/pr-evidence/issue-79/README.md). Real Gemini, retailer availability, and production were not verified.
 
-The mobile editor follow-up passes frontend lint/build and an exact-source category guard check (supported aliases accepted; poster/acrylic_stand rejected). Phone layout, close/save/undo interactions, and replacement screenshots require browser verification at the final integrated revision.
+The mobile editor follow-up passes frontend lint/build and an exact-source category guard check (supported aliases accepted; poster/acrylic_stand rejected). The actual frontend at 390 × 844 passes replacement, original undo, redo, save/reload, close, and the selected-SKU coordination request with controlled API fixtures. The panel measures 366px wide with 12px gutters and no horizontal page overflow. The final screenshot is in the review evidence.
