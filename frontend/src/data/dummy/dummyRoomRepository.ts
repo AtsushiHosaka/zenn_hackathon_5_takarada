@@ -70,6 +70,13 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
     const pending = unsavedRooms.get(userId) ?? [];
     return [...pending, ...storedRooms(userId).filter(room => !pending.some(saved => saved.id === room.id))];
   };
+  const retain = (userId: number, room: SavedRoom) => {
+    const rooms = roomsFor(userId);
+    try {
+      localStorage.setItem(`hack.dummy.rooms.v1.${userId}`, JSON.stringify([room, ...rooms.filter(saved => saved.id !== room.id)]));
+      unsavedRooms.delete(userId);
+    } catch { unsavedRooms.set(userId, [room, ...(unsavedRooms.get(userId) ?? []).filter(saved => saved.id !== room.id)]); }
+  };
   const repository: RoomRepository = {
     demo: createDemoRoom,
     async importFurniture() {
@@ -97,6 +104,14 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
       const room = roomsFor(currentUserId()).find(room => room.id === roomId);
       if (!room?.design) throw new DomainError("部屋が見つかりません", 404);
       return room.design;
+    },
+    async createFromTemplate(template, signal) {
+      const userId = currentUserId();
+      if (signal?.aborted) throw new DomainError("操作をキャンセルしました");
+      if (!isRoomDesign(template) || !template.room || !template.analysisInput || template.items.length > 100) throw new DomainError("テンプレートの内容を確認してください");
+      const design = {...structuredClone(template), id: `dummy-room-${crypto.randomUUID()}`, source: "demo" as const, description: "保存したテンプレートから作成した部屋です。", backendRoomId: undefined};
+      retain(userId, {id: design.id, title: design.title, status: "ready", createdAt: new Date().toISOString(), design});
+      return design;
     },
     analyze: (input, signal) => repository.generate(input, signal),
     async capabilities() {
@@ -130,13 +145,7 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
       const design = paletteId ? applyRoomPalette(themedDesign, paletteId) : themedDesign;
       if (!isRoomDesign(design)) throw new DomainError("部屋の入力内容を確認してください", 422);
       const room: SavedRoom = { id: design.id, title: design.title, status: "ready", createdAt: previous?.createdAt ?? new Date().toISOString(), design };
-      try {
-        localStorage.setItem(`hack.dummy.rooms.v1.${userId}`, JSON.stringify([room, ...rooms.filter(saved => saved.id !== room.id)]));
-        unsavedRooms.delete(userId);
-      } catch {
-        // Keep only failed writes in memory; successful disk data stays authoritative.
-        unsavedRooms.set(userId, [room, ...(unsavedRooms.get(userId) ?? []).filter(saved => saved.id !== room.id)]);
-      }
+      retain(userId, room);
       input.onProgress?.("preview");
       return design;
     },

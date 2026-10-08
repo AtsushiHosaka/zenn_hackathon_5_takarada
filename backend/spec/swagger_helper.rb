@@ -267,6 +267,15 @@ RSpec.configure do |config|
             },
             required: %w[key upload_url]
           },
+          RoomTemplateScene: {
+            type: :object,
+            description: "保存した部屋の配置をコピーする。外部モデルURLは受け付けず、モデルはサーバーで選ぶ",
+            properties: {
+              room: { "$ref" => "#/components/schemas/RoomShape" },
+              objects: { type: :array, maxItems: 100, items: { "$ref" => "#/components/schemas/SceneObject" }, description: "sourceはexisting、model_urlはnull。IDは64文字以内、家具名は100文字以内" }
+            },
+            required: %w[room objects]
+          },
           RoomInput: {
             type: :object,
             properties: {
@@ -275,6 +284,7 @@ RSpec.configure do |config|
                 properties: {
                   tatami: { type: :number, minimum: 3, maximum: 30, description: "部屋の広さ (畳)", example: 6 },
                   shape: { type: :string, enum: %w[square standard long], description: "部屋の形。square: 正方形に近い (1:1.15), standard: やや縦長 (3:4), long: 細長い (1:2)", example: "standard" },
+                  template_scene: { "$ref" => "#/components/schemas/RoomTemplateScene" },
                   photo_keys: { type: :array, items: { type: :string }, description: "POST /api/v1/uploads で得た key。アップロード済みのものだけ受け付ける。省略すると写真なしで解析する", example: [] }
                 },
                 required: %w[tatami shape]
