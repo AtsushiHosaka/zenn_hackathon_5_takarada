@@ -26,7 +26,7 @@ Frontend lint and production build passed. The build retains the existing large-
 
 A temporary rolled-back transaction checked all seven themes via authenticated controller POST, mock generation job, and GET retrieval. It checked theme metadata/title, room colors, augmented prompt instructions, original Before colors, and rejection of unknown IDs. A temporary frontend SSR script checked all seven dummy themes through save/reload, equal frontend/backend catalogues, seven distinct motif geometries and unknown-ID rejection.
 
-Browser selection/rendering, screenshots, live Gemini, production and native iOS are not yet verified. The root agent owns the shared browser review and PR publication. No new permanent tests were added.
+Live Gemini, production and native iOS remain unverified. Browser verification is recorded below. No new permanent tests were added.
 
 ## Combined integration verification
 
@@ -34,6 +34,8 @@ Stacked implementation is based on `codex/issue-74-room-palettes`, including pal
 
 A temporary rolled-back authenticated Rails POST/job/GET transaction checked all seven themes both with and without explicit palettes. It verified both persisted IDs, character title, palette wall/floor precedence, character-before-palette prompt ordering, unchanged original room/Before, followup base references and invalid-id rejection. A temporary SSR runtime check passed all 420 character/palette combinations and restored saved rooms. It verified motif colors come from the selected palette while all seven motif geometries remain distinct. No permanent tests or new running apps were created.
 
-Browser screenshots and live provider/deployment verification remain with the root agent. The authenticated temporary checks use Rails request dispatch and mock providers, not a network-hosted API or live Gemini/EC.
+Live provider/deployment verification remains unperformed. The authenticated temporary checks use Rails request dispatch and mock providers, not a network-hosted API or live Gemini/EC.
 
 The final branch also merges prepared palette branch `170d93d1c4def534d5f414a09084a46043ec2035`, preserving the published upload, generation-step and followup-mode ancestry. Frontend lint/build and the 420-combination dummy checks passed again after this merge. A temporary harness executed the actual extracted `RoomStudioPage` mutation function for current/new requests and confirmed both theme/palette IDs, existing-room/base references, new-room photo/furniture isolation and aborted-request progress guards. No browser was launched by this agent.
+
+Root browser verification on the final merged source generated and reloaded all seven themes with Teal Studio, retaining each character identity/title and explicit palette wall/floor colors. The 390px chooser has no horizontal overflow. Actual UI screenshots are in docs/pr-evidence/issue-73 (chooser, Miku music motif and Kuromi star motif). These screenshots show deterministic dummy rendering, not live Gemini product proposals. The existing browser/server was reused with an isolated context to avoid concurrent chat interference.
