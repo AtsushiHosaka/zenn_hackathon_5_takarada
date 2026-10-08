@@ -1,12 +1,38 @@
 import { DomainError } from "../../domain/error";
 import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
 import { furnitureCategories, isRoomDesign, isRoomShape, isTextureStatus } from "../../domain/room";
+import type { SavedRoom } from "../../domain/roomRepository";
 import type { components } from "../generated/api";
 
 export type AnalysisRoomRecord = components["schemas"]["Room"];
 export type CoordinationRecord = components["schemas"]["Coordination"];
 
 export type UploadRecord = components["schemas"]["Upload"];
+
+export function toSavedRoom(value: unknown, baseUrl: string): SavedRoom {
+  const record = toAnalysisRoomRecord(value);
+  const latest = record.latest_coordination;
+  const design = record.status === "ready"
+    ? latest
+      ? toCoordinatedRoomDesign(latest, baseUrl, { tatami: record.tatami, shape: record.shape })
+      : toAnalyzedRoomDesign(record, baseUrl)
+    : undefined;
+  return {
+    id: String(record.id),
+    title: design?.title ?? `${record.tatami}畳の部屋`,
+    createdAt: record.created_at,
+    status: record.status,
+    design,
+    errorMessage: record.error_message ?? undefined,
+  };
+}
+
+export function toSavedRooms(value: unknown, baseUrl: string): SavedRoom[] {
+  if (!Array.isArray(value)) invalid("Rooms");
+  const rooms = value.map(record => toSavedRoom(record, baseUrl));
+  if (new Set(rooms.map(room => room.id)).size !== rooms.length) invalid("Rooms.id の重複");
+  return rooms;
+}
 
 // 発行されたアップロード先。枚数が合わないとFileとkeyの対応が崩れるので数も見る
 export function toUploadRecords(value: unknown, expected: number): UploadRecord[] {
@@ -316,6 +342,8 @@ export function toAnalysisRoomRecord(value: unknown): AnalysisRoomRecord {
   if (!Number.isFinite(Date.parse(createdAt))) invalid("Room.created_at");
   const scene = record.scene === null ? null : analysisScene(record.scene);
   if (record.status === "ready" && !scene) invalid("Room.scene");
+  const latestCoordination = record.latest_coordination == null ? null : toCoordinationRecord(record.latest_coordination);
+  if (latestCoordination && (latestCoordination.status !== "done" || latestCoordination.room_id !== record.id)) invalid("Room.latest_coordination");
   // 解析方法 (gemini: 写真を AI で解析 / mock: モック) は古い API では返らない
   const analyzedBy = record.analyzed_by === "gemini" || record.analyzed_by === "mock" ? record.analyzed_by : null;
   return {
@@ -324,6 +352,7 @@ export function toAnalysisRoomRecord(value: unknown): AnalysisRoomRecord {
     shape: record.shape,
     status: record.status,
     scene,
+    latest_coordination: latestCoordination,
     analyzed_by: analyzedBy,
     error_message: nullableText(record.error_message, "Room.error_message"),
     created_at: createdAt,
