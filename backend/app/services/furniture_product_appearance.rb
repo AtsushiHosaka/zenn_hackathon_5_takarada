@@ -42,12 +42,13 @@ class FurnitureProductAppearance
         object["model_url"] = FurnitureModelCatalog.model_url(model)
         object["model_size"] = { "w" => model.width.to_f, "h" => model.height.to_f, "d" => model.depth.to_f }
         object["model_fit"] = "contain"
-        object["color"] = item["color"]
-        overrides = color_overrides(item, model)
+        object["color"] ||= item["color"]
+        edited_color = object["color"] != item["color"]
+        overrides = color_overrides(item, model, color: object["color"])
         # Apply the product color even without image generation or its dependencies.
         object["material_overrides"] = overrides if overrides.present?
         status = overrides.present? ? "ready" : "disabled"
-        if !image_color?(item) && object["model_url"].present? && ENV["MODELS_BUCKET"].present? && GeminiImageClient.configured?(user_id: @user_id)
+        if !edited_color && !image_color?(item) && object["model_url"].present? && ENV["MODELS_BUCKET"].present? && GeminiImageClient.configured?(user_id: @user_id)
           object["texture_source"] = item["texture_source"] = "description"
           @generator ||= FurnitureTextureGenerator.new
           generated = @generator.call(item: item, model: model, max_images: MAX_IMAGES - @generator.attempts, deadline: deadline)
@@ -71,8 +72,7 @@ class FurnitureProductAppearance
     item.dig("product_metadata", "color_source") == IMAGE_COLOR_SOURCE
   end
 
-  def color_overrides(item, model)
-    color = item["color"]
+  def color_overrides(item, model, color:)
     return {} unless color.is_a?(String) && color.match?(/\A#[0-9a-f]{6}\z/i)
 
     material = SHAPE_MATERIALS[model.shape] || PRIMARY_MATERIALS.find { |name| model.materials.include?(name) }
