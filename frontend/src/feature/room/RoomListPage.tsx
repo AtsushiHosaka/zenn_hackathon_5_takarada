@@ -60,6 +60,7 @@ export default function RoomListPage() {
   return <div className="room-list-page">
     <header className="room-list-header">
       <Link to="/rooms" className="room-list-brand"><ReferenceSvg page={2} index={0}/><span>へやいろ</span></Link>
+      <Link className="rc-secondary" to="/room-templates">テンプレート</Link>
       <AccountMenu/>
     </header>
     <main className="room-list-main">
