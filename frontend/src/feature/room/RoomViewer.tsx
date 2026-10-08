@@ -9,6 +9,7 @@ import { isManualFurniture, type RoomDesign, type RoomItem } from "../../domain/
 import { buildReferenceRoom, usesReferenceRoom } from "./referenceRoomModel";
 import { buildCharacterThemeDecor } from "./characterThemeDecor";
 import { buildMeasuredRoom } from "./roomArchitecture";
+import { createShellFloorOverlay } from "./shellFloorSurface";
 import { LAYOUT_GRID_STEP } from "./layoutGrid";
 import { applyMaterialOverrides } from "./furnitureMaterials";
 import { canPlaceOnFurniture, furniturePositionInRoom, getFurniturePlacementBounds, isFurnitureSupport, snapFurnitureEditPosition } from './roomBounds';
@@ -503,6 +504,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   const fallback = useRef<HTMLDivElement>(null);
   const modelNotice = useRef<HTMLDivElement>(null);
   const textureNotice = useRef<HTMLDivElement>(null);
+  const floorNotice = useRef<HTMLDivElement>(null);
   const runtime = useRef<ViewerRuntime | null>(null);
   const roomBounds = useRef<{ id: string; bounds: THREE.Box3 } | null>(null);
   const cameraState = useRef<{ id: string; position: THREE.Vector3; target: THREE.Vector3; zoom: number; minDistance: number; view: RoomViewerProps["view"]; lastCommandSequence: number | null } | null>(null);
@@ -534,6 +536,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     if (fallback.current) fallback.current.hidden = true;
     if (modelNotice.current) modelNotice.current.hidden = true;
     if (textureNotice.current) textureNotice.current.hidden = true;
+    if (floorNotice.current) floorNotice.current.hidden = true;
     let disposed = false;
     let assetsReady = true;
     let assetFailed = false;
@@ -618,6 +621,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     let clearPlacementPreview = () => {};
     let currentPlacement = initialPlacement();
     let loadedRoom: THREE.Group | null = null;
+    let shellFloor: THREE.Mesh | null = null;
+    let shellFloorUnavailable = false;
     const completeRoomModel = Boolean(design.modelUrl) && design.modelKind !== "shell";
     const gridBounds = referenceRoom?.floorBounds ?? baseRoomBounds;
     const gridFloor = design.room || referenceRoom ? 0 : getFurniturePlacementBounds(design).floor;
@@ -678,6 +683,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     };
     const updateVisibility = () => {
       if (themedDecor) themedDecor.visible = !currentBefore;
+      if (shellFloor) shellFloor.visible = !currentBefore;
+      if (floorNotice.current) floorNotice.current.hidden = currentBefore || !shellFloorUnavailable;
       layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel;
       proceduralRoomVisible = currentBefore || !loadedRoom;
       architecture.visible = proceduralRoomVisible;
@@ -909,6 +916,11 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         });
         scene.add(gltf.scene);
         loadedRoom = gltf.scene;
+        if (!completeRoomModel && design.floorColor) {
+          shellFloor = design.room ? createShellFloorOverlay(gltf.scene, design.room, design.floorColor) : null;
+          if (shellFloor) scene.add(shellFloor);
+          else shellFloorUnavailable = true;
+        }
         if (completeRoomModel) {
           for (const item of design.items) {
             const group = new THREE.Group();
@@ -1299,6 +1311,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       <div ref={modelNotice} className="viewer-model-notice" hidden role="status">
         3Dモデルを読み込めませんでした。
       </div>
+      <div ref={floorNotice} className="viewer-model-notice" hidden role="status">モデルの床面を特定できないため、保存した床の色をこのモデルに表示できません。</div>
       <div ref={textureNotice} className="viewer-model-notice" style={{bottom:84}} hidden role="status">
         一部の素材を読み込めませんでした。
       </div>
