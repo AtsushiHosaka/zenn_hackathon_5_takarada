@@ -197,7 +197,7 @@ function FurnitureSizeEditor({ item, design, onChange }: { item: RoomItem; desig
       return;
     }
     setError(undefined);
-    if (item.artwork) position[1] = Math.min(getFurniturePlacementBounds(design).max[1] - size[1] / 2, Math.max(position[1], item.position[1] - item.size[1] / 2 + size[1] / 2));
+    if (item.artwork && item.category === 'poster') position[1] = Math.min(getFurniturePlacementBounds(design).max[1] - size[1] / 2, Math.max(position[1], item.position[1] - item.size[1] / 2 + size[1] / 2));
     onChange({ size, position });
   }
 

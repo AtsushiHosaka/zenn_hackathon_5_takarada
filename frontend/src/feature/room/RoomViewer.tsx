@@ -9,9 +9,9 @@ import { isManualFurniture, type RoomDesign, type RoomItem } from "../../domain/
 import { buildReferenceRoom, usesReferenceRoom } from "./referenceRoomModel";
 import { buildCharacterThemeDecor } from "./characterThemeDecor";
 import { buildMeasuredRoom } from "./roomArchitecture";
-import { LAYOUT_GRID_STEP, snapItemPosition } from "./layoutGrid";
+import { LAYOUT_GRID_STEP } from "./layoutGrid";
 import { applyMaterialOverrides } from "./furnitureMaterials";
-import { getFurniturePlacementBounds, snapFurnitureEditPosition } from './roomBounds';
+import { canPlaceOnFurniture, furniturePositionInRoom, furnitureSurfaceHeight, getFurniturePlacementBounds, snapFurnitureEditPosition } from './roomBounds';
 
 interface RoomViewerProps {
   design: RoomDesign;
@@ -964,25 +964,22 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       const rect = renderer.domElement.getBoundingClientRect();
       if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) return null;
       setRay(event);
-      const hit = raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -gridFloor), new THREE.Vector3());
-      if (!hit || hit.x < gridBounds.min.x || hit.x > gridBounds.max.x || hit.z < gridBounds.min.z || hit.z > gridBounds.max.z) return null;
-      const angle = THREE.MathUtils.degToRad(item.rotation ?? 0);
-      const halfWidth = (Math.abs(Math.cos(angle)) * item.size[0] + Math.abs(Math.sin(angle)) * item.size[2]) / 2;
-      const halfDepth = (Math.abs(Math.sin(angle)) * item.size[0] + Math.abs(Math.cos(angle)) * item.size[2]) / 2;
-      if (halfWidth * 2 > gridBounds.max.x - gridBounds.min.x || halfDepth * 2 > gridBounds.max.z - gridBounds.min.z) return null;
-      if (item.size[1] > (design.room?.height ?? baseRoomBounds.max.y - gridFloor)) return null;
-      const position = snapItemPosition(item, [hit.x, item.position[1], hit.z], [0, 2], design.room);
-      // Inferred/demo rooms may be offset from the origin; constrain their bounds
-      // while retaining the same 10 cm grid used for moving existing furniture.
-      for (const [axis, halfSize] of [[0, halfWidth], [2, halfDepth]] as const) {
-        const name = axis === 0 ? "x" : "z";
-        const minimum = Math.ceil((gridBounds.min[name] + halfSize - 1e-9) / LAYOUT_GRID_STEP) / 10;
-        const maximum = Math.floor((gridBounds.max[name] - halfSize + 1e-9) / LAYOUT_GRID_STEP) / 10;
-        if (minimum > maximum) return null;
-        position[axis] = Math.max(minimum, Math.min(maximum, position[axis]));
+      const heights = [gridFloor];
+      if (canPlaceOnFurniture(item)) for (const support of design.items) {
+        if (support.id !== item.id && ['shelf', 'desk', 'table'].includes(support.category)) heights.push(support.position[1] + support.size[1] / 2);
       }
-      position[1] = gridFloor + item.size[1] / 2;
-      return position;
+      let nearest: { distance: number; position: RoomItem['position'] } | null = null;
+      for (const height of heights) {
+        const hit = raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -height), new THREE.Vector3());
+        if (!hit || hit.x < gridBounds.min.x || hit.x > gridBounds.max.x || hit.z < gridBounds.min.z || hit.z > gridBounds.max.z) continue;
+        const position = furniturePositionInRoom(item, [hit.x, height + item.size[1] / 2, hit.z], design);
+        if (!position) continue;
+        const surface = furnitureSurfaceHeight(item, position, design) ?? gridFloor;
+        if (Math.abs(surface - height) > .001) continue;
+        const distance = hit.distanceTo(raycaster.ray.origin);
+        if (!nearest || distance < nearest.distance) nearest = { distance, position };
+      }
+      return nearest?.position ?? null;
     };
     const dragOver = (event: DragEvent) => {
       if (!currentPlacement) return;
@@ -1086,7 +1083,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         event.stopImmediatePropagation();
         const active = drag;
         const delta = active.group.position.clone().sub(active.origin);
-        const changed = active.moved && Math.hypot(delta.x, delta.z) > .0005;
+        const changed = active.moved && delta.length() > .0005;
         releaseDrag(!changed);
         if (changed) {
           moveItem(active.id, active.position);
@@ -1114,7 +1111,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         if (!position) return;
         drag.position = position;
         // Preserve the model group's origin offset while previewing the snapped position.
-        drag.group.position.copy(drag.origin).add(new THREE.Vector3(position[0] - drag.itemPosition[0], 0, position[2] - drag.itemPosition[2]));
+        drag.group.position.copy(drag.origin).add(new THREE.Vector3(position[0] - drag.itemPosition[0], position[1] - drag.itemPosition[1], position[2] - drag.itemPosition[2]));
         drag.group.updateMatrixWorld(true);
         drag.moved = true;
         selection?.update();
