@@ -1,14 +1,17 @@
-import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router';
 import { useRepositories } from '../../core/repositories';
 import { useSession } from '../../core/session';
 import { loadConnection } from '../../core/connection';
-import { isManualFurniture, type FurnitureAddition, type FurnitureOperation, type RoomDesign, type RoomItem, type RoomShape, type Style } from '../../domain/room';
+import { isManualFurniture, isTemplateFurniture, type FurnitureAddition, type FurnitureOperation, type RoomDesign, type RoomItem, type RoomShape, type Style } from '../../domain/room';
 import type { RoomGenerationPhase } from '../../domain/roomRepository';
 import AccountMenu from './AccountMenu';
 import ReferenceSvg from './ReferenceSvg';
 import RoomScene from './RoomScene';
+import RoomPanelTransition from './RoomPanelTransition';
+import { useMotionPresence } from '../shared/useMotionPresence';
+import { identifyFurnitureAdditions } from './furnitureAdditionIds';
 import RecommendationPanel from './RecommendationPanel';
 import RoomGenerating from './RoomGenerating';
 import RoomPalettePicker from './RoomPalettePicker';
@@ -20,13 +23,12 @@ import { roomPlanKeys as sharedRoomPlanKeys, scopedRoomPlanKeys, useRoomPlanScop
 import ErrorText from '../shared/ErrorText';
 import { useMotionDialog } from '../shared/useMotionDialog';
 import { DomainError } from '../../domain/error';
+import CharacterThemePicker from './CharacterThemePicker';
+import { roomPhotoLimits, roomPhotoRequirements, roomPhotoValidationError } from '../../domain/roomPhoto';
 import { isTemplateId } from '../../domain/roomTemplate';
 import { createTemplateSnapshot, saveRoomTemplate } from './templates';
 import { templateKeys } from './templateStorage';
-import CharacterThemePicker from './CharacterThemePicker';
-import { roomPhotoLimits, roomPhotoRequirements, roomPhotoValidationError } from '../../domain/roomPhoto';
 import { motionScrollIntoView } from '../../core/motion';
-import { useMotionPresence } from '../shared/useMotionPresence';
 import './room-studio.css';
 import './room-templates.css';
 
@@ -116,7 +118,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const [budget,setBudget]=useState(design.budget??30000);
   const existingFurniture=existingItems(design);
   const [furnitureOperations,setFurnitureOperations]=useState<FurnitureOperation[]>(()=>design.furnitureOperations??existingFurniture.map(item=>({objectId:item.id,action:'keep'})));
-  const [furnitureAdditions,setFurnitureAdditions]=useState<FurnitureAddition[]>(()=>design.furnitureAdditions??[]);
+  const [furnitureAdditions,setFurnitureAdditions]=useState<FurnitureAddition[]>(()=>identifyFurnitureAdditions(design.furnitureAdditions??[]));
   const selectsFurniture=analysisMode&&canCoordinate&&!isNew&&design.source==='api'&&!!design.backendRoomId;
   const [message,setMessage]=useState('');
   const [roomPaletteId,setRoomPaletteId]=useState(design.roomPaletteId??defaultRoomPaletteId);
@@ -139,6 +141,10 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const [selectedId,setSelectedId]=useState<string|null>(inputState?.selectedId??design.items.find(item=>item.id==='3')?.id??design.items.find(item=>!item.existing)?.id??null);
   const [panel,setPanel]=useState(!analyzed||!!inputState?.selectedId);
   const [editing,setEditing]=useState(inputState?.editing??analyzed);
+  const [focusPanel,setFocusPanel]=useState(false);
+  const panelPresence=useMotionPresence(panel);
+  const panelScroll=useRef({edit:0,products:0});
+  const savePanelScroll=useCallback((mode:'edit'|'products',position:number)=>{panelScroll.current[mode]=position;},[]);
   const [view,setView]=useState<PlannerView>(inputState?.view??'perspective');
   const [placementItem,setPlacementItem]=useState<RoomItem|null>(null);
   const [dimensions,setDimensions]=useState(inputState?.dimensions??false);
@@ -150,11 +156,18 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const placementDisabled=before||Boolean(design.modelUrl&&design.modelKind!=='shell');
   const [filter,setFilter]=useState('all');
   const [templateName,setTemplateName]=useState<string|null>(null);
-  const templateDialog=useRef<HTMLDialogElement>(null);
-  useEffect(()=>{if(templateName!==null)templateDialog.current?.showModal();else templateDialog.current?.close();},[templateName]);
+  const templateDialogRef=useRef<HTMLDialogElement>(null);
+  const templateDialog=useMotionDialog(templateDialogRef,templateName!==null,()=>setTemplateName(null));
   const [rename,setRename]=useState(false);
   const [title,setTitle]=useState(design.title);
   const upload=useRef<HTMLInputElement>(null);
+  const header=useRef<HTMLElement>(null);
+  useLayoutEffect(()=>{
+    const element=header.current;const studio=element?.parentElement;if(!element||!studio)return;
+    const measure=()=>studio.style.setProperty('--rc-header-bottom',`${Math.max(0,element.getBoundingClientRect().bottom)}px`);
+    measure();const observer=new ResizeObserver(measure);observer.observe(element);window.addEventListener('resize',measure);
+    return()=>{observer.disconnect();window.removeEventListener('resize',measure);studio.style.removeProperty('--rc-header-bottom');};
+  },[]);
   const messages=useRef<HTMLDivElement>(null);
   const composer=useRef<HTMLFormElement>(null);
   const nearBottom=useRef(true);
@@ -191,14 +204,14 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
     },
     onSuccess:(result,variables)=>{
       const editedItems=(variables.createNew?[]:design.editedItems??[]).filter(item=>item.existing||result.items.some(current=>current.id===item.id));
-      const references=new Map(existingFurniture.filter(item=>item.referenceImage).map(item=>[item.id,item.referenceImage]));
-      const preserveReference=(item:RoomItem):RoomItem=>references.has(item.id)&&isManualFurniture(item)?{...item,referenceImage:references.get(item.id)}:item;
-      const saved={...result,characterThemeId:result.characterThemeId??characterThemeId,roomPaletteId:result.roomPaletteId??roomPaletteId,items:result.items.map(preserveReference),...(result.before?{before:{...result.before,items:result.before.items.map(preserveReference)}}:{}),...(!variables.analyzeOnly&&editedItems.length?{editedItems}:{}),...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request.trim()||undefined,budget:variables.budget}:{}),id:result.id};
+      const references=new Map((variables.createNew?[]:existingFurniture).filter(item=>item.referenceImage||item.artwork).map(item=>[item.id,{referenceImage:item.referenceImage,artwork:item.artwork}]));
+      const preserveReference=(item:RoomItem):RoomItem=>references.has(item.id)&&(isManualFurniture(item)||isTemplateFurniture(item))?{...item,...references.get(item.id)}:item;
+      const saved={...result,items:result.items.map(preserveReference),...(result.before?{before:{...result.before,items:result.before.items.map(preserveReference)}}:{}),characterThemeId:result.characterThemeId??characterThemeId,roomPaletteId:result.roomPaletteId??roomPaletteId,...(!variables.analyzeOnly&&editedItems.length?{editedItems}:{}),...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request.trim()||undefined,budget:variables.budget}:{}),id:result.id};
       let storageNotice: string|undefined;
       try {saveRoomPlan(client,saved,scope);}catch{client.setQueryData(roomPlanKeys.detail(saved.id),saved);if(!rooms.persistenceWarning?.()){storageNotice='ブラウザに保存できませんでした。保存容量を確認してください。';setNotice(storageNotice);}}
       setSavedFingerprint(JSON.stringify(saved));setHistory({past:[],future:[]});
       setFurnitureOperations(saved.furnitureOperations??(saved.before?.items??saved.items).filter(item=>item.existing).map(item=>({objectId:item.id,action:'keep'})));
-      setFurnitureAdditions(saved.furnitureAdditions??[]);
+      setFurnitureAdditions(identifyFurnitureAdditions(saved.furnitureAdditions??[]));
       navigate(`/rooms/${saved.id}`,{state:{prompt:result.kind==='analysis'&&canCoordinate?variables.request:saved.prompt??(result.kind==='analysis'?analysisPrompt:variables.request),photos:result.analysisInput?[]:photos,editing:result.kind==='analysis',notice:storageNotice}});
     },
   });
@@ -206,7 +219,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const total=additions.reduce((sum,item)=>sum+(item.price??0),0);
   const referenceStory=design.source==='demo'&&design.style==='oshi'&&additions.length===8&&additions.find(item=>item.id==='3')?.color==='#bba5ee';
   const referenceBase=rooms.demo('oshi');
-  const referenceLayout=referenceStory&&!design.wallColor&&!design.floorColor&&design.items.every(item=>{const original=referenceBase.items.find(base=>base.id===item.id);return original&&JSON.stringify(item.position)===JSON.stringify(original.position)&&JSON.stringify(item.size)===JSON.stringify(original.size)&&item.color===original.color&&!(item.rotation??0);});
+  const referenceLayout=design.source==='demo'&&design.style==='oshi'&&additions.length===8&&!design.wallColor&&design.items.every(item=>{const original=referenceBase.items.find(base=>base.id===item.id);return original&&JSON.stringify(item.position)===JSON.stringify(original.position)&&JSON.stringify(item.size)===JSON.stringify(original.size)&&item.color===original.color&&!(item.rotation??0);});
   const pending=generation.isPending;
   useLayoutEffect(()=>{if(wasPending.current&&!pending){const target=composer.current?.querySelector<HTMLElement>('input:not([type=hidden]),textarea,button:not(:disabled)')??document.getElementById(analyzed?'coordinate-request':'res-msg');target?.focus();}wasPending.current=pending;},[pending,analyzed]);
   function addPhotos(files:File[]) {
@@ -329,14 +342,14 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
     catch(error){setNotice(error instanceof Error?error.message:'テンプレートを保存できませんでした。');}
   }
   return <div className="rc-studio">
-    <header className={`rc-studio-header${isNew?' motion-enter':''}`}><Link className="rc-back" to={isTemplate?'/room-templates':'/rooms'} aria-label={isTemplate?'テンプレート一覧に戻る':'ルーム一覧に戻る'} title={isTemplate?'テンプレート一覧':'ルーム一覧'}><ReferenceSvg page={3} index={0}/></Link><span className="rc-header-divider"/><div className={`rc-title${isNew?' is-new':''}`}>{isTemplate&&<span className="rc-template-badge">テンプレート</span>}<h1>{isNew?'新しいルーム':design.title}</h1>{!isNew&&<button type="button" aria-label="ルーム名を変更" onClick={()=>{setTitle(design.title);setRename(true);}}><ReferenceSvg page={5} index={1}/></button>}</div><nav className="rc-template-actions" aria-label="テンプレート"><Link className="rc-secondary" to="/room-templates">テンプレート一覧</Link>{!isNew&&!isTemplate&&<button type="button" className="rc-secondary" onClick={()=>setTemplateName(design.title)}>テンプレートに保存</button>}</nav><AccountMenu onEditLayout={!isNew&&id!=='sample-game'?()=>{setEditing(true);setPanel(true);setBefore(false);}:undefined}/></header>
+    <header ref={header} className={`rc-studio-header${isNew?' motion-enter':''}`}><Link className="rc-back" to={isTemplate?'/room-templates':'/rooms'} aria-label={isTemplate?'テンプレート一覧に戻る':'ルーム一覧に戻る'} title={isTemplate?'テンプレート一覧':'ルーム一覧'}><ReferenceSvg page={3} index={0}/></Link><span className="rc-header-divider"/><div className={`rc-title${isNew?' is-new':''}`}>{isTemplate&&<span className="rc-template-badge">テンプレート</span>}<h1>{isNew?'新しいルーム':design.title}</h1>{!isNew&&<button type="button" aria-label="ルーム名を変更" onClick={()=>{setTitle(design.title);setRename(true);}}><ReferenceSvg page={5} index={1}/></button>}</div><nav className="rc-template-actions" aria-label="テンプレート"><Link className="rc-secondary" to="/room-templates">テンプレート一覧</Link>{!isNew&&!isTemplate&&<button type="button" className="rc-secondary" onClick={()=>setTemplateName(design.title)}>テンプレートに保存</button>}</nav><AccountMenu onEditLayout={!isNew&&id!=='sample-game'?()=>{setEditing(true);setFocusPanel(true);setPanel(true);setBefore(false);}:undefined}/></header>
     <input ref={upload} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden aria-describedby="room-photo-requirements" onChange={event=>{addPhotos(Array.from(event.target.files??[]));event.target.value='';}}/>
     <div className={`rc-workspace${pending||id==='sample-game'?' is-generating':''}`}>
       {pending||id==='sample-game'?<RoomGenerating phase={generationPhase} prompt={generation.variables?.analyzeOnly?analysisPrompt:generation.variables?.request??(analysisMode?analysisPrompt:prompt)} photos={acceptsPhotos?photos:[]} sample={loadConnection()==='dummy'} dimensions={analysisMode} coordination={canCoordinate&&!generation.variables?.analyzeOnly} onCancel={()=>{if(pending){abort.current?.abort();generation.reset();setNotice('生成を停止しました。');}else navigate('/rooms');}}/>:<>
         <section className="rc-chat" aria-label="チャット">
           {isNew?<>
             <div ref={messages} onScroll={event=>{const node=event.currentTarget;nearBottom.current=node.scrollHeight-node.scrollTop-node.clientHeight<64;}} className="rc-messages is-new">{stepIndex>0&&<div className="rc-input-summary">{inputSteps.slice(0,stepIndex).map(step=><p className="motion-enter" key={step}>{step==='tatami'?`${tatami}畳`:step==='shape'?shapeLabel(shape):step==='photos'?`写真 ${photos.length||samplePhotos.length}枚`:prompt}</p>)}</div>}<Intro key={inputStep} step={inputStep} analysis={analysisMode}/></div>
-            <form ref={composer} className={`rc-new-composer motion-fade${photoDrop?' is-photo-drop':''}`} onSubmit={start} onDragOver={event=>{event.preventDefault();if(inputStep==='photos'&&event.dataTransfer.types.includes('Files'))setPhotoDrop(true);}} onDragLeave={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null))setPhotoDrop(false);}} onDrop={event=>{event.preventDefault();setPhotoDrop(false);if(inputStep==='photos')addPhotos(Array.from(event.dataTransfer.files));}}>
+            <form ref={composer} className={`rc-new-composer${photoDrop?' is-photo-drop':''}`} onSubmit={start} onDragOver={event=>{event.preventDefault();if(inputStep==='photos'&&event.dataTransfer.types.includes('Files'))setPhotoDrop(true);}} onDragLeave={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null))setPhotoDrop(false);}} onDrop={event=>{event.preventDefault();setPhotoDrop(false);if(inputStep==='photos')addPhotos(Array.from(event.dataTransfer.files));}}>
               {inputSteps.length>0&&<ol className="rc-input-progress" aria-label="部屋の入力手順">{inputSteps.map((step,index)=><li key={step} aria-current={index===stepIndex?'step':undefined} className={`motion-control${index<stepIndex?' is-complete':''}`}><span>{index+1}</span>{stepLabels[step]}</li>)}</ol>}
               <div key={inputStep} className="rc-setup-step motion-enter">{inputStep==='tatami'&&<div className="rc-analysis-settings"><label className="rc-setting" htmlFor="room-tatami">部屋の広さ<span className="rc-tatami-input"><input id="room-tatami" type="number" min={3} max={30} step="0.5" value={Number.isNaN(tatami)?'':tatami} onChange={event=>setTatami(event.target.valueAsNumber)} required/>畳</span></label></div>}
               {inputStep==='shape'&&<div className="rc-analysis-settings"><fieldset><legend>部屋の形</legend><div className="rc-shape-options">{roomShapes.map(item=><button key={item.value} type="button" className="motion-control" aria-pressed={shape===item.value} onClick={()=>setShape(item.value)}>{item.label}</button>)}</div></fieldset></div>}
@@ -357,7 +370,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
               <div key={`user-${design.id}`} className="rc-user-message motion-enter">{!design.analysisInput&&<div className="rc-user-photos">{photos.length?photos.map(file=><div key={`${file.name}-${file.size}-${file.lastModified}`}><PhotoImage file={file}/></div>):[3,4,5,6].map(index=><div key={index}><ReferenceSvg page={5} index={index}/></div>)}</div>}<p>{design.kind==='analysis'&&design.analysisInput?`${design.analysisInput.tatami}畳・${shapeLabel(design.analysisInput.shape)}の部屋を3Dで確認したい。`:prompt}</p></div>
               <div key={`result-${design.id}`} className="rc-assistant motion-enter"><span className="rc-assistant-icon"><ReferenceSvg page={5} index={7}/></span><div className="rc-assistant-body"><span className="rc-assistant-name">へやいろ</span><span className="rc-complete"><ReferenceSvg page={5} index={8}/>{isTemplate?'テンプレート':design.description==='保存したテンプレートから作成した部屋です。'?'作成完了':design.source==='demo'?'サンプル':analyzed?'解析完了':'コーディネート完了'}</span><p>{referenceStory?'今あるベッドとデスクはそのままに、紫をアクセントにした推し活ルームにしました。':roomDescription(design.description)}</p>
                 {referenceStory&&<ul className="rc-bullets"><li>壁の上部にLEDテープを回して、夜は紫の間接照明に</li><li>ベッドの足元に、アクスタを飾れるひな壇シェルフ</li><li>ラグ・クッション・ベッドカバーをラベンダー系で統一</li></ul>}
-                {!analyzed&&<div className="rc-summary motion-fade"><div className="rc-summary-heading"><span>コーディネート案</span><span>{additions.length}アイテム · <span className="rc-money">{money(total)}</span></span></div><div className="rc-summary-actions"><button type="button" className="rc-primary" onClick={()=>{setEditing(false);setPanel(true);}}><ReferenceSvg page={5} index={9}/>アイテム一覧</button><button type="button" className="rc-secondary" onClick={()=>setBefore(old=>!old)}>Before / After</button></div></div>}
+                {!analyzed&&<div className="rc-summary motion-fade"><div className="rc-summary-heading"><span>コーディネート案</span><span>{additions.length}アイテム · <span className="rc-money">{money(total)}</span></span></div><div className="rc-summary-actions"><button type="button" className="rc-primary" onClick={()=>{setEditing(false);setFocusPanel(true);setPanel(true);}}><ReferenceSvg page={5} index={9}/>アイテム一覧</button><button type="button" className="rc-secondary" onClick={()=>setBefore(old=>!old)}>Before / After</button></div></div>}
               </div></div>
               {canCoordinate&&!analyzed&&<CharacterThemePicker value={characterThemeId} onChange={setCharacterThemeId}/>}
               {canCoordinate&&!analyzed&&<RoomPalettePicker value={roomPaletteId} onChange={setRoomPaletteId}/>}
@@ -378,13 +391,13 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
             {canCoordinate&&analyzed?null:canCoordinate?<form className="rc-followup-composer" onSubmit={followup}><FollowupModePicker value={followupMode} onChange={setFollowupMode} canModify={canModify}/><div className="rc-followup-input">{!analysisMode&&<button type="button" aria-label="写真を追加" onClick={()=>upload.current?.click()}><ReferenceSvg page={5} index={10}/></button>}<label className="rc-sr-only" htmlFor="res-msg">メッセージ</label><textarea id="res-msg" rows={1} placeholder="変えたいところを伝えてください" value={message} maxLength={analysisMode?500:2000} onChange={event=>setMessage(event.target.value)}/><button type="submit" aria-label="送信" ><ReferenceSvg page={5} index={11}/></button></div>{photoError&&<p className="rc-error" role="alert">{photoError}</p>}</form>:<div className="rc-followup-composer rc-analysis-note">{isTemplate?'配置と色を編集し、変更を保存してください。部屋の作成はテンプレート一覧から行えます。':'コーディネートは利用できません。'}</div>}
           </>}
         </section>
-        {isNew?<EmptyScene/>:<RoomScene key={design.id} design={design} panel={panel} before={before} filter={filter} selectedId={selectedId} referenceLayout={referenceLayout} editing={editing} view={view} dimensions={dimensions} onSelect={value=>{setSelectedId(value);setPanel(true);setFilter('all');const item=design.items.find(item=>item.id===value);if(analyzed||item){setEditing(true);setBefore(false);}}} onBefore={value=>{setPlacementItem(null);setBefore(value);}} onMoveItem={moveItem} placementItem={placementItem} onPlaceItem={(position,supportObjectId,supportSurface)=>{if(placementItem)addItem(placementItem,position,supportObjectId,supportSurface);}} onOpenPanel={()=>{setPanel(true);if(analyzed)setEditing(true);}}>{panel&&(editing?<PlannerPanel onAddItem={addItem} onDragItem={startPlacement} onRemoveItem={removeItem} placementDisabled={placementDisabled} placementHint={before?'Afterに切り替えると家具を追加できます。':undefined} design={design} templateEditing={isTemplate} selectedId={selectedId} onSelect={setSelectedId} furnitureRequests={selectsFurniture?{existingItems:existingFurniture,operations:furnitureOperations,additions:furnitureAdditions,onOperationChange:(objectId,action)=>setFurnitureOperations(previous=>[...previous.filter(operation=>operation.objectId!==objectId),{objectId,action}]),onAdditionsChange:setFurnitureAdditions}:undefined} onChange={editDesign} onUndo={undo} onRedo={redo} canUndo={history.past.length>0} canRedo={history.future.length>0} dirty={dirty} onSave={saveEdits} onClose={()=>{setPlacementItem(null);setEditing(false);setPanel(false);}} onProducts={()=>{setPlacementItem(null);setEditing(false);}} view={view} onView={setView} dimensions={dimensions} onDimensions={setDimensions}/>:<RecommendationPanel onEditLayout={()=>{setEditing(true);setBefore(false);}} searchEntryPoints={design.searchEntryPoints} originalItems={design.before?.items} items={additions} selectedId={selectedId} filter={filter} onSelect={setSelectedId} onFilter={setFilter} onClose={()=>setPanel(false)}/>)}</RoomScene>}
+        {isNew?<EmptyScene/>:<RoomScene key={design.id} design={design} panel={panelPresence.isPresent} before={before} filter={filter} selectedId={selectedId} referenceLayout={referenceLayout} editing={editing} view={view} dimensions={dimensions} onSelect={value=>{setSelectedId(value);setFocusPanel(true);setPanel(true);setFilter('all');const item=design.items.find(item=>item.id===value);if(analyzed||item){setEditing(true);setBefore(false);}}} onBefore={value=>{setPlacementItem(null);setBefore(value);}} onMoveItem={moveItem} placementItem={placementItem} onPlaceItem={(position,supportObjectId,supportSurface)=>{if(placementItem)addItem(placementItem,position,supportObjectId,supportSurface);}} onOpenPanel={()=>{setFocusPanel(true);setPanel(true);if(analyzed)setEditing(true);}}>{panelPresence.isPresent&&<RoomPanelTransition open={panel} focusOnMount={focusPanel} mode={editing?'edit':'products'} scrollPositions={panelScroll} onScrollPositionChange={savePanelScroll}>{shownMode=>shownMode==='edit'?<PlannerPanel onAddItem={addItem} onDragItem={startPlacement} onRemoveItem={removeItem} placementDisabled={placementDisabled} placementHint={before?'Afterに切り替えると家具を追加できます。':undefined} design={design} templateEditing={isTemplate} selectedId={selectedId} onSelect={setSelectedId} furnitureRequests={selectsFurniture?{existingItems:existingFurniture,operations:furnitureOperations,additions:furnitureAdditions,onOperationChange:(objectId,action)=>setFurnitureOperations(previous=>[...previous.filter(operation=>operation.objectId!==objectId),{objectId,action}]),onAdditionsChange:setFurnitureAdditions}:undefined} onChange={editDesign} onUndo={undo} onRedo={redo} canUndo={history.past.length>0} canRedo={history.future.length>0} dirty={dirty} onSave={saveEdits} onClose={()=>{setPlacementItem(null);setEditing(false);setPanel(false);}} onProducts={()=>{setPlacementItem(null);setEditing(false);}} view={view} onView={setView} dimensions={dimensions} onDimensions={setDimensions}/>:<RecommendationPanel onEditLayout={()=>{setEditing(true);setBefore(false);}} searchEntryPoints={design.searchEntryPoints} originalItems={design.before?.items} items={additions} selectedId={selectedId} filter={filter} onSelect={setSelectedId} onFilter={setFilter} onClose={()=>setPanel(false)}/> }</RoomPanelTransition>}</RoomScene>}
       </>}
     </div>
     {notice&&<div key={notice} className="rc-notice motion-fade" role="status">{notice}<button className="motion-control" type="button" aria-label="通知を閉じる" onClick={()=>setNotice('')}>×</button></div>}
     {rooms.persistenceWarning?.()&&<div className="rc-notice motion-fade" role="alert">{rooms.persistenceWarning()}</div>}
-    {templateWarning&&<div className="rc-notice" role="alert">{templateWarning}</div>}
-    <dialog ref={templateDialog} className="rc-dialog" onCancel={()=>setTemplateName(null)}><form onSubmit={saveAsTemplate}><div className="rc-dialog-heading"><h2>テンプレートに保存</h2><button type="button" aria-label="閉じる" onClick={()=>setTemplateName(null)}>×</button></div><label className="rc-setting">テンプレート名<input value={templateName??''} onChange={event=>setTemplateName(event.target.value)} maxLength={80} required autoFocus/></label><p>現在の配置と色を、このブラウザに保存します。元の部屋は変更しません。</p><button className="rc-primary" type="submit">保存</button></form></dialog>
+    {templateWarning&&<div className="rc-notice motion-fade" role="alert">{templateWarning}</div>}
+    <dialog ref={templateDialogRef} className="rc-dialog motion-dialog motion-presence" data-motion-state={templateDialog.state} tabIndex={-1} aria-labelledby="save-template-title" onKeyDown={templateDialog.onKeyDown} onCancel={templateDialog.onCancel} onClose={templateDialog.onClose} onClick={templateDialog.onClick}><form inert={templateDialog.closing} aria-hidden={templateDialog.closing} onSubmit={saveAsTemplate}><div className="rc-dialog-heading"><h2 id="save-template-title">テンプレートに保存</h2><button type="button" aria-label="閉じる" onClick={()=>setTemplateName(null)}>×</button></div><label className="rc-setting">テンプレート名<input className="motion-field" value={templateName??''} onChange={event=>setTemplateName(event.target.value)} maxLength={80} required autoFocus/></label><p>現在の配置と色を、このブラウザに保存します。元の部屋は変更しません。</p><button className="rc-primary" type="submit">保存</button></form></dialog>
     <dialog ref={renameDialogRef} className="rc-dialog motion-dialog motion-presence" data-motion-state={renameDialog.state} tabIndex={-1} aria-labelledby="rename-room-title" onKeyDown={renameDialog.onKeyDown} onCancel={renameDialog.onCancel} onClose={renameDialog.onClose} onClick={renameDialog.onClick}><form inert={renameDialog.closing} aria-hidden={renameDialog.closing} onSubmit={changeTitle}><div className="rc-dialog-heading"><h2 id="rename-room-title">ルーム名を変更</h2><button type="button" aria-label="閉じる" onClick={()=>setRename(false)}>×</button></div><label className="rc-setting">ルーム名<input className="motion-field" value={title} onChange={event=>setTitle(event.target.value)} maxLength={80} required autoFocus/></label><p/><button className="rc-primary" type="submit">保存</button></form></dialog>
   </div>;
 }

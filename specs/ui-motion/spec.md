@@ -57,3 +57,13 @@ Screenshots and reproduction notes: `docs/pr-evidence/issue-52-53`. Native file 
 ## Independent correction (2026-10-09)
 
 Review of PR #102 at `eedcab00f318fc42dca6b5161969b80e382d21fb` found that deleting a sample photo did not restore keyboard focus: only the real-file count triggered the layout effect. The effect now also observes the active sample-photo count, so both kinds of removal focus the existing Add Photo control immediately while the removed tile becomes inert. The motion lifecycle and submitted photo list are unchanged. No permanent tests were added.
+
+## Combined acceptance corrections (#58)
+
+The integration preserves all feature branches through normal merges. Newly introduced template dialogs use the shared native-dialog helper and template cards use stable-key bounded entrance feedback. Template copies remap support-parent IDs and captured world-to-local surface footprints, including inferred-room recentering; copied floor overrides become the existing room floor contract. These corrections keep furniture-surface contact valid across API/offline copies without mutating the source.
+
+At widths up to 720px, the ready studio gives the 3D stage the full width above the chat (280–420px, otherwise 45dvh). New Room hides the uncreated-room illustration and bounds the existing composer scroll area. The earlier 240px chat/150px stage split clipped 3D controls at390px. The generation-specific layout remains independent. Fixed mobile editors use the measured header bottom so wrapped template navigation does not cover their controls. Combined browser acceptance remains pending.
+
+### Short phone windows — issue #58
+
+Short phone windows (up to720px wide and600px high) scroll the workspace below the persistent header with a260px stage and240px chat region. Scene insets preserve a positive124px render area and follow-up controls scroll inside the chat. This adopts the inspected short-screen correction from879da38387c9a52ff366b213800349f31836809c and replaces an initial height-only shrink that could collapse the viewer beneath its chrome. Final combined browser verification is recorded in issue58 evidence.
