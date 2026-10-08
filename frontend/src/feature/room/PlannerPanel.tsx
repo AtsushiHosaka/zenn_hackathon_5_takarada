@@ -1,7 +1,7 @@
 import { useState, type DragEvent } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRepositories } from '../../core/repositories';
-import { isManualFurniture, isTemplateFurniture, furnitureCategories, replacementFurnitureCategories, type FurnitureAddition, type FurnitureCategory, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
+import { isManualFurniture, isTemplateFurniture, furnitureCategories, replacementFurnitureCategories, productCategories, type FurnitureAddition, type FurnitureCategory, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
 import ErrorText from '../shared/ErrorText';
 import { downloadShoppingCsv } from './exports';
 import { LAYOUT_GRID_STEP, snapToLayoutGrid } from './layoutGrid';
@@ -17,6 +17,11 @@ import FurnitureSearchPanel from './FurnitureSearchPanel';
 import { productReplacementPosition } from './productReplacement';
 
 export type PlannerView = 'perspective' | 'top' | 'front';
+
+function isProductCategory(category: string) {
+  const aliases: Record<string, string> = { lamp: 'floor_lamp', artwork: 'wall_art', cover: 'bed_cover' };
+  return productCategories.some(value => value === (aliases[category] ?? category));
+}
 
 type PlannerPanelProps = {
   design: RoomDesign;
@@ -308,7 +313,7 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
           {selectableItems.map(item => <option key={item.id} value={item.id}>{item.name}{item.existing ? '（今ある家具）' : ''}</option>)}
         </select>
         {selected && <>
-          <FurnitureSearchPanel key={`${selected.id}:${selected.productMetadata?.variantId ?? selected.productUrl ?? selected.name}`} replacementTarget={selected} design={design} disabled={itemDisabled} onAddItem={product => {
+          {isProductCategory(selected.category) && <FurnitureSearchPanel key={`${selected.id}:${selected.productMetadata?.variantId ?? selected.productUrl ?? selected.name}`} replacementTarget={selected} design={design} disabled={itemDisabled} onAddItem={product => {
             const position = productReplacementPosition(product, selected, design);
             if (!position) return;
             const { ecProductId, ...details } = product;
@@ -318,7 +323,7 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
             const operations = design.furnitureOperations ?? furnitureRequests?.operations ?? (design.before?.items ?? design.items).filter(item => item.existing).map(item => ({ objectId: item.id, action: 'keep' as const }));
             const nextOperations: FurnitureOperation[] = originalId ? [...operations.filter(operation => operation.objectId !== originalId), { objectId: originalId, action: 'replace' }] : operations;
             onChange({ ...design, ...(selected.existing && !design.before && design.room ? { before: { room: design.room, items: design.items, wallColor: design.wallColor } } : {}), items: design.items.map(item => item.id === selected.id ? replacement : item), ...(originalId ? { furnitureOperations: nextOperations, keptObjectIds: nextOperations.filter(operation => operation.action === 'keep').map(operation => operation.objectId) } : {}) });
-          }} />
+          }} />}
           {(selected.imageUrl || selected.referenceImage) && <FurniturePhoto key={selected.imageUrl ?? selected.referenceImage?.dataUrl} item={selected} compact />}
           {selected.existing && furnitureRequests && <div className="rc-planner-operation">
             <div className="rc-planner-segments" role="group" aria-label={`${selected.name}の操作`}>

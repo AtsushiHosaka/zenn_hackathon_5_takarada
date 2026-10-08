@@ -1,6 +1,8 @@
 {
   "coordination": {
-    "prompt": "選択した商品と配置を保つ",
+    "room_palette_id": "warm-ivory",
+    "character_theme_id": "pochacco",
+    "prompt": "選択した家具を保つ",
     "budget": 30000,
     "kept_object_ids": [
       "bed-1",
@@ -54,7 +56,7 @@
         "color": "#8b6a4a"
       },
       {
-        "id": "manual-dc39c5d5-5284-483b-a623-8a539aa5950f",
+        "id": "manual-c0bd7633-356c-4a2a-97e7-1d82191ab8da",
         "position": {
           "x": 1.68,
           "y": 0,
@@ -86,7 +88,7 @@
         "action": "keep"
       },
       {
-        "object_id": "manual-dc39c5d5-5284-483b-a623-8a539aa5950f",
+        "object_id": "manual-c0bd7633-356c-4a2a-97e7-1d82191ab8da",
         "action": "replace"
       }
     ],
