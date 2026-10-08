@@ -892,6 +892,17 @@ components:
       - wall_color
       - floor_color
       - windows
+    ImageArtwork:
+      type: object
+      properties:
+        data_url:
+          type: string
+          maxLength: 262144
+          pattern: "^data:image/png;base64,"
+          description: 最大512pxのPNG画像。透過を保持する
+          example: data:image/png;base64,iVBORw0KGgo=
+      required:
+      - data_url
     SceneObject:
       type: object
       properties:
@@ -908,6 +919,8 @@ components:
         category:
           type: string
           example: bed
+        artwork:
+          "$ref": "#/components/schemas/ImageArtwork"
         label:
           type: string
           example: ベッド
@@ -1197,8 +1210,12 @@ components:
           - chair
           - shelf
           - table
+          - poster
+          - acrylic_stand
           description: 手動で補完した所有家具では必須
           example: chair
+        artwork:
+          "$ref": "#/components/schemas/ImageArtwork"
         ec_product_id:
           type: integer
           minimum: 1
@@ -1558,6 +1575,83 @@ components:
         coordination:
           type: object
           properties:
+            room_palette_id:
+              type: string
+              enum:
+              - snow-graphite
+              - porcelain
+              - silver-line
+              - stone-gray
+              - monochrome-gallery
+              - mist-smoke
+              - warm-ivory
+              - oatmeal
+              - desert-sand
+              - mushroom-taupe
+              - coffee-cream
+              - linen-ink
+              - sage-clay
+              - olive-linen
+              - moss-oak
+              - terracotta-fern
+              - botanical-white
+              - jungle-earth
+              - mint-cloud
+              - seafoam
+              - teal-studio
+              - turquoise-pop
+              - celadon
+              - lagoon-dusk
+              - sky-white
+              - powder-blue
+              - coastal-blue
+              - cobalt-gallery
+              - denim-wood
+              - ice-navy
+              - lavender-milk
+              - lilac-garden
+              - amethyst
+              - violet-pop
+              - mauve-taupe
+              - orchid-gold
+              - blush-linen
+              - rose-quartz
+              - dusty-rose
+              - peach-pink
+              - fuchsia-pop
+              - cherry-blossom
+              - brick-cream
+              - scarlet-pop
+              - apricot
+              - tangerine-studio
+              - butter-yellow
+              - sunflower
+              - candy-pastel
+              - mint-strawberry
+              - lavender-lemon
+              - primary-play
+              - tropical-pop
+              - festival
+              - charcoal-silver
+              - midnight-brass
+              - forest-night
+              - plum-velvet
+              - burgundy-lounge
+              - espresso-copper
+              description: 部屋のカラーテーマ。省略時は従来の配色
+              example: warm-ivory
+            character_theme_id:
+              type: string
+              enum:
+              - hatsune-miku
+              - sanrio
+              - hello-kitty
+              - my-melody
+              - kuromi
+              - cinnamoroll
+              - pompompurin
+              description: 任意のキャラクターテーマ。画像や公式商品を保証しない
+              example: hatsune-miku
             prompt:
               type: string
               example: 紫色の推し活ルームにしたい
@@ -1690,6 +1784,19 @@ components:
           - done
           - failed
           example: done
+        character_theme_id:
+          type: string
+          nullable: true
+          enum:
+          -
+          - hatsune-miku
+          - sanrio
+          - hello-kitty
+          - my-melody
+          - kuromi
+          - cinnamoroll
+          - pompompurin
+          example: hatsune-miku
         prompt:
           type: string
           example: 紫色の推し活ルームにしたい
@@ -1754,6 +1861,72 @@ components:
           type: integer
           nullable: true
           example: 26840
+        room_palette_id:
+          type: string
+          nullable: true
+          enum:
+          -
+          - snow-graphite
+          - porcelain
+          - silver-line
+          - stone-gray
+          - monochrome-gallery
+          - mist-smoke
+          - warm-ivory
+          - oatmeal
+          - desert-sand
+          - mushroom-taupe
+          - coffee-cream
+          - linen-ink
+          - sage-clay
+          - olive-linen
+          - moss-oak
+          - terracotta-fern
+          - botanical-white
+          - jungle-earth
+          - mint-cloud
+          - seafoam
+          - teal-studio
+          - turquoise-pop
+          - celadon
+          - lagoon-dusk
+          - sky-white
+          - powder-blue
+          - coastal-blue
+          - cobalt-gallery
+          - denim-wood
+          - ice-navy
+          - lavender-milk
+          - lilac-garden
+          - amethyst
+          - violet-pop
+          - mauve-taupe
+          - orchid-gold
+          - blush-linen
+          - rose-quartz
+          - dusty-rose
+          - peach-pink
+          - fuchsia-pop
+          - cherry-blossom
+          - brick-cream
+          - scarlet-pop
+          - apricot
+          - tangerine-studio
+          - butter-yellow
+          - sunflower
+          - candy-pastel
+          - mint-strawberry
+          - lavender-lemon
+          - primary-play
+          - tropical-pop
+          - festival
+          - charcoal-silver
+          - midnight-brass
+          - forest-night
+          - plum-velvet
+          - burgundy-lounge
+          - espresso-copper
+          example: warm-ivory
         planned_by:
           type: string
           nullable: true
