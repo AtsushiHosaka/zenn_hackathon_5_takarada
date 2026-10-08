@@ -1,0 +1,11 @@
+{
+  "revision": "bcc16b27aed1ce847f0242a46382ce1623f381c7",
+  "checks": [
+    "sole row normal/reduced keyboard focus",
+    "supported image categories",
+    "manual mirror retained",
+    "single canvas",
+    "zero page errors"
+  ],
+  "errors": []
+}
