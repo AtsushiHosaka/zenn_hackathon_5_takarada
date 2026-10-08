@@ -40,7 +40,7 @@ export function createTemplateSnapshot(design: RoomDesign, title: string): RoomD
   const snapshot: RoomDesign = {
     id: `room-template-${crypto.randomUUID()}`, source: design.source, kind: 'analysis', title: title.trim(),
     description: '保存した部屋のテンプレートです。', style: design.style, room, analysisInput,
-    wallColor: design.wallColor, budget: design.budget, prompt: design.prompt,
+    wallColor: design.wallColor, budget: design.budget, prompt: design.prompt, roomPaletteId: design.roomPaletteId, characterThemeId: design.characterThemeId,
     items: design.items.map(original => {
       const item = structuredClone(original);
       return {...item, id: `template-object-${crypto.randomUUID()}`, existing: true,

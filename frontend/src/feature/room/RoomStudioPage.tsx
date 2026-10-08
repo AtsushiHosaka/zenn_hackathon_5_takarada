@@ -4,7 +4,7 @@ import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-route
 import { useRepositories } from '../../core/repositories';
 import { useSession } from '../../core/session';
 import { loadConnection } from '../../core/connection';
-import { isManualFurniture, type FurnitureAddition, type FurnitureOperation, type RoomDesign, type RoomItem, type RoomShape, type Style } from '../../domain/room';
+import { isManualFurniture, isTemplateFurniture, type FurnitureAddition, type FurnitureOperation, type RoomDesign, type RoomItem, type RoomShape, type Style } from '../../domain/room';
 import type { RoomGenerationPhase } from '../../domain/roomRepository';
 import AccountMenu from './AccountMenu';
 import ReferenceSvg from './ReferenceSvg';
@@ -167,8 +167,8 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
     },
     onSuccess:(result,variables)=>{
       const editedItems=(variables.createNew?[]:design.editedItems??[]).filter(item=>item.existing||result.items.some(current=>current.id===item.id));
-      const references=new Map((variables.createNew?[]:existingFurniture).filter(item=>item.referenceImage).map(item=>[item.id,item.referenceImage]));
-      const preserveReference=(item:RoomItem):RoomItem=>references.has(item.id)&&isManualFurniture(item)?{...item,referenceImage:references.get(item.id)}:item;
+      const references=new Map((variables.createNew?[]:existingFurniture).filter(item=>item.referenceImage||item.artwork).map(item=>[item.id,{referenceImage:item.referenceImage,artwork:item.artwork}]));
+      const preserveReference=(item:RoomItem):RoomItem=>references.has(item.id)&&(isManualFurniture(item)||isTemplateFurniture(item))?{...item,...references.get(item.id)}:item;
       const saved={...result,items:result.items.map(preserveReference),...(result.before?{before:{...result.before,items:result.before.items.map(preserveReference)}}:{}),characterThemeId:result.characterThemeId??characterThemeId,roomPaletteId:result.roomPaletteId??roomPaletteId,...(!variables.analyzeOnly&&editedItems.length?{editedItems}:{}),...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request.trim()||undefined,budget:variables.budget}:{}),id:result.id};
       let storageNotice: string|undefined;
       try {saveRoomPlan(client,saved,scope);}catch{client.setQueryData(roomPlanKeys.detail(saved.id),saved);if(!rooms.persistenceWarning?.()){storageNotice='ブラウザに保存できませんでした。保存容量を確認してください。';setNotice(storageNotice);}}
