@@ -43,7 +43,8 @@ export default function ImageFurniturePalette({ disabled, onImport }: { disabled
     {photo && <span className="rc-furniture-photo"><img src={photo.dataUrl} alt={name || '取り込む家具'} /></span>}
     <label>家具の名前<input type="text" maxLength={100} required value={name} disabled={disabled || pending} onChange={event => setName(event.target.value)} /></label>
     <label>家具の種類<select value={category} disabled={disabled} onChange={event => {
-      const next = imageFurnitureTemplates.find(item => item.category === event.target.value)!;
+      const next = imageFurnitureTemplates.find(item => item.category === event.target.value);
+      if (!next) return;
       setCategory(next.category); setDimensions(next.size.map(value => String(Math.round(value * 100)))); setColor(next.color);
     }}>{imageFurnitureTemplates.map(item => <option key={item.category} value={item.category}>{item.name}</option>)}</select></label>
     <fieldset className="rc-furniture-dimensions" disabled={disabled}><legend>家具の寸法（cm）</legend><div>{(['幅', '高さ', '奥行き'] as const).map((label, axis) => <label key={label}>{label}<input type="number" min="1" step="1" required value={dimensions[axis]} onChange={event => setDimensions(previous => previous.map((value, index) => index === axis ? event.target.value : value))} /></label>)}</div></fieldset>

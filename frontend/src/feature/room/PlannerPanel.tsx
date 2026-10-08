@@ -388,7 +388,7 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
       {furnitureRequests && <details className="rc-planner-section rc-planner-additions">
         <summary>家具を追加{furnitureRequests.additions.length > 0 && `（${furnitureRequests.additions.length}点）`}</summary>
         <p className="rc-planner-note">次のコーディネートで提案する家具を、最大6点指定できます。</p>
-        <FurnitureAdditionRows values={furnitureRequests.additions} onChange={furnitureRequests.onAdditionsChange} onEmptyRemove={()=>additionButton.current?.focus({preventScroll:true})}/>
+        <FurnitureAdditionRows values={furnitureRequests.additions} onChange={furnitureRequests.onAdditionsChange} emptyFocusTarget={additionButton}/>
         <button ref={additionButton} type="button" className="rc-secondary" disabled={furnitureRequests.additions.length >= 6} onClick={() => furnitureRequests.onAdditionsChange([...furnitureRequests.additions, { category: 'sofa', uiId: crypto.randomUUID() }])}>家具を追加</button>
       </details>}
     </div>
