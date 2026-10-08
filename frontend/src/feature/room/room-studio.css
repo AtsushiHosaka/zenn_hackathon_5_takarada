@@ -195,3 +195,11 @@
   .rc-stage.is-empty {gap:16px;padding-top:68px;padding-bottom:20px}
   .rc-empty-art {min-height:0;flex:1;width:min(100%,400px)}
 }
+
+.rc-prompt-target {margin:0 0 12px;padding:0;border:0;min-width:0}
+.rc-prompt-target legend {margin-bottom:8px;font-size:13px;font-weight:600;color:#3A3746}
+.rc-prompt-target>div {display:flex;flex-wrap:wrap;gap:8px}
+.rc-prompt-target label {display:flex;align-items:center;gap:6px;min-height:40px;padding:8px 10px;border:1px solid #DCD8E4;border-radius:10px;font-size:13px;cursor:pointer}
+.rc-prompt-target label:has(input:checked) {border-color:#6A3CD6;background:#F7F4FD;color:#5A2FC0}
+.rc-prompt-target input {margin:0;accent-color:#6A3CD6}
+.rc-prompt-target p {margin:8px 0 0;font-size:12px;line-height:1.6;color:#656174}
