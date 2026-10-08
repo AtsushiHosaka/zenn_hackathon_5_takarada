@@ -725,7 +725,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       const size = cameraBounds.getSize(new THREE.Vector3());
       const diagonal = size.length();
       const cameraAspect = camera instanceof THREE.PerspectiveCamera ? camera.aspect : (camera.right - camera.left) / (camera.top - camera.bottom);
-      fitDistances.perspective = fittedDistance(cameraBounds, roomCenter, defaultDirections.perspective, cameraAspect, 36) * (preview ? .82 : 1);
+      fitDistances.perspective = fittedDistance(cameraBounds, roomCenter, defaultDirections.perspective, cameraAspect, 36);
       fitDistances.top = fittedDistance(cameraBounds, roomCenter, defaultDirections.top, cameraAspect, 36);
       fitDistances.front = fittedDistance(cameraBounds, roomCenter, defaultDirections.front, cameraAspect, 36);
       controls.minDistance = Math.max(0.5, diagonal * 0.24);
