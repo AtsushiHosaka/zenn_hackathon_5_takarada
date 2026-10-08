@@ -1475,6 +1475,12 @@ export interface components {
                  * @enum {string}
                  */
                 room_palette_id?: "snow-graphite" | "porcelain" | "silver-line" | "stone-gray" | "monochrome-gallery" | "mist-smoke" | "warm-ivory" | "oatmeal" | "desert-sand" | "mushroom-taupe" | "coffee-cream" | "linen-ink" | "sage-clay" | "olive-linen" | "moss-oak" | "terracotta-fern" | "botanical-white" | "jungle-earth" | "mint-cloud" | "seafoam" | "teal-studio" | "turquoise-pop" | "celadon" | "lagoon-dusk" | "sky-white" | "powder-blue" | "coastal-blue" | "cobalt-gallery" | "denim-wood" | "ice-navy" | "lavender-milk" | "lilac-garden" | "amethyst" | "violet-pop" | "mauve-taupe" | "orchid-gold" | "blush-linen" | "rose-quartz" | "dusty-rose" | "peach-pink" | "fuchsia-pop" | "cherry-blossom" | "brick-cream" | "scarlet-pop" | "apricot" | "tangerine-studio" | "butter-yellow" | "sunflower" | "candy-pastel" | "mint-strawberry" | "lavender-lemon" | "primary-play" | "tropical-pop" | "festival" | "charcoal-silver" | "midnight-brass" | "forest-night" | "plum-velvet" | "burgundy-lounge" | "espresso-copper";
+                /**
+                 * @description 任意のキャラクターテーマ。画像や公式商品を保証しない
+                 * @example hatsune-miku
+                 * @enum {string}
+                 */
+                character_theme_id?: "hatsune-miku" | "sanrio" | "hello-kitty" | "my-melody" | "kuromi" | "cinnamoroll" | "pompompurin" | "pochacco";
                 /** @example 紫色の推し活ルームにしたい */
                 prompt: string;
                 /**
@@ -1562,6 +1568,11 @@ export interface components {
              * @enum {string}
              */
             status: "pending" | "processing" | "done" | "failed";
+            /**
+             * @example hatsune-miku
+             * @enum {string|null}
+             */
+            character_theme_id?: null | "hatsune-miku" | "sanrio" | "hello-kitty" | "my-melody" | "kuromi" | "cinnamoroll" | "pompompurin" | "pochacco";
             /** @example 紫色の推し活ルームにしたい */
             prompt: string;
             /** @example 30000 */
