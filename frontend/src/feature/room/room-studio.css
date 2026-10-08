@@ -229,5 +229,8 @@
 .viewer-overlap-notice:not([hidden]){position:absolute;left:16px;right:16px;bottom:54px;z-index:3;width:fit-content;max-width:calc(100% - 32px);padding:8px 12px;border:1px solid #F87171;border-radius:8px;background:#2C1724E8;color:#FFE4E6;font-size:12px;pointer-events:none}
 
 @media(max-width:720px) and (max-height:600px) {
-  .rc-workspace:not(.is-generating)>.rc-stage:not(.is-empty) {flex-basis:clamp(140px,38dvh,240px);height:clamp(140px,38dvh,240px)}
+  .rc-workspace:not(.is-generating) {overflow-y:auto;overscroll-behavior:contain}
+  .rc-workspace:not(.is-generating)>.rc-stage:not(.is-empty) {flex-basis:260px;height:260px}
+  .rc-workspace:not(.is-generating)>.rc-chat {flex:0 0 auto;height:240px;min-height:240px}
+  .rc-workspace:not(.is-generating) .rc-scene-stage {top:64px;bottom:72px}
 }
