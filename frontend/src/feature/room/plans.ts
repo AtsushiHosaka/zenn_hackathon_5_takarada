@@ -4,6 +4,9 @@ import type { SavedRoom } from '../../domain/roomRepository';
 import { useSession } from '../../core/session';
 import { useRepositories } from '../../core/repositories';
 import { loadConnection } from '../../core/connection';
+import { DomainError } from '../../domain/error';
+import { isTemplateId } from '../../domain/roomTemplate';
+import { readRoomTemplates } from './templateStorage';
 import { appConfig } from '../../core/config';
 
 export const roomPlanKeys = { capabilities: ['room', 'capabilities'] as const };
@@ -67,6 +70,12 @@ export function useRoomPlan(id: string, enabled: boolean, initialDesign?: () => 
   return useQuery({
     queryKey: scopedRoomPlanKeys(scope).detail(id),
     queryFn: async ({ signal }) => {
+      if (isTemplateId(id)) {
+        const templates = client.getQueryData<import('../../domain/roomTemplate').RoomTemplate[]>(['room', scope, 'templates']) ?? readRoomTemplates(scope);
+        const template = templates.find(item => item.id === id);
+        if (!template) throw new DomainError('テンプレートが見つかりません。');
+        return template.design;
+      }
       const result = await rooms.get(id, signal);
       // Apply edits only after resolving the backend's canonical result ID.
       const cached = client.getQueryData<RoomDesign>(scopedRoomPlanKeys(scope).detail(result.id));
