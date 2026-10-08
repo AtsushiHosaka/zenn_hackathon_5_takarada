@@ -55,13 +55,15 @@ module InteriorLinks
 
     class Unverified < StandardError; end
 
-    def initialize(user_id: nil, extractor: nil)
+    def initialize(user_id: nil, extractor: nil, image_color_extractor: nil)
       @user_id = user_id
       @extractor = extractor
+      @image_color_extractor = image_color_extractor
     end
 
     def parse(html:, url:, store:)
       @extraction_failure = nil
+      @image_colors = {}
       @document = Nokogiri::HTML(html)
       @url = url
       @store = store
@@ -129,6 +131,9 @@ module InteriorLinks
       end
       color_name = product["color"].to_s.presence || name
       color = COLORS.find { |pattern, _| pattern.match?(color_name) }&.last || "#bdb4a8"
+      image = image_url(product)
+      image_color = image_color_for(product)
+      color = image_color["color"] if image_color["color"]
       shape = shape_for(name, category, evidence)
       extracted_shape = product.dig("_html_extraction", "shape")
       shape ||= extracted_shape if HtmlProductExtractor::SHAPES.include?(extracted_shape) && extracted_shape != "unknown"
@@ -142,7 +147,8 @@ module InteriorLinks
           "estimated_axes" => estimated_axes, "estimated_values_m" => dimensions.slice(*estimated_axes),
           "estimate_basis" => estimated_axes.any? ? "category_standard_dimensions" : nil },
         "estimated_axes" => estimated_axes, "material" => material_for(product),
-        "color_name" => color_name, "color_source" => "official_color_name_approximation", "shape" => shape,
+        "color_name" => color_name, "color_source" => image_color["source"] || "official_color_name_approximation",
+        "image_color" => image_color, "shape" => shape,
         "shape_source" => { "url" => url, "name" => name, "measurements" => evidence, "kind" => "category_and_official_text" },
         "availability" => availability, "price_source" => price_evidence, "tax_included" => true,
         "image_usage" => { "display" => "unconfirmed", "storage" => "unconfirmed", "generation_input" => "unconfirmed",
@@ -150,7 +156,7 @@ module InteriorLinks
       }
       metadata["html_extraction"] = product["_html_extraction"] if product["_html_extraction"]
       metadata["html_extraction_failure"] = @extraction_failure if @extraction_failure
-      { slot:, category:, name:, price:, shop: shop_name, url:, image_url: image_url(product), color:, size: dimensions, metadata: }
+      { slot:, category:, name:, price:, shop: shop_name, url:, image_url: image, color:, size: dimensions, metadata: }
     end
 
     private
@@ -182,9 +188,14 @@ module InteriorLinks
       missing -= [ THIN_AXES[category]&.first ]
       price_for(product)
       unknown_color = product["color"].blank? && COLORS.keys.none? { |pattern| pattern.match?(product["name"].to_s) }
-      missing.any? || material_for(product).blank? || unknown_color
+      missing.any? || material_for(product).blank? || (unknown_color && image_color_for(product)["color"].blank?)
     rescue Unverified
       true
+    end
+
+    def image_color_for(product)
+      image = image_url(product)
+      @image_colors[image] ||= (@image_color_extractor || ProductImageColor.new).call(url: image, provider: @store[:provider])
     end
 
     def merge_extraction(product, extracted)
@@ -398,16 +409,21 @@ module InteriorLinks
 
     def image_url(product)
       images = product["image"].is_a?(Array) ? product["image"] : [ product["image"] ]
-      values = images.map { |image| image.is_a?(Hash) ? image["contentUrl"] || image["url"] : image }
-      values << @document.at_css('meta[property="og:image"], meta[name="og:image"]')&.[]("content")
-      values.filter_map do |value|
+      candidates = images.map { |image| image.is_a?(Hash) ? image["contentUrl"] || image["url"] : image }
+      candidates += @document.css('meta[property="og:image"], meta[name="og:image"], meta[name="twitter:image"]').map { |node| node["content"] }
+      resolved = candidates.filter_map do |value|
         next unless value.is_a?(String) && value.present?
 
-        parsed = URI.join(@url, value)
-        parsed.to_s if parsed.is_a?(URI::HTTPS) && parsed.host.present? && parsed.userinfo.nil?
+        target = URI.join(@url, value.to_s)
+        if target.scheme == "http"
+          secure = URI.parse(target.to_s.sub(/\Ahttp:/, "https:"))
+          target = secure if ProductImageFetcher.allowed?(secure.to_s, provider: @store[:provider])
+        end
+        target.to_s if target.scheme == "https" && target.port == 443 && target.userinfo.nil?
       rescue URI::InvalidURIError
         nil
-      end.first
+      end
+      resolved.find { |target| ProductImageFetcher.allowed?(target, provider: @store[:provider]) } || resolved.first
     end
   end
 end

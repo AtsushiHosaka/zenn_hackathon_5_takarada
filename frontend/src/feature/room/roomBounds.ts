@@ -1,5 +1,5 @@
 import { isManualFurniture, type RoomDesign, type RoomItem } from '../../domain/room';
-import { LAYOUT_GRID_STEP, snapToLayoutGrid } from './layoutGrid';
+import { LAYOUT_GRID_STEP, snapItemPosition, snapToLayoutGrid } from './layoutGrid';
 
 type Vector = [number, number, number];
 export type RoomBounds = { min: Vector; max: Vector };
@@ -54,4 +54,12 @@ export function furniturePositionInRoom(item: Pick<RoomItem, 'size' | 'rotation'
     next[axis] = Math.max(minimum, Math.min(maximum, snapToLayoutGrid(position[axis])));
   }
   return next;
+}
+
+// Manual furniture must stay on the inferred floor after placement as well.
+// Other furniture keeps its existing positioning rules, including raised items.
+export function snapFurnitureEditPosition(item: RoomItem, position: RoomItem['position'], axes: readonly (0 | 2)[], design: RoomDesign): RoomItem['position'] | null {
+  if (design.room || !isManualFurniture(item)) return snapItemPosition(item, position, axes, design.room);
+  const bounded = furniturePositionInRoom(item, position, design);
+  return bounded ? [bounded[0], item.position[1], bounded[2]] : null;
 }

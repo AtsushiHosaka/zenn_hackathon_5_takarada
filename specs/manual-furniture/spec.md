@@ -16,6 +16,8 @@ backendは商品ページの取得に `PageFetcher`、商品情報の抽出に `
 
 部屋寸法の `room` がない古いサンプルでも、実際に描画する床の推定境界を `roomBounds.ts` で共有し、中央追加とドラッグ配置の判定に使う。最終QAで見つかった、幅600cmの家具を中央へ追加できる不具合をこの境界判定で修正する。
 
+Review correction, authorized by the user's request to fix review findings on 2026-10-08: manually added furniture in samples without room dimensions also stays within the inferred floor during button moves, drag moves, and rotation. Moves clamp to the 10 cm grid; rotation is disabled when the rotated footprint cannot fit. Existing measured-room and raised-item positioning is preserved. Google Docs remains unset and this correction is not reflected there.
+
 ドラッグが使えない場合は「部屋の中央に追加」で配置できる。追加後は寸法・位置・回転・色を編集でき、手動で追加した家具は削除できる。追加・編集・削除は既存の履歴とブラウザ保存に含める。Before表示と家具を含む完成モデルでは追加しない。
 
 ## 追加家具も次のコーディネートへ渡す
