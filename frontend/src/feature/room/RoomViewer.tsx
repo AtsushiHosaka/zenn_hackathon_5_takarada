@@ -1253,8 +1253,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         controls.update();
       }
       renderer.setSize(width, height);
-      furnitureOutline.resize(width, height);
       resizeMirrorSurfaces(scene, renderer);
+      furnitureOutline.resize(width, height);
     };
     const observer = new ResizeObserver(resize);
     observer.observe(host);
