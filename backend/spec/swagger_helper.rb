@@ -395,6 +395,7 @@ RSpec.configure do |config|
                 type: :object,
                 properties: {
                   room_palette_id: { type: :string, enum: RoomPalette::CATALOGUE.keys, description: "部屋のカラーテーマ。省略時は従来の配色", example: "warm-ivory" },
+                  character_theme_id: { type: :string, enum: CharacterRoomTheme::CATALOGUE.keys, description: "任意のキャラクターテーマ。画像や公式商品を保証しない", example: "hatsune-miku" },
                   prompt: { type: :string, example: "紫色の推し活ルームにしたい" },
                   budget: { type: :integer, description: "追加・入れ替え商品の予算 (円・送料別)", example: 30_000 },
                   kept_object_ids: { type: :array, items: { type: :string }, description: "活かす家具の id。空なら全部活かす", example: %w[bed-1 desk-1 shelf-1] },
@@ -435,6 +436,7 @@ RSpec.configure do |config|
               id: { type: :integer, example: 1 },
               room_id: { type: :integer, example: 1 },
               status: { type: :string, enum: %w[pending processing done failed], example: "done" },
+              character_theme_id: { type: :string, nullable: true, enum: [ nil, *CharacterRoomTheme::CATALOGUE.keys ], example: "hatsune-miku" },
               prompt: { type: :string, example: "紫色の推し活ルームにしたい" },
               budget: { type: :integer, example: 30_000 },
               kept_object_ids: { type: :array, items: { type: :string }, example: %w[bed-1 desk-1 shelf-1] },

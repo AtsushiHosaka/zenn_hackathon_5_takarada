@@ -1,3 +1,4 @@
+import { characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
 import { furnitureCategories, isFurnitureAdditions, isFurnitureOperations, isManualFurniture, isRoomItem, isRoomShape } from "../../domain/room";
 import type { GenerateRoomInput, RoomRepository } from "../../domain/roomRepository";
@@ -65,7 +66,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
     async analyze(input, signal) {
       if (config.contract === "legacy") throw new DomainError("この接続先では畳数による部屋解析を利用できません");
       const design = await createApiRoomRepository(api, { ...config, contract: "analysis" }, baseUrl).generate(input, signal);
-      return { ...design, prompt: input.prompt.trim() || undefined, budget: input.budget, keptObjectIds: design.items.filter(item => item.existing).map(item => item.id) };
+      return { ...design, characterThemeId: input.characterThemeId, prompt: input.prompt.trim() || undefined, budget: input.budget, keptObjectIds: design.items.filter(item => item.existing).map(item => item.id) };
     },
     async capabilities() {
       return {
@@ -101,7 +102,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
             if (input.furnitureOperations !== undefined && (!isFurnitureOperations(input.furnitureOperations) || input.furnitureOperations.length !== existingIds.length || input.furnitureOperations.some(operation => !existingIds.includes(operation.objectId)))) throw new DomainError("各家具について残すか入れ替えるかを選んでください");
             const keptObjectIds = input.furnitureOperations?.filter(operation => operation.action === "keep").map(operation => operation.objectId) ?? input.keptObjectIds ?? [];
             if (!Array.isArray(keptObjectIds) || keptObjectIds.some(id => typeof id !== "string" || !existingIds.includes(id)) || new Set(keptObjectIds).size !== keptObjectIds.length) throw new DomainError("活かす家具の選択が正しくありません");
-            const request: components["schemas"]["CoordinationInput"] = { coordination: { room_palette_id: input.roomPaletteId === undefined ? undefined : toRoomPaletteId(input.roomPaletteId), prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: edits, ...(input.baseCoordinationId && /^[1-9]\d*$/.test(input.baseCoordinationId) ? { base_coordination_id: Number(input.baseCoordinationId) } : {}), ...(input.furnitureOperations === undefined ? {} : { furniture_operations: input.furnitureOperations.map(operation => ({ object_id: operation.objectId, action: operation.action })) }), ...(input.furnitureAdditions === undefined ? {} : { additions: input.furnitureAdditions }) } };
+            const request: components["schemas"]["CoordinationInput"] = { coordination: { room_palette_id: input.roomPaletteId === undefined ? undefined : toRoomPaletteId(input.roomPaletteId), ...(input.characterThemeId ? { character_theme_id: input.characterThemeId as components["schemas"]["CoordinationInput"]["coordination"]["character_theme_id"] } : {}), prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: edits, ...(input.baseCoordinationId && /^[1-9]\d*$/.test(input.baseCoordinationId) ? { base_coordination_id: Number(input.baseCoordinationId) } : {}), ...(input.furnitureOperations === undefined ? {} : { furniture_operations: input.furnitureOperations.map(operation => ({ object_id: operation.objectId, action: operation.action })) }), ...(input.furnitureAdditions === undefined ? {} : { additions: input.furnitureAdditions }) } };
             let coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationPath.replace("{id}", String(record.id)), { method: "POST", body: request, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 270_000 }));
             const coordinationId = coordination.id;
             if (coordination.room_id !== expectedId) throw new DomainError("別の部屋のコーディネートを受け取りました");
@@ -212,6 +213,7 @@ function photoUploadRequest(photos: File[]): components["schemas"]["UploadInput"
 }
 
 function validateCoordinationInput(input: GenerateRoomInput) {
+  if (input.characterThemeId !== undefined && !characterTheme(input.characterThemeId)) throw new DomainError("キャラクターテーマを選んでください");
   if (!input.prompt.trim() || input.prompt.length > 500) throw new DomainError("部屋の希望を500文字以内で入力してください");
   if (!Number.isSafeInteger(input.budget) || input.budget <= 0) throw new DomainError("予算は1円以上の整数で入力してください");
   if (input.furnitureOperations !== undefined && !isFurnitureOperations(input.furnitureOperations)) throw new DomainError("家具の操作が正しくありません");

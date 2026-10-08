@@ -1,4 +1,5 @@
 import { roomPalette } from "../../domain/roomPalette";
+import { characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
 import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
 import { furnitureCategories, isManualFurniture, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
@@ -91,6 +92,7 @@ export function toCoordinationRecord(value: unknown): CoordinationRecord {
     room_id: integer(record.room_id, "Coordination.room_id"),
     status: record.status,
     prompt: text(record.prompt, "Coordination.prompt"),
+    character_theme_id: record.character_theme_id == null ? undefined : characterThemeRecord(record.character_theme_id),
     budget: integer(record.budget, "Coordination.budget"),
     room_palette_id: record.room_palette_id == null ? null : toRoomPaletteId(record.room_palette_id),
     kept_object_ids: record.kept_object_ids as string[],
@@ -135,9 +137,10 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     kind: "coordination",
     id: `api-coordination-${record.id}`,
     title: record.title,
+    characterThemeId: record.character_theme_id??undefined,
     description: record.comment,
     ...(record.planned_by ? { generatedBy: record.planned_by } : {}),
-    style: record.title === "ラベンダーの推し活ルーム" ? "oshi" : record.title === "グリーンが映えるボタニカルルーム" ? "botanical" : "natural",
+    style: record.character_theme_id ? "oshi" : record.title === "ラベンダーの推し活ルーム" ? "oshi" : record.title === "グリーンが映えるボタニカルルーム" ? "botanical" : "natural",
     ...after,
     items: after.items.map(item => {
       if (item.existing) return item;
@@ -626,4 +629,10 @@ function url(value: unknown, baseUrl: string): string | undefined {
   } catch {
     return invalid("URL");
   }
+}
+
+function characterThemeRecord(value: unknown): NonNullable<components["schemas"]["Coordination"]["character_theme_id"]> {
+  const theme = characterTheme(value);
+  if (!theme) invalid("character_theme_id");
+  return theme.id as NonNullable<components["schemas"]["Coordination"]["character_theme_id"]>;
 }

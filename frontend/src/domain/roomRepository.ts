@@ -1,6 +1,7 @@
 import type { FurnitureAddition, FurnitureOperation, RoomDesign, RoomItem, RoomShape, Style } from "./room";
 
 export type GenerateRoomInput = {
+  characterThemeId?: string;
   photos: File[];
   prompt: string;
   style: Style;

@@ -13,6 +13,8 @@ class CoordinationBuilder
     @scene = coordination.input_scene
     if (palette = RoomPalette.find(coordination.room_palette_id))
       @scene["room"].merge!("wall_color" => palette.fetch("base"), "floor_color" => palette.fetch("secondary"))
+    elsif (theme = CharacterRoomTheme.find(coordination.character_theme_id))
+      @scene["room"].merge!("wall_color" => theme.fetch("base"), "floor_color" => theme.fetch("secondary"))
     end
     @scene["objects"].map! do |object|
       edit = coordination.edited_objects.find { |value| value["id"] == object["id"] }
@@ -72,8 +74,8 @@ class CoordinationBuilder
     diagnostics = client.respond_to?(:diagnostics) ? client.diagnostics.except("search_entry_point") : {}
 
     Result.new(
-      title: plan.planned_by == "mock" && @coordination.room_palette_id ? "#{RoomPalette.find(@coordination.room_palette_id).fetch('name')}の部屋" : plan.title,
-      comment: [ comment(plan, placed, active, removed), *failures ].join,
+      title: result_title(plan),
+      comment: [ @coordination.character_theme_id ? "#{CharacterRoomTheme.find(@coordination.character_theme_id).fetch('name')}をイメージしたインテリアです。" : nil, comment(plan, placed, active, removed), *failures ].compact.join,
       after_scene: appearance.fetch(:scene),
       items: appearance.fetch(:items),
       total_price: placed.sum { |p| p[:item].price },
@@ -86,6 +88,16 @@ class CoordinationBuilder
   end
 
   private
+
+  def result_title(plan)
+    if (theme = CharacterRoomTheme.find(@coordination.character_theme_id))
+      theme.fetch("title")
+    elsif plan.planned_by == "mock" && (palette = RoomPalette.find(@coordination.room_palette_id))
+      "#{palette.fetch('name')}の部屋"
+    else
+      plan.title
+    end
+  end
 
   def result_operations(active, removed)
     if @coordination.furniture_operations.empty?

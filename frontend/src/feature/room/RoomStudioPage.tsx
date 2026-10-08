@@ -18,6 +18,7 @@ import { roomDescription } from './roomDescription';
 import { roomPlanKeys as sharedRoomPlanKeys, scopedRoomPlanKeys, useRoomPlanScope, saveRoomPlan, useRoomPlan, isApiRoomAlias } from './plans';
 import ErrorText from '../shared/ErrorText';
 import { DomainError } from '../../domain/error';
+import CharacterThemePicker from './CharacterThemePicker';
 import './room-studio.css';
 
 const initialPrompt='紫色の推し活ルームにしたい。ベッドとデスクはそのまま使いたいです。';
@@ -91,6 +92,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const selectsFurniture=analysisMode&&canCoordinate&&!isNew&&design.source==='api'&&!!design.backendRoomId;
   const [message,setMessage]=useState('');
   const [roomPaletteId,setRoomPaletteId]=useState(design.roomPaletteId??defaultRoomPaletteId);
+  const [characterThemeId,setCharacterThemeId]=useState<string|undefined>(design.characterThemeId);
   const [style,setStyle]=useState<Style>(isNew?'oshi':design.style);
   const [preset,setPreset]=useState<number|null>(null);
   const [stepIndex,setStepIndex]=useState(0);
@@ -134,14 +136,14 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
       const roomId=!isNew&&!id.startsWith('sample-')
         ? design.backendRoomId??(loadConnection()==='dummy'&&design.id.startsWith('dummy-room-')?design.id:undefined)
         : undefined;
-      const input={roomPaletteId,baseCoordinationId,photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId,keptObjectIds:selectsFurniture?existingFurniture.filter(item=>(furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep')==='keep').map(item=>item.id):undefined,furnitureOperations:selectsFurniture?existingFurniture.map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'})):undefined,furnitureAdditions:selectsFurniture?furnitureAdditions:undefined,editedItems:selectsFurniture?[...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))]:undefined};
+      const input={characterThemeId,roomPaletteId,baseCoordinationId,photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId,keptObjectIds:selectsFurniture?existingFurniture.filter(item=>(furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep')==='keep').map(item=>item.id):undefined,furnitureOperations:selectsFurniture?existingFurniture.map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'})):undefined,furnitureAdditions:selectsFurniture?furnitureAdditions:undefined,editedItems:selectsFurniture?[...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))]:undefined};
       const result=await (analyzeOnly?rooms.analyze(input,controller.signal):rooms.generate(input,controller.signal));
       if(controller.signal.aborted||tokenStore.load()!==token) throw new DomainError("ログイン状態が変わりました。もう一度お試しください。");
       return result;
     },
     onSuccess:(result,variables)=>{
       const editedItems=(design.editedItems??[]).filter(item=>item.existing||result.items.some(current=>current.id===item.id));
-      const saved={...result,roomPaletteId:result.roomPaletteId??roomPaletteId,...(!variables.analyzeOnly&&editedItems.length?{editedItems}:{}),...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request.trim()||undefined,budget:variables.budget}:{}),id:result.id};
+      const saved={...result,characterThemeId:result.characterThemeId??characterThemeId,roomPaletteId:result.roomPaletteId??roomPaletteId,...(!variables.analyzeOnly&&editedItems.length?{editedItems}:{}),...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request.trim()||undefined,budget:variables.budget}:{}),id:result.id};
       let storageNotice: string|undefined;
       try {saveRoomPlan(client,saved,scope);}catch{client.setQueryData(roomPlanKeys.detail(saved.id),saved);if(!rooms.persistenceWarning?.()){storageNotice='ブラウザに保存できませんでした。保存容量を確認してください。';setNotice(storageNotice);}}
       setSavedFingerprint(JSON.stringify(saved));setHistory({past:[],future:[]});
@@ -269,6 +271,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
               <div className="rc-photos">{photos.length?photos.map((file,index)=><div className="rc-photo" key={`${file.name}-${file.lastModified}`}><PhotoImage file={file}/><button type="button" className="rc-photo-remove" aria-label={`写真${index+1}を削除`} onClick={()=>setPhotos(old=>old.filter((_,i)=>i!==index))}><ReferenceSvg page={3} index={4}/></button></div>):samplePhotos.map(index=><div className="rc-photo" key={index} aria-label={`サンプル写真${index+1}`}><ReferenceSvg page={3} index={3+index*2}/><button type="button" className="rc-photo-remove" aria-label={`写真${index+1}を削除`} onClick={()=>setSamplePhotos(old=>old.filter(i=>i!==index))}><ReferenceSvg page={3} index={4}/></button></div>)}{(photos.length||samplePhotos.length)<4&&<button type="button" className="rc-photo-add" aria-label="写真を追加（撮影またはライブラリ）" onClick={()=>upload.current?.click()}><ReferenceSvg page={3} index={9}/>追加</button>}</div>
               </>}
               {inputStep==='request'&&<><div className="rc-presets">{presets.map((item,index)=><button type="button" key={item.label} aria-pressed={preset===index} onClick={()=>{setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</div><div className="rc-request-box"><label className="rc-sr-only" htmlFor="new-request">どんな部屋にしたいか</label><textarea id="new-request" rows={3} placeholder="例：紫色の推し活ルームにしたい" value={prompt} maxLength={2000} onChange={event=>setPrompt(event.target.value)} required/></div></>}
+              {lastInputStep&&(canCoordinate||loadConnection()==='dummy')&&<CharacterThemePicker value={characterThemeId} onChange={value=>{setCharacterThemeId(value);if(value){setStyle('oshi');if(!prompt.trim())setPrompt('推しグッズを飾れる部屋にしたい。');}}}/>}
               {lastInputStep&&(canCoordinate||loadConnection()==='dummy')&&<RoomPalettePicker value={roomPaletteId} onChange={setRoomPaletteId}/>}
               <div className="rc-input-actions">{stepIndex>0&&<button type="button" className="rc-secondary" onClick={()=>changeStep(stepIndex-1)}>戻る</button>}<button type="submit" className="rc-primary" disabled={!inputStep}>{!lastInputStep?'次へ':analysisMode?canCoordinate?'部屋を解析する':'部屋を作成する':'コーディネートを始める'}<ReferenceSvg page={3} index={10}/></button></div>
 
@@ -282,10 +285,12 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
                 {referenceStory&&<ul className="rc-bullets"><li>壁の上部にLEDテープを回して、夜は紫の間接照明に</li><li>ベッドの足元に、アクスタを飾れるひな壇シェルフ</li><li>ラグ・クッション・ベッドカバーをラベンダー系で統一</li></ul>}
                 {!analyzed&&<div className="rc-summary"><div className="rc-summary-heading"><span>コーディネート案</span><span>{additions.length}アイテム · <span className="rc-money">{money(total)}</span></span></div><div className="rc-summary-actions"><button type="button" className="rc-primary" onClick={()=>{setEditing(false);setPanel(true);}}><ReferenceSvg page={5} index={9}/>アイテム一覧</button><button type="button" className="rc-secondary" onClick={()=>setBefore(old=>!old)}>Before / After</button></div></div>}
               </div></div>
+              {canCoordinate&&!analyzed&&<CharacterThemePicker value={characterThemeId} onChange={setCharacterThemeId}/>}
               {canCoordinate&&!analyzed&&<RoomPalettePicker value={roomPaletteId} onChange={setRoomPaletteId}/>}
               {canCoordinate&&!analyzed&&<div className="rc-followups">{['もう少し落ち着いた紫に','予算を2万円以内に','グリーンも足したい'].map(text=><button type="button" key={text} onClick={()=>setMessage(text)}>{text}</button>)}</div>}
               {canCoordinate&&analyzed&&<form className="rc-coordinate-form" onSubmit={coordinate}>
                 <div className="rc-presets">{presets.map((item,index)=><button type="button" key={item.label} aria-pressed={preset===index} onClick={()=>{setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</div>
+                <CharacterThemePicker value={characterThemeId} onChange={value=>{setCharacterThemeId(value);if(value){setStyle('oshi');if(!prompt.trim())setPrompt('推しグッズを飾れる部屋にしたい。');}}}/>
                 <label className="rc-setting" htmlFor="coordinate-request">どんな部屋にしたいか<textarea id="coordinate-request" rows={3} value={prompt} maxLength={500} onChange={event=>setPrompt(event.target.value)} required/></label>
                 <RoomPalettePicker value={roomPaletteId} onChange={setRoomPaletteId}/>
                 <label className="rc-setting" htmlFor="coordinate-budget">入れ替え・追加商品の予算（送料別）<span className="rc-tatami-input"><input id="coordinate-budget" type="number" min={1} step={1} value={Number.isNaN(budget)?'':budget} onChange={event=>setBudget(event.target.valueAsNumber)} required/>円</span></label>
