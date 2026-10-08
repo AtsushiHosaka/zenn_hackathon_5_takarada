@@ -2,7 +2,7 @@ import { roomPalette } from "../../domain/roomPalette";
 import { characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
 import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
-import { furnitureCategories, isManualFurniture, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
+import { furnitureCategories, isManualFurniture, isImageArtwork, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
 import type { SavedRoom } from "../../domain/roomRepository";
 import type { components } from "../generated/api";
 
@@ -191,6 +191,7 @@ function sceneSnapshot(scene: components["schemas"]["Scene"], baseUrl: string): 
       position: [item.position.x - room.width / 2, item.position.y + item.size.h / 2, item.position.z - room.depth / 2],
       size: [item.size.w, item.size.h, item.size.d],
       rotation: item.rotation_y,
+      ...(item.artwork ? { artwork: { dataUrl: item.artwork.data_url } } : {}),
       marker: item.marker ?? undefined,
       productId: item.item_id === null ? undefined : String(item.item_id),
       modelUrl: item.source === "suggested" && item.texture_status === "unmatched" ? undefined : url(item.model_url, baseUrl),
@@ -431,6 +432,7 @@ export function toAnalyzedRoomDesign(value: unknown, baseUrl: string): RoomDesig
       position: [item.position.x - room.width / 2, item.position.y + item.size.h / 2, item.position.z - room.depth / 2],
       size: [item.size.w, item.size.h, item.size.d],
       rotation: item.rotation_y,
+      ...(item.artwork ? { artwork: { dataUrl: item.artwork.data_url } } : {}),
       productId: item.item_id === null ? undefined : String(item.item_id),
       modelUrl: url(item.model_url, baseUrl),
     })),
@@ -479,6 +481,7 @@ function analysisObject(value: unknown): components["schemas"]["SceneObject"] {
     id: text(record.id, "SceneObject.id"),
     source: record.source,
     category: text(record.category, "SceneObject.category"),
+    ...(record.artwork == null ? {} : { artwork: artworkRecord(record.artwork) }),
     label: text(record.label, "SceneObject.label"),
     size: { w: positive(size.w, "size.w"), h: positive(size.h, "size.h"), d: positive(size.d, "size.d") },
     position: { x: finite(position.x, "position.x"), y: finite(position.y, "position.y"), z: finite(position.z, "position.z") },
@@ -629,6 +632,12 @@ function url(value: unknown, baseUrl: string): string | undefined {
   } catch {
     return invalid("URL");
   }
+}
+
+function artworkRecord(value: unknown): components["schemas"]["ImageArtwork"] {
+  const record = object(value, "artwork");
+  if (!isImageArtwork({ dataUrl: record.data_url })) invalid("artwork.data_url");
+  return { data_url: record.data_url as string };
 }
 
 function characterThemeRecord(value: unknown): NonNullable<components["schemas"]["Coordination"]["character_theme_id"]> {

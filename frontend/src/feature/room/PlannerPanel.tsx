@@ -6,7 +6,8 @@ import ErrorText from '../shared/ErrorText';
 import { downloadShoppingCsv } from './exports';
 import { LAYOUT_GRID_STEP, snapToLayoutGrid } from './layoutGrid';
 import { createFurnitureItem, FURNITURE_DRAG_TYPE, furnitureTemplates } from './furniturePlacement';
-import { furniturePositionInRoom, snapFurnitureEditPosition } from './roomBounds';
+import { getFurniturePlacementBounds, furniturePositionInRoom, snapFurnitureEditPosition } from './roomBounds';
+import ImageGoodsPalette from './ImageGoodsPalette';
 import './planner.css';
 
 export type PlannerView = 'perspective' | 'top' | 'front';
@@ -88,7 +89,7 @@ function furnitureLink(value?: string): string | undefined {
 
 function FurniturePhoto({ item, compact = false }: { item: RoomItem; compact?: boolean }) {
   const [failed, setFailed] = useState(false);
-  const imageUrl = furnitureLink(item.imageUrl);
+  const imageUrl = item.artwork?.dataUrl ?? furnitureLink(item.imageUrl);
   return <span className={`rc-furniture-photo${compact ? ' rc-furniture-photo-compact' : ''}`}>
     {imageUrl && !failed
       ? <img src={imageUrl} alt={item.name} draggable={false} onError={() => setFailed(true)} />
@@ -106,7 +107,7 @@ function FurniturePalette({ design, disabled, hint, onAddItem, onDragItem, onVie
   view: PlannerView;
 }) {
   const { rooms } = useRepositories();
-  const [source, setSource] = useState<'link' | 'manual'>('link');
+  const [source, setSource] = useState<'link' | 'manual' | 'image'>('link');
   const [link, setLink] = useState('');
   const submittedLink = furnitureLink(link.trim());
   const imported = useMutation({
@@ -141,8 +142,9 @@ function FurniturePalette({ design, disabled, hint, onAddItem, onDragItem, onVie
     <div className="rc-planner-segments rc-furniture-source" role="group" aria-label="家具の追加方法">
       <button type="button" aria-pressed={source === 'link'} onClick={() => setSource('link')}>リンクから追加</button>
       <button type="button" aria-pressed={source === 'manual'} onClick={() => setSource('manual')}>リンクなしで選ぶ</button>
+      <button type="button" aria-pressed={source === 'image'} onClick={() => setSource('image')}>画像から推しグッズ</button>
     </div>
-    {source === 'link' ? <div className="rc-furniture-link-panel">
+    {source === 'image' ? <ImageGoodsPalette design={design} disabled={disabled} onAddItem={onAddItem} onDragStart={startItemDrag} onDragEnd={() => onDragItem(null)} /> : source === 'link' ? <div className="rc-furniture-link-panel">
       <form className="rc-furniture-link-form" onSubmit={event => { event.preventDefault(); if (submittedLink && !disabled && !imported.isPending) imported.mutate(submittedLink); }}>
         <label htmlFor="planner-product-link">商品リンク</label>
         <input id="planner-product-link" type="url" inputMode="url" placeholder="https://…" required value={link} disabled={disabled || imported.isPending} onChange={event => setLink(event.target.value)} />
@@ -195,6 +197,7 @@ function FurnitureSizeEditor({ item, design, onChange }: { item: RoomItem; desig
       return;
     }
     setError(undefined);
+    if (item.artwork) position[1] = Math.min(getFurniturePlacementBounds(design).max[1] - size[1] / 2, Math.max(position[1], item.position[1] - item.size[1] / 2 + size[1] / 2));
     onChange({ size, position });
   }
 
@@ -280,6 +283,12 @@ export default function PlannerPanel({ design, selectedId, onSelect, furnitureRe
           <dl className="rc-planner-size">
             {([['幅', 0], ['高さ', 1], ['奥行き', 2]] as const).map(([label, index]) => <div key={label}><dt>{label}</dt><dd>{cm(selected.size[index])}<span>cm</span></dd></div>)}
           </dl>
+          {selected.artwork && !itemDisabled && <label className="rc-image-goods-height">床からの高さ（cm）<input type="number" min="0" max={Math.floor((getFurniturePlacementBounds(design).max[1] - getFurniturePlacementBounds(design).floor - selected.size[1]) * 100)} step="1" value={Math.round((selected.position[1] - selected.size[1] / 2 - getFurniturePlacementBounds(design).floor) * 100)} onChange={event => {
+            const bottom = Number(event.target.value) / 100;
+            const bounds = getFurniturePlacementBounds(design);
+            if (!Number.isFinite(bottom) || bottom < 0 || bounds.floor + bottom + selected.size[1] > bounds.max[1]) return;
+            changeItem({ position: [selected.position[0], bounds.floor + bottom + selected.size[1] / 2, selected.position[2]] });
+          }} /></label>}
           {selectedProductLink && <a className="rc-furniture-product-link" href={selectedProductLink} target="_blank" rel="noopener noreferrer">商品ページを見る</a>}
           {selected.id.startsWith('manual-') && !completeModel && <>
             {!itemDisabled && <FurnitureSizeEditor key={`${selected.id}:${selected.size.join(',')}`} item={selected} design={design} onChange={changeItem} />}
