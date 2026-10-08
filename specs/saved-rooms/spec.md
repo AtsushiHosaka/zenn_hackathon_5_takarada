@@ -20,6 +20,8 @@ Google Docs URLは `docs/project.md` に未設定のため未確認。今回の�
 
 ## 実装と保存範囲
 
+Review correction for issue #41 (2026-10-08): failed dummy room writes retain valid generated results in the repository session, separated by owner. List/get and later generation reuse those pending results, including analyze calls. Studio/list show the current owner's persistence warning; a subsequent successful write saves pending rooms and clears the warning. Reloading loses pending memory, and malformed stored rooms remain a reported read error. Google Docs remains unconfigured and this correction is not reflected there.
+
 Review correction for issue #40 (2026-10-08): API room aliases are revalidated on opening, including when a local analysis is cached. The backend resolves the latest canonical result before matching local edits are applied. Alias loading/errors are shown instead of presenting an unverified cached analysis. The studio has one detail-query owner; sample/new-room initialization and query-cache edits continue through that owner. Google Docs remains unconfigured and this correction is not reflected there.
 
 既存のAPI作成処理はすでに本人の部屋をDBへ保存していた。Webがブラウザ内の保存結果だけを一覧に使っていたため、本人の部屋を返すGET一覧APIを追加し、最新の成功した提案を一覧・詳細応答に含める。解析が終わる前に画面を離れた場合も、DBに保存した部屋を一覧から確認できる。
