@@ -233,6 +233,7 @@ export default function PlannerPanel({ design, selectedId, onSelect, furnitureRe
   const paletteScope = useRoomPlanScope();
   const selectableItems = [...design.items, ...(furnitureRequests?.existingItems ?? []).filter(item => !design.items.some(current => current.id === item.id))];
   const selected = selectableItems.find(item => item.id === selectedId);
+  const detectedItems = furnitureRequests?.existingItems.filter(item => !isManualFurniture(item)) ?? [];
   const selectedProductLink = furnitureLink(selected?.productUrl);
   const completeModel = Boolean(design.modelUrl && design.modelKind !== 'shell');
   const itemDisabled = !selected || !design.items.some(item => item.id === selected.id) || completeModel;
@@ -280,6 +281,23 @@ export default function PlannerPanel({ design, selectedId, onSelect, furnitureRe
         <button type="button" onClick={onRedo} disabled={!canRedo}><ArrowIcon redo />やり直す</button>
       </div>
       <FurniturePalette key={paletteScope} design={design} disabled={placementDisabled || completeModel} hint={placementHint} onAddItem={onAddItem} onDragItem={onDragItem} view={view} onView={onView} />
+      {furnitureRequests && <section className="rc-planner-section" aria-labelledby="planner-detected-label">
+        <h3 id="planner-detected-label">写真から検出した家具</h3>
+        <p className="rc-planner-note" id="planner-detected-help">正しく検出された家具にチェックを入れると、次の部屋に残します。</p>
+        {detectedItems.length === 0
+          ? <p className="rc-planner-note">検出された家具はありません。</p>
+          : <ul className="rc-planner-detected-list">
+            {detectedItems.map(item => {
+              const action = furnitureRequests.operations.find(operation => operation.objectId === item.id)?.action ?? 'keep';
+              return <li key={item.id}>
+                <label className="rc-planner-check">
+                  <input type="checkbox" checked={action === 'keep'} aria-describedby="planner-detected-help" onChange={event => furnitureRequests.onOperationChange(item.id, event.target.checked ? 'keep' : 'remove')} />
+                  <span>{item.name}{action === 'replace' && <small>入れ替える家具</small>}</span>
+                </label>
+              </li>;
+            })}
+          </ul>}
+      </section>}
       <section className="rc-planner-section" aria-labelledby="planner-view-label">
         <h3 id="planner-view-label">見え方</h3>
         <div className="rc-planner-segments" role="group" aria-label="視点を切り替える">
