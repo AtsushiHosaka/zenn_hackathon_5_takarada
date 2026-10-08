@@ -84,6 +84,8 @@ export type RoomDesign = {
   modelKind?: "complete" | "shell";
   wallColor?: string;
   room?: RoomGeometry;
+  // Stable floor inferred for legacy designs without measured room geometry.
+  inferredRoomBounds?: { min: [number, number, number]; max: [number, number, number]; floor: number };
   analysisInput?: { tatami: number; shape: RoomShape };
   before?: RoomSnapshot;
   backendRoomId?: string;
@@ -111,6 +113,7 @@ export function isRoomDesign(value: unknown): value is RoomDesign {
   if (value.modelKind !== undefined && value.modelKind !== "complete" && value.modelKind !== "shell") return false;
   if (value.wallColor !== undefined && (typeof value.wallColor !== "string" || !/^#[0-9a-f]{6}$/i.test(value.wallColor))) return false;
   if (value.room !== undefined && !isRoomGeometry(value.room)) return false;
+  if (value.inferredRoomBounds !== undefined && !isInferredRoomBounds(value.inferredRoomBounds)) return false;
   if (value.analysisInput !== undefined && (!isRecord(value.analysisInput) || !isTatami(value.analysisInput.tatami) || !isRoomShape(value.analysisInput.shape))) return false;
   if (value.backendRoomId !== undefined && (typeof value.backendRoomId !== "string" || !/^[1-9]\d*$/.test(value.backendRoomId))) return false;
   if (value.prompt !== undefined && (!nonemptyString(value.prompt) || value.prompt.length > 500)) return false;
@@ -136,6 +139,13 @@ export function isRoomDesign(value: unknown): value is RoomDesign {
     if (value.furnitureOperations.length !== furniture.length || value.furnitureOperations.some(operation => !furniture.some(item => item.id === operation.objectId))) return false;
   }
   return new Set(value.items.map(item => item.id)).size === value.items.length;
+}
+
+function isInferredRoomBounds(value: unknown): boolean {
+  if (!isRecord(value) || !finiteVector(value.min) || !finiteVector(value.max)) return false;
+  const maximums = value.max;
+  if (!value.min.every((minimum, axis) => minimum < maximums[axis])) return false;
+  return typeof value.floor === 'number' && Number.isFinite(value.floor) && value.floor >= value.min[1] && value.floor < value.max[1];
 }
 
 function isRoomSnapshot(value: unknown): value is RoomSnapshot {

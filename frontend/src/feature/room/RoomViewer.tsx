@@ -8,7 +8,7 @@ import { buildReferenceRoom, usesReferenceRoom } from "./referenceRoomModel";
 import { buildMeasuredRoom } from "./roomArchitecture";
 import { LAYOUT_GRID_STEP, snapItemPosition } from "./layoutGrid";
 import { applyMaterialOverrides } from "./furnitureMaterials";
-import { getInferredRoomBounds, snapFurnitureEditPosition } from './roomBounds';
+import { getFurniturePlacementBounds, snapFurnitureEditPosition } from './roomBounds';
 
 interface RoomViewerProps {
   design: RoomDesign;
@@ -563,8 +563,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
           new THREE.Vector3(design.room.width / 2, design.room.height, design.room.depth / 2),
         ),
       };
-    } else if (roomBounds.current?.id !== design.id) {
-      const inferred = getInferredRoomBounds(design.before?.items ?? design.items);
+    } else if (design.inferredRoomBounds || roomBounds.current?.id !== design.id) {
+      const inferred = getFurniturePlacementBounds(design);
       roomBounds.current = { id: design.id, bounds: new THREE.Box3(new THREE.Vector3(...inferred.min), new THREE.Vector3(...inferred.max)) };
     }
     const baseRoomBounds = roomBounds.current.bounds.clone();
@@ -585,7 +585,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     let loadedRoom: THREE.Group | null = null;
     const completeRoomModel = Boolean(design.modelUrl) && design.modelKind !== "shell";
     const gridBounds = referenceRoom?.floorBounds ?? baseRoomBounds;
-    const gridFloor = design.room || referenceRoom ? 0 : baseRoomBounds.min.y + 0.1835;
+    const gridFloor = design.room || referenceRoom ? 0 : getFurniturePlacementBounds(design).floor;
     const layoutGrid = createLayoutGrid(gridBounds, gridFloor);
     layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel;
     scene.add(layoutGrid);
