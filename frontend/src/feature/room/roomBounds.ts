@@ -31,6 +31,7 @@ export function getFurniturePlacementBounds(design: RoomDesign): RoomBounds & { 
     min: [-design.room.width / 2, 0, -design.room.depth / 2],
     max: [design.room.width / 2, design.room.height, design.room.depth / 2], floor: 0,
   };
+  if (design.inferredRoomBounds) return design.inferredRoomBounds;
   const inferred = getInferredRoomBounds(design.before?.items ?? design.items);
   if (design.source === 'demo' && design.style === 'oshi') return {
     min: [...REFERENCE_FLOOR_BOUNDS.min],

@@ -18,6 +18,8 @@ backendは商品ページの取得に `PageFetcher`、商品情報の抽出に `
 
 Review correction, authorized by the user's request to fix review findings on 2026-10-08: manually added furniture in samples without room dimensions also stays within the inferred floor during button moves, drag moves, and rotation. Moves clamp to the 10 cm grid; rotation is disabled when the rotated footprint cannot fit. Existing measured-room and raised-item positioning is preserved. Google Docs remains unset and this correction is not reflected there.
 
+The follow-up review on 2026-10-08 found that moving original furniture could enlarge placement bounds while the viewer retained its earlier floor. The first edit now preserves the pre-edit floor in optional `inferredRoomBounds`; rendering, placement, saved-plan restoration and history reuse those same bounds. This applies to all sample styles and custom designs without measured room geometry. Older plans infer their floor before their next edit. Google Docs remains unset and unupdated.
+
 ドラッグが使えない場合は「部屋の中央に追加」で配置できる。追加後は寸法・位置・回転・色を編集でき、手動で追加した家具は削除できる。追加・編集・削除は既存の履歴とブラウザ保存に含める。Before表示と家具を含む完成モデルでは追加しない。
 
 ## 追加家具も次のコーディネートへ渡す

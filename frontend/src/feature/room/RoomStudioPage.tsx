@@ -11,7 +11,7 @@ import RoomScene from './RoomScene';
 import RecommendationPanel from './RecommendationPanel';
 import RoomGenerating from './RoomGenerating';
 import PlannerPanel, { type PlannerView } from './PlannerPanel';
-import { furniturePositionInRoom, snapFurnitureEditPosition } from './roomBounds';
+import { furniturePositionInRoom, getFurniturePlacementBounds, snapFurnitureEditPosition } from './roomBounds';
 import { roomDescription } from './roomDescription';
 import { roomPlanKeys as sharedRoomPlanKeys, scopedRoomPlanKeys, useRoomPlanScope, saveRoomPlan, useRoomPlan, isApiRoomAlias } from './plans';
 import ErrorText from '../shared/ErrorText';
@@ -194,6 +194,8 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   function changeTitle(event:FormEvent) {event.preventDefault();if(!requireOwner())return;const value=title.trim();if(!value)return;try{const next={...design,title:value};saveRoomPlan(client,next,scope);setSavedFingerprint(JSON.stringify(next));setRename(false);}catch{setNotice('ルーム名を保存できませんでした。');}}
   function editDesign(next:RoomDesign) {
     if(JSON.stringify(next)===JSON.stringify(design))return;
+    // Preserve the rendered floor before any original furniture can move.
+    if(!design.room)next={...next,inferredRoomBounds:getFurniturePlacementBounds(design)};
     setBefore(false);
     setHistory(previous=>({past:[...previous.past,design].slice(-50),future:[]}));
     // Explicit deletion updates next.editedItems; replacement keeps the original.
