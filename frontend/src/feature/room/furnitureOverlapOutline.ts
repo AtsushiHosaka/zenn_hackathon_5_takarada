@@ -1,10 +1,11 @@
 import * as THREE from 'three';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
-import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 
 class FurnitureOutlinePass extends OutlinePass {
+  private readonly overlay = new FullScreenQuad(this.overlayMaterial);
+
+  override dispose() { this.overlay.dispose(); super.dispose(); }
   override render(renderer: THREE.WebGLRenderer, writeBuffer: THREE.WebGLRenderTarget, readBuffer: THREE.WebGLRenderTarget, deltaTime: number, maskActive: boolean) {
     const objects = this.selectedObjects;
     const reflectors: { object: THREE.Object3D; callback: THREE.Object3D['onBeforeRender'] }[] = [];
@@ -20,6 +21,14 @@ class FurnitureOutlinePass extends OutlinePass {
       for (const object of objects) {
         this.selectedObjects = [object];
         super.render(renderer, writeBuffer, readBuffer, deltaTime, maskActive);
+        // Composite only the alpha boundary onto the already-rendered scene.
+        // Reprocessing the base scene changes clear colors and toneMapped=false
+        // artwork/markers, so leave its color pipeline completely untouched.
+        renderer.setRenderTarget(null);
+        const autoClear = renderer.autoClear;
+        renderer.autoClear = false;
+        try { this.overlay.render(renderer); }
+        finally { renderer.autoClear = autoClear; }
       }
     } finally {
       this.selectedObjects = objects;
@@ -29,18 +38,16 @@ class FurnitureOutlinePass extends OutlinePass {
 }
 
 export function createFurnitureOverlapOutline(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera) {
-  let composer: EffectComposer | undefined;
   let outline: FurnitureOutlinePass | undefined;
-  let output: OutputPass | undefined;
+  // OutlinePass writes its discarded composite here while producing its masks.
+  const scratch = new THREE.WebGLRenderTarget(1, 1);
   let width = 1, height = 1;
   return {
     render(objects: THREE.Object3D[]) {
-      if (!objects.length) { renderer.render(scene, camera); return; }
-      if (!composer) {
-        const target = new THREE.WebGLRenderTarget(width * renderer.getPixelRatio(), height * renderer.getPixelRatio(), { type: THREE.HalfFloatType });
-        target.samples = Math.min(4, renderer.capabilities.maxSamples);
-        composer = new EffectComposer(renderer, target);
-        composer.addPass(new RenderPass(scene, camera));
+      renderer.setRenderTarget(null);
+      renderer.render(scene, camera);
+      if (!objects.length) return;
+      if (!outline) {
         outline = new FurnitureOutlinePass(new THREE.Vector2(width, height), scene, camera);
         outline.visibleEdgeColor.set('white');
         outline.hiddenEdgeColor.set('white');
@@ -51,6 +58,7 @@ export function createFurnitureOverlapOutline(renderer: THREE.WebGLRenderer, sce
         // Alpha covers only the thin boundary. Normal blending keeps the line
         // red on light furniture without tinting the furniture's surfaces.
         outline.overlayMaterial.blending = THREE.NormalBlending;
+        outline.overlayMaterial.toneMapped = false;
         outline.overlayMaterial.uniforms.outlineColor = { value: new THREE.Color('#ed2638') };
         outline.overlayMaterial.fragmentShader = `
           varying vec2 vUv;
@@ -62,24 +70,21 @@ export function createFurnitureOverlapOutline(renderer: THREE.WebGLRenderer, sce
             float edge = texture2D(edgeTexture1, vUv).r;
             float outside = texture2D(maskTexture, vUv).r;
             gl_FragColor = vec4(outlineColor, clamp(edge * edgeStrength * outside, 0.0, 1.0));
+            #include <colorspace_fragment>
           }
         `;
-        composer.addPass(outline);
-        output = new OutputPass();
-        composer.addPass(output);
-        composer.setSize(width, height);
+        outline.setSize(width * renderer.getPixelRatio(), height * renderer.getPixelRatio());
       }
-      outline!.selectedObjects = objects;
-      composer.render();
+      outline.selectedObjects = objects;
+      outline.render(renderer, scratch, scratch, 0, false);
     },
     resize(nextWidth: number, nextHeight: number) {
       width = nextWidth; height = nextHeight;
-      composer?.setSize(width, height);
+      outline?.setSize(width * renderer.getPixelRatio(), height * renderer.getPixelRatio());
     },
     dispose() {
       outline?.dispose();
-      output?.dispose();
-      composer?.dispose();
+      scratch.dispose();
     },
   };
 }

@@ -915,7 +915,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         if (completeRoomModel) {
           const mapped = mapCompleteRoomFurniture(gltf.scene, design.items);
           completeFurniture = mapped.groups;
-          unmappedFurniture = mapped.unmapped;
+          unmappedFurniture = [...mapped.unmapped, ...mapped.partial];
           for (const item of design.items) {
             const group = new THREE.Group();
             group.userData.itemId = item.id;
@@ -1242,9 +1242,14 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         if (overlapNotice.current) {
           const missing = completeRoomModel && loadedRoom && !currentBefore ? unmappedFurniture : [];
           overlapNotice.current.hidden = ids.size === 0 && missing.length === 0;
+          const names = (identities: ReadonlySet<string>) => {
+            const list = design.items.filter(item => identities.has(item.id));
+            const labels = list.slice(0, 3).map(item => item.name.length > 40 ? `${item.name.slice(0, 40)}…` : item.name);
+            return labels.join('、') + (list.length > 3 ? `、ほか${list.length - 3}点` : '');
+          };
           overlapNotice.current.textContent = [
-            ids.size ? `家具が重なっています：${design.items.filter(item => ids.has(item.id)).map(item => item.name).join('、')}` : '',
-            missing.length ? `モデル内の家具を特定できないため、重なりを確認できません：${design.items.filter(item => missing.includes(item.id)).map(item => item.name).join('、')}` : '',
+            ids.size ? `家具が重なっています：${names(ids)}` : '',
+            missing.length ? `モデル内の家具を十分に特定できません。一部の部品は重なり判定や赤い輪郭の対象外になる場合があります：${names(new Set(missing))}` : '',
           ].filter(Boolean).join('。');
         }
       }
@@ -1313,7 +1318,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     <div className="room-viewer">
       <div ref={canvasHost} className="viewer-canvas" style={{ position: "absolute", inset: 0 }} />
       {selectedItem && <button type="button" className="viewer-selected-item" aria-label={`${selectedItem.name}にフォーカス`} onClick={() => runtime.current?.focus(selectedItem.id)}>選択中: {selectedItem.name}</button>}
-      <div ref={overlapNotice} hidden role="status" aria-live="polite" style={{position:"absolute",left:16,top:16,maxWidth:"calc(100% - 32px)",padding:"8px 12px",background:"rgba(29,27,38,.9)",border:"1px solid #ed2638",borderRadius:8,color:"#fff",fontSize:12,pointerEvents:"none"}} />
+      <div ref={overlapNotice} hidden role="status" aria-live="polite" tabIndex={0} style={{position:"absolute",left:16,top:16,maxWidth:"calc(100% - 32px)",padding:"8px 12px",background:"rgba(29,27,38,.9)",border:"1px solid #ed2638",borderRadius:8,color:"#fff",fontSize:12,boxSizing:"border-box",maxHeight:48,overflowY:"auto",overflowWrap:"anywhere",pointerEvents:"auto"}} />
       {dimensionItem && <div role="status" style={{ position: "absolute", left: 16, bottom: 16, padding: "8px 12px", background: "rgba(29,27,38,.88)", border: "1px solid #6e6a7c", borderRadius: 8, color: "#fff", fontSize: 12, pointerEvents: "none" }}>幅 {Math.round(dimensionItem.size[0] * 100)} × 高さ {Math.round(dimensionItem.size[1] * 100)} × 奥行き {Math.round(dimensionItem.size[2] * 100)} cm</div>}
       <div ref={fallback} className="viewer-fallback" hidden role="status">
         <strong>この環境では3Dを表示できません</strong>
