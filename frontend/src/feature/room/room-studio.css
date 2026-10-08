@@ -208,3 +208,10 @@
 
 .rc-planner-floor-color {display:flex;align-items:center;gap:12px;margin-top:12px;font-size:13px}
 .rc-planner-floor-color input {width:48px;min-height:44px;border:1px solid #DDD5EE;border-radius:6px;cursor:pointer}
+.rc-setup-step {display:flex;flex-direction:column;gap:12px;min-width:0}
+.rc-new-composer {transition:background-color var(--motion-control-duration) var(--motion-ease),box-shadow var(--motion-control-duration) var(--motion-ease)}
+.rc-new-composer.is-photo-drop {background:#F1ECFB;box-shadow:inset 0 0 0 2px #6A3CD6}
+.rc-photo[data-motion-state="closing"] {pointer-events:none}
+.rc-viewer-reveal {position:absolute;inset:0}
+.rc-viewer-reveal[data-readiness="loading"] {opacity:0}
+.rc-viewer-readiness-note {position:absolute;left:16px;right:16px;bottom:84px;margin:0;padding:8px 12px;border-radius:8px;background:#221F2C;font-size:12px}
