@@ -2,6 +2,7 @@
 class Coordination < ApplicationRecord
   STATUSES = %w[pending processing done failed].freeze
   FLOOR_CATEGORIES = %w[sofa bed desk chair shelf table].freeze
+  MANUAL_OBJECT_ID = /\Amanual-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i
 
   belongs_to :room
   # 追加の指示 (チャット) で作り直すときの前回のコーデ
@@ -14,10 +15,39 @@ class Coordination < ApplicationRecord
   validate :valid_operations, on: :create
   validate :valid_base_coordination
 
+  # 写真で見つからなかった所有家具も、今回の提案の元の部屋に含める。
+  def input_scene
+    scene = room.scene.deep_dup
+    scene["objects"] += manual_objects
+    scene
+  end
+
   private
 
+  def manual_objects
+    return [] unless edited_objects.is_a?(Array) && edited_objects.size <= 100
+
+    edited_objects.filter_map do |edit|
+      next unless edit.is_a?(Hash) && edit["id"].is_a?(String) && edit["id"].match?(MANUAL_OBJECT_ID)
+      product_id = edit["ec_product_id"]
+      product = EcProduct.find_by(id: product_id) if product_id.is_a?(Integer) && product_id.positive?
+      next if product_id && (!product || !FLOOR_CATEGORIES.include?(product.data["category"]))
+      next unless product || (FLOOR_CATEGORIES.include?(edit["category"]) && edit["label"].is_a?(String) && edit["label"].strip.present? && edit["label"].length <= 100)
+
+      trusted = product ? FurnitureImport.scene_attributes(product).compact.merge(edit.slice("position", "size", "rotation_y", "color")) : edit.slice("label", "category", "position", "size", "rotation_y", "color")
+      trusted.merge(
+        "id" => edit["id"],
+        "source" => "existing", "slot" => nil, "attach_to" => nil, "item_id" => nil, "marker" => nil, "model_url" => trusted["model_url"]
+      )
+    end
+  end
+
+  def existing_objects
+    (room&.scene&.fetch("objects", [])&.select { |object| object["source"] == "existing" } || []) + manual_objects
+  end
+
   def valid_operations
-    existing = room&.scene&.fetch("objects", [])&.select { |object| object["source"] == "existing" } || []
+    existing = existing_objects
     if furniture_operations != []
       valid = furniture_operations.is_a?(Array) && furniture_operations.size <= 100 &&
         furniture_operations.all? { |operation| operation.is_a?(Hash) && operation["object_id"].is_a?(String) && %w[keep replace remove].include?(operation["action"]) }
@@ -46,8 +76,8 @@ class Coordination < ApplicationRecord
   end
 
   def valid_furniture_input
-    existing_objects = room&.scene&.fetch("objects", [])&.select { |object| object["source"] == "existing" } || []
-    existing_ids = existing_objects.pluck("id")
+    existing = existing_objects
+    existing_ids = existing.pluck("id")
     unless kept_object_ids.is_a?(Array) && kept_object_ids.uniq == kept_object_ids && (kept_object_ids - existing_ids).empty?
       errors.add(:kept_object_ids, "活かす家具の選択が正しくありません")
     end
@@ -62,9 +92,10 @@ class Coordination < ApplicationRecord
       (scene&.fetch("objects", []) || []).select { |object| object["source"] == "suggested" }
     end
     suggested_ids = suggested_objects.pluck("id")
-    objects_by_id = (existing_objects + suggested_objects).index_by { |object| object["id"] }
+    objects_by_id = (existing + suggested_objects).index_by { |object| object["id"] }
     ids = edited_objects.pluck("id")
-    unless ids.uniq == ids && (ids - existing_ids - suggested_ids).empty? && edited_objects.all? { |edit| valid_edit?(edit, objects_by_id.fetch(edit["id"])) }
+    linked_ids_valid = edited_objects.all? { |edit| edit["ec_product_id"].nil? || (edit["id"].is_a?(String) && edit["id"].match?(MANUAL_OBJECT_ID) && objects_by_id[edit["id"]]&.fetch("ec_product_id", nil) == edit["ec_product_id"]) }
+    unless ids.uniq == ids && linked_ids_valid && (ids - existing_ids - suggested_ids).empty? && edited_objects.all? { |edit| valid_edit?(edit, objects_by_id.fetch(edit["id"])) }
       errors.add(:edited_objects, "家具の編集内容が正しくありません")
     end
   end

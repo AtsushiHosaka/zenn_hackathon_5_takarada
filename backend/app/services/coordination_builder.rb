@@ -10,10 +10,10 @@ class CoordinationBuilder
 
   def initialize(coordination)
     @coordination = coordination
-    @scene = coordination.room.scene.deep_dup
+    @scene = coordination.input_scene
     @scene["objects"].map! do |object|
       edit = coordination.edited_objects.find { |value| value["id"] == object["id"] }
-      edit ? object.merge(edit.except("id")) : object
+      edit ? object.merge(edit.slice("position", "size", "rotation_y", "color")) : object
     end
   end
 

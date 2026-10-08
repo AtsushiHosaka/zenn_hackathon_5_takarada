@@ -1,9 +1,9 @@
 import { DomainError } from "../../domain/error";
-import { isFurnitureAdditions, isFurnitureOperations, isRoomItem, isRoomShape } from "../../domain/room";
+import { furnitureCategories, isFurnitureAdditions, isFurnitureOperations, isManualFurniture, isRoomItem, isRoomShape } from "../../domain/room";
 import type { GenerateRoomInput, RoomRepository } from "../../domain/roomRepository";
 import type { ApiClient } from "../apiClient";
 import { createDemoRoom } from "../dummy/dummyRoomRepository";
-import { toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toRoomDesign, toSavedRoom, toSavedRooms, toUploadRecords } from "../records/room";
+import { toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toImportedFurniture, toRoomDesign, toSavedRoom, toSavedRooms, toUploadRecords } from "../records/room";
 import type { components } from "../generated/api";
 
 export type RoomApiConfig = {
@@ -25,6 +25,14 @@ const unavailableMessage = "部屋APIの接続先が設定されていません�
 export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, baseUrl: string): RoomRepository {
   return {
     demo: createDemoRoom,
+    async importFurniture(url, signal) {
+      let parsed: URL;
+      try { parsed = new URL(url.trim()); } catch { throw new DomainError("商品ページのURLを入力してください"); }
+      if (parsed.protocol !== "https:" || parsed.username || parsed.password || url.length > 2048) throw new DomainError("HTTPSの商品ページURLを入力してください");
+      return toImportedFurniture(await api.send<unknown>("/api/v1/furniture_imports", {
+        method: "POST", body: { url: parsed.href }, signal, timeoutMs: 60_000,
+      }), baseUrl);
+    },
     async list(signal) {
       if (config.contract === "legacy") throw new DomainError("この接続先では保存した部屋を取得できません");
       if (!config.generationPath) throw new DomainError(unavailableMessage);
@@ -88,11 +96,12 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
           if (record.status === "ready") {
             if (config.contract === "analysis") return toAnalyzedRoomDesign(record, baseUrl);
             if (!config.coordinationPath.includes("{id}")) throw new DomainError("コーディネートの作成先が設定されていません");
-            const existingIds = record.scene?.objects.filter(item => item.source === "existing").map(item => item.id) ?? [];
+            const edits = editedObjects(input, record);
+            const existingIds = [...(record.scene?.objects.filter(item => item.source === "existing").map(item => item.id) ?? []), ...edits.filter(edit => edit.category !== undefined).map(edit => edit.id)];
             if (input.furnitureOperations !== undefined && (!isFurnitureOperations(input.furnitureOperations) || input.furnitureOperations.length !== existingIds.length || input.furnitureOperations.some(operation => !existingIds.includes(operation.objectId)))) throw new DomainError("各家具について残すか入れ替えるかを選んでください");
             const keptObjectIds = input.furnitureOperations?.filter(operation => operation.action === "keep").map(operation => operation.objectId) ?? input.keptObjectIds ?? [];
-            if (!Array.isArray(keptObjectIds) || keptObjectIds.some(id => typeof id !== "string" || !record.scene?.objects.some(item => item.source === "existing" && item.id === id)) || new Set(keptObjectIds).size !== keptObjectIds.length) throw new DomainError("活かす家具の選択が正しくありません");
-            const request: components["schemas"]["CoordinationInput"] = { coordination: { prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: editedObjects(input, record), ...(input.baseCoordinationId && /^[1-9]\d*$/.test(input.baseCoordinationId) ? { base_coordination_id: Number(input.baseCoordinationId) } : {}), ...(input.furnitureOperations === undefined ? {} : { furniture_operations: input.furnitureOperations.map(operation => ({ object_id: operation.objectId, action: operation.action })) }), ...(input.furnitureAdditions === undefined ? {} : { additions: input.furnitureAdditions }) } };
+            if (!Array.isArray(keptObjectIds) || keptObjectIds.some(id => typeof id !== "string" || !existingIds.includes(id)) || new Set(keptObjectIds).size !== keptObjectIds.length) throw new DomainError("活かす家具の選択が正しくありません");
+            const request: components["schemas"]["CoordinationInput"] = { coordination: { prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: edits, ...(input.baseCoordinationId && /^[1-9]\d*$/.test(input.baseCoordinationId) ? { base_coordination_id: Number(input.baseCoordinationId) } : {}), ...(input.furnitureOperations === undefined ? {} : { furniture_operations: input.furnitureOperations.map(operation => ({ object_id: operation.objectId, action: operation.action })) }), ...(input.furnitureAdditions === undefined ? {} : { additions: input.furnitureAdditions }) } };
             let coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationPath.replace("{id}", String(record.id)), { method: "POST", body: request, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 270_000 }));
             const coordinationId = coordination.id;
             if (coordination.room_id !== expectedId) throw new DomainError("別の部屋のコーディネートを受け取りました");
@@ -146,7 +155,8 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
 
 function editedObjects(input: GenerateRoomInput, record: components["schemas"]["Room"]): components["schemas"]["FurnitureEdit"][] {
   if (!input.editedItems) return [];
-  if (!Array.isArray(input.editedItems) || !input.editedItems.every(isRoomItem) || new Set(input.editedItems.map(item => item.id)).size !== input.editedItems.length || !record.scene) throw new DomainError("家具の編集内容が正しくありません");
+  if (!Array.isArray(input.editedItems) || input.editedItems.length > 100 || !input.editedItems.every(isRoomItem) || new Set(input.editedItems.map(item => item.id)).size !== input.editedItems.length || !record.scene) throw new DomainError("家具の編集内容が正しくありません");
+  if (input.editedItems.some(item => isManualFurniture(item) && (!furnitureCategories.some(category => category === item.category) || !item.ecProductId && item.name.length > 100))) throw new DomainError("手動で追加した家具の種類または名前が正しくありません");
   const { room } = record.scene;
   return input.editedItems.map(item => ({
     id: item.id,
@@ -154,6 +164,8 @@ function editedObjects(input: GenerateRoomInput, record: components["schemas"]["
     size: { w: item.size[0], h: item.size[1], d: item.size[2] },
     rotation_y: item.rotation ?? 0,
     color: item.color,
+    ...(isManualFurniture(item) ? { category: item.category as typeof furnitureCategories[number], ...(!item.ecProductId ? { label: item.name } : {}) } : {}),
+    ...(isManualFurniture(item) && item.ecProductId ? { ec_product_id: Number(item.ecProductId) } : {}),
   }));
 }
 

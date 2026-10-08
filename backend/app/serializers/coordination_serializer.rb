@@ -9,6 +9,6 @@ class CoordinationSerializer
 
   attribute(:after_scene) { |coordination| ModelResolver.call(coordination.after_scene) }
   # ビフォー/アフター切り替え用に部屋の元のシーンも返す
-  attribute(:before_scene) { |coordination| ModelResolver.call(coordination.room.scene) }
+  attribute(:before_scene) { |coordination| ModelResolver.call(coordination.input_scene) }
   attribute(:created_at) { |coordination| coordination.created_at.iso8601 }
 end
