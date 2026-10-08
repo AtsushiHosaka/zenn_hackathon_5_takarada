@@ -1,0 +1,41 @@
+{
+  "revision": "24223f9a3cf581c9b1a9bb28328c0cb8e210148b",
+  "scope": "Actual UI with controlled HTTP auth/upload/room/coordinator fixtures; no production/provider calls, no source rewriting",
+  "stages": [
+    {
+      "name": "Controlled API setup",
+      "status": "PASS",
+      "elapsedMs": 241
+    },
+    {
+      "name": "Setup identity/back/focus and mixed photos/remove/revoke/limit",
+      "status": "PASS",
+      "elapsedMs": 1161
+    },
+    {
+      "name": "Initial failure/pending/stop/retry/immediate success/one ready viewer",
+      "status": "PASS",
+      "elapsedMs": 752
+    },
+    {
+      "name": "Follow-up identity/scroll/error/pending/stop/focus/retry success",
+      "status": "PASS",
+      "elapsedMs": 728
+    },
+    {
+      "name": "Chat stop/retry/single canvas/live reduced photo+waiting/navigation cleanup",
+      "status": "PASS",
+      "elapsedMs": 1443
+    },
+    {
+      "name": "Dummy sample-photo removal",
+      "status": "NOT VERIFIED",
+      "reason": "Current dummy capabilities omit photo step; sample entries not reachable in ordinary dummy dimension setup without altering source/dependencies. Real-file removal focus is checked."
+    }
+  ],
+  "errors": [],
+  "expectedErrors": [
+    "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+    "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+  ]
+}
