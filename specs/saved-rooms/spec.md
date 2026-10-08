@@ -20,6 +20,8 @@ Google Docs URLは `docs/project.md` に未設定のため未確認。今回の�
 
 ## 実装と保存範囲
 
+Review correction for issue #41 (2026-10-08): failed dummy room writes retain valid generated results in the repository session, separated by owner. List/get and later generation reuse those pending results, including analyze calls. Studio/list show the current owner's persistence warning; a subsequent successful write saves pending rooms and clears the warning. Reloading loses pending memory, and malformed stored rooms remain a reported read error. Google Docs remains unconfigured and this correction is not reflected there.
+
 既存のAPI作成処理はすでに本人の部屋をDBへ保存していた。Webがブラウザ内の保存結果だけを一覧に使っていたため、本人の部屋を返すGET一覧APIを追加し、最新の成功した提案を一覧・詳細応答に含める。解析が終わる前に画面を離れた場合も、DBに保存した部屋を一覧から確認できる。
 
 Webのタイトル変更・配置・色の手動編集は従来どおり接続先・API origin・利用者ID別のブラウザ保存。別端末へ同期するのはAPIで生成された部屋と提案であり、手動編集は同期しない。ダミーとサンプルから保存したルームもそのブラウザ内だけに保存する。ゲストがサンプルを保存するときは先にログインを求め、ゲストの保存結果を次の利用者へ割り当てない。
