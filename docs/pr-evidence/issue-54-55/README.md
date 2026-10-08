@@ -23,3 +23,11 @@ Browser verification exposed two application regressions that were corrected bef
 ## Boundaries
 
 API responses and external-link destinations were intercepted local fixtures. These checks do not prove a deployed environment, provider generation, real cloud DB/authentication, physical touch hardware, or the final combined motion inventory. Browser and Vite were closed after verification and the shared slot was explicitly released to the parent agent.
+
+## Follow-up keyboard focus correction
+
+Independent review of immutable head `e659dc959b7f7c58a710bc79e93310b8ee26fa18` found that removing the sole remaining furniture request left focus on the outgoing inert row. The planner now explicitly focuses its native Add furniture button when no adjacent request remains. Removing other rows still focuses the next or previous native select.
+
+A temporary browser harness bundled the actual changed `FurnitureAdditionRows` component and its motion hooks, with the same explicit button-ref callback used by `PlannerPanel`. Keyboard removal passed next-row, previous-row and sole-row focus checks, both immediately and after the 150ms exit, under normal and reduced motion. Enter on the focused Add button created a usable new request. No page errors occurred; isolated contexts were closed. Frontend lint and production build passed, retaining the existing chunk-size warning. No permanent tests were added.
+
+The three screenshots and full room journey above precede this narrow focus correction. The component harness proves the correction independently; a full combined room rerun is recorded separately by the integration PR. This probe does not prove deployed/provider behavior.
