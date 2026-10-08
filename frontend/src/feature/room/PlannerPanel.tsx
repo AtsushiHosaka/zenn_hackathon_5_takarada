@@ -339,7 +339,7 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
             const bottom = Number(event.target.value) / 100;
             const bounds = getFurniturePlacementBounds(design);
             if (!Number.isFinite(bottom) || bottom < 0 || bounds.floor + bottom + selected.size[1] > bounds.max[1]) return;
-            changeItem({ supportObjectId: undefined, position: [selected.position[0], bounds.floor + bottom + selected.size[1] / 2, selected.position[2]] });
+            changeItem({ supportObjectId: undefined, supportSurface: undefined, position: [selected.position[0], bounds.floor + bottom + selected.size[1] / 2, selected.position[2]] });
           }} /></label>}
           {selectedProductLink && <a className="rc-furniture-product-link" href={selectedProductLink} target="_blank" rel="noopener noreferrer">商品ページを見る</a>}
           {(selected.id.startsWith('manual-') || templateEditing) && !completeModel && <>
