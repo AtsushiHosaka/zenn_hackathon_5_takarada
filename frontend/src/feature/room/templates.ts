@@ -41,6 +41,7 @@ export function createTemplateSnapshot(design: RoomDesign, title: string): RoomD
     id: `room-template-${crypto.randomUUID()}`, source: design.source, kind: 'analysis', title: title.trim(),
     description: '保存した部屋のテンプレートです。', style: design.style, room, analysisInput,
     wallColor: design.wallColor, budget: design.budget, prompt: design.prompt,
+    characterThemeId: design.characterThemeId, roomPaletteId: design.roomPaletteId,
     items: design.items.map(original => {
       const item = structuredClone(original);
       return {...item, id: `template-object-${crypto.randomUUID()}`, existing: true,
