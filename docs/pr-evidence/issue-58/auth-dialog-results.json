@@ -1,0 +1,75 @@
+{
+  "revision": "932393544fba444d9e87ad99bbe8f336c569f58b",
+  "url": "http://127.0.0.1:5173",
+  "scope": "Actual UI; isolated dummy authentication; no account mutation or production API",
+  "checks": [
+    {
+      "name": "Auth typing preserves mounted entrance block",
+      "status": "PASS"
+    },
+    {
+      "name": "Actual dummy invalid-login error and immediate field recovery",
+      "status": "PASS"
+    },
+    {
+      "name": "Native auth dialog keyboard containment; browser chrome boundary remains native",
+      "status": "PASS",
+      "tag": "BODY",
+      "hasFocus": false,
+      "modal": true
+    },
+    {
+      "name": "Escape retains native modal/inert exit and restores trigger focus",
+      "status": "PASS",
+      "closingSamples": 1
+    },
+    {
+      "name": "Five rapid close/reopen cycles retain exactly one modal",
+      "status": "PASS"
+    },
+    {
+      "name": "Outside-rectangle backdrop dismissal and focus restoration",
+      "status": "PASS"
+    },
+    {
+      "name": "Live reduced motion removes exit and disables dialog animation",
+      "status": "PASS",
+      "animation": "0s",
+      "transition": "0s"
+    },
+    {
+      "name": "Signup navigation and browser Back keep controls available",
+      "status": "PASS"
+    },
+    {
+      "name": "390px login/dialog fit and dismissal preserves scroll position",
+      "status": "PASS"
+    },
+    {
+      "name": "Deletion confirmation Escape focuses safe Cancel, cancels, restores trigger; no mutation",
+      "status": "PASS"
+    },
+    {
+      "name": "Deletion confirmation cancel focuses safe Cancel, cancels, restores trigger; no mutation",
+      "status": "PASS"
+    },
+    {
+      "name": "Deletion confirmation reduced focuses safe Cancel, cancels, restores trigger; no mutation",
+      "status": "PASS"
+    },
+    {
+      "name": "390px account confirmation fits without overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "Account menu Escape focus restoration after navigation",
+      "status": "PASS"
+    },
+    {
+      "name": "No unexpected app page errors or non-GET requests",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "requests": []
+}
