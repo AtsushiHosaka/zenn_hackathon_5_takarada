@@ -11,7 +11,7 @@ import { buildCharacterThemeDecor } from "./characterThemeDecor";
 import { buildMeasuredRoom } from "./roomArchitecture";
 import { LAYOUT_GRID_STEP } from "./layoutGrid";
 import { overlappingFurnitureIds } from './furnitureOverlap';
-import { createFurnitureOutline, completeFurnitureMeshes, renderedFurnitureBounds, furnitureMeshBoundsIntersect } from './furnitureOutline';
+import { createFurnitureOutline, completeFurnitureMeshes, renderedFurnitureVolumes, furnitureMeshVolumesIntersect } from './furnitureOutline';
 import { applyMaterialOverrides } from "./furnitureMaterials";
 import { canPlaceOnFurniture, furniturePositionInRoom, getFurniturePlacementBounds, isFurnitureSupport, snapFurnitureEditPosition } from './roomBounds';
 
@@ -619,6 +619,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     let currentPlacement = initialPlacement();
     let loadedRoom: THREE.Group | null = null;
     let completeMeshes = new Map<string, THREE.Object3D[]>();
+    let incompleteFurniture: string[] = [];
     let furnitureGeometryVersion = 0;
     const completeRoomModel = Boolean(design.modelUrl) && design.modelKind !== "shell";
     const gridBounds = referenceRoom?.floorBounds ?? baseRoomBounds;
@@ -909,7 +910,11 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         scene.add(gltf.scene);
         loadedRoom = gltf.scene;
         furnitureGeometryVersion++;
-        if (completeRoomModel) completeMeshes = completeFurnitureMeshes(gltf.scene, design.items);
+        if (completeRoomModel) {
+          const mapped = completeFurnitureMeshes(gltf.scene, design.items);
+          completeMeshes = mapped.meshes;
+          incompleteFurniture = [...mapped.unmapped, ...mapped.partial];
+        }
         if (completeRoomModel) {
           for (const item of design.items) {
             const group = new THREE.Group();
@@ -1231,19 +1236,21 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
           });
         }
       }
-      const meshesFor = (id: string) => loadedRoom && completeRoomModel && !currentBefore ? completeMeshes.get(id) : id === currentPlacement?.id && placementPreview?.visible ? [placementPreview] : furniture.has(id) ? [furniture.get(id)!] : undefined;
+      let previewId = currentPlacement?.id;
+      if (previewId && placementPreview?.visible) while (furniture.has(previewId)) previewId += ":preview";
+      const meshesFor = (id: string) => loadedRoom && completeRoomModel && !currentBefore ? completeMeshes.get(id) : id === previewId && placementPreview?.visible ? [placementPreview] : furniture.has(id) ? [furniture.get(id)!] : undefined;
       const nextOverlapSignature = JSON.stringify([furnitureGeometryVersion, currentBefore, drag?.id, drag?.position, drag?.supportObjectId, drag?.supportSurface, currentPlacement?.id, placementPreview?.userData.supportObjectId, placementPreview?.userData.supportSurface, placementPreview?.visible && placementPreview.position.toArray()]);
       if (nextOverlapSignature !== overlapSignature) {
         const visibleItems = design.items.filter(item => !currentBefore || existingIds.has(item.id)).map(item => drag?.id === item.id ? { ...item, position: drag.position, supportObjectId: drag.supportObjectId, supportSurface: drag.supportSurface } : item);
-        if (currentPlacement && placementPreview?.visible) visibleItems.push({ ...currentPlacement, supportObjectId: placementPreview.userData.supportObjectId, supportSurface: placementPreview.userData.supportSurface, position: [placementPreview.position.x, placementPreview.position.y + currentPlacement.size[1] / 2, placementPreview.position.z] });
-        const bounds = new Map<string, THREE.Box3[]>();
+        if (currentPlacement && placementPreview?.visible) visibleItems.push({ ...currentPlacement, id: previewId!, supportObjectId: placementPreview.userData.supportObjectId, supportSurface: placementPreview.userData.supportSurface, position: [placementPreview.position.x, placementPreview.position.y + currentPlacement.size[1] / 2, placementPreview.position.z] });
+        const bounds = new Map<string, ReturnType<typeof renderedFurnitureVolumes>>();
         const boundsFor = (id: string) => {
-          if (!bounds.has(id)) bounds.set(id, renderedFurnitureBounds(meshesFor(id) ?? []));
+          if (!bounds.has(id)) bounds.set(id, renderedFurnitureVolumes(meshesFor(id) ?? []));
           return bounds.get(id)!;
         };
         overlaps = overlappingFurnitureIds(visibleItems, design, (a, b) => {
           const left = boundsFor(a.id), right = boundsFor(b.id);
-          return !left.length || !right.length || furnitureMeshBoundsIntersect(left, right);
+          return (!meshesFor(a.id)?.length || !meshesFor(b.id)?.length) || furnitureMeshVolumesIntersect(left, right);
         });
         overlapSignature = nextOverlapSignature;
       }
@@ -1253,7 +1260,10 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         if (meshes?.length) targets.push(meshes);
       }
       if (overlapNotice.current) {
-        const text = overlaps.size ? `家具${overlaps.size}点が重なっています。${targets.length === overlaps.size ? "赤い輪郭を確認してください。" : ""}` : '';
+        const missing = loadedRoom && completeRoomModel && !currentBefore ? design.items.filter(item => incompleteFurniture.includes(item.id)) : [];
+        const labels = missing.slice(0, 3).map(item => item.name.length > 40 ? item.name.slice(0, 40) + "…" : item.name);
+        const coverage = missing.length ? `モデル内の家具を十分に特定できません。一部の部品は重なり判定や赤い輪郭の対象外になる場合があります：${labels.join("、")}${missing.length > 3 ? `、ほか${missing.length - 3}点` : ""}` : "";
+        const text = [overlaps.size ? `家具${overlaps.size}点が重なっています。${targets.length === overlaps.size ? "赤い輪郭を確認してください。" : ""}` : "", coverage].filter(Boolean).join("。");
         if (overlapNotice.current.textContent !== text) overlapNotice.current.textContent = text;
         overlapNotice.current.hidden = !text;
       }
@@ -1320,7 +1330,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   return (
     <div className="room-viewer">
       <div ref={canvasHost} className="viewer-canvas" style={{ position: "absolute", inset: 0 }} />
-      <div ref={overlapNotice} className="viewer-overlap-notice" hidden role="status" aria-live="polite"/>
+      <div ref={overlapNotice} className="viewer-overlap-notice" tabIndex={0} hidden role="status" aria-live="polite"/>
       {selectedItem && <button type="button" className="viewer-selected-item" aria-label={`${selectedItem.name}にフォーカス`} onClick={() => runtime.current?.focus(selectedItem.id)}>選択中: {selectedItem.name}</button>}
       {dimensionItem && <div role="status" style={{ position: "absolute", left: 16, bottom: 16, padding: "8px 12px", background: "rgba(29,27,38,.88)", border: "1px solid #6e6a7c", borderRadius: 8, color: "#fff", fontSize: 12, pointerEvents: "none" }}>幅 {Math.round(dimensionItem.size[0] * 100)} × 高さ {Math.round(dimensionItem.size[1] * 100)} × 奥行き {Math.round(dimensionItem.size[2] * 100)} cm</div>}
       <div ref={fallback} className="viewer-fallback" hidden role="status">
