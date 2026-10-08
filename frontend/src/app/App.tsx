@@ -27,9 +27,7 @@ const queryClient = new QueryClient({
 function RoomStudioRoute() {
   const { id } = useParams();
   const scope = useRoomPlanScope();
-  const page = <RoomStudioPage key={`${scope}:${id}`} />;
-  return loadConnection() === "dummy" || ["sample-oshi", "sample-botanical", "sample-natural", "sample-game"].includes(id ?? "")
-    ? page : <RequireAuth>{page}</RequireAuth>;
+  return <RoomStudioPage key={`${scope}:${id}`} />;
 }
 
 export default function App() {
@@ -38,10 +36,10 @@ export default function App() {
       <RepositoriesContext value={repositories}>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Navigate to="/rooms/sample-oshi" replace />} />
-            <Route path="/rooms" element={<RoomListPage />} />
+            <Route path="/" element={<Navigate to="/rooms" replace />} />
+            <Route path="/rooms" element={<RequireAuth><RoomListPage /></RequireAuth>} />
             <Route path="/coordinate" element={<Navigate to="/rooms/new" replace />} />
-            <Route path="/rooms/:id" element={<RoomStudioRoute />} />
+            <Route path="/rooms/:id" element={<RequireAuth><RoomStudioRoute /></RequireAuth>} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<LoginPage key="signup" />} />
             <Route
