@@ -161,7 +161,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const focusStep=useRef(false);
   const focusPhoto=useRef(false);
   const wasPending=useRef(false);
-  useLayoutEffect(()=>{if(focusPhoto.current){composer.current?.querySelector<HTMLElement>('.rc-photo-add')?.focus();focusPhoto.current=false;}},[photos.length]);
+  useLayoutEffect(()=>{if(focusPhoto.current){composer.current?.querySelector<HTMLElement>('.rc-photo-add')?.focus();focusPhoto.current=false;}},[photos.length,samplePhotos.length]);
   useLayoutEffect(()=>{if(focusStep.current){composer.current?.querySelector<HTMLElement>('input:not([type=hidden]),textarea,button:not(:disabled)')?.focus();focusStep.current=false;}},[inputStep]);
   useEffect(()=>{if(nearBottom.current&&messages.current)motionScrollIntoView(messages.current.lastElementChild,{block:'end'});},[inputStep,design.id]);
   const abort=useRef<AbortController|null>(null);

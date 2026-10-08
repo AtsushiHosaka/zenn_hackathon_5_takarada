@@ -53,3 +53,7 @@ Actual Chromium from this checkout, using intercepted authenticated room/coordin
 - Desktop 1440×1000 and mobile 390×844 screenshots were visually inspected. Existing mobile waiting columns squeezed status text; a waiting-only vertical layout now retains the same illustration/status and readable stop button. The mobile document remained 390px wide. The broader result studio layout remains unchanged.
 
 Screenshots and reproduction notes: `docs/pr-evidence/issue-52-53`. Native file drag/drop interaction and physical touch hardware were not exercised; the existing drop handler shares the verified file validation and its feedback is wired in source. Production authentication, provider generation and deployed performance were not verified. No permanent tests were added. Final existing lint/build passed, with the existing large-chunk warning.
+
+## Independent correction (2026-10-09)
+
+Review of PR #102 at `eedcab00f318fc42dca6b5161969b80e382d21fb` found that deleting a sample photo did not restore keyboard focus: only the real-file count triggered the layout effect. The effect now also observes the active sample-photo count, so both kinds of removal focus the existing Add Photo control immediately while the removed tile becomes inert. The motion lifecycle and submitted photo list are unchanged. No permanent tests were added.
