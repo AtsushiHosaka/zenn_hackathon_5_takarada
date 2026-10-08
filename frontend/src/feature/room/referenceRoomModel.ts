@@ -186,6 +186,8 @@ export function buildReferenceRoom(scene: THREE.Scene, design: RoomDesign): { ar
   const lamp = furniture.get('6');
   if (lamp) {
     const glow = new THREE.Mesh(new THREE.SphereGeometry(.555, 24, 16), new THREE.MeshBasicMaterial({ color: tint('6', '#c8aaff'), transparent: true, opacity: .28, depthWrite: false, toneMapped: false }));
+    // This halo visualizes emitted light; it has no physical furniture volume.
+    glow.userData.nonPhysical = true;
     glow.position.set(1.7003, 1.92, -.86);
     lamp.add(glow);
   }
