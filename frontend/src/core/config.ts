@@ -3,8 +3,29 @@
 const configuredRoomContract = import.meta.env.VITE_ROOM_API_CONTRACT;
 const roomContract = configuredRoomContract === "analysis" || configuredRoomContract === "legacy" ? configuredRoomContract : "coordination";
 
+function documentUrl(value: string | undefined): string | undefined {
+  if (!value?.trim()) return undefined;
+  if (value.includes('\\') || [...value].some(character => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)) return undefined;
+  // Configure URI-encoded paths and punycode hosts, matching the API validator.
+  if (!/^[A-Za-z0-9\-._~:/?#[\]@!$&'()*+,;=%]+$/.test(value.trim()) || /%(?![0-9a-f]{2})/i.test(value.trim())) return undefined;
+  const absolute = /^https:\/\//i.test(value.trim());
+  if (!absolute && !/^\/(?!\/)/.test(value.trim())) return undefined;
+  try {
+    const url = new URL(value.trim(), window.location.origin);
+    if (url.username || url.password) return undefined;
+    if (absolute) return url.protocol === "https:" ? url.href : undefined;
+    return url.origin === window.location.origin && ["http:", "https:"].includes(url.protocol) ? url.href : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export const appConfig = {
   isDevelopment: import.meta.env.DEV,
+  legal: {
+    termsUrl: documentUrl(import.meta.env.VITE_TERMS_URL),
+    privacyUrl: documentUrl(import.meta.env.VITE_PRIVACY_URL),
+  },
   // 空文字も未設定として扱う (compose が空の環境変数を渡してくることがある)
   // 同一オリジンの /api を配信サーバーが GCP へ中継する。
   apiEndpoint: import.meta.env.VITE_API_ENDPOINT || window.location.origin,

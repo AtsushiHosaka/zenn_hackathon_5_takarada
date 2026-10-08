@@ -54,6 +54,12 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/User"
+        '503':
+          description: 正式文書の未設定により新規登録を停止中
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationErrors"
         '422':
           description: バリデーションエラー
           content:

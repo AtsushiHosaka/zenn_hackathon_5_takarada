@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation } from 'react-router';
 import { useLogin, useSession, useSignup } from '../../core/session';
+import { appConfig } from '../../core/config';
+import { loadConnection } from '../../core/connection';
 import ErrorText from '../shared/ErrorText';
 import ReferenceSvg from '../room/ReferenceSvg';
 import ConnectionSwitch from '../shared/ConnectionSwitch';
@@ -37,6 +39,8 @@ export default function LoginPage() {
   const from: unknown = location.state?.from;
   const destination = typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') && !/^\/(login|signup)([/?#]|$)/.test(from) ? from : '/rooms/new';
   const isSignup = mode === 'signup';
+  const isDummy = loadConnection() === 'dummy';
+  const signupPaused = isSignup && !isDummy && (!appConfig.legal.termsUrl || !appConfig.legal.privacyUrl);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -52,7 +56,7 @@ export default function LoginPage() {
   if (session.status === 'authenticated') return <Navigate to={destination} replace />;
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    if (pending || session.status === 'loading') return;
+    if (pending || session.status === 'loading' || signupPaused) return;
     if (isSignup && !name.trim()) { setValidation('ニックネームを入力してください'); return; }
     if (isSignup && new TextEncoder().encode(password).length > 72) { setValidation('パスワードはUTF-8で72バイト以内にしてください（半角英数字なら72文字以内）'); return; }
     setValidation(null);
@@ -60,6 +64,10 @@ export default function LoginPage() {
     else login.mutate({ email: email.trim(), password });
   };
   const openNotice = (event: React.MouseEvent, kind: 'password' | 'terms' | 'privacy') => { event.preventDefault(); setNotice(kind); };
+  const legalLink = (kind: 'terms' | 'privacy') => {
+    const url = kind === 'terms' ? appConfig.legal.termsUrl : appConfig.legal.privacyUrl;
+    return <a href={url || `#${kind}`} target={url ? '_blank' : undefined} rel={url ? 'noopener noreferrer' : undefined} onClick={(event) => { if (!url) openNotice(event, kind); }}>{kind === 'terms' ? '利用規約' : 'プライバシーポリシー'}</a>;
+  };
   const resetAuth = () => { login.reset(); signup.reset(); setValidation(null); };
   const id = isSignup ? 'su' : 'login';
   return <main className="reference-auth">
@@ -70,23 +78,25 @@ export default function LoginPage() {
         {session.status === 'loading' && <p role="status">ログイン状態を確認しています…</p>}
         {session.status === 'error' && <div><ErrorText error={session.error} /><button className="reference-auth-secondary" type="button" onClick={session.retry}>ログイン状態を再確認</button></div>}
         <div className="reference-auth-heading"><h1>{isSignup ? 'アカウントを作成' : 'おかえりなさい'}</h1></div>
+        {isSignup && isDummy && <p role="status" className="reference-auth-hint">ダミーモードのデモ登録です。</p>}
+        {signupPaused && <p role="alert" className="reference-auth-error">利用規約とプライバシーポリシーを公開するまで、新規登録を停止しています。</p>}
         <form className="reference-auth-form" onSubmit={submit} aria-busy={pending}>
-          {isSignup && <div className="reference-auth-field"><label htmlFor="su-name">ニックネーム</label><input id="su-name" type="text" autoComplete="nickname" placeholder="ルームに表示される名前" value={name} onChange={(event) => { setName(event.target.value); setValidation(null); signup.reset(); }} disabled={pending} required maxLength={50} /></div>}
-          <div className="reference-auth-field"><label htmlFor={`${id}-email`}>メールアドレス</label><input id={`${id}-email`} type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(event) => { setEmail(event.target.value); resetAuth(); }} disabled={pending} required /></div>
+          {isSignup && <div className="reference-auth-field"><label htmlFor="su-name">ニックネーム</label><input id="su-name" type="text" autoComplete="nickname" placeholder="ルームに表示される名前" value={name} onChange={(event) => { setName(event.target.value); setValidation(null); signup.reset(); }} disabled={pending || signupPaused} required maxLength={50} /></div>}
+          <div className="reference-auth-field"><label htmlFor={`${id}-email`}>メールアドレス</label><input id={`${id}-email`} type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(event) => { setEmail(event.target.value); resetAuth(); }} disabled={pending || signupPaused} required /></div>
           <div className="reference-auth-field">
             {isSignup ? <label htmlFor="su-password">パスワード</label> : <div className="reference-auth-password-label"><label htmlFor="login-password">パスワード</label><a href="#password" onClick={(event) => openNotice(event, 'password')}>パスワードを忘れた場合</a></div>}
-            <div className="reference-auth-password"><input id={`${id}-password`} type={showPassword ? 'text' : 'password'} autoComplete={isSignup ? 'new-password' : 'current-password'} placeholder="パスワード" aria-describedby={isSignup ? 'su-password-hint' : undefined} value={password} onChange={(event) => { setPassword(event.target.value); resetAuth(); }} disabled={pending} minLength={isSignup ? 8 : undefined} maxLength={isSignup ? 72 : undefined} required /><button type="button" aria-label={showPassword ? 'パスワードを隠す' : 'パスワードを表示'} aria-pressed={showPassword} onClick={() => setShowPassword((value) => !value)}><ReferenceSvg page={isSignup ? 1 : 0} index={isSignup ? 2 : 4} /></button></div>
+            <div className="reference-auth-password"><input id={`${id}-password`} type={showPassword ? 'text' : 'password'} autoComplete={isSignup ? 'new-password' : 'current-password'} placeholder="パスワード" aria-describedby={isSignup ? 'su-password-hint' : undefined} value={password} onChange={(event) => { setPassword(event.target.value); resetAuth(); }} disabled={pending || signupPaused} minLength={isSignup ? 8 : undefined} maxLength={isSignup ? 72 : undefined} required /><button type="button" aria-label={showPassword ? 'パスワードを隠す' : 'パスワードを表示'} aria-pressed={showPassword} onClick={() => setShowPassword((value) => !value)}><ReferenceSvg page={isSignup ? 1 : 0} index={isSignup ? 2 : 4} /></button></div>
             {isSignup && <span id="su-password-hint" className="reference-auth-hint">8文字以上、半角英数字なら72文字以内で入力してください</span>}
           </div>
-          {isSignup && <label className="reference-auth-terms" htmlFor="su-terms"><input id="su-terms" type="checkbox" required /><span><a href="#terms" onClick={(event) => openNotice(event, 'terms')}>利用規約</a>と<a href="#privacy" onClick={(event) => openNotice(event, 'privacy')}>プライバシーポリシー</a>に同意します</span></label>}
+          {isSignup && !isDummy && !signupPaused && <label className="reference-auth-terms" htmlFor="su-terms"><input id="su-terms" type="checkbox" required /><span>{legalLink('terms')}と{legalLink('privacy')}に同意します</span></label>}
           {validation && <p role="alert" className="reference-auth-error">{validation}</p>}
           {error && <ErrorText error={error} />}
-          <button className="reference-auth-primary" type="submit" disabled={pending || session.status === 'loading'}>{pending ? '送信しています…' : isSignup ? '登録してはじめる' : 'ログイン'}</button>
+          <button className="reference-auth-primary" type="submit" disabled={pending || session.status === 'loading' || signupPaused}>{pending ? '送信しています…' : isSignup ? '登録してはじめる' : 'ログイン'}</button>
         </form>
         {isSignup ? <p className="reference-auth-existing"><span>すでにアカウントをお持ちの方</span><Link to="/login" state={{ from: destination }} onClick={resetAuth}>ログイン</Link></p> : <>
           <div className="reference-auth-divider"><span /><span>はじめての方</span><span /></div>
           <Link className="reference-auth-secondary" to="/signup" state={{ from: destination }} onClick={resetAuth}>アカウントを作成</Link>
-          <div className="reference-auth-legal"><a href="#terms" onClick={(event) => openNotice(event, 'terms')}>利用規約</a><a href="#privacy" onClick={(event) => openNotice(event, 'privacy')}>プライバシーポリシー</a></div>
+          <div className="reference-auth-legal">{legalLink('terms')}{legalLink('privacy')}</div>
         </>}
       </div>
     </section>
