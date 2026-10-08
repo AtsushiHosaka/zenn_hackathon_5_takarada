@@ -78,9 +78,14 @@ export function createApiClient(baseUrl: string, tokenStore: TokenStore): ApiCli
       try {
         response = await fetch(url, { method: "PUT", headers: { "Content-Type": file.type }, body: file, signal: requestSignal });
       } catch (error) {
-        throw requestInterruption(error, requestSignal) ?? new DomainError("写真を送信できませんでした");
+        const interrupted = requestInterruption(error, requestSignal);
+        const reason = interrupted?.message ?? "アップロード先との通信に失敗しました。ブラウザから詳しい原因を確認できません。通信状況を確認して、もう一度お試しください。";
+        throw new DomainError(`「${file.name}」を送信できませんでした。${reason}`, interrupted?.status);
       }
-      if (!response.ok) throw new DomainError(`写真の送信に失敗しました (${response.status})`, response.status);
+      if (!response.ok) {
+        const reason = await uploadErrorMessage(response, requestSignal);
+        throw new DomainError(`「${file.name}」を送信できませんでした。${reason}`, response.status);
+      }
     },
 
     async sendReceivingToken<T>(path: string, options: RequestOptions = {}) {
@@ -114,4 +119,41 @@ function requestInterruption(error: unknown, signal: AbortSignal): DomainError |
   if ((signal.reason instanceof DOMException && signal.reason.name === "TimeoutError") || (error instanceof DOMException && error.name === "TimeoutError")) return new DomainError("サーバーの応答が時間内にありませんでした。少し待ってから再度お試しください");
   if (signal.aborted || (error instanceof DOMException && error.name === "AbortError")) return new DomainError("操作をキャンセルしました");
   return undefined;
+}
+
+// GCS returns XML errors; the local storage adapter can return JSON errors.
+async function uploadErrorMessage(response: Response, signal: AbortSignal): Promise<string> {
+  let code: string | undefined;
+  let message: string | undefined;
+  try {
+    const text = await response.text();
+    if (response.headers.get("Content-Type")?.includes("json")) {
+      const body: unknown = JSON.parse(text);
+      if (body && typeof body === "object") {
+        const error = (body as { error?: unknown }).error;
+        if (typeof error === "string") message = error;
+      }
+    } else {
+      const xml = new DOMParser().parseFromString(text, "application/xml");
+      if (!xml.querySelector("parsererror")) code = xml.querySelector("Error > Code")?.textContent ?? undefined;
+    }
+  } catch (error) {
+    const interrupted = requestInterruption(error, signal);
+    if (interrupted) return interrupted.message;
+  }
+  const status = `HTTP ${response.status}`;
+  if (code && /^[A-Za-z0-9_]{1,80}$/.test(code)) {
+    const reasons: Record<string, string> = {
+      EntityTooLarge: "アップロード先の容量制限を超えました。",
+      AccessDenied: "アップロード先がアクセスを拒否しました。",
+      SignatureDoesNotMatch: "アップロード先で送信の署名を確認できませんでした。",
+      ExpiredToken: "送信に必要な認証情報の有効期限が切れました。",
+      RequestTimeTooSkewed: "送信時刻とアップロード先の時刻が一致しませんでした。",
+    };
+    return `${reasons[code] ?? "アップロード先からエラーが返されました。"}（${status}・${code}）もう一度お試しください。`;
+  }
+  if (message) return `${message}（${status}）`;
+  if (response.status === 413) return `アップロード先が送信容量を超えたため拒否しました。（${status}）画像の容量を減らしてお試しください。`;
+  if (response.status === 401 || response.status === 403) return `アップロード先が認証またはアクセスを拒否しました。（${status}）もう一度お試しください。`;
+  return `アップロード先からエラーが返されました。（${status}）詳しい原因を確認できません。少し待ってから再度お試しください。`;
 }
