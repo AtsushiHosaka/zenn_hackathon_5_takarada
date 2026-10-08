@@ -24,7 +24,7 @@ Google DocsのURLは `docs/project.md` で未設定のため、Docsは未確認�
 
 背景は `#F5F4F8`、主要な文字は `#1D1B26`、主要ボタンは `#6A3CD6` とする。認証画面の左側は `#16141C`。フォントはZen Kaku Gothic NewとBricolage Grotesqueを使い、HTMLのSVGを画面のアイコンやイラストに利用する。以前の独自配色・サイドバー・予算スライダーを引き継がない。
 
-`/` は `/rooms/sample-oshi` の結果サンプルへ移動する。`/rooms` は一覧、`/rooms/new` は新規入力、`/rooms/:id` は結果と追加指示、`/login` と `/signup` は認証画面とする。旧URLの `/coordinate` は `/rooms/new` へ移動する。生成中はルーム画面内の状態として表示する。接続先の切り替えは右上のアカウントメニューに置く。
+`/`は`/rooms`のマイルームへ移動する。`/rooms`は一覧、`/rooms/new`は新規入力、`/rooms/:id`は結果と追加指示、`/login`と`/signup`は認証画面とする。部屋の各画面はサンプルを含め認証必須とし、ログイン・新規登録後に元の画面へ戻す。2026年10月8日の本人依頼による変更は`specs/room-authentication/spec.md`に記録する。旧URLの`/coordinate`は`/rooms/new`へ移動する。生成中はルーム画面内の状態として表示する。接続先の切り替えは右上のアカウントメニューに置く。
 
 参照デザインには架空ショップ名・価格・完了表示が含まれる。サンプルの結果では、商品検索先と参考価格を表示し、AI生成の完了を装わずサンプルと記す。全画面・全状態でピクセル単位の一致を確認済みとは扱わない。
 
@@ -89,7 +89,7 @@ Google Docs URLは未設定のため、今回の依頼と既存API契約を根�
 
 ## 正式APIを2段階で呼び、Sceneと商品を変換する
 
-`VITE_ROOM_API_CONTRACT` は既定で `coordination`、`analysis` は部屋解析だけ、`legacy` は将来の写真API向け提案形式とする。正式契約はJSON送信で、部屋・商品提案APIはログイン不要。環境変数で作成・取得のパスと認証設定を変えられる。このチャットでは公開Swaggerを1時間ごとに監視する設定を追加した。契約が変わっても、未確認のエンドポイントを自動で呼び出さない。
+`VITE_ROOM_API_CONTRACT` は既定で `coordination`、`analysis` は部屋解析だけ、`legacy` は将来の写真API向け提案形式とする。正式契約はJSON送信で、部屋・商品提案APIは認証必須。環境変数で作成・取得のパスと認証設定を変えられる。このチャットでは公開Swaggerを1時間ごとに監視する設定を追加した。契約が変わっても、未確認のエンドポイントを自動で呼び出さない。
 
 `POST /api/v1/rooms` に `{ room: { tatami, shape } }` を送り、`GET /api/v1/rooms/{id}` の状態が `analyzing` から `ready` になるまで待つ。解析済みの家具を表示し、活かす家具と希望・予算を入力してから商品提案へ進む。
 
