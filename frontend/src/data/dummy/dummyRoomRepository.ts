@@ -1,4 +1,5 @@
 import { applyRoomPalette, defaultRoomPaletteId, roomPalette } from "../../domain/roomPalette";
+import { copyFurniture } from "../../domain/furnitureCopy";
 import { applyCharacterTheme, characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
 import type { TokenStore } from "../../core/tokenStore";
@@ -109,7 +110,7 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
       const userId = currentUserId();
       if (signal?.aborted) throw new DomainError("操作をキャンセルしました");
       if (!isRoomDesign(template) || !template.room || !template.analysisInput || template.items.length > 100) throw new DomainError("テンプレートの内容を確認してください");
-      const design = {...structuredClone(template), id: `dummy-room-${crypto.randomUUID()}`, source: "demo" as const, description: "保存したテンプレートから作成した部屋です。", backendRoomId: undefined};
+      const design = {...structuredClone(template), items: copyFurniture(template.items), id: `dummy-room-${crypto.randomUUID()}`, source: "demo" as const, description: "保存したテンプレートから作成した部屋です。", backendRoomId: undefined};
       retain(userId, {id: design.id, title: design.title, status: "ready", createdAt: new Date().toISOString(), design});
       return design;
     },
