@@ -205,3 +205,6 @@
 .rc-followup-mode label {display:flex;align-items:center;gap:4px}
 .rc-followup-mode input {accent-color:#7040df}
 .rc-followup-mode p {flex-basis:100%;margin:0;color:#6b6574;line-height:1.5}
+
+.rc-planner-floor-color {display:flex;align-items:center;gap:12px;margin-top:12px;font-size:13px}
+.rc-planner-floor-color input {width:48px;min-height:44px;border:1px solid #DDD5EE;border-radius:6px;cursor:pointer}
