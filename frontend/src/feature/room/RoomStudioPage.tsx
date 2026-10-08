@@ -155,6 +155,13 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const [rename,setRename]=useState(false);
   const [title,setTitle]=useState(design.title);
   const upload=useRef<HTMLInputElement>(null);
+  const header=useRef<HTMLElement>(null);
+  useLayoutEffect(()=>{
+    const element=header.current;const studio=element?.parentElement;if(!element||!studio)return;
+    const measure=()=>studio.style.setProperty('--rc-header-bottom',`${Math.max(0,element.getBoundingClientRect().bottom)}px`);
+    measure();const observer=new ResizeObserver(measure);observer.observe(element);window.addEventListener('resize',measure);
+    return()=>{observer.disconnect();window.removeEventListener('resize',measure);studio.style.removeProperty('--rc-header-bottom');};
+  },[]);
   const messages=useRef<HTMLDivElement>(null);
   const composer=useRef<HTMLFormElement>(null);
   const nearBottom=useRef(true);
@@ -321,7 +328,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
     catch(error){setNotice(error instanceof Error?error.message:'テンプレートを保存できませんでした。');}
   }
   return <div className="rc-studio">
-    <header className={`rc-studio-header${isNew?' motion-enter':''}`}><Link className="rc-back" to={isTemplate?'/room-templates':'/rooms'} aria-label={isTemplate?'テンプレート一覧に戻る':'ルーム一覧に戻る'} title={isTemplate?'テンプレート一覧':'ルーム一覧'}><ReferenceSvg page={3} index={0}/></Link><span className="rc-header-divider"/><div className={`rc-title${isNew?' is-new':''}`}>{isTemplate&&<span className="rc-template-badge">テンプレート</span>}<h1>{isNew?'新しいルーム':design.title}</h1>{!isNew&&<button type="button" aria-label="ルーム名を変更" onClick={()=>{setTitle(design.title);setRename(true);}}><ReferenceSvg page={5} index={1}/></button>}</div><nav className="rc-template-actions" aria-label="テンプレート"><Link className="rc-secondary" to="/room-templates">テンプレート一覧</Link>{!isNew&&!isTemplate&&<button type="button" className="rc-secondary" onClick={()=>setTemplateName(design.title)}>テンプレートに保存</button>}</nav><AccountMenu onEditLayout={!isNew&&id!=='sample-game'?()=>{setEditing(true);setPanel(true);setBefore(false);}:undefined}/></header>
+    <header ref={header} className={`rc-studio-header${isNew?' motion-enter':''}`}><Link className="rc-back" to={isTemplate?'/room-templates':'/rooms'} aria-label={isTemplate?'テンプレート一覧に戻る':'ルーム一覧に戻る'} title={isTemplate?'テンプレート一覧':'ルーム一覧'}><ReferenceSvg page={3} index={0}/></Link><span className="rc-header-divider"/><div className={`rc-title${isNew?' is-new':''}`}>{isTemplate&&<span className="rc-template-badge">テンプレート</span>}<h1>{isNew?'新しいルーム':design.title}</h1>{!isNew&&<button type="button" aria-label="ルーム名を変更" onClick={()=>{setTitle(design.title);setRename(true);}}><ReferenceSvg page={5} index={1}/></button>}</div><nav className="rc-template-actions" aria-label="テンプレート"><Link className="rc-secondary" to="/room-templates">テンプレート一覧</Link>{!isNew&&!isTemplate&&<button type="button" className="rc-secondary" onClick={()=>setTemplateName(design.title)}>テンプレートに保存</button>}</nav><AccountMenu onEditLayout={!isNew&&id!=='sample-game'?()=>{setEditing(true);setPanel(true);setBefore(false);}:undefined}/></header>
     <input ref={upload} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden aria-describedby="room-photo-requirements" onChange={event=>{addPhotos(Array.from(event.target.files??[]));event.target.value='';}}/>
     <div className={`rc-workspace${pending||id==='sample-game'?' is-generating':''}`}>
       {pending||id==='sample-game'?<RoomGenerating phase={generationPhase} prompt={generation.variables?.analyzeOnly?analysisPrompt:generation.variables?.request??(analysisMode?analysisPrompt:prompt)} photos={acceptsPhotos?photos:[]} sample={loadConnection()==='dummy'} dimensions={analysisMode} coordination={canCoordinate&&!generation.variables?.analyzeOnly} onCancel={()=>{if(pending){abort.current?.abort();generation.reset();setNotice('生成を停止しました。');}else navigate('/rooms');}}/>:<>
