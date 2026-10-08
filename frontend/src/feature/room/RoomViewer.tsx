@@ -893,8 +893,11 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         }
         for (const child of [...group.children]) { group.remove(child); disposeObject(child); }
         group.scale.set(1, 1, 1);
+        // Capture normalized model bounds before the furniture transform makes
+        // them world-space; the reflection plane is a child in local space.
+        const mirrorBounds = item.category === "mirror" ? new THREE.Box3().setFromObject(gltf.scene) : undefined;
         group.add(gltf.scene);
-        if (item.category === "mirror") addMirrorSurface(group, item, new THREE.Box3().setFromObject(gltf.scene));
+        if (mirrorBounds) addMirrorSurface(group, item, mirrorBounds);
         if (selectedId === item.id) updateSelection(selectedId);
       }, undefined, showModelFailure);
     }
