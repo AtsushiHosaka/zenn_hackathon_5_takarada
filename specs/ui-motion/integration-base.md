@@ -17,3 +17,5 @@ Compatibility correction: a shared `isTemplateFurniture` helper identifies exist
 Frontend lint/build passed after merging dependencies. Temporary exact-source checks passed copied artwork/reference-image validation, invalid external reference rejection, and omission of template artwork from manual-only server edit payloads. Screenshot evidence for each dependency belongs to its original PR. Integration browser verification is recorded by the motion feature PR; deployed/provider behavior is not claimed here.
 
 Dependency refresh preserved #79 product-category guards and its fixed mobile planner overlay, plus #67 integrated import evidence. Template reference/artwork provenance remains the combined version above; refreshing #67 does not drop those local overlays or copy them into a distinct new room.
+
+Combined #58 integration preserves later surface-profile copying, trusted/manual image provenance, floor colors, renderer readiness, mirror/category guards and measured mobile header layout while applying PR #108 `5c0063f3369c1a2b56b6654b35ee8e44d844e4ff`. The dependency list above records the isolated motion base; final integrated heads are recorded by #58.

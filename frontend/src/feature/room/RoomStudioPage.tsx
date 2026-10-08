@@ -25,10 +25,10 @@ import { useMotionDialog } from '../shared/useMotionDialog';
 import { DomainError } from '../../domain/error';
 import CharacterThemePicker from './CharacterThemePicker';
 import { roomPhotoLimits, roomPhotoRequirements, roomPhotoValidationError } from '../../domain/roomPhoto';
+import { motionScrollIntoView } from '../../core/motion';
 import { isTemplateId } from '../../domain/roomTemplate';
 import { createTemplateSnapshot, saveRoomTemplate } from './templates';
 import { templateKeys } from './templateStorage';
-import { motionScrollIntoView } from '../../core/motion';
 import './room-studio.css';
 import './room-templates.css';
 
@@ -156,8 +156,8 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const placementDisabled=before||Boolean(design.modelUrl&&design.modelKind!=='shell');
   const [filter,setFilter]=useState('all');
   const [templateName,setTemplateName]=useState<string|null>(null);
-  const templateDialogRef=useRef<HTMLDialogElement>(null);
-  const templateDialog=useMotionDialog(templateDialogRef,templateName!==null,()=>setTemplateName(null));
+  const templateDialog=useRef<HTMLDialogElement>(null);
+  const templateMotion = useMotionDialog(templateDialog, templateName !== null, () => setTemplateName(null));
   const [rename,setRename]=useState(false);
   const [title,setTitle]=useState(design.title);
   const upload=useRef<HTMLInputElement>(null);
@@ -219,7 +219,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const total=additions.reduce((sum,item)=>sum+(item.price??0),0);
   const referenceStory=design.source==='demo'&&design.style==='oshi'&&additions.length===8&&additions.find(item=>item.id==='3')?.color==='#bba5ee';
   const referenceBase=rooms.demo('oshi');
-  const referenceLayout=design.source==='demo'&&design.style==='oshi'&&additions.length===8&&!design.wallColor&&design.items.every(item=>{const original=referenceBase.items.find(base=>base.id===item.id);return original&&JSON.stringify(item.position)===JSON.stringify(original.position)&&JSON.stringify(item.size)===JSON.stringify(original.size)&&item.color===original.color&&!(item.rotation??0);});
+  const referenceLayout=design.source==='demo'&&design.style==='oshi'&&additions.length===8&&!design.wallColor&&!design.floorColor&&design.items.every(item=>{const original=referenceBase.items.find(base=>base.id===item.id);return original&&JSON.stringify(item.position)===JSON.stringify(original.position)&&JSON.stringify(item.size)===JSON.stringify(original.size)&&item.color===original.color&&!(item.rotation??0);});
   const pending=generation.isPending;
   useLayoutEffect(()=>{if(wasPending.current&&!pending){const target=composer.current?.querySelector<HTMLElement>('input:not([type=hidden]),textarea,button:not(:disabled)')??document.getElementById(analyzed?'coordinate-request':'res-msg');target?.focus();}wasPending.current=pending;},[pending,analyzed]);
   function addPhotos(files:File[]) {
@@ -396,8 +396,8 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
     </div>
     {notice&&<div key={notice} className="rc-notice motion-fade" role="status">{notice}<button className="motion-control" type="button" aria-label="通知を閉じる" onClick={()=>setNotice('')}>×</button></div>}
     {rooms.persistenceWarning?.()&&<div className="rc-notice motion-fade" role="alert">{rooms.persistenceWarning()}</div>}
-    {templateWarning&&<div className="rc-notice motion-fade" role="alert">{templateWarning}</div>}
-    <dialog ref={templateDialogRef} className="rc-dialog motion-dialog motion-presence" data-motion-state={templateDialog.state} tabIndex={-1} aria-labelledby="save-template-title" onKeyDown={templateDialog.onKeyDown} onCancel={templateDialog.onCancel} onClose={templateDialog.onClose} onClick={templateDialog.onClick}><form inert={templateDialog.closing} aria-hidden={templateDialog.closing} onSubmit={saveAsTemplate}><div className="rc-dialog-heading"><h2 id="save-template-title">テンプレートに保存</h2><button type="button" aria-label="閉じる" onClick={()=>setTemplateName(null)}>×</button></div><label className="rc-setting">テンプレート名<input className="motion-field" value={templateName??''} onChange={event=>setTemplateName(event.target.value)} maxLength={80} required autoFocus/></label><p>現在の配置と色を、このブラウザに保存します。元の部屋は変更しません。</p><button className="rc-primary" type="submit">保存</button></form></dialog>
     <dialog ref={renameDialogRef} className="rc-dialog motion-dialog motion-presence" data-motion-state={renameDialog.state} tabIndex={-1} aria-labelledby="rename-room-title" onKeyDown={renameDialog.onKeyDown} onCancel={renameDialog.onCancel} onClose={renameDialog.onClose} onClick={renameDialog.onClick}><form inert={renameDialog.closing} aria-hidden={renameDialog.closing} onSubmit={changeTitle}><div className="rc-dialog-heading"><h2 id="rename-room-title">ルーム名を変更</h2><button type="button" aria-label="閉じる" onClick={()=>setRename(false)}>×</button></div><label className="rc-setting">ルーム名<input className="motion-field" value={title} onChange={event=>setTitle(event.target.value)} maxLength={80} required autoFocus/></label><p/><button className="rc-primary" type="submit">保存</button></form></dialog>
+    {templateWarning&&<div className="rc-notice motion-fade" role="alert">{templateWarning}</div>}
+    <dialog ref={templateDialog} className="rc-dialog motion-dialog motion-presence" data-motion-state={templateMotion.state} tabIndex={-1} aria-labelledby="save-template-title" onKeyDown={templateMotion.onKeyDown} onCancel={templateMotion.onCancel} onClose={templateMotion.onClose} onClick={templateMotion.onClick}><form inert={templateMotion.closing} aria-hidden={templateMotion.closing} onSubmit={saveAsTemplate}><div className="rc-dialog-heading"><h2 id="save-template-title">テンプレートに保存</h2><button type="button" aria-label="閉じる" onClick={()=>setTemplateName(null)}>×</button></div><label className="rc-setting">テンプレート名<input className="motion-field" value={templateName??''} onChange={event=>setTemplateName(event.target.value)} maxLength={80} required autoFocus/></label><p>現在の配置と色を、このブラウザに保存します。元の部屋は変更しません。</p><button className="rc-primary" type="submit">保存</button></form></dialog>
   </div>;
 }
