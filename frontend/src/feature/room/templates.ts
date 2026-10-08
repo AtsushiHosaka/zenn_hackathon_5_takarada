@@ -35,7 +35,9 @@ export function createTemplateSnapshot(design: RoomDesign, title: string): RoomD
   if (design.modelUrl && design.modelKind !== 'shell') throw new DomainError('家具を含む完成モデルはテンプレートに保存できません。個別に編集できる部屋を選んでください。');
   const bounds = getFurniturePlacementBounds(design);
   const center = [(bounds.min[0] + bounds.max[0]) / 2, bounds.floor, (bounds.min[2] + bounds.max[2]) / 2];
-  const room = structuredClone(design.room ?? {width: bounds.max[0] - bounds.min[0], depth: bounds.max[2] - bounds.min[2], height: bounds.max[1] - bounds.floor, floorColor: '#e8dcc6', windows: []});
+  const inferredFloorColor = !design.room && 'floorColor' in design ? design.floorColor : undefined;
+  if (inferredFloorColor !== undefined && typeof inferredFloorColor !== 'string') throw new DomainError('テンプレートの内容を確認してください。');
+  const room = structuredClone(design.room ?? {width: bounds.max[0] - bounds.min[0], depth: bounds.max[2] - bounds.min[2], height: bounds.max[1] - bounds.floor, floorColor: inferredFloorColor ?? '#e8dcc6', windows: []});
   const analysisInput = design.analysisInput ?? { tatami: Math.max(3, Math.min(30, room.width * room.depth / 1.62)), shape: 'standard' as const };
   const snapshot: RoomDesign = {
     id: `room-template-${crypto.randomUUID()}`, source: design.source, kind: 'analysis', title: title.trim(),
