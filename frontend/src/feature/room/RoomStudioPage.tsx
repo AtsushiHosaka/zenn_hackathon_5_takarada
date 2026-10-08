@@ -29,7 +29,6 @@ import { isTemplateId } from '../../domain/roomTemplate';
 import { createTemplateSnapshot, saveRoomTemplate } from './templates';
 import { templateKeys } from './templateStorage';
 import { motionScrollIntoView } from '../../core/motion';
-import { useMotionPresence } from '../shared/useMotionPresence';
 import './room-studio.css';
 import './room-templates.css';
 
