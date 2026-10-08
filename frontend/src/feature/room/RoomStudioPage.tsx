@@ -61,7 +61,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign?:RoomDesign}) {
   const client=useQueryClient();
   const location=useLocation();
   const navigate=useNavigate();
-  const inputState=location.state as {prompt?:string;photos?:File[];editing?:boolean;view?:PlannerView;selectedId?:string|null;dimensions?:boolean}|null;
+  const inputState=location.state as {prompt?:string;photos?:File[];editing?:boolean;view?:PlannerView;selectedId?:string|null;dimensions?:boolean;notice?:string}|null;
   const cached=client.getQueryData<RoomDesign>(roomPlanKeys.detail(id));
   const designQuery=useQuery({queryKey:roomPlanKeys.detail(id),queryFn:()=>initialDesign??sampleDesign(rooms.demo(id==='sample-botanical'?'botanical':id==='sample-natural'?'natural':'oshi'),id),initialData:()=>cached??initialDesign??sampleDesign(rooms.demo(id==='sample-botanical'?'botanical':id==='sample-natural'?'natural':'oshi'),id),staleTime:Infinity});
   const design=designQuery.data;
@@ -90,7 +90,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign?:RoomDesign}) {
   const [photos,setPhotos]=useState<File[]>(()=>inputState?.photos?.filter(file=>file instanceof File)??[]);
   const [samplePhotos,setSamplePhotos]=useState<number[]>(()=>loadConnection()==='dummy'?[0,1,2]:[]);
   const [photoError,setPhotoError]=useState('');
-  const [notice,setNotice]=useState('');
+  const [notice,setNotice]=useState(inputState?.notice??'');
   const [selectedId,setSelectedId]=useState<string|null>(inputState?.selectedId??design.items.find(item=>item.id==='3')?.id??design.items.find(item=>!item.existing)?.id??null);
   const [panel,setPanel]=useState(true);
   const [editing,setEditing]=useState(inputState?.editing??analyzed);
@@ -130,11 +130,12 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign?:RoomDesign}) {
     onSuccess:(result,variables)=>{
       const editedItems=(design.editedItems??[]).filter(item=>item.existing||result.items.some(current=>current.id===item.id));
       const saved={...result,...(!variables.analyzeOnly&&editedItems.length?{editedItems}:{}),...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request.trim()||undefined,budget:variables.budget}:{}),id:result.id};
-      try {saveRoomPlan(client,saved,scope);}catch{client.setQueryData(roomPlanKeys.detail(saved.id),saved);setNotice('ブラウザに保存できませんでした。保存容量を確認してください。');}
+      let storageNotice: string|undefined;
+      try {saveRoomPlan(client,saved,scope);}catch{client.setQueryData(roomPlanKeys.detail(saved.id),saved);if(!rooms.persistenceWarning?.()){storageNotice='ブラウザに保存できませんでした。保存容量を確認してください。';setNotice(storageNotice);}}
       setSavedFingerprint(JSON.stringify(saved));setHistory({past:[],future:[]});
       setFurnitureOperations(saved.furnitureOperations??(saved.before?.items??saved.items).filter(item=>item.existing).map(item=>({objectId:item.id,action:'keep'})));
       setFurnitureAdditions(saved.furnitureAdditions??[]);
-      navigate(`/rooms/${saved.id}`,{state:{prompt:result.kind==='analysis'&&canCoordinate?variables.request:saved.prompt??(result.kind==='analysis'?analysisPrompt:variables.request),photos:result.analysisInput?[]:photos,editing:result.kind==='analysis'&&!canCoordinate}});
+      navigate(`/rooms/${saved.id}`,{state:{prompt:result.kind==='analysis'&&canCoordinate?variables.request:saved.prompt??(result.kind==='analysis'?analysisPrompt:variables.request),photos:result.analysisInput?[]:photos,editing:result.kind==='analysis'&&!canCoordinate,notice:storageNotice}});
     },
   });
   const additions=design.items.filter(item=>!item.existing);
@@ -270,6 +271,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign?:RoomDesign}) {
       </>}
     </div>
     {notice&&<div className="rc-notice" role="status">{notice}<button type="button" aria-label="通知を閉じる" onClick={()=>setNotice('')}>×</button></div>}
+    {rooms.persistenceWarning?.()&&<div className="rc-notice" role="alert">{rooms.persistenceWarning()}</div>}
     <dialog ref={renameDialog} className="rc-dialog" onCancel={()=>setRename(false)}><form onSubmit={changeTitle}><div className="rc-dialog-heading"><h2>ルーム名を変更</h2><button type="button" aria-label="閉じる" onClick={()=>setRename(false)}>×</button></div><label className="rc-setting">ルーム名<input value={title} onChange={event=>setTitle(event.target.value)} maxLength={80} required autoFocus/></label><p/><button className="rc-primary" type="submit">保存</button></form></dialog>
   </div>;
 }
