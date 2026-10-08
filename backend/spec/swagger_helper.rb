@@ -303,7 +303,7 @@ RSpec.configure do |config|
             properties: {
               id: { type: :string, description: "元の家具、この部屋で採用済みの商品、またはmanual-UUID形式の所有家具id", example: "bed-1" },
               label: { type: :string, maxLength: 100, description: "手動で補完した所有家具では必須", example: "今ある椅子" },
-              category: { type: :string, enum: %w[sofa bed desk chair shelf table poster acrylic_stand], description: "手動で補完した所有家具では必須", example: "chair" },
+              category: { type: :string, enum: %w[sofa bed desk chair shelf table poster acrylic_stand mirror], description: "手動で補完した所有家具では必須", example: "chair" },
               artwork: { "$ref" => "#/components/schemas/ImageArtwork" },
               ec_product_id: { type: :integer, minimum: 1, description: "商品リンクのインポート結果のID。商品・モデル情報はサーバー側で復元する", example: 1 },
               position: { "$ref" => "#/components/schemas/Position" },

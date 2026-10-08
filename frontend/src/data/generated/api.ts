@@ -1320,7 +1320,7 @@ export interface components {
              * @example chair
              * @enum {string}
              */
-            category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table" | "poster" | "acrylic_stand";
+            category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table" | "poster" | "acrylic_stand" | "mirror";
             artwork?: components["schemas"]["ImageArtwork"];
             /**
              * @description 商品リンクのインポート結果のID。商品・モデル情報はサーバー側で復元する
