@@ -21,4 +21,4 @@ Primary API reference: https://threejs.org/docs/pages/Reflector.html; installed 
 
 ## Verification
 
-Frontend lint and production build passed. Existing build chunk-size warning remains. Reflection runtime and screenshot evidence are pending.
+Frontend lint and production build passed. Existing build chunk-size warning remains. A temporary isolated browser check reused the existing Chromium and rendered controlled saved-room/glTF fixtures with the actual WebGL renderer. GPU reflection pixels include the red chair and green shelf; orbit changes both the reflected camera and texture pixels. Translated/rotated individual glTF surfaces and complete-room metadata surfaces align with their furniture. No page errors occurred. See `docs/pr-evidence/issue-76/README.md` for captures and verification boundaries.
