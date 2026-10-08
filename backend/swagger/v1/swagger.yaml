@@ -1490,6 +1490,18 @@ components:
               - espresso-copper
               description: 部屋のカラーテーマ。省略時は従来の配色
               example: warm-ivory
+            character_theme_id:
+              type: string
+              enum:
+              - hatsune-miku
+              - sanrio
+              - hello-kitty
+              - my-melody
+              - kuromi
+              - cinnamoroll
+              - pompompurin
+              description: 任意のキャラクターテーマ。画像や公式商品を保証しない
+              example: hatsune-miku
             prompt:
               type: string
               example: 紫色の推し活ルームにしたい
@@ -1622,6 +1634,19 @@ components:
           - done
           - failed
           example: done
+        character_theme_id:
+          type: string
+          nullable: true
+          enum:
+          -
+          - hatsune-miku
+          - sanrio
+          - hello-kitty
+          - my-melody
+          - kuromi
+          - cinnamoroll
+          - pompompurin
+          example: hatsune-miku
         prompt:
           type: string
           example: 紫色の推し活ルームにしたい

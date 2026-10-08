@@ -1,5 +1,6 @@
 import { roomPalette } from "./roomPalette";
 
+import { characterTheme } from "./characterTheme";
 export type Style = "botanical" | "oshi" | "natural";
 export type RoomShape = "square" | "standard" | "long";
 export const furnitureCategories = ["sofa", "bed", "desk", "chair", "shelf", "table"] as const;
@@ -74,6 +75,7 @@ export function isManualFurniture(item: RoomItem): boolean {
 export type RoomSnapshot = { room: RoomGeometry; items: RoomItem[]; wallColor?: string };
 
 export type RoomDesign = {
+  characterThemeId?: string;
   kind?: "analysis" | "coordination";
   source: "demo" | "api";
   id: string;
@@ -109,6 +111,7 @@ export type RoomDesign = {
 // ブラウザに保存されたデータも、復元時には信頼しない。
 export function isRoomDesign(value: unknown): value is RoomDesign {
   if (!isRecord(value)) return false;
+  if (value.characterThemeId !== undefined && !characterTheme(value.characterThemeId)) return false;
   if (value.source !== "demo" && value.source !== "api") return false;
   if (value.kind !== undefined && value.kind !== "analysis" && value.kind !== "coordination") return false;
   if (value.style !== "botanical" && value.style !== "oshi" && value.style !== "natural") return false;

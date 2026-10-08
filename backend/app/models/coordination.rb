@@ -11,6 +11,7 @@ class Coordination < ApplicationRecord
   validates :prompt, presence: true, length: { maximum: 500 }
   validates :budget, numericality: { only_integer: true, greater_than: 0 }
   validates :status, inclusion: { in: STATUSES }
+  validates :character_theme_id, inclusion: { in: ->(_) { CharacterRoomTheme::CATALOGUE.keys } }, allow_nil: true
   validate :valid_furniture_input
   validate :valid_operations, on: :create
   validate :valid_base_coordination
@@ -32,8 +33,16 @@ class Coordination < ApplicationRecord
     self.analysis = (analysis || {}).merge("room_palette_id" => value)
   end
 
+  def character_theme_id
+    analysis&.dig("character_theme_id")
+  end
+
+  def character_theme_id=(value)
+    self.analysis = (analysis || {}).merge("character_theme_id" => value)
+  end
+
   def generation_prompt
-    RoomPalette.prompt(prompt, room_palette_id)
+    RoomPalette.prompt(CharacterRoomTheme.prompt(prompt, character_theme_id), room_palette_id)
   end
 
   private
