@@ -21,6 +21,6 @@ Primary API reference: https://threejs.org/docs/pages/Reflector.html; installed 
 
 ## Verification
 
-Frontend lint and production build passed. Existing build chunk-size warning remains. Reflection runtime and screenshot evidence are pending.
+Frontend lint and production build passed. Existing build chunk-size warning remains. A temporary isolated browser check reused the existing Chromium and rendered controlled saved-room/glTF fixtures with the actual WebGL renderer. GPU reflection pixels include the red chair and green shelf; orbit changes both the reflected camera and texture pixels. Translated/rotated individual glTF surfaces and complete-room metadata surfaces align with their furniture. No page errors occurred. See `docs/pr-evidence/issue-76/README.md` for captures and verification boundaries.
 
-Trusted wall_mirror and legacy mirror categories are accepted for procedural, imported and complete-model paths. Independent temporary exact-source Three.js probes verify both categories, translated four-way fitted-model poses, target disposal, and recursion/override-material suppression with controlled render hooks. Frontend lint/build pass; reflected pixels and view changes require the author's final browser evidence. No permanent tests added.
+Trusted wall_mirror and legacy mirror categories are accepted for procedural, imported and complete-model paths. Independent temporary exact-source Three.js probes verify both categories, translated four-way fitted-model poses, target disposal, and recursion/override-material suppression with controlled render hooks. Frontend lint/build pass. Existing browser captures use legacy mirror fixtures; trusted wall_mirror browser verification at the integrated head remains pending. No permanent tests added.
