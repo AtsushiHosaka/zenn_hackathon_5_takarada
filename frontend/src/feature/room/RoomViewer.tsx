@@ -1,6 +1,7 @@
 import { roomPalette } from "../../domain/roomPalette";
 import { characterTheme } from "../../domain/characterTheme";
-import { useEffect, useEffectEvent, useMemo, useRef } from "react";
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
+import { useMotionPresence } from "../shared/useMotionPresence";
 import * as THREE from "three";
 import { Reflector } from "three/examples/jsm/objects/Reflector.js";
 import { resizeMirrorSurfaces } from "./mirrorReflection";
@@ -498,6 +499,14 @@ function disposeObject(object: THREE.Object3D) {
     texture.dispose();
     if (!texture.userData.sharedImage && typeof ImageBitmap !== "undefined" && texture.image instanceof ImageBitmap) texture.image.close();
   }
+}
+
+function DimensionLabel({item}:{item:RoomItem|undefined}) {
+  const presence=useMotionPresence(Boolean(item));
+  const [lastItem,setLastItem]=useState(item);
+  if(item&&item!==lastItem)setLastItem(item);
+  const displayed=item??lastItem;
+  return presence.isPresent&&displayed?<div role="status" className="motion-presence" data-motion-state={presence.state} aria-hidden={!item||undefined} style={{position:"absolute",left:16,bottom:16,padding:"8px 12px",background:"rgba(29,27,38,.88)",border:"1px solid #6e6a7c",borderRadius:8,color:"#fff",fontSize:12,pointerEvents:"none"}}>幅 {Math.round(displayed.size[0]*100)} × 高さ {Math.round(displayed.size[1]*100)} × 奥行き {Math.round(displayed.size[2]*100)} cm</div>:null;
 }
 
 export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, view, resetKey, before = false, command, dimensions = false, editing = false, onMoveItem, placementItem = null, onPlaceItem, preview = false, onReady }: RoomViewerProps) {
@@ -1378,7 +1387,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       <div ref={canvasHost} className="viewer-canvas" style={{ position: "absolute", inset: 0 }} />
       <div ref={overlapNotice} className="viewer-overlap-notice" hidden role="status" aria-live="polite" tabIndex={0}/>
       {selectedItem && <button type="button" className="viewer-selected-item" aria-label={`${selectedItem.name}にフォーカス`} onClick={() => runtime.current?.focus(selectedItem.id)}>選択中: {selectedItem.name}</button>}
-      {dimensionItem && <div role="status" style={{ position: "absolute", left: 16, bottom: 16, padding: "8px 12px", background: "rgba(29,27,38,.88)", border: "1px solid #6e6a7c", borderRadius: 8, color: "#fff", fontSize: 12, pointerEvents: "none" }}>幅 {Math.round(dimensionItem.size[0] * 100)} × 高さ {Math.round(dimensionItem.size[1] * 100)} × 奥行き {Math.round(dimensionItem.size[2] * 100)} cm</div>}
+      <DimensionLabel item={dimensionItem}/>
       <div ref={fallback} className="viewer-fallback" hidden role="status">
         <strong>この環境では3Dを表示できません</strong>
       </div>
