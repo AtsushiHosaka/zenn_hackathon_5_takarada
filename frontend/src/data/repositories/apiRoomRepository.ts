@@ -84,9 +84,15 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
         if (input.roomId !== undefined && !/^[1-9]\d*$/.test(input.roomId)) throw new DomainError("部屋のIDが正しくありません");
         const jobSignal = boundedSignal(signal);
         if (input.roomId !== undefined && !config.jobPath.includes("{id}")) throw new DomainError("部屋の解析結果の取得先が設定されていません");
+        let photoBody = body;
+        if (input.roomId === undefined) {
+          if (input.photos.length && config.uploadsPath) input.onProgress?.("uploading");
+          photoBody = await withPhotoKeys(api, config, body, input.photos, jobSignal);
+        }
+        input.onProgress?.("analyzing");
         let record = toAnalysisRoomRecord(input.roomId !== undefined
           ? await api.send<unknown>(config.jobPath.replace("{id}", encodeURIComponent(input.roomId)), { requiresAuth: config.requiresAuth, signal: jobSignal })
-          : await api.send<unknown>(config.generationPath, { method: "POST", body: await withPhotoKeys(api, config, body, input.photos, jobSignal), requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 120_000 }));
+          : await api.send<unknown>(config.generationPath, { method: "POST", body: photoBody, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 120_000 }));
         const expectedId = record.id;
         if (input.roomId !== undefined && String(expectedId) !== input.roomId) throw new DomainError("別の部屋の解析結果を受け取りました");
         if (!config.jobPath.includes("{id}") && record.status === "analyzing") throw new DomainError("部屋の解析結果の取得先が設定されていません");
@@ -94,7 +100,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
         for (let attempt = 0; attempt < 60; attempt++) {
           if (record.status === "failed") throw new DomainError(record.error_message || "部屋の解析に失敗しました");
           if (record.status === "ready") {
-            if (config.contract === "analysis") return toAnalyzedRoomDesign(record, baseUrl);
+            if (config.contract === "analysis") { const result = toAnalyzedRoomDesign(record, baseUrl); input.onProgress?.("preview"); return result; }
             if (!config.coordinationPath.includes("{id}")) throw new DomainError("コーディネートの作成先が設定されていません");
             const edits = editedObjects(input, record);
             const existingIds = [...(record.scene?.objects.filter(item => item.source === "existing").map(item => item.id) ?? []), ...edits.filter(edit => edit.category !== undefined).map(edit => edit.id)];
@@ -102,12 +108,13 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
             const keptObjectIds = input.furnitureOperations?.filter(operation => operation.action === "keep").map(operation => operation.objectId) ?? input.keptObjectIds ?? [];
             if (!Array.isArray(keptObjectIds) || keptObjectIds.some(id => typeof id !== "string" || !existingIds.includes(id)) || new Set(keptObjectIds).size !== keptObjectIds.length) throw new DomainError("活かす家具の選択が正しくありません");
             const request: components["schemas"]["CoordinationInput"] = { coordination: { prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: edits, ...(input.baseCoordinationId && /^[1-9]\d*$/.test(input.baseCoordinationId) ? { base_coordination_id: Number(input.baseCoordinationId) } : {}), ...(input.furnitureOperations === undefined ? {} : { furniture_operations: input.furnitureOperations.map(operation => ({ object_id: operation.objectId, action: operation.action })) }), ...(input.furnitureAdditions === undefined ? {} : { additions: input.furnitureAdditions }) } };
+            input.onProgress?.("coordinating");
             let coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationPath.replace("{id}", String(record.id)), { method: "POST", body: request, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 270_000 }));
             const coordinationId = coordination.id;
             if (coordination.room_id !== expectedId) throw new DomainError("別の部屋のコーディネートを受け取りました");
             for (let step = 0; step < 120; step++) {
               if (coordination.status === "failed") throw new DomainError(coordination.error_message || "コーディネートに失敗しました");
-              if (coordination.status === "done") return toCoordinatedRoomDesign(coordination, baseUrl, { tatami: record.tatami, shape: record.shape });
+              if (coordination.status === "done") { const result = toCoordinatedRoomDesign(coordination, baseUrl, { tatami: record.tatami, shape: record.shape }); input.onProgress?.("preview"); return result; }
               if (!config.coordinationJobPath.includes("{id}")) throw new DomainError("コーディネートの取得先が設定されていません");
               await pause(2_000, jobSignal);
               coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationJobPath.replace("{id}", String(coordinationId)), { requiresAuth: config.requiresAuth, signal: jobSignal }));
@@ -129,6 +136,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
       request.append(config.budgetField, String(input.budget));
       // ジョブ全体は最大120秒。通信と待機の両方を同じsignalで止める。
       const jobSignal = boundedSignal(signal);
+      input.onProgress?.("analyzing");
       let result = await api.send<unknown>(config.generationPath, { method: "POST", body: request, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 120_000 });
       let pollPath: string | undefined;
       for (let attempt = 0; attempt < 60; attempt++) {
@@ -146,7 +154,9 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
           continue;
         }
         if (record.status && record.status !== "completed" && record.status !== "succeeded") throw new DomainError("生成ジョブの状態を解釈できませんでした");
-        return toRoomDesign(record.design ?? record.result ?? result, baseUrl);
+        const design = toRoomDesign(record.design ?? record.result ?? result, baseUrl);
+        input.onProgress?.("preview");
+        return design;
       }
       throw new DomainError("生成に時間がかかっています。少し待ってから再度お試しください");
     },
