@@ -20,4 +20,5 @@ Integrated actual browser verification at root6b87b371 passed shell floor GPU re
 
 Legacy analysis rooms without a Before snapshot retain room.floorColor as the original floor; the editor changes only the explicit design.floorColor override. Measured floor faces and joints restore that original color in Before. A legacy shell retains the actual loaded model in Before and hides its overlay, preserving original model pixels rather than substituting procedural architecture. Existing explicit Before snapshots keep their existing semantics. Previously saved edits that overwrote room.floorColor cannot recover an unknown original color.
 
+Normal no-snapshot analysis browser verification passed at root7a45d6be: actual original shell GPU pixels in Before, saved original room.floorColor plus edited override, measured original/edited faces, undo/redo/custom/save/reload and 390px keyboard/save/close. See analysis-no-before captures and README.
 The visibility traversal accepts numeric black (`0`) as an original material color. A temporary exact-source Three.js probe verifies black floor-joint restoration in Before and the edited color in After; typecheck passed.
