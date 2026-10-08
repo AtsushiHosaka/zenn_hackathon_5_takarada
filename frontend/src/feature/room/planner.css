@@ -23,6 +23,10 @@
 .rc-planner-segments button[aria-pressed=true] {background:#fff;color:#6A3CD6;font-weight:700;box-shadow:0 1px 5px rgba(29,27,38,.08)}
 .rc-planner-check {display:flex;align-items:center;gap:9px;margin-top:12px;color:#5A5768;font-size:13px;cursor:pointer}
 .rc-planner-check input {width:16px;height:16px;margin:0;accent-color:#6A3CD6}
+.rc-planner-detected-list {margin:0;padding:0;list-style:none}
+.rc-planner-detected-list .rc-planner-check {min-height:44px;margin:0;padding:6px 8px;border-bottom:1px solid #ECE8F3;overflow-wrap:anywhere}
+.rc-planner-detected-list input {flex:none}
+.rc-planner-detected-list small {display:block;color:#6E6A7C;font-size:11px}
 .rc-planner-size {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;overflow:hidden;margin:12px 0 8px;border:1px solid #ECE8F3;border-radius:12px;background:#ECE8F3}
 .rc-planner-size>div {padding:10px 8px;background:#FAF9FC;text-align:center}
 .rc-planner-size dt {font-size:12px;color:#6E6A7C}
