@@ -78,9 +78,16 @@ export function createApiClient(baseUrl: string, tokenStore: TokenStore): ApiCli
       try {
         response = await fetch(url, { method: "PUT", headers: { "Content-Type": file.type }, body: file, signal: requestSignal });
       } catch (error) {
-        throw requestInterruption(error, requestSignal) ?? new DomainError("写真を送信できませんでした");
+        throw requestInterruption(error, requestSignal) ?? new DomainError(`${file.name}を送信できませんでした。通信またはブラウザの接続制限が原因の可能性があります。接続を確認して再度お試しください。`);
       }
-      if (!response.ok) throw new DomainError(`写真の送信に失敗しました (${response.status})`, response.status);
+      if (!response.ok) {
+        const reason = response.status === 413 ? "送信先の容量制限で拒否されました。画像を小さくしてから再度お試しください。"
+          : response.status === 403 ? "送信先でアクセスを拒否されました。時間を置かずに再度お試しください。"
+          : response.status === 422 ? "送信した画像の形式または容量が、アップロード申請と一致しません。写真を選び直してください。"
+          : response.status >= 500 ? "送信先でエラーが発生しました。少し待ってから再度お試しください。"
+          : "送信先に拒否されました。写真を選び直して再度お試しください。";
+        throw new DomainError(`${file.name}の送信に失敗しました（HTTP ${response.status}）。${reason}`, response.status);
+      }
     },
 
     async sendReceivingToken<T>(path: string, options: RequestOptions = {}) {
