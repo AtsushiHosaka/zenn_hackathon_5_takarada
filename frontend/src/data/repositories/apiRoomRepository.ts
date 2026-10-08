@@ -1,5 +1,5 @@
-import { roomPhotoError, roomPhotoMaxCount } from "../../domain/roomPhoto";
 import { DomainError } from "../../domain/error";
+import { roomPhotoLimits, roomPhotoValidationError } from "../../domain/roomPhoto";
 import { furnitureCategories, isFurnitureAdditions, isFurnitureOperations, isManualFurniture, isRoomItem, isRoomShape } from "../../domain/room";
 import type { GenerateRoomInput, RoomRepository } from "../../domain/roomRepository";
 import type { ApiClient } from "../apiClient";
@@ -202,9 +202,9 @@ type PhotoContentType = components["schemas"]["UploadInput"]["uploads"][number][
 
 // sizeは署名に入るのでここで申告した値とPUTする中身が一致していなければならない
 function photoUploadRequest(photos: File[]): components["schemas"]["UploadInput"]["uploads"] {
-  if (photos.length > roomPhotoMaxCount) throw new DomainError("写真は最大4枚です");
+  if (photos.length > roomPhotoLimits.maxCount) throw new DomainError("写真は最大4枚です");
   return photos.map(photo => {
-    const error = roomPhotoError(photo);
+    const error = roomPhotoValidationError(photo);
     if (error) throw new DomainError(error);
     return { content_type: photo.type as PhotoContentType, size: photo.size };
   });
@@ -222,9 +222,8 @@ function validJobId(value: unknown): value is string | number {
 }
 
 function validateInput(input: GenerateRoomInput) {
-  if (input.photos.length < 3 || input.photos.length > roomPhotoMaxCount) throw new DomainError("部屋の写真を3〜4枚選んでください");
-  const photoError = input.photos.map(roomPhotoError).find(Boolean);
-  if (photoError) throw new DomainError(photoError);
+  if (input.photos.length < 3 || input.photos.length > 4) throw new DomainError("部屋の写真を3〜4枚選んでください");
+  photoUploadRequest(input.photos);
   if (!input.prompt.trim()) throw new DomainError("どんな部屋にしたいか入力してください");
   if (!Number.isFinite(input.budget) || input.budget < 0) throw new DomainError("予算は0円以上で入力してください");
 }
