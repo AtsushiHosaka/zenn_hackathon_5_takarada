@@ -32,3 +32,9 @@ Use existing frontend lint/build and temporary browser checks for image identity
 - Desktop 1440×1000 and mobile 390×844 screenshots were captured and visually inspected. The existing studio columns squeezed the mobile editor; a planner-only viewport overlay at widths up to 600px makes import/search controls readable. At 390px the editor is 374px wide and document width is 390px. Keyboard source navigation, close and the item-list-to-editor reopen path passed.
 
 Evidence: `docs/pr-evidence/issue-67`. Live retailer parsing, deployed authentication, provider operations and cross-device photo persistence remain unverified. Automatic photo-to-geometry reconstruction is not implemented; the UI and this spec expose the category-model representation explicitly.
+
+## Dependency refresh review (2026-10-09)
+
+Reviewed PR #95 at `64021c7dd13b6b10e7422abb8dd1d7b93ccc20f6` against the current issue. Merged the updated #89 dependency through its existing branch without rewriting history. The save-result conflict preserves image references on manual scene items and Before snapshots, selected character/palette metadata, and the new-room rule that discards earlier edit overlays.
+
+Existing frontend lint/build passed after resolution (the existing bundle-size warning remains). Fourteen temporary storage/domain checks passed against the merged source; source-level checks also covered both new-room and follow-up saves. Existing screenshots remain evidence from their recorded earlier source, not new browser verification of this dependency refresh. Live retailer fetching and deployed/provider behavior remain unverified.
