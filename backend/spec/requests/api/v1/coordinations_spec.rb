@@ -31,7 +31,7 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
             manual.merge("id" => "manual-8e24d3af-c12d-4567-8910-123456789ab#{index}", "category" => category, "label" => "推しグッズ",
                          "size" => { "w" => 0.2, "h" => 0.3, "d" => 0.06 }, "artwork" => artwork)
           end
-          { coordination: { prompt: "紫色の推し活ルームにしたい", budget: 30_000,
+          { coordination: { prompt: "音楽を楽しむ部屋にしたい", character_theme_id: "hatsune-miku", room_palette_id: "warm-ivory", budget: 30_000,
                             kept_object_ids: objects.pluck("id") + [ manual["id"] ] + goods.pluck("id"),
                             furniture_operations: (objects + [ manual ] + goods).map { |object| { object_id: object["id"], action: "keep" } },
                             additions: [ { category: "table" } ],
@@ -40,6 +40,7 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
 
         run_test! do |response|
           expect(JSON.parse(response.body)["before_scene"]["objects"].last(2).map { |object| object.dig("artwork", "data_url") }).to all(start_with("data:image/png;base64,"))
+          expect(JSON.parse(response.body)["character_theme_id"]).to eq("hatsune-miku")
           expect(GenerateCoordinationJob).to have_been_enqueued
           expect(JSON.parse(response.body)["additions"]).to eq([ { "category" => "table" } ])
           expect(JSON.parse(response.body)["before_scene"]["objects"].find { |object| object["id"] == "manual-8e24d3af-c12d-4567-8910-123456789abc" }).to include("id" => "manual-8e24d3af-c12d-4567-8910-123456789abc", "source" => "existing", "category" => "chair", "item_id" => nil)
@@ -84,7 +85,7 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
         schema "$ref" => "#/components/schemas/Coordination"
 
         let(:coordination) do
-          room.coordinations.create!(prompt: "紫色の推し活ルームにしたい", budget: 30_000).tap do |c|
+          room.coordinations.create!(room_palette_id: "warm-ivory", prompt: "紫色の推し活ルームにしたい", budget: 30_000).tap do |c|
             c.update!(status: "done", **CoordinationBuilder.call(c).to_h)
           end
         end
