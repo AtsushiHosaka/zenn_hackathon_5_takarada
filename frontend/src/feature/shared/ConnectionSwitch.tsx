@@ -13,7 +13,7 @@ export default function ConnectionSwitch() {
       <select
         value={current}
         onChange={(event) => saveConnection(event.target.value as Connection)}
-        className="rounded border border-slate-300 bg-white px-2 py-1 text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+        className="motion-field rounded border border-slate-300 bg-white px-2 py-1 text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
       >
         {connections.map((connection) => (
           <option key={connection} value={connection}>
