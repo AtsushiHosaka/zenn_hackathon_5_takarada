@@ -1388,7 +1388,7 @@ export interface components {
              * @example chair
              * @enum {string}
              */
-            category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table" | "poster" | "acrylic_stand";
+            category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table" | "poster" | "acrylic_stand" | "mirror";
             artwork?: components["schemas"]["ImageArtwork"];
             /**
              * @description 手動の所有家具を置き換える購入商品のID。所有家具のec_product_idは変更しない

@@ -2,12 +2,15 @@ import { roomPalette } from "../../domain/roomPalette";
 import { characterTheme } from "../../domain/characterTheme";
 import { useEffect, useEffectEvent, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { Reflector } from "three/examples/jsm/objects/Reflector.js";
+import { resizeMirrorSurfaces } from "./mirrorReflection";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { isManualFurniture, type RoomDesign, type RoomItem } from "../../domain/room";
 import { buildReferenceRoom, usesReferenceRoom } from "./referenceRoomModel";
 import { buildCharacterThemeDecor } from "./characterThemeDecor";
+import { addMirrorSurface, isMirrorCategory } from "./mirrorSurface";
 import { buildMeasuredRoom } from "./roomArchitecture";
 import { LAYOUT_GRID_STEP } from "./layoutGrid";
 import { applyMaterialOverrides } from "./furnitureMaterials";
@@ -143,6 +146,11 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean, manager?
   const dark = "#605747";
   const color = item.color;
   switch (item.category) {
+    case "wall_mirror":
+    case "mirror":
+      box(group, [w, h, d], [0, h / 2, 0], color, true);
+      addMirrorSurface(group, item);
+      break;
     case "poster":
     case "acrylic_stand": {
       const stand = item.category === "acrylic_stand";
@@ -464,6 +472,11 @@ function createLayoutGrid(bounds: THREE.Box3, floor: number) {
 function disposeObject(object: THREE.Object3D) {
   const textures = new Set<THREE.Texture>();
   object.traverse((child) => {
+    if (child instanceof Reflector) {
+      child.geometry.dispose();
+      child.dispose();
+      return;
+    }
     if (!(child instanceof THREE.Mesh || child instanceof THREE.Line || child instanceof THREE.Sprite)) return;
     if (!(child instanceof THREE.Sprite)) child.geometry.dispose();
     const materials = Array.isArray(child.material) ? child.material : [child.material];
@@ -618,6 +631,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     const gridBounds = referenceRoom?.floorBounds ?? baseRoomBounds;
     const gridFloor = design.room || referenceRoom ? 0 : getFurniturePlacementBounds(design).floor;
     const layoutGrid = createLayoutGrid(gridBounds, gridFloor);
+    layoutGrid.userData.reflectionExcluded = true;
     layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel;
     scene.add(layoutGrid);
     const cutawayWalls: { object: THREE.Object3D; wall: "north" | "east" | "south" | "west" }[] = [];
@@ -882,7 +896,11 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         }
         for (const child of [...group.children]) { group.remove(child); disposeObject(child); }
         group.scale.set(1, 1, 1);
+        // Capture normalized model bounds before the furniture transform makes
+        // them world-space; the reflection plane is a child in local space.
+        const mirrorBounds = isMirrorCategory(item.category) ? new THREE.Box3().setFromObject(gltf.scene) : undefined;
         group.add(gltf.scene);
+        if (mirrorBounds) { addMirrorSurface(group, item, mirrorBounds); resizeMirrorSurfaces(group, renderer); }
         if (selectedId === item.id) updateSelection(selectedId);
       }, undefined, showModelFailure);
     }
@@ -916,6 +934,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
             );
             hitTarget.position.y = item.size[1] / 2;
             group.add(hitTarget);
+            if (isMirrorCategory(item.category)) { addMirrorSurface(group, item); resizeMirrorSurfaces(group, renderer); }
             hitTargets.set(item.id, group);
             scene.add(group);
           }
@@ -1010,6 +1029,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       if (!position) { if (placementPreview) placementPreview.visible = false; return; }
       if (!placementPreview) {
         placementPreview = createFurniture(currentPlacement, accent, oshi, loadingManager);
+        placementPreview.userData.reflectionExcluded = true;
         placementPreview.traverse(object => {
           if (!(object instanceof THREE.Mesh)) return;
           object.castShadow = false;
@@ -1020,6 +1040,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
           }
         });
         scene.add(placementPreview);
+        resizeMirrorSurfaces(placementPreview, renderer);
       }
       placementPreview.visible = true;
       placementPreview.position.set(position[0], position[1] - currentPlacement.size[1] / 2, position[2]);
@@ -1183,6 +1204,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         controls.update();
       }
       renderer.setSize(width, height);
+      resizeMirrorSurfaces(scene, renderer);
     };
     const observer = new ResizeObserver(resize);
     observer.observe(host);

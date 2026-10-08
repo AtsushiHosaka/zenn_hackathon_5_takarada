@@ -1,7 +1,7 @@
 import { characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
 import { roomPhotoLimits, roomPhotoValidationError } from "../../domain/roomPhoto";
-import { furnitureCategories, imageGoodsCategories, isFurnitureAdditions, isFurnitureOperations, isManualFurniture, isRoomItem, isRoomShape } from "../../domain/room";
+import { manualFurnitureCategories, imageGoodsCategories, isFurnitureAdditions, isFurnitureOperations, isManualFurniture, isRoomItem, isRoomShape } from "../../domain/room";
 import type { GenerateRoomInput, RoomRepository } from "../../domain/roomRepository";
 import type { ApiClient } from "../apiClient";
 import { createDemoRoom } from "../dummy/dummyRoomRepository";
@@ -187,7 +187,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
 function editedObjects(input: GenerateRoomInput, record: components["schemas"]["Room"]): components["schemas"]["FurnitureEdit"][] {
   if (!input.editedItems) return [];
   if (!Array.isArray(input.editedItems) || input.editedItems.length > 100 || !input.editedItems.every(isRoomItem) || new Set(input.editedItems.map(item => item.id)).size !== input.editedItems.length || !record.scene) throw new DomainError("家具の編集内容が正しくありません");
-  if (input.editedItems.some(item => isManualFurniture(item) && (![...furnitureCategories, ...imageGoodsCategories].some(category => category === item.category) || !item.ecProductId && item.name.length > 100))) throw new DomainError("手動で追加した家具の種類または名前が正しくありません");
+  if (input.editedItems.some(item => isManualFurniture(item) && (![...manualFurnitureCategories, ...imageGoodsCategories].some(category => category === item.category) || !item.ecProductId && item.name.length > 100))) throw new DomainError("手動で追加した家具の種類または名前が正しくありません");
   const { room } = record.scene;
   return input.editedItems.map(item => ({
     id: item.id,
