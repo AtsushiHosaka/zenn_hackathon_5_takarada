@@ -63,6 +63,7 @@ export type RoomItem = {
   name: string;
   category: string;
   existing: boolean;
+  supportObjectId?: string;
   price?: number;
   shop?: string;
   productUrl?: string;
@@ -114,6 +115,7 @@ export type RoomDesign = {
   // modelUrlがある場合、未指定なら家具を含む完成モデルとして扱う。
   modelKind?: "complete" | "shell";
   wallColor?: string;
+  floorColor?: string;
   room?: RoomGeometry;
   // Stable floor inferred for legacy designs without measured room geometry.
   inferredRoomBounds?: { min: [number, number, number]; max: [number, number, number]; floor: number };
@@ -145,6 +147,7 @@ export function isRoomDesign(value: unknown): value is RoomDesign {
   if (value.roomPaletteId !== undefined && !roomPalette(value.roomPaletteId)) return false;
   if (value.modelKind !== undefined && value.modelKind !== "complete" && value.modelKind !== "shell") return false;
   if (value.wallColor !== undefined && (typeof value.wallColor !== "string" || !/^#[0-9a-f]{6}$/i.test(value.wallColor))) return false;
+  if (value.floorColor !== undefined && (typeof value.floorColor !== "string" || !/^#[0-9a-f]{6}$/i.test(value.floorColor))) return false;
   if (value.room !== undefined && !isRoomGeometry(value.room)) return false;
   if (value.inferredRoomBounds !== undefined && !isInferredRoomBounds(value.inferredRoomBounds)) return false;
   if (value.analysisInput !== undefined && (!isRecord(value.analysisInput) || !isTatami(value.analysisInput.tatami) || !isRoomShape(value.analysisInput.shape))) return false;
@@ -217,6 +220,7 @@ function isRoomWindow(value: unknown): value is RoomWindow {
 
 export function isRoomItem(value: unknown): value is RoomItem {
   if (!isRecord(value)) return false;
+  if (value.supportObjectId !== undefined && (!nonemptyString(value.supportObjectId) || value.supportObjectId === value.id)) return false;
   if (![value.id, value.name, value.category, value.color].every(nonemptyString) || typeof value.existing !== "boolean") return false;
   if (!finiteVector(value.position) || !finiteVector(value.size) || value.size.some(number => number <= 0)) return false;
   if (value.rotation !== undefined && (typeof value.rotation !== "number" || !Number.isFinite(value.rotation) || value.rotation < 0 || value.rotation >= 360)) return false;
