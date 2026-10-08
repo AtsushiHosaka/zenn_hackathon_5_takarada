@@ -9,7 +9,7 @@ export const productCategories = [...replacementFurnitureCategories, "bed_cover"
 export type ProductCategory = typeof productCategories[number];
 export type FurnitureCategory = typeof furnitureCategories[number];
 export type FurnitureOperation = { objectId: string; action: "keep" | "replace" | "remove" };
-export type FurnitureAddition = { category: FurnitureCategory };
+export type FurnitureAddition = { category: FurnitureCategory; uiId?: string };
 export type TextureStatus = "disabled" | "ready" | "failed" | "skipped" | "unmatched";
 export type MaterialOverrides = Record<string, { textureUrl?: string; tileSizeM?: number; color?: string }>;
 export type ProductColorVariant = { colorName: string; url: string; variantId?: string; source: "official_color_picker" | "official_product_group" };
@@ -244,7 +244,7 @@ export function isFurnitureOperations(value: unknown): value is FurnitureOperati
 }
 
 export function isFurnitureAdditions(value: unknown): value is FurnitureAddition[] {
-  return Array.isArray(value) && value.length <= 6 && value.every(addition => isRecord(addition) && furnitureCategories.some(category => category === addition.category));
+  return Array.isArray(value) && value.length <= 6 && value.every(addition => isRecord(addition) && furnitureCategories.some(category => category === addition.category) && (addition.uiId === undefined || typeof addition.uiId === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(addition.uiId)));
 }
 
 export function isTextureStatus(value: unknown): value is TextureStatus {
