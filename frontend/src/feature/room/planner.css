@@ -114,3 +114,7 @@
 .rc-image-goods-upload input { max-width: 100%; font-size: 12px; }
 .rc-image-goods-height input { width: 100%; padding: 8px 10px; border: 1px solid #E4E1EC; border-radius: 8px; background: #fff; color: #1D1B26; }
 .rc-image-goods-preview { background: repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 0 0 / 16px 16px; }
+
+@media(max-width:720px) {
+  .rc-panel.rc-planner {position:fixed;z-index:50;top:68px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));left:12px;width:auto;max-width:none;min-width:0}
+}

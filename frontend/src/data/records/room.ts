@@ -2,7 +2,7 @@ import { roomPalette } from "../../domain/roomPalette";
 import { characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
 import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
-import { furnitureCategories, isManualFurniture, isImageArtwork, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
+import { productCategories, furnitureCategories, isManualFurniture, isImageArtwork, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
 import type { FurnitureSearchResult, SavedRoom } from "../../domain/roomRepository";
 import type { components } from "../generated/api";
 
@@ -24,7 +24,7 @@ export function toFurnitureSearch(value: unknown, baseUrl: string): FurnitureSea
 
 export function toImportedFurniture(value: unknown, baseUrl: string): RoomItem {
   const record = object(value, "FurnitureImport");
-  const category = furnitureCategories.find(category => category === record.category);
+  const category = productCategories.find(category => category === record.category);
   if (!category) invalid("FurnitureImport.category");
   const size = sizeRecord(record.size);
   const match = record.model_match == null ? undefined : modelMatchRecord(record.model_match);
@@ -326,6 +326,7 @@ function sceneProductDetails(item: components["schemas"]["SceneObject"], baseUrl
     textureUrl: url(override.texture_url, baseUrl), tileSizeM: override.tile_size_m ?? undefined, color: override.color ?? undefined,
   }]));
   return {
+    ecProductId: item.ec_product_id == null ? undefined : String(item.ec_product_id),
     materialOverrides,
     textureStatus: item.texture_status ?? undefined,
     textureSource: item.texture_source ?? undefined,
