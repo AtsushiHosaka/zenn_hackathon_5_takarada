@@ -31,6 +31,8 @@ export type SavedRoom = {
 
 export type RoomRepository = {
   demo(style?: Style): RoomDesign;
+  // Non-fatal persistence status for the current owner, when supported.
+  persistenceWarning?(): string | undefined;
   list(signal?: AbortSignal): Promise<SavedRoom[]>;
   // 一覧のIDまたはRoomDesign.idから、保存された部屋を復元する。
   get(id: string, signal?: AbortSignal): Promise<RoomDesign>;

@@ -51,7 +51,7 @@ export function useSavedRooms() {
     if (saved.some(room => room.id === (design.backendRoomId ?? design.id))) continue;
     saved.push({ id: design.backendRoomId ?? design.id, title: design.title, status: 'ready', createdAt: '', design });
   }
-  return { ...query, data: session.status === 'authenticated' ? saved : [] };
+  return { ...query, data: session.status === 'authenticated' ? saved : [], persistenceWarning: session.status === 'authenticated' ? rooms.persistenceWarning?.() : undefined };
 }
 export function useRoomPlans(): RoomDesign[] {
   return useSavedRooms().data.flatMap(room => room.design ? [room.design] : []);
