@@ -11,6 +11,7 @@ const axisLabels = {w:'幅',h:'高さ',d:'奥行き'};
 const dimensionLabel = (value:number|null) => value === null ? '不明' : `${Math.round(value*1000)/10}cm`;
 function ProductDetails({item,originalItems}:{item:RoomItem;originalItems?:RoomItem[]}) {
   const metadata=item.productMetadata;
+  const generatedTexture=Object.values(item.materialOverrides??{}).some(override=>Boolean(override.textureUrl));
   const replaced=originalItems?.find(original=>original.id===item.replacesObjectId);
   return <>
     {item.replacesObjectId&&<span className="rc-item-shop">{replaced?.name??item.replacesObjectId}の入れ替え</span>}
@@ -18,8 +19,8 @@ function ProductDetails({item,originalItems}:{item:RoomItem;originalItems?:RoomI
     {metadata?.size&&<span className="rc-item-shop">商品寸法: 幅{dimensionLabel(metadata.size.w)} × 高さ{dimensionLabel(metadata.size.h)} × 奥行き{dimensionLabel(metadata.size.d)}</span>}
     {!!metadata?.estimatedAxes?.length&&<span className="rc-item-shop">{metadata.estimatedAxes.map(axis=>axisLabels[axis]).join('・')}は描画・配置用の推定寸法</span>}
     {item.modelMatch?.approximate&&<span className="rc-item-shop" title={item.modelMatch.reason}>形状は既存モデルによる近似</span>}
-    {item.textureStatus&&<span className="rc-item-shop">{textureLabels[item.textureStatus]}</span>}
-    {item.textureStatus==='ready'&&item.textureSource==='description'&&<span className="rc-item-shop">色・素材の説明から生成。商品画像の再現ではありません。</span>}
+    {item.textureStatus&&<span className="rc-item-shop">{textureLabels[item.textureStatus==='ready'&&!generatedTexture?'disabled':item.textureStatus]}</span>}
+    {item.textureStatus==='ready'&&generatedTexture&&item.textureSource==='description'&&<span className="rc-item-shop">色・素材の説明から生成。商品画像の再現ではありません。</span>}
   </>;
 }
 export default function RecommendationPanel({items,originalItems,searchEntryPoints,selectedId,filter,onSelect,onFilter,onClose}:{items:RoomItem[];originalItems?:RoomItem[];searchEntryPoints?:string[];selectedId:string|null;filter:string;onSelect:(id:string)=>void;onFilter:(filter:string)=>void;onClose:()=>void}) {
