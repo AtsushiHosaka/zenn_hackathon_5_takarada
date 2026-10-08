@@ -1,4 +1,4 @@
-import { isManualFurniture, type RoomDesign, type RoomItem } from '../../domain/room';
+import { isFurnitureSupportSurface, isManualFurniture, type RoomDesign, type RoomItem } from '../../domain/room';
 import { LAYOUT_GRID_STEP, snapItemPosition, snapToLayoutGrid } from './layoutGrid';
 
 type Vector = [number, number, number];
@@ -40,33 +40,42 @@ export function getFurniturePlacementBounds(design: RoomDesign): RoomBounds & { 
   return { ...inferred, floor: inferred.min[1] + 0.1835 };
 }
 
-type PlacementItem = Pick<RoomItem, 'size' | 'rotation'> & Partial<Pick<RoomItem, 'id' | 'category'>>;
+type PlacementItem = Pick<RoomItem, 'size' | 'rotation'> & Partial<Pick<RoomItem, 'id' | 'category' | 'supportObjectId' | 'supportSurface'>>;
 
 export function canPlaceOnFurniture(item: PlacementItem) {
-  return Boolean(item.category && !['sofa', 'bed', 'desk', 'chair', 'shelf', 'table', 'poster', 'rug', 'mirror', 'lamp'].includes(item.category)
+  return Boolean(item.category && !['sofa', 'bed', 'desk', 'chair', 'shelf', 'table', 'storage', 'tv_stand', 'display', 'display_case', 'wall_shelf', 'poster', 'rug', 'mirror'].includes(item.category)
     && item.size.every(value => Number.isFinite(value) && value > 0 && value <= .8));
 }
 
-// Require the whole rotated footprint to fit on the rectangular top, not just
-// the object's center. The highest fitting support wins; exact contact is valid.
-export function furnitureSurfaceHeight(item: PlacementItem, position: RoomItem['position'], design: RoomDesign): number | null {
-  if (!canPlaceOnFurniture(item)) return null;
-  let height: number | null = null;
-  for (const support of design.items) {
-    if (support.id === item.id || !['shelf', 'desk', 'table'].includes(support.category)) continue;
-    const top = support.position[1] + support.size[1] / 2;
-    if (top + item.size[1] > getFurniturePlacementBounds(design).max[1] + 1e-9) continue;
-    const angle = (support.rotation ?? 0) * Math.PI / 180;
-    const dx = position[0] - support.position[0], dz = position[2] - support.position[2];
-    const x = dx * Math.cos(angle) - dz * Math.sin(angle);
-    const z = dx * Math.sin(angle) + dz * Math.cos(angle);
-    const relative = ((item.rotation ?? 0) - (support.rotation ?? 0)) * Math.PI / 180;
-    const halfWidth = (Math.abs(Math.cos(relative)) * item.size[0] + Math.abs(Math.sin(relative)) * item.size[2]) / 2;
-    const halfDepth = (Math.abs(Math.sin(relative)) * item.size[0] + Math.abs(Math.cos(relative)) * item.size[2]) / 2;
-    if (Math.abs(x) + halfWidth > support.size[0] / 2 + 1e-9 || Math.abs(z) + halfDepth > support.size[2] / 2 + 1e-9) continue;
-    height = Math.max(height ?? -Infinity, top);
+export function isFurnitureSupport(item: RoomItem) {
+  return ['shelf', 'desk', 'table', 'storage', 'tv_stand', 'display', 'display_case', 'wall_shelf'].includes(item.category);
+}
+
+// Every path checks the same captured rendered footprint, including circular
+// tops. No model shape is inferred from the furniture category.
+export function fitsFurnitureSurface(item: PlacementItem, position: RoomItem['position'], surface: NonNullable<RoomItem['supportSurface']>): boolean {
+  if (!isFurnitureSupportSurface(surface) || !item.size.every(value => Number.isFinite(value) && value > 0) || !position.every(Number.isFinite) || !Number.isFinite(item.rotation ?? 0)) return false;
+  const [a, b, c, d, e, f] = surface.transform;
+  const [minX, minZ, maxX, maxZ] = surface.bounds;
+  const angle = (item.rotation ?? 0) * Math.PI / 180;
+  for (const x of [-item.size[0] / 2, item.size[0] / 2]) for (const z of [-item.size[2] / 2, item.size[2] / 2]) {
+    const worldX = position[0] + Math.cos(angle) * x + Math.sin(angle) * z;
+    const worldZ = position[2] - Math.sin(angle) * x + Math.cos(angle) * z;
+    const localX = a * worldX + b * worldZ + c, localZ = d * worldX + e * worldZ + f;
+    if (localX < minX - .0001 || localX > maxX + .0001 || localZ < minZ - .0001 || localZ > maxZ + .0001) return false;
+    if (surface.radius !== undefined && Math.hypot(localX, localZ) > surface.radius + .0001) return false;
   }
-  return height;
+  return true;
+}
+
+export function furnitureSurfaceHeight(item: PlacementItem, position: RoomItem['position'], design: RoomDesign): number | null {
+  const surface = item.supportSurface;
+  if (!canPlaceOnFurniture(item) || !surface || !isFurnitureSupportSurface(surface)) return null;
+  const support = design.items.find(candidate => candidate.id === item.supportObjectId && candidate.id !== item.id && isFurnitureSupport(candidate));
+  if (!support || JSON.stringify([support.position, support.size, support.rotation ?? 0]) !== JSON.stringify([surface.supportPosition, surface.supportSize, surface.supportRotation])) return null;
+  const bounds = getFurniturePlacementBounds(design);
+  if (surface.height < support.position[1] - support.size[1] / 2 || surface.height > support.position[1] + support.size[1] / 2 + .001 || surface.height <= bounds.floor + .0001 || surface.height + item.size[1] > bounds.max[1] + 1e-9 || Math.abs(position[1] - item.size[1] / 2 - surface.height) > .001) return null;
+  return fitsFurnitureSurface(item, position, surface) ? surface.height : null;
 }
 
 export function furniturePositionInRoom(item: PlacementItem, position: RoomItem['position'], design: RoomDesign, axes: readonly (0 | 2)[] = [0, 2]): RoomItem['position'] | null {
@@ -84,7 +93,7 @@ export function furniturePositionInRoom(item: PlacementItem, position: RoomItem[
     if (minimum > maximum) return null;
     next[axis] = Math.max(minimum, Math.min(maximum, snapToLayoutGrid(position[axis])));
   }
-  next[1] = (furnitureSurfaceHeight(item, next, design) ?? bounds.floor) + item.size[1] / 2;
+  next[1] = (furnitureSurfaceHeight(item, [next[0], position[1], next[2]], design) ?? bounds.floor) + item.size[1] / 2;
   return next;
 }
 
@@ -93,6 +102,7 @@ export function furniturePositionInRoom(item: PlacementItem, position: RoomItem[
 export function snapFurnitureEditPosition(item: RoomItem, position: RoomItem['position'], axes: readonly (0 | 2)[], design: RoomDesign): RoomItem['position'] | null {
   if (canPlaceOnFurniture(item)) {
     const snapped = snapItemPosition(item, position, axes, design.room);
+    snapped[1] = position[1];
     return furniturePositionInRoom(item, snapped, design, axes);
   }
   if (design.room || !isManualFurniture(item)) return snapItemPosition(item, position, axes, design.room);

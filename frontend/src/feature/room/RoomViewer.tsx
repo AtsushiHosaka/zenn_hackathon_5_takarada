@@ -14,7 +14,7 @@ import { findFurnitureOverlaps } from "./furnitureOverlap";
 import { mapCompleteRoomFurniture } from "./completeRoomFurniture";
 import { createFurnitureOverlapOutline } from "./furnitureOverlapOutline";
 import { applyMaterialOverrides } from "./furnitureMaterials";
-import { canPlaceOnFurniture, furniturePositionInRoom, furnitureSurfaceHeight, getFurniturePlacementBounds, snapFurnitureEditPosition } from './roomBounds';
+import { canPlaceOnFurniture, furniturePositionInRoom, getFurniturePlacementBounds, isFurnitureSupport, snapFurnitureEditPosition } from './roomBounds';
 
 interface RoomViewerProps {
   design: RoomDesign;
@@ -23,9 +23,9 @@ interface RoomViewerProps {
   view: "perspective" | "top" | "front";
   dimensions?: boolean;
   editing?: boolean;
-  onMoveItem?: (id: string, position: RoomItem["position"]) => void;
+  onMoveItem?: (id: string, position: RoomItem["position"], supportObjectId?: string, supportSurface?: RoomItem['supportSurface']) => void;
   placementItem?: RoomItem | null;
-  onPlaceItem?: (position: RoomItem["position"]) => void;
+  onPlaceItem?: (position: RoomItem["position"], supportObjectId?: string, supportSurface?: RoomItem['supportSurface']) => void;
   resetKey: number;
   before?: boolean;
   preview?: boolean;
@@ -508,8 +508,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   const cameraState = useRef<{ id: string; position: THREE.Vector3; target: THREE.Vector3; zoom: number; minDistance: number; view: RoomViewerProps["view"]; lastCommandSequence: number | null } | null>(null);
   const reportReady = useEffectEvent((ready: boolean) => onReady?.(ready));
   const selectItem = useEffectEvent(onSelectItem);
-  const moveItem = useEffectEvent((id: string, position: RoomItem["position"]) => onMoveItem?.(id, position));
-  const placeItem = useEffectEvent((position: RoomItem["position"]) => onPlaceItem?.(position));
+  const moveItem = useEffectEvent((id: string, position: RoomItem["position"], supportObjectId?: string, supportSurface?: RoomItem['supportSurface']) => onMoveItem?.(id, position, supportObjectId, supportSurface));
+  const placeItem = useEffectEvent((position: RoomItem["position"], supportObjectId?: string, supportSurface?: RoomItem['supportSurface']) => onPlaceItem?.(position, supportObjectId, supportSurface));
   const initialView = useEffectEvent(() => view);
   const initialBefore = useEffectEvent(() => legacyBefore);
   const initialMarkersVisible = useEffectEvent(() => !before && !preview);
@@ -957,6 +957,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       x: number;
       y: number;
       moved: boolean;
+      supportObjectId?: string;
+      supportSurface?: RoomItem['supportSurface'];
       controlsEnabled: boolean;
     };
     let drag: FurnitureDrag | null = null;
@@ -972,32 +974,51 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       disposeObject(placementPreview);
       placementPreview = null;
     };
-    const placementPosition = (event: DragEvent): RoomItem["position"] | null => {
+    const pickedSurface = (item: RoomItem): { position: RoomItem['position']; supportObjectId: string; supportSurface: NonNullable<RoomItem['supportSurface']> } | null => {
+      if (!canPlaceOnFurniture(item)) return null;
+      const supports = design.items.filter(candidate => candidate.id !== item.id && isFurnitureSupport(candidate));
+      const targets = supports.flatMap(support => { const group = furniture.get(support.id); return group?.visible ? [group] : []; });
+      for (const hit of raycaster.intersectObjects(targets, true)) {
+        const mesh = hit.object;
+        if (!(mesh instanceof THREE.Mesh) || !hit.face) continue;
+        const normal = hit.face.normal.clone().applyMatrix3(new THREE.Matrix3().getNormalMatrix(mesh.matrixWorld));
+        if (normal.normalize().y < .99) continue;
+        let parent: THREE.Object3D | null = mesh;
+        while (parent && typeof parent.userData.itemId !== 'string') parent = parent.parent;
+        const support = supports.find(candidate => candidate.id === parent?.userData.itemId);
+        if (!support) continue;
+        mesh.geometry.computeBoundingBox();
+        const bounds = mesh.geometry.boundingBox;
+        if (!bounds) continue;
+        const inverse = mesh.matrixWorld.clone().invert().elements;
+        const supportSurface: NonNullable<RoomItem['supportSurface']> = {
+          transform: [inverse[0], inverse[8], inverse[4] * hit.point.y + inverse[12], inverse[2], inverse[10], inverse[6] * hit.point.y + inverse[14]],
+          bounds: [bounds.min.x, bounds.min.z, bounds.max.x, bounds.max.z], height: hit.point.y,
+          ...(mesh.geometry.type === 'CylinderGeometry' ? {radius: (mesh.geometry as THREE.CylinderGeometry).parameters.radiusTop} : {}),
+          supportPosition: [...support.position], supportSize: [...support.size], supportRotation: support.rotation ?? 0,
+        };
+        const position = furniturePositionInRoom({...item, supportObjectId: support.id, supportSurface}, [hit.point.x, hit.point.y + item.size[1] / 2, hit.point.z], design);
+        if (position && Math.abs(position[1] - item.size[1] / 2 - hit.point.y) < .001) return {position, supportObjectId: support.id, supportSurface};
+      }
+      return null;
+    };
+    const placementPosition = (event: DragEvent): { position: RoomItem['position']; supportObjectId?: string; supportSurface?: RoomItem['supportSurface'] } | null => {
       const item = currentPlacement;
       if (!item || !currentEditing || !markersVisible || currentBefore || completeRoomModel) return null;
       const rect = renderer.domElement.getBoundingClientRect();
       if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) return null;
       setRay(event);
-      const heights = [gridFloor];
-      if (canPlaceOnFurniture(item)) for (const support of design.items) {
-        if (support.id !== item.id && ['shelf', 'desk', 'table'].includes(support.category)) heights.push(support.position[1] + support.size[1] / 2);
-      }
-      let nearest: { distance: number; position: RoomItem['position'] } | null = null;
-      for (const height of heights) {
-        const hit = raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -height), new THREE.Vector3());
-        if (!hit || hit.x < gridBounds.min.x || hit.x > gridBounds.max.x || hit.z < gridBounds.min.z || hit.z > gridBounds.max.z) continue;
-        const position = furniturePositionInRoom(item, [hit.x, height + item.size[1] / 2, hit.z], design);
-        if (!position) continue;
-        const surface = furnitureSurfaceHeight(item, position, design) ?? gridFloor;
-        if (Math.abs(surface - height) > .001) continue;
-        const distance = hit.distanceTo(raycaster.ray.origin);
-        if (!nearest || distance < nearest.distance) nearest = { distance, position };
-      }
-      return nearest?.position ?? null;
+      const surface = pickedSurface(item);
+      if (surface) return surface;
+      const hit = raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -gridFloor), new THREE.Vector3());
+      if (!hit || hit.x < gridBounds.min.x || hit.x > gridBounds.max.x || hit.z < gridBounds.min.z || hit.z > gridBounds.max.z) return null;
+      const position = furniturePositionInRoom(item, [hit.x, gridFloor + item.size[1] / 2, hit.z], design);
+      return position ? { position } : null;
     };
     const dragOver = (event: DragEvent) => {
       if (!currentPlacement) return;
-      const position = placementPosition(event);
+      const placement = placementPosition(event);
+      const position = placement?.position;
       event.preventDefault();
       if (event.dataTransfer) event.dataTransfer.dropEffect = position ? "copy" : "none";
       if (!position) { if (placementPreview) placementPreview.visible = false; return; }
@@ -1021,9 +1042,9 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       if (!currentPlacement) return;
       event.preventDefault();
       event.stopPropagation();
-      const position = placementPosition(event);
+      const placement = placementPosition(event);
       clearPlacementPreview();
-      if (position) placeItem(position);
+      if (placement) placeItem(placement.position, placement.supportObjectId, placement.supportSurface);
     };
     const dragLeave = (event: DragEvent) => {
       if (event.relatedTarget instanceof Node && host.contains(event.relatedTarget)) return;
@@ -1081,7 +1102,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         : new THREE.Plane(new THREE.Vector3(0, 1, 0), -item.position[1]);
       const hit = raycaster.ray.intersectPlane(plane, new THREE.Vector3());
       if (!hit) return;
-      drag = { pointerId: event.pointerId, id, itemPosition: [...item.position], position: [...item.position], group, origin: group.position.clone(), hit, plane, x: event.clientX, y: event.clientY, moved: false, controlsEnabled: controls.enabled };
+      drag = { supportSurface: item.supportSurface, supportObjectId: item.supportObjectId, pointerId: event.pointerId, id, itemPosition: [...item.position], position: [...item.position], group, origin: group.position.clone(), hit, plane, x: event.clientX, y: event.clientY, moved: false, controlsEnabled: controls.enabled };
       controls.enabled = false;
       renderer.domElement.setPointerCapture(event.pointerId);
       renderer.domElement.style.cursor = "grab";
@@ -1101,7 +1122,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         const changed = active.moved && delta.length() > .0005;
         releaseDrag(!changed);
         if (changed) {
-          moveItem(active.id, active.position);
+          moveItem(active.id, active.position, active.supportObjectId, active.supportSurface);
         } else if (!active.moved) focusItem(active.id);
         return;
       }
@@ -1122,9 +1143,13 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         const delta = hit.sub(drag.hit);
         const item = design.items.find(item => item.id === drag?.id);
         if (!item) return;
-        const position = snapFurnitureEditPosition(item, [drag.itemPosition[0] + delta.x, drag.itemPosition[1], drag.itemPosition[2] + delta.z], currentView === "front" ? [0] : [0, 2], design);
+        const surface = currentView !== "front" ? pickedSurface(item) : null;
+        const floor = canPlaceOnFurniture(item) && currentView !== "front" ? gridFloor + item.size[1] / 2 : drag.itemPosition[1];
+        const position = surface?.position ?? snapFurnitureEditPosition(item, [drag.itemPosition[0] + delta.x, floor, drag.itemPosition[2] + delta.z], currentView === "front" ? [0] : [0, 2], design);
         if (!position) return;
         drag.position = position;
+        drag.supportObjectId = surface?.supportObjectId ?? (currentView === "front" ? item.supportObjectId : undefined);
+        drag.supportSurface = surface?.supportSurface ?? (currentView === "front" ? item.supportSurface : undefined);
         // Preserve the model group's origin offset while previewing the snapped position.
         drag.group.position.copy(drag.origin).add(new THREE.Vector3(position[0] - drag.itemPosition[0], position[1] - drag.itemPosition[1], position[2] - drag.itemPosition[2]));
         drag.group.updateMatrixWorld(true);
