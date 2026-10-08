@@ -575,6 +575,7 @@ export function toRoomDesign(value: unknown, baseUrl: string): RoomDesign {
     modelUrl: url(record.model_url ?? record.modelUrl, baseUrl),
     modelKind,
     wallColor: wallColor(record.wallColor !== undefined ? record.wallColor : record.wall_color),
+    floorColor: wallColor(record.floorColor !== undefined ? record.floorColor : record.floor_color),
   };
 }
 

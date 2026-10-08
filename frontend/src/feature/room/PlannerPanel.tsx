@@ -375,6 +375,13 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
           {wallColors.map(([color, label]) => <button key={color} type="button" aria-label={`壁を${label}にする`} title={label} aria-pressed={design.wallColor?.toUpperCase() === color.toUpperCase()} style={{ backgroundColor: color }} onClick={() => onChange({ ...design, wallColor: color })} />)}
         </div>
       </fieldset>
+      <fieldset className="rc-planner-section" disabled={completeModel}>
+        <legend>床の色</legend>
+        <div className="rc-planner-swatches" role="group" aria-label="床の色を選ぶ">
+          {wallColors.map(([color, label]) => <button key={color} type="button" aria-label={`床を${label}にする`} title={label} aria-pressed={(design.floorColor ?? design.room?.floorColor)?.toUpperCase() === color.toUpperCase()} style={{ backgroundColor: color }} onClick={() => onChange({ ...design, floorColor: color, ...(design.room ? { room: { ...design.room, floorColor: color } } : {}) })} />)}
+        </div>
+        <label className="rc-planner-floor-color">自由に選ぶ<input type="color" aria-label="床の色を自由に選ぶ" value={design.floorColor ?? design.room?.floorColor ?? '#D9BF99'} onChange={event => onChange({ ...design, floorColor: event.target.value, ...(design.room ? { room: { ...design.room, floorColor: event.target.value } } : {}) })} /></label>
+      </fieldset>
       {furnitureRequests && <details className="rc-planner-section rc-planner-additions">
         <summary>家具を追加{furnitureRequests.additions.length > 0 && `（${furnitureRequests.additions.length}点）`}</summary>
         <p className="rc-planner-note">次のコーディネートで提案する家具を、最大6点指定できます。</p>

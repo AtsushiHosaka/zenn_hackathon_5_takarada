@@ -206,7 +206,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const total=additions.reduce((sum,item)=>sum+(item.price??0),0);
   const referenceStory=design.source==='demo'&&design.style==='oshi'&&additions.length===8&&additions.find(item=>item.id==='3')?.color==='#bba5ee';
   const referenceBase=rooms.demo('oshi');
-  const referenceLayout=referenceStory&&!design.wallColor&&design.items.every(item=>{const original=referenceBase.items.find(base=>base.id===item.id);return original&&JSON.stringify(item.position)===JSON.stringify(original.position)&&JSON.stringify(item.size)===JSON.stringify(original.size)&&item.color===original.color&&!(item.rotation??0);});
+  const referenceLayout=referenceStory&&!design.wallColor&&!design.floorColor&&design.items.every(item=>{const original=referenceBase.items.find(base=>base.id===item.id);return original&&JSON.stringify(item.position)===JSON.stringify(original.position)&&JSON.stringify(item.size)===JSON.stringify(original.size)&&item.color===original.color&&!(item.rotation??0);});
   const pending=generation.isPending;
   useLayoutEffect(()=>{if(wasPending.current&&!pending){const target=composer.current?.querySelector<HTMLElement>('input:not([type=hidden]),textarea,button:not(:disabled)')??document.getElementById(analyzed?'coordinate-request':'res-msg');target?.focus();}wasPending.current=pending;},[pending,analyzed]);
   function addPhotos(files:File[]) {
