@@ -67,6 +67,8 @@ jobs:
             VITE_API_ENDPOINT=
             API_UPSTREAM_ORIGIN=${{ secrets.GCP_API_URL }}
             VITE_CONNECTION=api
+            VITE_TERMS_URL=${{ vars.VITE_TERMS_URL }}
+            VITE_PRIVACY_URL=${{ vars.VITE_PRIVACY_URL }}
           tags: |
             ${{ secrets.GCP_WEB_IMAGE_REPO }}:${{ github.event.workflow_run.head_sha }}
             ${{ secrets.GCP_WEB_IMAGE_REPO }}:latest
@@ -86,8 +88,17 @@ jobs:
             --project "${{ secrets.GCP_PROJECT_ID }}" --wait
 
       - name: Cloud Run を更新
+        env:
+          VITE_TERMS_URL: ${{ vars.VITE_TERMS_URL }}
+          VITE_PRIVACY_URL: ${{ vars.VITE_PRIVACY_URL }}
         run: |
+          legal_separator="__LEGAL_DOCUMENTS__"
+          while [[ "$VITE_TERMS_URL$VITE_PRIVACY_URL" == *"$legal_separator"* ]]; do
+            legal_separator="${legal_separator}_"
+          done
+          legal_env="^${legal_separator}^VITE_TERMS_URL=${VITE_TERMS_URL}${legal_separator}VITE_PRIVACY_URL=${VITE_PRIVACY_URL}"
           gcloud run services update "${{ secrets.GCP_API_SERVICE }}" \
+            --update-env-vars "$legal_env" \
             --image "${{ secrets.GCP_API_IMAGE_REPO }}:$SHA" \
             --region "${{ secrets.GCP_REGION }}" \
             --project "${{ secrets.GCP_PROJECT_ID }}" --quiet
