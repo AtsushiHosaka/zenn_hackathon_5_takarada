@@ -1,0 +1,72 @@
+[
+  {
+    "id": "hatsune-miku",
+    "name": "初音ミク",
+    "title": "初音ミクの音楽ルーム",
+    "instructions": "音楽を楽しむデスクと、グッズを並べる飾り棚。直線的な家具とリズムを感じる音符のモチーフを合わせる。",
+    "motif": "music",
+    "base": "#E8F7F4",
+    "secondary": "#B1DBD4",
+    "accent": "#36B5AB"
+  },
+  {
+    "id": "sanrio",
+    "name": "サンリオ共通",
+    "title": "サンリオのかわいいルーム",
+    "instructions": "複数のキャラクターのグッズを一緒に飾る。丸い家具と星やハートのモチーフを合わせ、飾る場所を複数用意する。",
+    "motif": "stars",
+    "base": "#F9EEF4",
+    "secondary": "#D7E7F5",
+    "accent": "#E8A5C9"
+  },
+  {
+    "id": "hello-kitty",
+    "name": "ハローキティ",
+    "title": "ハローキティのリボンルーム",
+    "instructions": "リボンのモチーフをアクセントにする。すっきりした家具と、グッズを見やすく並べる飾り棚を合わせる。",
+    "motif": "bow",
+    "base": "#FFF5F0",
+    "secondary": "#EABBB2",
+    "accent": "#D95362"
+  },
+  {
+    "id": "my-melody",
+    "name": "マイメロディ",
+    "title": "マイメロディのやさしいルーム",
+    "instructions": "ハートのモチーフと柔らかな布小物を合わせる。丸い照明と、ぬいぐるみを飾れる収納を選ぶ。",
+    "motif": "hearts",
+    "base": "#FFF0F4",
+    "secondary": "#EDC5D7",
+    "accent": "#D47DA5"
+  },
+  {
+    "id": "kuromi",
+    "name": "クロミ",
+    "title": "クロミのクールなルーム",
+    "instructions": "星のモチーフとシャープな形を合わせる。コントラストのある小物と、グッズを主役にできる飾り棚を選ぶ。",
+    "motif": "star",
+    "base": "#EEE9F4",
+    "secondary": "#AAA1BC",
+    "accent": "#5A3C73"
+  },
+  {
+    "id": "cinnamoroll",
+    "name": "シナモロール",
+    "title": "シナモロールの雲ルーム",
+    "instructions": "雲のモチーフと丸みのある家具を合わせる。軽やかな布小物と柔らかな照明で、グッズを飾る場所を作る。",
+    "motif": "cloud",
+    "base": "#F0F8FF",
+    "secondary": "#C3E0F1",
+    "accent": "#72ADD4"
+  },
+  {
+    "id": "pompompurin",
+    "name": "ポムポムプリン",
+    "title": "ポムポムプリンのくつろぎルーム",
+    "instructions": "プリンを思わせる丸いモチーフを合わせる。木目の家具と柔らかなクッションで、くつろげるグッズ展示スペースを作る。",
+    "motif": "pudding",
+    "base": "#FFF7DC",
+    "secondary": "#EAD59A",
+    "accent": "#A47848"
+  }
+]
