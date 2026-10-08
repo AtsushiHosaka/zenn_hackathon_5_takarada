@@ -261,7 +261,15 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   }
   function changeTitle(event:FormEvent) {event.preventDefault();if(!requireOwner())return;const value=title.trim();if(!value)return;try{const next={...design,title:value};if(isTemplate)saveRoomTemplate(client,scope,next);else saveRoomPlan(client,next,scope);setSavedFingerprint(JSON.stringify(next));setRename(false);}catch{setNotice('ルーム名を保存できませんでした。');}}
   function editDesign(next:RoomDesign) {
-    next={...next,items:next.items.map(item=>item.supportObjectId&&furnitureSurfaceHeight(item,item.position,next)===null?{...item,supportObjectId:undefined,supportSurface:undefined,position:[item.position[0],getFurniturePlacementBounds(next).floor+item.size[1]/2,item.position[2]]}:item)};
+    next={...next,items:next.items.map(item=>{
+      if(!item.supportObjectId)return item;
+      const previousSupport=design.items.find(support=>support.id===item.supportObjectId);
+      const support=next.items.find(support=>support.id===item.supportObjectId);
+      // Same-ID product replacement can change the mesh without changing its bounds.
+      const geometryIdentity=(value:RoomItem|undefined)=>value&&[value.category,value.modelUrl,value.modelSize,value.modelFit];
+      const geometryChanged=JSON.stringify(geometryIdentity(previousSupport))!==JSON.stringify(geometryIdentity(support));
+      return geometryChanged||furnitureSurfaceHeight(item,item.position,next)===null?{...item,supportObjectId:undefined,supportSurface:undefined,position:[item.position[0],getFurniturePlacementBounds(next).floor+item.size[1]/2,item.position[2]]}:item;
+    })};
     if(JSON.stringify(next)===JSON.stringify(design))return;
     // Preserve the rendered floor before any original furniture can move.
     if(!design.room)next={...next,inferredRoomBounds:getFurniturePlacementBounds(design)};
