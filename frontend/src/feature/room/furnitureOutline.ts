@@ -143,8 +143,27 @@ export function completeFurnitureMeshes(root: THREE.Object3D, items: RoomItem[])
     const id = candidates[0].id;
     result.set(id, [...(result.get(id) ?? []), object]);
   });
-  // Keep source nodes/transforms intact. A tagged leaf or uniquely contained
-  // part cannot establish ownership of every other part of that furniture.
+  // OutlinePass and collision collection both traverse selected roots. Detach
+  // cross-owned descendants so one furniture target cannot capture another's
+  // meshes. Preserve exact affine world matrices without decomposing them.
+  const owned = [...result].flatMap(([id, meshes]) => meshes.map(mesh => ({ id, mesh, world: mesh.matrixWorld.clone() })));
+  const inverse = root.matrixWorld.clone().invert();
+  const groups = new Map<string, THREE.Group>();
+  for (const id of result.keys()) {
+    const group = new THREE.Group();
+    group.userData.itemId = id;
+    root.add(group);
+    groups.set(id, group);
+  }
+  for (const { id, mesh, world } of owned) {
+    mesh.matrix.copy(inverse.clone().multiply(world));
+    mesh.matrixAutoUpdate = false;
+    groups.get(id)!.add(mesh);
+  }
+  root.updateWorldMatrix(true, true);
+  for (const [id, group] of groups) result.set(id, [group]);
+  // A tagged leaf or uniquely contained part cannot establish ownership of
+  // every other part of that furniture; keep the incomplete coverage notice.
   return {
     meshes: result,
     unmapped: items.filter(item => !result.has(item.id)).map(item => item.id),
