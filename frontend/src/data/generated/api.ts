@@ -461,7 +461,39 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * 本人の保存済みの部屋を一覧で取得する
+         * @description 作成日時の降順。解析中・失敗した部屋も含み、各部屋に最後に成功した提案を返す
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 本人の部屋一覧 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Room"][];
+                    };
+                };
+                /** @description ログインが必要 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Unauthorized"];
+                    };
+                };
+            };
+        };
         put?: never;
         /**
          * 部屋を登録して解析を始める
@@ -1168,6 +1200,8 @@ export interface components {
             analyzed_by: null | "gemini" | "mock";
             /** @example null */
             error_message: string | null;
+            /** @description この部屋で最後に生成が成功した提案。提案がなければ null */
+            latest_coordination: components["schemas"]["Coordination"] | null;
             /** Format: date-time */
             created_at: string;
         };

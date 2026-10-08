@@ -4,6 +4,12 @@ module Api
     # クライアントは GET で status が ready になるまでポーリングする。
     # 認証済みユーザーが所有する部屋・提案だけを扱う。
     class RoomsController < ApplicationController
+      # GET /api/v1/rooms
+      def index
+        rooms = current_user.rooms.includes(:latest_coordination).order(created_at: :desc, id: :desc)
+        render json: RoomSerializer.new(rooms)
+      end
+
       # POST /api/v1/rooms
       def create
         room = current_user.rooms.new(room_params)
@@ -20,7 +26,7 @@ module Api
 
       # GET /api/v1/rooms/:id
       def show
-        render json: RoomSerializer.new(current_user.rooms.find(params[:id]))
+        render json: RoomSerializer.new(current_user.rooms.includes(:latest_coordination).find(params[:id]))
       end
 
       private

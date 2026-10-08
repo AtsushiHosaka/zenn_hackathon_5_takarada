@@ -1,4 +1,4 @@
-// デモ専用 DB。同じタブの sessionStorage に保存し、リロード後も変更を復元する。
+// デモ専用 DB。localStorage に保存し、タブを閉じた後も登録ユーザーを復元する。
 // 実 API の認証基盤ではない。パスワードは SHA-256 の値だけを保存する。
 import { DomainError } from "../../domain/error";
 import type { User, UserId } from "../../domain/user";
@@ -51,7 +51,7 @@ class DummyDatabase {
 
   constructor() {
     try {
-      const saved: unknown = JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? "null");
+      const saved: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? sessionStorage.getItem(STORAGE_KEY) ?? "null");
       if (typeof saved !== "object" || saved === null) return;
       const state = saved as Record<string, unknown>;
       if (!Array.isArray(state.users) || !state.users.every(isStoredUser)
@@ -61,6 +61,7 @@ class DummyDatabase {
         ...user, createdAt: new Date(user.createdAt), updatedAt: new Date(user.updatedAt),
       }));
       this.nextId = state.nextId;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ users: this.users, nextId: this.nextId }));
     } catch {
       // 保存データを読めない場合は初期データを使う。
     }
@@ -68,7 +69,7 @@ class DummyDatabase {
 
   private commit(users: DummyUser[], nextId = this.nextId): void {
     try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ users, nextId }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ users, nextId }));
     } catch {
       throw new DomainError("ダミーデータを保存できません。ブラウザの保存設定を確認してください");
     }

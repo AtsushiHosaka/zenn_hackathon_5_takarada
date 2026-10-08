@@ -53,12 +53,12 @@ export function resolveFurnitureModels(design: RoomDesign, models: FurnitureMode
   };
 }
 
-export function useFurnitureModelsForDesign(design: RoomDesign): RoomDesign {
+export function useRoomFurnitureModels(design: RoomDesign) {
   const { furnitureModels } = useRepositories();
   const usesCompleteModel = Boolean(design.modelUrl) && design.modelKind !== "shell";
   const candidates = usesCompleteModel ? design.before?.items ?? [] : [...design.items, ...(design.before?.items ?? [])];
   const needsModels = design.source === "api" && candidates.some(item => item.textureStatus !== "unmatched" && !item.modelUrl && Boolean(bindingKey(item)));
-  const { data } = useQuery({
+  const { data, isFetching, isError } = useQuery({
     queryKey: furnitureModelKeys.all,
     queryFn: () => furnitureModels.list(),
     enabled: needsModels,
@@ -67,5 +67,9 @@ export function useFurnitureModelsForDesign(design: RoomDesign): RoomDesign {
     retry: false,
   });
   // カタログ取得やGLBの読み込みが失敗しても、既存の簡易家具で操作を続ける。
-  return useMemo(() => data ? resolveFurnitureModels(design, data) : design, [design, data]);
+  const resolved = useMemo(() => data ? resolveFurnitureModels(design, data) : design, [design, data]);
+  return { design: resolved, loading: needsModels && isFetching, error: needsModels && isError };
+}
+export function useFurnitureModelsForDesign(design: RoomDesign): RoomDesign {
+  return useRoomFurnitureModels(design).design;
 }
