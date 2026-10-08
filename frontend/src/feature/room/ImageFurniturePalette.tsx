@@ -1,12 +1,12 @@
 import { useRef, useState } from 'react';
-import { type FurnitureCategory, type ImageArtwork, type RoomItem } from '../../domain/room';
+import { type ManualFurnitureCategory, type ImageArtwork, type RoomItem } from '../../domain/room';
 import { createFurnitureItem, furnitureTemplates } from './furniturePlacement';
 import { readArtwork } from './readArtwork';
 
 export default function ImageFurniturePalette({ disabled, onImport }: { disabled: boolean; onImport: (item: RoomItem) => void }) {
   const [photo, setPhoto] = useState<ImageArtwork>();
   const [name, setName] = useState('');
-  const [category, setCategory] = useState<FurnitureCategory>('chair');
+  const [category, setCategory] = useState<ManualFurnitureCategory>('chair');
   const [dimensions, setDimensions] = useState(['45', '80', '45']);
   const [color, setColor] = useState('#73966c');
   const [pending, setPending] = useState(false);
