@@ -12,8 +12,18 @@ export function isRoomTemplate(value: unknown): value is RoomTemplate {
 }
 
 /** Give copied furniture new identities while keeping valid shelf contacts. */
-export function remapTemplateItems(items: RoomItem[]): RoomItem[] {
+export function remapTemplateItems(items: RoomItem[], offset: RoomItem['position'] = [0, 0, 0]): RoomItem[] {
   const identities = new Map(items.map(item => [item.id, `template-object-${crypto.randomUUID()}`]));
-  return items.map(item => ({...structuredClone(item), id: identities.get(item.id)!,
-    supportObjectId: item.supportObjectId ? identities.get(item.supportObjectId) : undefined}));
+  return items.map(original => {
+    const item = structuredClone(original);
+    const supportObjectId = item.supportObjectId ? identities.get(item.supportObjectId) : undefined;
+    const surface = supportObjectId ? item.supportSurface : undefined;
+    const supportSurface = surface ? {...surface,
+      transform: [surface.transform[0], surface.transform[1], surface.transform[2] + surface.transform[0] * offset[0] + surface.transform[1] * offset[2],
+        surface.transform[3], surface.transform[4], surface.transform[5] + surface.transform[3] * offset[0] + surface.transform[4] * offset[2]] as typeof surface.transform,
+      height: surface.height - offset[1],
+      supportPosition: surface.supportPosition.map((value, axis) => value - offset[axis]) as RoomItem['position']} : undefined;
+    return {...item, id: identities.get(item.id)!, supportObjectId, supportSurface,
+      position: item.position.map((value, axis) => value - offset[axis]) as RoomItem['position']};
+  });
 }

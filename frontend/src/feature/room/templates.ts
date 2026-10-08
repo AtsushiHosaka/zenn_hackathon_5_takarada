@@ -34,7 +34,7 @@ export function deleteRoomTemplate(client: QueryClient, scope: string, id: strin
 export function createTemplateSnapshot(design: RoomDesign, title: string): RoomDesign {
   if (design.modelUrl && design.modelKind !== 'shell') throw new DomainError('家具を含む完成モデルはテンプレートに保存できません。個別に編集できる部屋を選んでください。');
   const bounds = getFurniturePlacementBounds(design);
-  const center = [(bounds.min[0] + bounds.max[0]) / 2, bounds.floor, (bounds.min[2] + bounds.max[2]) / 2];
+  const center: RoomDesign['items'][number]['position'] = [(bounds.min[0] + bounds.max[0]) / 2, bounds.floor, (bounds.min[2] + bounds.max[2]) / 2];
   const room = structuredClone(design.room ?? {width: bounds.max[0] - bounds.min[0], depth: bounds.max[2] - bounds.min[2], height: bounds.max[1] - bounds.floor, floorColor: design.floorColor ?? '#e8dcc6', windows: []});
   if (design.floorColor) room.floorColor = design.floorColor;
   const analysisInput = design.analysisInput ?? { tatami: Math.max(3, Math.min(30, room.width * room.depth / 1.62)), shape: 'standard' as const };
@@ -42,10 +42,10 @@ export function createTemplateSnapshot(design: RoomDesign, title: string): RoomD
     id: `room-template-${crypto.randomUUID()}`, source: design.source, kind: 'analysis', title: title.trim(),
     description: '保存した部屋のテンプレートです。', style: design.style, room, analysisInput,
     wallColor: design.wallColor, floorColor: design.floorColor, budget: design.budget, prompt: design.prompt, roomPaletteId: design.roomPaletteId, characterThemeId: design.characterThemeId,
-    items: remapTemplateItems(design.items).map(original => {
+    items: remapTemplateItems(design.items, design.room ? [0,0,0] : center).map(original => {
       const item = structuredClone(original);
       return {...item, existing: true,
-        name: item.name.slice(0,100), position: design.room ? item.position : [item.position[0] - center[0], item.position[1] - center[1], item.position[2] - center[2]] as [number,number,number],
+        name: item.name.slice(0,100), position: item.position,
         marker: undefined, productId: undefined, ecProductId: undefined,
         replacesObjectId: undefined, materialOverrides: undefined};
     }),
