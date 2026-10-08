@@ -1,6 +1,8 @@
 export type Style = "botanical" | "oshi" | "natural";
 export type RoomShape = "square" | "standard" | "long";
 export const furnitureCategories = ["sofa", "bed", "desk", "chair", "shelf", "table"] as const;
+export const productCategories = [...furnitureCategories, "bed_cover", "curtain", "rug", "cushion", "floor_lamp", "desk_lamp", "plant", "small_plant", "wall_art", "wall_mirror", "wall_planter", "wall_shelf", "display_case", "acrylic_stand_case", "oshi_goods", "tapestry", "neon", "vase", "candle"] as const;
+export type ProductCategory = typeof productCategories[number];
 export type FurnitureCategory = typeof furnitureCategories[number];
 export type FurnitureOperation = { objectId: string; action: "keep" | "replace" | "remove" };
 export type FurnitureAddition = { category: FurnitureCategory };
@@ -195,7 +197,7 @@ export function isRoomItem(value: unknown): value is RoomItem {
   if (value.marker !== undefined && (typeof value.marker !== "number" || !Number.isSafeInteger(value.marker) || value.marker <= 0)) return false;
   if (value.shop !== undefined && !nonemptyString(value.shop)) return false;
   if (value.productId !== undefined && (typeof value.productId !== "string" || !/^[1-9]\d*$/.test(value.productId))) return false;
-  if (value.ecProductId !== undefined && (typeof value.ecProductId !== "string" || !/^[1-9]\d*$/.test(value.ecProductId) || !isManualFurniture(value as RoomItem))) return false;
+  if (value.ecProductId !== undefined && (typeof value.ecProductId !== "string" || !/^[1-9]\d*$/.test(value.ecProductId))) return false;
   if (value.materialOverrides !== undefined && !isMaterialOverrides(value.materialOverrides)) return false;
   if (value.textureStatus !== undefined && !isTextureStatus(value.textureStatus)) return false;
   if (value.textureSource !== undefined && value.textureSource !== "description") return false;

@@ -9,7 +9,7 @@ export type GenerateRoomInput = {
   shape?: RoomShape;
   roomId?: string;
   keptObjectIds?: string[];
-  editedItems?: RoomItem[];
+  editedItems?: (RoomItem & { replacementEcProductId?: number })[];
   furnitureOperations?: FurnitureOperation[];
   furnitureAdditions?: FurnitureAddition[];
   // 追加の指示 (チャット) で作り直すときの前回のコーデ (backend の ID)。指示に関係ない商品は前回のものが残る
@@ -41,7 +41,7 @@ export type RoomRepository = {
   get(id: string, signal?: AbortSignal): Promise<RoomDesign>;
   analyze(input: GenerateRoomInput, signal?: AbortSignal): Promise<RoomDesign>;
   generate(input: GenerateRoomInput, signal?: AbortSignal): Promise<RoomDesign>;
-  importFurniture(url: string, signal?: AbortSignal, variantId?: string): Promise<RoomItem>;
+  importFurniture(url: string, signal?: AbortSignal, variantId?: string, purpose?: "replacement"): Promise<RoomItem>;
   searchFurniture(input: FurnitureSearchInput, signal?: AbortSignal): Promise<FurnitureSearchResult>;
   capabilities(): Promise<RoomCapabilities>;
 };

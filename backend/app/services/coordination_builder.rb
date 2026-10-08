@@ -21,7 +21,9 @@ class CoordinationBuilder
     kept = kept_objects
     replacement_ids = @coordination.furniture_operations.select { |operation| operation["action"] == "replace" }.pluck("object_id")
     preferred_categories = (@scene["objects"].select { |object| replacement_ids.include?(object["id"]) }.pluck("category") + @coordination.additions.pluck("category")).uniq
-    client = InteriorLinks.client(user_id: @coordination.room.user_id, preferred_categories:, previous_items: @coordination.base_coordination&.items || [])
+    selected = selected_product_items
+    client = InteriorLinks.client(user_id: @coordination.room.user_id, preferred_categories:, previous_items: effective_previous_items)
+    client = FurnitureSelectedProductClient.new(client, selected) if selected.any?
     candidate_limit = GeminiClient.configured?(user_id: @coordination.room.user_id) ? CoordinationPlanner::Gemini::CANDIDATES_PER_GROUP : 3
     floor_candidates = FurnitureOperationPlanner.call(@coordination, @scene, client:, candidate_limit:)
     plan = CoordinationPlanner.call(prompt: @coordination.prompt, budget: @coordination.budget, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id, client:, additional_candidates: floor_candidates, previous:,
@@ -56,7 +58,12 @@ class CoordinationBuilder
     placed = floor_placed + placed
     raise ArgumentError, "商品合計が予算を超えています" if placed.sum { |entry| entry[:item].price } > @coordination.budget
 
-    placed.each.with_index(1) { |entry, marker| entry[:placement].object["marker"] = marker }
+    placed.each.with_index(1) do |entry, marker|
+      entry[:placement].object["marker"] = marker
+      if entry[:item].metadata["provider"].present? && entry[:item].id > EcProduct::PUBLIC_ID_OFFSET
+        entry[:placement].object["ec_product_id"] = entry[:item].id - EcProduct::PUBLIC_ID_OFFSET
+      end
+    end
     scene = { "room" => @scene["room"], "objects" => active + placed.map { |entry| entry[:placement].object } }
     items = placed.map.with_index(1) { |entry, marker| item_json(entry[:item], entry[:placement].note, marker) }
     appearance = FurnitureProductAppearance.call(scene:, items:, user_id: @coordination.room.user_id)
@@ -109,7 +116,7 @@ class CoordinationBuilder
       reserved = entries.drop(index + 1).sum { |_, candidate| candidate.price }
       options = placement_options(item, by_group[group], coherent ? remaining - reserved : item.price)
       options.each do |candidate|
-        layout = SlotLayout.new(@scene, occupants, edited_objects: @coordination.edited_objects)
+        layout = SlotLayout.new(@scene, occupants, edited_objects: layout_edits)
         placement = layout.place(candidate) or next
         placement.object["replaces_object_id"] = original_id
         placed << { slot: group, item: candidate, placement: }
@@ -137,7 +144,7 @@ class CoordinationBuilder
 
   def place_choices(chosen, by_slot, kept, coherent: false, reserved_budget: 0)
     candidates = by_slot.values.flatten.index_by { |item| SlotLayout.object_id_for(item) }
-    edits = @coordination.edited_objects.filter_map do |edit|
+    edits = layout_edits.filter_map do |edit|
       item = candidates[edit["id"]]
       edit.merge("slot" => item.slot) if item
     end
@@ -210,12 +217,59 @@ class CoordinationBuilder
     chosen
   end
 
+  def selected_product_items
+    @selected_product_items ||= begin
+      base = @coordination.base_coordination
+      originals = Array(base&.after_scene&.fetch("objects", [])) + @coordination.input_scene.fetch("objects")
+      @coordination.edited_objects.filter_map do |edit|
+        original = originals.find { |object| object["id"] == edit["id"] }
+        product_id = edit["replacement_ec_product_id"] || edit["ec_product_id"]
+        product = EcProduct.find_by(id: product_id) if product_id.is_a?(Integer)
+        next unless original && product
+
+        next if original["source"] == "existing" && @coordination.furniture_operations.any? { |operation| operation["object_id"] == original["id"] && operation["action"] != "replace" }
+
+        previous = Array(base&.items).find { |item| item["item_id"] == original["item_id"] }
+        data = product.data.symbolize_keys.except(:metadata, :slot)
+        metadata = product.data.fetch("metadata").merge(previous&.fetch("product_metadata", {})&.slice("group_id", "replaces_object_id") || {})
+        if original["source"] == "existing"
+          metadata = metadata.merge("group_id" => "replace:#{original['id']}", "replaces_object_id" => original["id"], "preferred_position" => edit["position"], "preferred_rotation" => edit["rotation_y"], "target_size" => original["size"])
+        end
+        InteriorLinks::Item.build(id: product.product_id, **data, slot: original["slot"] || "floor", metadata:)
+      end
+    end
+  end
+
+  def layout_edits
+    base = @coordination.base_coordination
+    originals = Array(base&.after_scene&.fetch("objects", [])) + @coordination.input_scene.fetch("objects")
+    @coordination.edited_objects.map do |edit|
+      original = originals.find { |object| object["id"] == edit["id"] }
+      product = selected_product_items.find { |item| item.id == EcProduct::PUBLIC_ID_OFFSET + (edit["replacement_ec_product_id"] || edit["ec_product_id"]).to_i } if original && (edit["replacement_ec_product_id"] || edit["ec_product_id"])
+      product ? edit.merge("id" => SlotLayout.object_id_for(product)) : edit
+    end
+  end
+
+  def effective_previous_items
+    base = @coordination.base_coordination
+    previous_items = Array(base&.items).map do |item|
+      original = Array(base.after_scene&.fetch("objects", [])).find { |object| object["item_id"] == item["item_id"] }
+      edit = original && @coordination.edited_objects.find { |value| value["id"] == original["id"] }
+      product = edit && EcProduct.find_by(id: edit["ec_product_id"])
+      product ? item.merge(product.data.except("slot", "metadata")).merge("item_id" => product.product_id, "product_metadata" => product.data["metadata"].merge(item.fetch("product_metadata", {}).slice("group_id", "replaces_object_id"))) : item
+    end
+    previous_items + selected_product_items.reject { |selected| previous_items.any? { |item| item["item_id"] == selected.id } }.map do |item|
+      item.to_h.stringify_keys.except("id", "metadata").merge("item_id" => item.id, "product_metadata" => item.metadata)
+    end
+  end
+
   # 追加の指示のときの前回のコーデ。前回の商品を引き継ぐのに使う
   def previous
     base = @coordination.base_coordination
-    return unless base&.status == "done"
+    return if !base && selected_product_items.empty?
+    return if base && base.status != "done"
 
-    CoordinationPlanner::Previous.new(prompt: base.prompt, title: base.title, items: base.items.map { |item| item.slice("item_id", "slot", "name").merge("group_id" => item.dig("product_metadata", "group_id") || item["slot"]) })
+    CoordinationPlanner::Previous.new(prompt: base&.prompt || @coordination.prompt, title: base&.title || "選択した家具", items: effective_previous_items.map { |item| item.slice("item_id", "slot", "name").merge("group_id" => item.dig("product_metadata", "group_id") || item["slot"]) })
   end
 
   # kept_object_ids が空なら今ある家具をすべて活かす
