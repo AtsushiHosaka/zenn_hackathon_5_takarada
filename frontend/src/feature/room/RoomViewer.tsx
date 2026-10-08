@@ -528,7 +528,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     } catch {
       if (fallback.current) fallback.current.hidden = false;
-      if (preview) reportReady(false);
+      reportReady(false);
       return;
     }
     if (fallback.current) fallback.current.hidden = true;
@@ -543,9 +543,9 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     loadingManager.onStart = () => { assetsReady = false; };
     loadingManager.onLoad = () => { assetsReady = true; previewNeedsRender = true; };
     loadingManager.onError = () => { assetFailed = true; if (!disposed && textureNotice.current) textureNotice.current.hidden = false; };
-    const previewDeadline = preview ? window.setTimeout(() => {
+    const previewDeadline = window.setTimeout(() => {
       if (!disposed && !readySent) { readySent = true; reportReady(false); }
-    }, 20000) : undefined;
+    }, 20000);
     const textureCleanups: (() => void)[] = [];
     const scene = new THREE.Scene();
     const themedDecor = buildCharacterThemeDecor(design);
@@ -1168,6 +1168,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       event.preventDefault();
       cancelDrag();
       if (fallback.current) fallback.current.hidden = false;
+      if (!readySent) { readySent = true; window.clearTimeout(previewDeadline); reportReady(false); }
     };
     renderer.domElement.addEventListener("pointerdown", pointerDown, true);
     renderer.domElement.addEventListener("pointerup", pointerUp, true);
@@ -1229,7 +1230,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         }
       }
       renderer.render(scene, camera);
-      if (preview && assetsReady && !readySent) {
+      if (assetsReady && !readySent) {
         readySent = true;
         window.clearTimeout(previewDeadline);
         reportReady(!assetFailed);
