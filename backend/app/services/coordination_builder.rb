@@ -246,7 +246,7 @@ class CoordinationBuilder
 
         next if original["source"] == "existing" && @coordination.furniture_operations.any? { |operation| operation["object_id"] == original["id"] && operation["action"] != "replace" }
 
-        previous = Array(base&.items).find { |item| item["item_id"] == original["item_id"] }
+        previous = Array(base&.items).find { |item| item["item_id"] == original["item_id"] && (original["marker"].nil? || item["marker"] == original["marker"]) }
         data = product.data.symbolize_keys.except(:metadata, :slot)
         metadata = product.data.fetch("metadata").merge(previous&.fetch("product_metadata", {})&.slice("group_id", "replaces_object_id") || {})
         if original["source"] == "existing"
@@ -270,12 +270,12 @@ class CoordinationBuilder
   def effective_previous_items
     base = @coordination.base_coordination
     previous_items = Array(base&.items).map do |item|
-      original = Array(base.after_scene&.fetch("objects", [])).find { |object| object["item_id"] == item["item_id"] }
+      original = Array(base.after_scene&.fetch("objects", [])).find { |object| object["item_id"] == item["item_id"] && (item["marker"].nil? || object["marker"] == item["marker"]) }
       edit = original && @coordination.edited_objects.find { |value| value["id"] == original["id"] }
       product = edit && EcProduct.find_by(id: edit["ec_product_id"])
       product ? item.merge(product.data.except("slot", "metadata")).merge("item_id" => product.product_id, "product_metadata" => product.data["metadata"].merge(item.fetch("product_metadata", {}).slice("group_id", "replaces_object_id"))) : item
     end
-    previous_items + selected_product_items.reject { |selected| previous_items.any? { |item| item["item_id"] == selected.id } }.map do |item|
+    previous_items + selected_product_items.reject { |selected| previous_items.any? { |item| item["item_id"] == selected.id && item.dig("product_metadata", "group_id") == selected.metadata["group_id"] } }.map do |item|
       item.to_h.stringify_keys.except("id", "metadata").merge("item_id" => item.id, "product_metadata" => item.metadata)
     end
   end
