@@ -1038,6 +1038,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         scene.add(placementPreview);
       }
       placementPreview.visible = true;
+      placementPreview.userData.supportObjectId = placement?.supportObjectId;
+      placementPreview.userData.supportSurface = placement?.supportSurface;
       placementPreview.position.set(position[0], position[1] - currentPlacement.size[1] / 2, position[2]);
     };
     const drop = (event: DragEvent) => {
@@ -1050,8 +1052,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     };
     const dragLeave = (event: DragEvent) => {
       if (event.relatedTarget instanceof Node && host.contains(event.relatedTarget)) return;
-      overlapsDirty = true;
       if (placementPreview) placementPreview.visible = false;
+      overlapsDirty = true;
     };
     host.addEventListener("dragover", dragOver);
     host.addEventListener("drop", drop);
@@ -1240,18 +1242,20 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       if (overlapOutline && overlapsDirty) {
         overlapsDirty = false;
         const objects = new Map(completeRoomModel && loadedRoom && !currentBefore ? completeFurniture : furniture);
-        const items = [...design.items];
-        if (currentPlacement && placementPreview?.visible) {
-          objects.set(currentPlacement.id, placementPreview);
-          items.push(currentPlacement);
+        const overlapItems = design.items.map(item => drag?.id === item.id ? {...item, position: drag.position, supportObjectId: drag.supportObjectId, supportSurface: drag.supportSurface} : item);
+        if (currentPlacement && placementPreview?.visible && !currentBefore && !completeRoomModel) {
+          let id = currentPlacement.id;
+          while (objects.has(id)) id += ":preview";
+          objects.set(id, placementPreview);
+          overlapItems.push({...currentPlacement, id, position: [placementPreview.position.x, placementPreview.position.y + currentPlacement.size[1] / 2, placementPreview.position.z], supportObjectId: placementPreview.userData.supportObjectId, supportSurface: placementPreview.userData.supportSurface});
         }
-        const ids = findFurnitureOverlaps(objects, items);
+        const ids = findFurnitureOverlaps(objects, {...design, items: overlapItems});
         overlappingObjects = [...ids].map(id => objects.get(id)!).filter(Boolean);
         if (overlapNotice.current) {
           const missing = completeRoomModel && loadedRoom && !currentBefore ? unmappedFurniture : [];
           overlapNotice.current.hidden = ids.size === 0 && missing.length === 0;
           const names = (identities: ReadonlySet<string>) => {
-            const list = design.items.filter(item => identities.has(item.id));
+            const list = overlapItems.filter(item => identities.has(item.id));
             const labels = list.slice(0, 3).map(item => item.name.length > 40 ? `${item.name.slice(0, 40)}…` : item.name);
             return labels.join('、') + (list.length > 3 ? `、ほか${list.length - 3}点` : '');
           };
