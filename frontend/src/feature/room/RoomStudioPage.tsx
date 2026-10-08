@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router';
 import { useRepositories } from '../../core/repositories';
@@ -22,6 +22,8 @@ import { useMotionDialog } from '../shared/useMotionDialog';
 import { DomainError } from '../../domain/error';
 import CharacterThemePicker from './CharacterThemePicker';
 import { roomPhotoLimits, roomPhotoRequirements, roomPhotoValidationError } from '../../domain/roomPhoto';
+import { motionScrollIntoView } from '../../core/motion';
+import { useMotionPresence } from '../shared/useMotionPresence';
 import './room-studio.css';
 
 const initialPrompt='紫色の推し活ルームにしたい。ベッドとデスクはそのまま使いたいです。';
@@ -42,10 +44,20 @@ function PhotoImage({file}:{file:File}) {
   useEffect(()=>{const url=URL.createObjectURL(file);if(image.current)image.current.src=url;return()=>URL.revokeObjectURL(url);},[file]);
   return <img ref={image} alt={file.name}/>;
 }
+type PhotoEntry = {id:string;file?:File;sample?:number;removing:boolean};
+function PhotoTile({entry,index,onRemove,onExit}:{entry:PhotoEntry;index:number;onRemove:()=>void;onExit:()=>void}) {
+  const presence=useMotionPresence(!entry.removing);
+  useEffect(()=>{if(!presence.isPresent)onExit();},[presence.isPresent,onExit]);
+  if(!presence.isPresent)return null;
+  return <div className="rc-photo motion-presence" data-motion-state={presence.state} inert={entry.removing} aria-hidden={entry.removing||undefined}>
+    {entry.file?<PhotoImage file={entry.file}/>:<ReferenceSvg page={3} index={3+(entry.sample??0)*2}/>}
+    <button type="button" className="rc-photo-remove motion-control" disabled={entry.removing} aria-label={`写真${index+1}を削除`} onClick={onRemove}><ReferenceSvg page={3} index={4}/></button>
+  </div>;
+}
 type InputStep = 'tatami' | 'shape' | 'photos' | 'request';
 const stepLabels: Record<InputStep,string> = {tatami:'広さ',shape:'形',photos:'写真',request:'希望'};
 function Intro({step,analysis}:{step:InputStep|undefined;analysis:boolean}) {
-  return <div className="rc-assistant"><span className="rc-assistant-icon"><ReferenceSvg page={3} index={2}/></span><div className="rc-assistant-body" aria-live="polite"><span className="rc-assistant-name">へやいろ</span>
+  return <div className="rc-assistant motion-enter"><span className="rc-assistant-icon"><ReferenceSvg page={3} index={2}/></span><div className="rc-assistant-body" aria-live="polite"><span className="rc-assistant-name">へやいろ</span>
     {step==='tatami'?<p>お部屋は何畳くらいですか？</p>:step==='shape'?<p>お部屋の形を教えてください。</p>:step==='photos'?<p>{analysis?'お部屋の写真はありますか？':'お部屋の写真を追加してください。'}</p>:step==='request'?<p>どんなお部屋にしたいですか？</p>:<p>入力できる項目を確認しています。</p>}
   </div></div>;
 }
@@ -113,8 +125,10 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const inputSteps: InputStep[]=capability.data?(analysisMode?['tatami','shape',...(acceptsPhotos?['photos' as const]:[])]:[...(acceptsPhotos?['photos' as const]:[]),...(canCoordinate?['request' as const]:[])]):[];
   const inputStep=inputSteps[stepIndex];
   const lastInputStep=stepIndex===inputSteps.length-1;
-  const [photos,setPhotos]=useState<File[]>(()=>inputState?.photos?.filter(file=>file instanceof File)??[]);
-  const [samplePhotos,setSamplePhotos]=useState<number[]>(()=>loadConnection()==='dummy'?[0,1,2]:[]);
+  const [photoEntries,setPhotoEntries]=useState<PhotoEntry[]>(()=>{const files=inputState?.photos?.filter(file=>file instanceof File)??[];return files.length?files.map(file=>({id:crypto.randomUUID(),file,removing:false})):loadConnection()==='dummy'?[0,1,2].map(sample=>({id:`sample-${sample}`,sample,removing:false})):[];});
+  const photos=photoEntries.filter(entry=>!entry.removing&&entry.file).map(entry=>entry.file!);
+  const samplePhotos=photoEntries.filter(entry=>!entry.removing&&entry.sample!==undefined).map(entry=>entry.sample!);
+  const [photoDrop,setPhotoDrop]=useState(false);
   const [photoError,setPhotoError]=useState('');
   const [notice,setNotice]=useState(inputState?.notice??'');
   const [selectedId,setSelectedId]=useState<string|null>(inputState?.selectedId??design.items.find(item=>item.id==='3')?.id??design.items.find(item=>!item.existing)?.id??null);
@@ -132,6 +146,15 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const [rename,setRename]=useState(false);
   const [title,setTitle]=useState(design.title);
   const upload=useRef<HTMLInputElement>(null);
+  const messages=useRef<HTMLDivElement>(null);
+  const composer=useRef<HTMLFormElement>(null);
+  const nearBottom=useRef(true);
+  const focusStep=useRef(false);
+  const focusPhoto=useRef(false);
+  const wasPending=useRef(false);
+  useLayoutEffect(()=>{if(focusPhoto.current){composer.current?.querySelector<HTMLElement>('.rc-photo-add')?.focus();focusPhoto.current=false;}},[photos.length]);
+  useLayoutEffect(()=>{if(focusStep.current){composer.current?.querySelector<HTMLElement>('input:not([type=hidden]),textarea,button:not(:disabled)')?.focus();focusStep.current=false;}},[inputStep]);
+  useEffect(()=>{if(nearBottom.current&&messages.current)motionScrollIntoView(messages.current.lastElementChild,{block:'end'});},[inputStep,design.id]);
   const abort=useRef<AbortController|null>(null);
   const renameDialogRef=useRef<HTMLDialogElement>(null);
   const renameDialog=useMotionDialog(renameDialogRef,rename,()=>setRename(false));
@@ -174,15 +197,21 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const referenceBase=rooms.demo('oshi');
   const referenceLayout=referenceStory&&!design.wallColor&&design.items.every(item=>{const original=referenceBase.items.find(base=>base.id===item.id);return original&&JSON.stringify(item.position)===JSON.stringify(original.position)&&JSON.stringify(item.size)===JSON.stringify(original.size)&&item.color===original.color&&!(item.rotation??0);});
   const pending=generation.isPending;
+  useLayoutEffect(()=>{if(wasPending.current&&!pending){const target=composer.current?.querySelector<HTMLElement>('input:not([type=hidden]),textarea,button:not(:disabled)')??document.getElementById(analyzed?'coordinate-request':'res-msg');target?.focus();}wasPending.current=pending;},[pending,analyzed]);
   function addPhotos(files:File[]) {
     const errors:string[]=[];
-    const valid=files.filter(file=>{const error=roomPhotoValidationError(file);if(error){errors.push(error);return false;}return !photos.some(previous=>previous.name===file.name&&previous.size===file.size&&previous.lastModified===file.lastModified);});
-    if(photos.length+valid.length>roomPhotoLimits.maxCount)errors.push('写真は最大4枚です。');
-    if(valid.length)setSamplePhotos([]);
-    setPhotos(previous=>[...previous,...valid].slice(0,roomPhotoLimits.maxCount));setPhotoError([...new Set(errors)].join(' '));
+    const selected=[...photos];
+    const valid:File[]=[];
+    for(const file of files){const error=roomPhotoValidationError(file);if(error){errors.push(error);continue;}
+      if(selected.some(previous=>previous.name===file.name&&previous.size===file.size&&previous.lastModified===file.lastModified))continue;
+      if(selected.length>=roomPhotoLimits.maxCount){errors.push('写真は最大4枚です。');continue;}
+      selected.push(file);valid.push(file);
+    }
+    if(valid.length)setPhotoEntries(previous=>[...previous.map(entry=>entry.sample!==undefined?{...entry,removing:true}:entry),...valid.map(file=>({id:crypto.randomUUID(),file,removing:false}))]);
+    setPhotoError([...new Set(errors)].join(' '));
   }
   function changeStep(index:number) {
-    setStepIndex(index);setPhotoError('');generation.reset();
+    focusStep.current=true;setStepIndex(index);setPhotoDrop(false);setPhotoError('');generation.reset();
   }
   function start(event:FormEvent) {
     event.preventDefault();setNotice('');
@@ -277,40 +306,40 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   return <div className="rc-studio">
     <header className="rc-studio-header"><Link className="rc-back" to="/rooms" aria-label="ルーム一覧に戻る" title="ルーム一覧"><ReferenceSvg page={3} index={0}/></Link><span className="rc-header-divider"/><div className={`rc-title${isNew?' is-new':''}`}><h1>{isNew?'新しいルーム':design.title}</h1>{!isNew&&<button type="button" aria-label="ルーム名を変更" onClick={()=>{setTitle(design.title);setRename(true);}}><ReferenceSvg page={5} index={1}/></button>}</div><AccountMenu onEditLayout={!isNew&&id!=='sample-game'?()=>{setEditing(true);setPanel(true);setBefore(false);}:undefined}/></header>
     <input ref={upload} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden aria-describedby="room-photo-requirements" onChange={event=>{addPhotos(Array.from(event.target.files??[]));event.target.value='';}}/>
-    <div className="rc-workspace">
-      {pending||id==='sample-game'?<RoomGenerating phase={generationPhase} prompt={analysisMode&&(!canCoordinate||generation.variables?.analyzeOnly)?analysisPrompt:isNew?prompt:message||prompt} photos={acceptsPhotos?photos:[]} sample={loadConnection()==='dummy'} dimensions={analysisMode} coordination={canCoordinate&&!generation.variables?.analyzeOnly} onCancel={()=>pending?abort.current?.abort():navigate('/rooms')}/>:<>
+    <div className={`rc-workspace${pending||id==='sample-game'?' is-generating':''}`}>
+      {pending||id==='sample-game'?<RoomGenerating phase={generationPhase} prompt={generation.variables?.analyzeOnly?analysisPrompt:generation.variables?.request??(analysisMode?analysisPrompt:prompt)} photos={acceptsPhotos?photos:[]} sample={loadConnection()==='dummy'} dimensions={analysisMode} coordination={canCoordinate&&!generation.variables?.analyzeOnly} onCancel={()=>{if(pending){abort.current?.abort();generation.reset();setNotice('生成を停止しました。');}else navigate('/rooms');}}/>:<>
         <section className="rc-chat" aria-label="チャット">
           {isNew?<>
-            <div className="rc-messages is-new">{stepIndex>0&&<div className="rc-input-summary">{inputSteps.slice(0,stepIndex).map(step=><p key={step}>{step==='tatami'?`${tatami}畳`:step==='shape'?shapeLabel(shape):step==='photos'?`写真 ${photos.length||samplePhotos.length}枚`:prompt}</p>)}</div>}<Intro step={inputStep} analysis={analysisMode}/></div>
-            <form className="rc-new-composer" onSubmit={start} onDragOver={event=>event.preventDefault()} onDrop={event=>{event.preventDefault();if(inputStep==='photos')addPhotos(Array.from(event.dataTransfer.files));}}>
-              {inputSteps.length>0&&<ol className="rc-input-progress" aria-label="部屋の入力手順">{inputSteps.map((step,index)=><li key={step} aria-current={index===stepIndex?'step':undefined} className={index<stepIndex?'is-complete':''}><span>{index+1}</span>{stepLabels[step]}</li>)}</ol>}
-              {inputStep==='tatami'&&<div className="rc-analysis-settings"><label className="rc-setting" htmlFor="room-tatami">部屋の広さ<span className="rc-tatami-input"><input id="room-tatami" type="number" min={3} max={30} step="0.5" value={Number.isNaN(tatami)?'':tatami} onChange={event=>setTatami(event.target.valueAsNumber)} required/>畳</span></label></div>}
-              {inputStep==='shape'&&<div className="rc-analysis-settings"><fieldset><legend>部屋の形</legend><div className="rc-shape-options">{roomShapes.map(item=><button key={item.value} type="button" aria-pressed={shape===item.value} onClick={()=>setShape(item.value)}>{item.label}</button>)}</div></fieldset></div>}
-              {inputStep==='photos'&&<><div className="rc-photo-heading"><span>部屋の写真{analysisMode&&'（任意）'}</span><span><strong>{photos.length||samplePhotos.length}</strong> / {roomPhotoLimits.maxCount}枚</span></div>
+            <div ref={messages} onScroll={event=>{const node=event.currentTarget;nearBottom.current=node.scrollHeight-node.scrollTop-node.clientHeight<64;}} className="rc-messages is-new">{stepIndex>0&&<div className="rc-input-summary">{inputSteps.slice(0,stepIndex).map(step=><p className="motion-enter" key={step}>{step==='tatami'?`${tatami}畳`:step==='shape'?shapeLabel(shape):step==='photos'?`写真 ${photos.length||samplePhotos.length}枚`:prompt}</p>)}</div>}<Intro key={inputStep} step={inputStep} analysis={analysisMode}/></div>
+            <form ref={composer} className={`rc-new-composer${photoDrop?' is-photo-drop':''}`} onSubmit={start} onDragOver={event=>{event.preventDefault();if(inputStep==='photos'&&event.dataTransfer.types.includes('Files'))setPhotoDrop(true);}} onDragLeave={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null))setPhotoDrop(false);}} onDrop={event=>{event.preventDefault();setPhotoDrop(false);if(inputStep==='photos')addPhotos(Array.from(event.dataTransfer.files));}}>
+              {inputSteps.length>0&&<ol className="rc-input-progress" aria-label="部屋の入力手順">{inputSteps.map((step,index)=><li key={step} aria-current={index===stepIndex?'step':undefined} className={`motion-control${index<stepIndex?' is-complete':''}`}><span>{index+1}</span>{stepLabels[step]}</li>)}</ol>}
+              <div key={inputStep} className="rc-setup-step motion-enter">{inputStep==='tatami'&&<div className="rc-analysis-settings"><label className="rc-setting" htmlFor="room-tatami">部屋の広さ<span className="rc-tatami-input"><input id="room-tatami" type="number" min={3} max={30} step="0.5" value={Number.isNaN(tatami)?'':tatami} onChange={event=>setTatami(event.target.valueAsNumber)} required/>畳</span></label></div>}
+              {inputStep==='shape'&&<div className="rc-analysis-settings"><fieldset><legend>部屋の形</legend><div className="rc-shape-options">{roomShapes.map(item=><button key={item.value} type="button" className="motion-control" aria-pressed={shape===item.value} onClick={()=>setShape(item.value)}>{item.label}</button>)}</div></fieldset></div>}
+              {inputStep==='photos'&&<><div className="rc-photo-heading"><span>部屋の写真{analysisMode&&'（任意）'}</span><span><strong key={photos.length||samplePhotos.length} className="motion-fade">{photos.length||samplePhotos.length}</strong> / {roomPhotoLimits.maxCount}枚</span></div>
               <p id="room-photo-requirements" className="rc-photo-requirements">{roomPhotoRequirements}</p>
-              <div className="rc-photos">{photos.length?photos.map((file,index)=><div className="rc-photo" key={`${file.name}-${file.lastModified}`}><PhotoImage file={file}/><button type="button" className="rc-photo-remove" aria-label={`写真${index+1}を削除`} onClick={()=>setPhotos(old=>old.filter((_,i)=>i!==index))}><ReferenceSvg page={3} index={4}/></button></div>):samplePhotos.map(index=><div className="rc-photo" key={index} aria-label={`サンプル写真${index+1}`}><ReferenceSvg page={3} index={3+index*2}/><button type="button" className="rc-photo-remove" aria-label={`写真${index+1}を削除`} onClick={()=>setSamplePhotos(old=>old.filter(i=>i!==index))}><ReferenceSvg page={3} index={4}/></button></div>)}{(photos.length||samplePhotos.length)<roomPhotoLimits.maxCount&&<button type="button" className="rc-photo-add" aria-label="写真を追加（撮影またはライブラリ）" aria-describedby="room-photo-requirements" onClick={()=>upload.current?.click()}><ReferenceSvg page={3} index={9}/>追加</button>}</div>
+              <div className="rc-photos">{photoEntries.map((entry,index)=><PhotoTile key={entry.id} entry={entry} index={index} onRemove={()=>{focusPhoto.current=true;setPhotoEntries(previous=>previous.map(item=>item.id===entry.id?{...item,removing:true}:item));}} onExit={()=>setPhotoEntries(previous=>previous.filter(item=>item.id!==entry.id))}/>)}{(photos.length||samplePhotos.length)<roomPhotoLimits.maxCount&&<button type="button" className="rc-photo-add" aria-label="写真を追加（撮影またはライブラリ）" aria-describedby="room-photo-requirements" onClick={()=>upload.current?.click()}><ReferenceSvg page={3} index={9}/>追加</button>}</div>
               </>}
-              {inputStep==='request'&&<><div className="rc-presets">{presets.map((item,index)=><button type="button" key={item.label} aria-pressed={preset===index} onClick={()=>{setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</div><div className="rc-request-box"><label className="rc-sr-only" htmlFor="new-request">どんな部屋にしたいか</label><textarea id="new-request" rows={3} placeholder="例：紫色の推し活ルームにしたい" value={prompt} maxLength={2000} onChange={event=>setPrompt(event.target.value)} required/></div></>}
+              {inputStep==='request'&&<><div className="rc-presets">{presets.map((item,index)=><button type="button" className="motion-control" key={item.label} aria-pressed={preset===index} onClick={()=>{setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</div><div className="rc-request-box"><label className="rc-sr-only" htmlFor="new-request">どんな部屋にしたいか</label><textarea id="new-request" rows={3} placeholder="例：紫色の推し活ルームにしたい" value={prompt} maxLength={2000} onChange={event=>setPrompt(event.target.value)} required/></div></>}
               {lastInputStep&&(canCoordinate||loadConnection()==='dummy')&&<CharacterThemePicker value={characterThemeId} onChange={value=>{setCharacterThemeId(value);if(value){setStyle('oshi');if(!prompt.trim())setPrompt('推しグッズを飾れる部屋にしたい。');}}}/>}
               {lastInputStep&&(canCoordinate||loadConnection()==='dummy')&&<RoomPalettePicker value={roomPaletteId} onChange={setRoomPaletteId}/>}
-              <div className="rc-input-actions">{stepIndex>0&&<button type="button" className="rc-secondary" onClick={()=>changeStep(stepIndex-1)}>戻る</button>}<button type="submit" className="rc-primary" disabled={!inputStep}>{!lastInputStep?'次へ':analysisMode?canCoordinate?'部屋を解析する':'部屋を作成する':'コーディネートを始める'}<ReferenceSvg page={3} index={10}/></button></div>
+              </div><div className="rc-input-actions">{stepIndex>0&&<button type="button" className="rc-secondary" onClick={()=>changeStep(stepIndex-1)}>戻る</button>}<button type="submit" className="rc-primary" disabled={!inputStep}>{!lastInputStep?'次へ':analysisMode?canCoordinate?'部屋を解析する':'部屋を作成する':'コーディネートを始める'}<ReferenceSvg page={3} index={10}/></button></div>
 
               <ErrorText error={capability.error}/>
               {photoError&&<p className="rc-error" role="alert">{photoError}</p>}<ErrorText error={generation.error}/>
             </form>
           </>:<>
-            <div className="rc-messages">
-              <div className="rc-user-message">{!design.analysisInput&&<div className="rc-user-photos">{photos.length?photos.map(file=><div key={`${file.name}-${file.lastModified}`}><PhotoImage file={file}/></div>):[3,4,5,6].map(index=><div key={index}><ReferenceSvg page={5} index={index}/></div>)}</div>}<p>{design.kind==='analysis'&&design.analysisInput?`${design.analysisInput.tatami}畳・${shapeLabel(design.analysisInput.shape)}の部屋を3Dで確認したい。`:prompt}</p></div>
-              <div className="rc-assistant"><span className="rc-assistant-icon"><ReferenceSvg page={5} index={7}/></span><div className="rc-assistant-body"><span className="rc-assistant-name">へやいろ</span><span className="rc-complete"><ReferenceSvg page={5} index={8}/>{design.source==='demo'?'サンプル':analyzed?'解析完了':'コーディネート完了'}</span><p>{referenceStory?'今あるベッドとデスクはそのままに、紫をアクセントにした推し活ルームにしました。':roomDescription(design.description)}</p>
+            <div ref={messages} onScroll={event=>{const node=event.currentTarget;nearBottom.current=node.scrollHeight-node.scrollTop-node.clientHeight<64;}} className="rc-messages">
+              <div key={`user-${design.id}`} className="rc-user-message motion-enter">{!design.analysisInput&&<div className="rc-user-photos">{photos.length?photos.map(file=><div key={`${file.name}-${file.size}-${file.lastModified}`}><PhotoImage file={file}/></div>):[3,4,5,6].map(index=><div key={index}><ReferenceSvg page={5} index={index}/></div>)}</div>}<p>{design.kind==='analysis'&&design.analysisInput?`${design.analysisInput.tatami}畳・${shapeLabel(design.analysisInput.shape)}の部屋を3Dで確認したい。`:prompt}</p></div>
+              <div key={`result-${design.id}`} className="rc-assistant motion-enter"><span className="rc-assistant-icon"><ReferenceSvg page={5} index={7}/></span><div className="rc-assistant-body"><span className="rc-assistant-name">へやいろ</span><span className="rc-complete"><ReferenceSvg page={5} index={8}/>{design.source==='demo'?'サンプル':analyzed?'解析完了':'コーディネート完了'}</span><p>{referenceStory?'今あるベッドとデスクはそのままに、紫をアクセントにした推し活ルームにしました。':roomDescription(design.description)}</p>
                 {referenceStory&&<ul className="rc-bullets"><li>壁の上部にLEDテープを回して、夜は紫の間接照明に</li><li>ベッドの足元に、アクスタを飾れるひな壇シェルフ</li><li>ラグ・クッション・ベッドカバーをラベンダー系で統一</li></ul>}
-                {!analyzed&&<div className="rc-summary"><div className="rc-summary-heading"><span>コーディネート案</span><span>{additions.length}アイテム · <span className="rc-money">{money(total)}</span></span></div><div className="rc-summary-actions"><button type="button" className="rc-primary" onClick={()=>{setEditing(false);setPanel(true);}}><ReferenceSvg page={5} index={9}/>アイテム一覧</button><button type="button" className="rc-secondary" onClick={()=>setBefore(old=>!old)}>Before / After</button></div></div>}
+                {!analyzed&&<div className="rc-summary motion-fade"><div className="rc-summary-heading"><span>コーディネート案</span><span>{additions.length}アイテム · <span className="rc-money">{money(total)}</span></span></div><div className="rc-summary-actions"><button type="button" className="rc-primary" onClick={()=>{setEditing(false);setPanel(true);}}><ReferenceSvg page={5} index={9}/>アイテム一覧</button><button type="button" className="rc-secondary" onClick={()=>setBefore(old=>!old)}>Before / After</button></div></div>}
               </div></div>
               {canCoordinate&&!analyzed&&<CharacterThemePicker value={characterThemeId} onChange={setCharacterThemeId}/>}
               {canCoordinate&&!analyzed&&<RoomPalettePicker value={roomPaletteId} onChange={setRoomPaletteId}/>}
-              {canCoordinate&&!analyzed&&<div className="rc-followups">{['もう少し落ち着いた紫に','予算を2万円以内に','グリーンも足したい'].map(text=><button type="button" key={text} onClick={()=>setMessage(text)}>{text}</button>)}</div>}
+              {canCoordinate&&!analyzed&&<div className="rc-followups">{['もう少し落ち着いた紫に','予算を2万円以内に','グリーンも足したい'].map(text=><button type="button" className="motion-control" key={text} onClick={()=>setMessage(text)}>{text}</button>)}</div>}
               {canCoordinate&&analyzed&&<form className="rc-coordinate-form" onSubmit={coordinate}>
                 <FollowupModePicker value={followupMode} onChange={setFollowupMode} canModify={canModify}/>
-                <div className="rc-presets">{presets.map((item,index)=><button type="button" key={item.label} aria-pressed={preset===index} onClick={()=>{setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</div>
+                <div className="rc-presets">{presets.map((item,index)=><button type="button" className="motion-control" key={item.label} aria-pressed={preset===index} onClick={()=>{setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</div>
                 <CharacterThemePicker value={characterThemeId} onChange={value=>{setCharacterThemeId(value);if(value){setStyle('oshi');if(!prompt.trim())setPrompt('推しグッズを飾れる部屋にしたい。');}}}/>
                 <label className="rc-setting" htmlFor="coordinate-request">どんな部屋にしたいか<textarea id="coordinate-request" rows={3} value={prompt} maxLength={500} onChange={event=>setPrompt(event.target.value)} required/></label>
                 <RoomPalettePicker value={roomPaletteId} onChange={setRoomPaletteId}/>
