@@ -8,8 +8,12 @@ class FurnitureOutlinePass extends OutlinePass {
   override dispose() { this.overlay.dispose(); super.dispose(); }
   override render(renderer: THREE.WebGLRenderer, writeBuffer: THREE.WebGLRenderTarget, readBuffer: THREE.WebGLRenderTarget, deltaTime: number, maskActive: boolean) {
     const objects = this.selectedObjects;
+    const shadowUpdates = renderer.shadowMap.autoUpdate;
+    renderer.shadowMap.autoUpdate = false;
+    const nonPhysical: THREE.Object3D[] = [];
     const reflectors: { object: THREE.Object3D; callback: THREE.Object3D['onBeforeRender'] }[] = [];
     this.renderScene.traverse(object => {
+      if (object.userData.nonPhysical && object.visible) { nonPhysical.push(object); object.visible = false; }
       if (!(object as THREE.Object3D & { isReflector?: boolean }).isReflector) return;
       reflectors.push({ object, callback: object.onBeforeRender });
       // Auxiliary depth/mask renders must not refresh a mirror's color texture.
@@ -32,6 +36,8 @@ class FurnitureOutlinePass extends OutlinePass {
       }
     } finally {
       this.selectedObjects = objects;
+      renderer.shadowMap.autoUpdate = shadowUpdates;
+      nonPhysical.forEach(object => { object.visible = true; });
       reflectors.forEach(({ object, callback }) => { object.onBeforeRender = callback; });
     }
   }

@@ -12,10 +12,12 @@ Source: [GitHub issue #75](https://github.com/AtsushiHosaka/zenn_hackathon_5_tak
 ## Implementation decisions
 
 - Detect against visible leaf meshes in each procedural or per-product GLB group. A broad world box eliminates distant pairs; oriented mesh boxes handle rotated and mirrored geometry. Independent leaf meshes preserve empty space between separate table/chair legs. Instanced meshes are included.
+- Surface adornments (covers, rugs, wall decorations, artwork, LED strips and posters) intentionally share host volumes and are excluded from furniture obstruction feedback. Solid lamps and transparent glass objects still participate. Explicitly tagged light halos are excluded from both collision volumes and auxiliary outline masks; their normal rendering remains visible.
+- Include translucent insertion previews and recompute on movement, leave/drop and cancellation.
 - Ignore penetration up to 3 mm to avoid warnings for support contact and numeric rounding. Contact with the floor, a tabletop, or another furniture surface is not an overlap.
 - Recompute after visibility changes, drag/cancel, and asynchronous product-model loading. Render each conflicting group separately through an outline mask, including hidden boundary edges; materials retain their original colors. Thumbnail previews do not run this effect.
-- Complete-room models map actual meshes by explicit node ownership (item ID/name or GLB extras), or unique whole-mesh containment in an oriented metadata box. Regrouping preserves exact world transforms, including reflection/shear. Ambiguous ownership is reported rather than inferred or cropped. Spatial or leaf-only ownership also reports incomplete coverage because it cannot prove that all remaining furniture parts belong to the same owner. Explicitly owned group subtrees provide full coverage.
-- Auxiliary outline depth/mask passes temporarily suppress Reflector callbacks, restoring them immediately afterward. The normal color scene render still refreshes reflections.
+- Complete-room models map actual meshes by explicit node ownership (item ID/name or GLB extras; unique catalog-name/model-filename aliases remain partial), or unique whole-mesh containment in an oriented metadata box. Regrouping preserves exact world transforms, including reflection/shear. Ambiguous ownership is reported rather than inferred or cropped. Spatial or leaf-only ownership also reports incomplete coverage because it cannot prove that all remaining furniture parts belong to the same owner. Explicitly owned group subtrees provide full coverage.
+- Auxiliary outline depth/mask passes temporarily suppress Reflector callbacks and shadow updates, restoring them immediately afterward. The normal color scene render still refreshes reflections.
 
 ## Limits retained explicitly
 
