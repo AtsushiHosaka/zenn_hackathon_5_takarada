@@ -1,4 +1,5 @@
 import { DomainError } from "../../domain/error";
+import { roomPhotoLimits, roomPhotoValidationError } from "../../domain/roomPhoto";
 import { furnitureCategories, isFurnitureAdditions, isFurnitureOperations, isManualFurniture, isRoomItem, isRoomShape } from "../../domain/room";
 import type { GenerateRoomInput, RoomRepository } from "../../domain/roomRepository";
 import type { ApiClient } from "../apiClient";
@@ -198,14 +199,13 @@ async function withPhotoKeys(api: ApiClient, config: RoomApiConfig, body: compon
 }
 
 type PhotoContentType = components["schemas"]["UploadInput"]["uploads"][number]["content_type"];
-const photoContentTypes: readonly PhotoContentType[] = ["image/jpeg", "image/png", "image/webp"];
 
 // sizeは署名に入るのでここで申告した値とPUTする中身が一致していなければならない
 function photoUploadRequest(photos: File[]): components["schemas"]["UploadInput"]["uploads"] {
-  if (photos.length > 4) throw new DomainError("写真は最大4枚です");
+  if (photos.length > roomPhotoLimits.maxCount) throw new DomainError("写真は最大4枚です");
   return photos.map(photo => {
-    if (!photoContentTypes.includes(photo.type as PhotoContentType)) throw new DomainError("写真はJPEG・PNG・WebPを選んでください");
-    if (photo.size === 0 || photo.size > 10 * 1024 * 1024) throw new DomainError("写真は1枚10MB以内にしてください");
+    const error = roomPhotoValidationError(photo);
+    if (error) throw new DomainError(error);
     return { content_type: photo.type as PhotoContentType, size: photo.size };
   });
 }
@@ -223,7 +223,7 @@ function validJobId(value: unknown): value is string | number {
 
 function validateInput(input: GenerateRoomInput) {
   if (input.photos.length < 3 || input.photos.length > 4) throw new DomainError("部屋の写真を3〜4枚選んでください");
-  if (input.photos.some(photo => !["image/jpeg", "image/png", "image/webp"].includes(photo.type) || photo.size > 10 * 1024 * 1024 || photo.size === 0)) throw new DomainError("写真は1枚10MB以内のJPEG・PNG・WebPを選んでください");
+  photoUploadRequest(input.photos);
   if (!input.prompt.trim()) throw new DomainError("どんな部屋にしたいか入力してください");
   if (!Number.isFinite(input.budget) || input.budget < 0) throw new DomainError("予算は0円以上で入力してください");
 }
