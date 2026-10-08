@@ -6,7 +6,7 @@ import ErrorText from '../shared/ErrorText';
 import { downloadShoppingCsv } from './exports';
 import { LAYOUT_GRID_STEP, snapToLayoutGrid } from './layoutGrid';
 import { createFurnitureItem, FURNITURE_DRAG_TYPE, furnitureTemplates } from './furniturePlacement';
-import { getFurniturePlacementBounds, furniturePositionInRoom, snapFurnitureEditPosition } from './roomBounds';
+import { canPlaceOnFurniture, getFurniturePlacementBounds, furniturePositionInRoom, snapFurnitureEditPosition } from './roomBounds';
 import ImageGoodsPalette from './ImageGoodsPalette';
 import './planner.css';
 
@@ -191,7 +191,9 @@ function FurnitureSizeEditor({ item, design, onChange }: { item: RoomItem; desig
   function commit() {
     const size = parseSize(values);
     const resized = { ...item, size };
-    const position = furniturePositionInRoom(resized, item.position, design);
+    const requested = [...item.position] as RoomItem['position'];
+    if (canPlaceOnFurniture(resized)) requested[1] = item.position[1] - item.size[1] / 2 + size[1] / 2;
+    const position = furniturePositionInRoom(resized, requested, design);
     if (!position) {
       setError(size.every(value => Number.isFinite(value) && value > 0) ? 'この寸法と向きでは部屋に収まりません。' : '0より大きい数値を入力してください。');
       return;
@@ -287,7 +289,7 @@ export default function PlannerPanel({ design, selectedId, onSelect, furnitureRe
             const bottom = Number(event.target.value) / 100;
             const bounds = getFurniturePlacementBounds(design);
             if (!Number.isFinite(bottom) || bottom < 0 || bounds.floor + bottom + selected.size[1] > bounds.max[1]) return;
-            changeItem({ position: [selected.position[0], bounds.floor + bottom + selected.size[1] / 2, selected.position[2]] });
+            changeItem({ supportObjectId: undefined, position: [selected.position[0], bounds.floor + bottom + selected.size[1] / 2, selected.position[2]] });
           }} /></label>}
           {selectedProductLink && <a className="rc-furniture-product-link" href={selectedProductLink} target="_blank" rel="noopener noreferrer">商品ページを見る</a>}
           {selected.id.startsWith('manual-') && !completeModel && <>

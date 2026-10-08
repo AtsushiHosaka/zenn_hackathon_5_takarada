@@ -52,6 +52,7 @@ export type RoomItem = {
   name: string;
   category: string;
   existing: boolean;
+  supportObjectId?: string;
   price?: number;
   shop?: string;
   productUrl?: string;
@@ -201,6 +202,7 @@ function isRoomWindow(value: unknown): value is RoomWindow {
 
 export function isRoomItem(value: unknown): value is RoomItem {
   if (!isRecord(value)) return false;
+  if (value.supportObjectId !== undefined && (!nonemptyString(value.supportObjectId) || value.supportObjectId === value.id)) return false;
   if (![value.id, value.name, value.category, value.color].every(nonemptyString) || typeof value.existing !== "boolean") return false;
   if (!finiteVector(value.position) || !finiteVector(value.size) || value.size.some(number => number <= 0)) return false;
   if (value.rotation !== undefined && (typeof value.rotation !== "number" || !Number.isFinite(value.rotation) || value.rotation < 0 || value.rotation >= 360)) return false;
