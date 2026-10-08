@@ -1,81 +1,48 @@
-import * as THREE from 'three';
-import { OBB } from 'three/examples/jsm/math/OBB.js';
-import type { RoomDesign, RoomItem } from '../../domain/room';
 import { furnitureSurfaceHeight } from './roomBounds';
+import type { RoomDesign, RoomItem } from '../../domain/room';
 
-// Ignore contact and sub-3mm placement/mesh rounding. Use each visible mesh's
-// bounding volume, preserving the empty space between separate table/chair legs.
-const CONTACT_TOLERANCE = 0.003;
+const EPSILON = 1e-6;
 const adornments = new Set(['cover', 'bed_cover', 'rug', 'wall_decor', 'artwork', 'led', 'poster']);
-const supportedContact = (item: RoomItem, support: RoomItem, design: RoomDesign) =>
-  item.supportObjectId === support.id && furnitureSurfaceHeight(item, item.position, design) !== null;
-type FurnitureVolume = { id: string; bounds: THREE.Box3; meshes: OBB[] };
-
-function meshVolume(mesh: THREE.Mesh, matrix: THREE.Matrix4): { bounds: THREE.Box3; obb: OBB } | undefined {
-  if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
-  const local = mesh.geometry.boundingBox;
-  if (!local || local.isEmpty()) return;
-  const bounds = local.clone().applyMatrix4(matrix);
-  const basis = [0, 1, 2].map(axis => new THREE.Vector3().setFromMatrixColumn(matrix, axis));
-  if (basis.some(axis => axis.lengthSq() < 1e-12)) return;
-  const scales = basis.map(axis => axis.length());
-  basis.forEach(axis => axis.normalize());
-  const sheared = Math.abs(basis[0].dot(basis[1])) > 1e-5 || Math.abs(basis[0].dot(basis[2])) > 1e-5 || Math.abs(basis[1].dot(basis[2])) > 1e-5;
-  const obb = new OBB().fromBox3(sheared ? bounds : local);
-  if (!sheared) {
-    // Build positive extents explicitly: OBB.applyMatrix4 gives negative extents
-    // for mirrored GLB nodes and does not fully transform a local box center.
-    obb.center.copy(local.getCenter(new THREE.Vector3()).applyMatrix4(matrix));
-    obb.halfSize.multiply(new THREE.Vector3(...scales));
-    obb.rotation.set(
-      basis[0].x, basis[1].x, basis[2].x,
-      basis[0].y, basis[1].y, basis[2].y,
-      basis[0].z, basis[1].z, basis[2].z,
-    );
-  }
-  obb.halfSize.subScalar(CONTACT_TOLERANCE / 2);
-  if (Math.min(obb.halfSize.x, obb.halfSize.y, obb.halfSize.z) <= 0) return;
-  return { bounds, obb };
+export const isFurnitureAdornment = (item: Pick<RoomItem, 'category'>) => adornments.has(item.category);
+const axes = (item: RoomItem) => {
+  const angle = (item.rotation ?? 0) * Math.PI / 180;
+  return [[Math.cos(angle), -Math.sin(angle)], [Math.sin(angle), Math.cos(angle)]] as const;
+};
+function projectedRadius(item: RoomItem, axis: readonly number[]) {
+  const [x, z] = axes(item);
+  return item.size[0] / 2 * Math.abs(x[0] * axis[0] + x[1] * axis[1])
+    + item.size[2] / 2 * Math.abs(z[0] * axis[0] + z[1] * axis[1]);
 }
-
-function furnitureVolume(id: string, group: THREE.Group): FurnitureVolume {
-  const bounds = new THREE.Box3();
-  const meshes: OBB[] = [];
-  group.updateWorldMatrix(true, true);
-  group.traverseVisible(object => {
-    if (!(object instanceof THREE.Mesh) || object.userData.nonPhysical) return;
-    const surfaces = Array.isArray(object.material) ? object.material : [object.material];
-    if (!surfaces.some(surface => surface.visible && surface.opacity > 0 && surface.colorWrite)) return;
-    const add = (matrix: THREE.Matrix4) => {
-      const volume = meshVolume(object, matrix);
-      if (volume) { bounds.union(volume.bounds); meshes.push(volume.obb); }
-    };
-    if (object instanceof THREE.InstancedMesh) {
-      const instance = new THREE.Matrix4();
-      for (let index = 0; index < object.count; index++) {
-        object.getMatrixAt(index, instance);
-        add(new THREE.Matrix4().multiplyMatrices(object.matrixWorld, instance));
-      }
-    } else add(object.matrixWorld);
+function supportedContact(item: RoomItem, support: RoomItem, design: RoomDesign) {
+  return item.supportObjectId === support.id && furnitureSurfaceHeight(item, item.position, design) !== null;
+}
+export function furnitureVolumesOverlap(a: RoomItem, b: RoomItem, design: RoomDesign) {
+  if (adornments.has(a.category) || adornments.has(b.category)) return false;
+  if ([a, b].some(item => item.size.some(value => !Number.isFinite(value) || value <= 0) || item.position.some(value => !Number.isFinite(value)))) return false;
+  if (Math.abs(a.position[1] - b.position[1]) >= (a.size[1] + b.size[1]) / 2 - EPSILON) return false;
+  if (supportedContact(a, b, design) || supportedContact(b, a, design)) return false;
+  return [...axes(a), ...axes(b)].every(axis => {
+    const distance = Math.abs((a.position[0] - b.position[0]) * axis[0] + (a.position[2] - b.position[2]) * axis[1]);
+    return distance < projectedRadius(a, axis) + projectedRadius(b, axis) - EPSILON;
   });
-  return { id, bounds, meshes };
+}
+export function overlappingFurnitureIds(items: RoomItem[], design: RoomDesign, intersects?: (a: RoomItem, b: RoomItem) => boolean): Set<string> {
+  const result = new Set<string>();
+  const current = { ...design, items };
+  for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) {
+    if (furnitureVolumesOverlap(items[i], items[j], current) && (!intersects || intersects(items[i], items[j]))) { result.add(items[i].id); result.add(items[j].id); }
+  }
+  return result;
 }
 
-export function findFurnitureOverlaps(groups: ReadonlyMap<string, THREE.Group>, design?: RoomDesign): Set<string> {
-  const items = new Map(design?.items.map(item => [item.id, item]) ?? []);
-  const volumes = [...groups].filter(([id, group]) => group.visible && !adornments.has(items.get(id)?.category ?? '')).map(([id, group]) => furnitureVolume(id, group));
-  const overlaps = new Set<string>();
-  for (let index = 0; index < volumes.length; index++) {
-    const left = volumes[index];
-    for (const right of volumes.slice(index + 1)) {
-      const firstItem = items.get(left.id), secondItem = items.get(right.id);
-      if (design && firstItem && secondItem && (supportedContact(firstItem, secondItem, design) || supportedContact(secondItem, firstItem, design))) continue;
-      if (!left.bounds.intersectsBox(right.bounds)) continue;
-      if (left.meshes.some(first => right.meshes.some(second => first.intersectsOBB(second)))) {
-        overlaps.add(left.id);
-        overlaps.add(right.id);
-      }
-    }
-  }
-  return overlaps;
+export function furnitureOverlapMessage(items: RoomItem[], overlaps: Set<string>, incomplete: Set<string>): string {
+  const names = (ids: Set<string>) => {
+    const list = items.filter(item => ids.has(item.id));
+    const labels = list.slice(0, 3).map(item => item.name.length > 40 ? `${item.name.slice(0, 40)}…` : item.name);
+    return labels.join('、') + (list.length > 3 ? `、ほか${list.length - 3}点` : '');
+  };
+  return [
+    overlaps.size ? `家具${overlaps.size}点が重なっています：${names(overlaps)}` : '',
+    incomplete.size ? `一部の家具は、重なり判定や赤い輪郭の表示が不完全です：${names(incomplete)}` : '',
+  ].filter(Boolean).join('。');
 }

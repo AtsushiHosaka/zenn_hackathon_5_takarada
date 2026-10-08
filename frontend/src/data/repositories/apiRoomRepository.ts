@@ -1,4 +1,5 @@
 import { characterTheme } from "../../domain/characterTheme";
+import { copyFurniture } from "../../domain/furnitureCopy";
 import { DomainError } from "../../domain/error";
 import { roomPhotoLimits, roomPhotoValidationError } from "../../domain/roomPhoto";
 import { manualFurnitureCategories, imageGoodsCategories, isFurnitureAdditions, isFurnitureOperations, isManualFurniture, isRoomItem, isRoomShape } from "../../domain/room";
@@ -73,7 +74,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
       if (config.contract === "legacy" || !config.generationPath) throw new DomainError("この接続先ではテンプレートから部屋を作成できません");
       const snapshot = structuredClone(template);
       // Newly added manual furniture is already part of this copied base scene.
-      snapshot.items = snapshot.items.map(item => ({...item, id: `template-object-${crypto.randomUUID()}`, existing: true,
+      snapshot.items = copyFurniture(snapshot.items).map(item => ({...item, existing: true,
         marker: undefined, productId: undefined, ecProductId: undefined, replacesObjectId: undefined}));
       const record = toAnalysisRoomRecord(await api.send<unknown>(config.generationPath, {
         method: "POST", body: templateRequest(snapshot), requiresAuth: true, signal,
@@ -127,7 +128,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
             if (input.furnitureOperations !== undefined && (!isFurnitureOperations(input.furnitureOperations) || input.furnitureOperations.length !== existingIds.length || input.furnitureOperations.some(operation => !existingIds.includes(operation.objectId)))) throw new DomainError("各家具について残すか入れ替えるかを選んでください");
             const keptObjectIds = input.furnitureOperations?.filter(operation => operation.action === "keep").map(operation => operation.objectId) ?? input.keptObjectIds ?? [];
             if (!Array.isArray(keptObjectIds) || keptObjectIds.some(id => typeof id !== "string" || !existingIds.includes(id)) || new Set(keptObjectIds).size !== keptObjectIds.length) throw new DomainError("活かす家具の選択が正しくありません");
-            const request: components["schemas"]["CoordinationInput"] = { coordination: { room_palette_id: input.roomPaletteId === undefined ? undefined : toRoomPaletteId(input.roomPaletteId), ...(input.characterThemeId ? { character_theme_id: input.characterThemeId as components["schemas"]["CoordinationInput"]["coordination"]["character_theme_id"] } : {}), prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: edits, ...(input.baseCoordinationId && /^[1-9]\d*$/.test(input.baseCoordinationId) ? { base_coordination_id: Number(input.baseCoordinationId) } : {}), ...(input.furnitureOperations === undefined ? {} : { furniture_operations: input.furnitureOperations.map(operation => ({ object_id: operation.objectId, action: operation.action })) }), ...(input.furnitureAdditions === undefined ? {} : { additions: input.furnitureAdditions }) } };
+            const request: components["schemas"]["CoordinationInput"] = { coordination: { room_palette_id: input.roomPaletteId === undefined ? undefined : toRoomPaletteId(input.roomPaletteId), ...(input.characterThemeId ? { character_theme_id: input.characterThemeId as components["schemas"]["CoordinationInput"]["coordination"]["character_theme_id"] } : {}), prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: edits, ...(input.baseCoordinationId && /^[1-9]\d*$/.test(input.baseCoordinationId) ? { base_coordination_id: Number(input.baseCoordinationId) } : {}), ...(input.furnitureOperations === undefined ? {} : { furniture_operations: input.furnitureOperations.map(operation => ({ object_id: operation.objectId, action: operation.action })) }), ...(input.furnitureAdditions === undefined ? {} : { additions: input.furnitureAdditions.map(({category})=>({category})) }) } };
             input.onProgress?.("coordinating");
             let coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationPath.replace("{id}", String(record.id)), { method: "POST", body: request, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 270_000 }));
             const coordinationId = coordination.id;
@@ -195,7 +196,7 @@ function editedObjects(input: GenerateRoomInput, record: components["schemas"]["
     size: { w: item.size[0], h: item.size[1], d: item.size[2] },
     rotation_y: item.rotation ?? 0,
     color: item.color,
-    ...(item.artwork ? { artwork: { data_url: item.artwork.dataUrl } } : {}),
+    ...(item.artwork && isManualFurniture(item) ? { artwork: { data_url: item.artwork.dataUrl } } : {}),
     ...(isManualFurniture(item) ? { category: item.category as components["schemas"]["FurnitureEdit"]["category"], ...(!item.ecProductId ? { label: item.name } : {}) } : {}),
     ...(item.ecProductId ? { ec_product_id: Number(item.ecProductId) } : {}),
     ...(item.replacementEcProductId ? { replacement_ec_product_id: item.replacementEcProductId } : {}),
@@ -278,7 +279,7 @@ function templateRequest(template: import("../../domain/room").RoomDesign): comp
   const {room,analysisInput} = template;
   if (!room || !analysisInput || template.items.length > 100) throw new DomainError("テンプレートの内容を確認してください");
   return {room: {...analysisInput, template_scene: {
-    room: {width: room.width, depth: room.depth, height: room.height, wall_color: template.wallColor ?? "#F0ECE5", floor_color: room.floorColor, windows: room.windows},
+    room: {width: room.width, depth: room.depth, height: room.height, wall_color: template.wallColor ?? "#F0ECE5", floor_color: template.floorColor ?? room.floorColor, windows: room.windows},
     objects: template.items.map(item => ({id: item.id, source: "existing", category: item.category, label: item.name,
       size: {w: item.size[0], h: item.size[1], d: item.size[2]}, position: {x: item.position[0] + room.width / 2, y: item.position[1] - item.size[1] / 2, z: item.position[2] + room.depth / 2},
       rotation_y: item.rotation ?? 0, color: item.color, model_url: null, slot: null, attach_to: null, item_id: null, marker: null}))
