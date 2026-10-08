@@ -195,12 +195,18 @@ RSpec.configure do |config|
             },
             required: %w[width depth height wall_color floor_color windows]
           },
+          ImageArtwork: {
+            type: :object,
+            properties: { data_url: { type: :string, maxLength: 262144, pattern: "^data:image/png;base64,", description: "最大512pxのPNG画像。透過を保持する", example: "data:image/png;base64,iVBORw0KGgo=" } },
+            required: %w[data_url]
+          },
           SceneObject: {
             type: :object,
             properties: {
               id: { type: :string, example: "bed-1" },
               source: { type: :string, enum: %w[existing suggested], description: "existing: 今ある家具, suggested: AI の追加提案", example: "existing" },
               category: { type: :string, example: "bed" },
+              artwork: { "$ref" => "#/components/schemas/ImageArtwork" },
               label: { type: :string, example: "ベッド" },
               size: { "$ref" => "#/components/schemas/Size" },
               position: { "$ref" => "#/components/schemas/Position" },
@@ -297,7 +303,8 @@ RSpec.configure do |config|
             properties: {
               id: { type: :string, description: "元の家具、この部屋で採用済みの商品、またはmanual-UUID形式の所有家具id", example: "bed-1" },
               label: { type: :string, maxLength: 100, description: "手動で補完した所有家具では必須", example: "今ある椅子" },
-              category: { type: :string, enum: %w[sofa bed desk chair shelf table], description: "手動で補完した所有家具では必須", example: "chair" },
+              category: { type: :string, enum: %w[sofa bed desk chair shelf table poster acrylic_stand], description: "手動で補完した所有家具では必須", example: "chair" },
+              artwork: { "$ref" => "#/components/schemas/ImageArtwork" },
               replacement_ec_product_id: { type: :integer, minimum: 1, description: "手動の所有家具を置き換える購入商品のID。所有家具のec_product_idは変更しない", example: 2 },
               ec_product_id: { type: :integer, minimum: 1, description: "商品検索・インポート結果のID。元の家具と同じカテゴリの商品に限り、商品・モデル情報をサーバー側で復元する", example: 1 },
               position: { "$ref" => "#/components/schemas/Position" },
@@ -426,6 +433,8 @@ RSpec.configure do |config|
               coordination: {
                 type: :object,
                 properties: {
+                  room_palette_id: { type: :string, enum: RoomPalette::CATALOGUE.keys, description: "部屋のカラーテーマ。省略時は従来の配色", example: "warm-ivory" },
+                  character_theme_id: { type: :string, enum: CharacterRoomTheme::CATALOGUE.keys, description: "任意のキャラクターテーマ。画像や公式商品を保証しない", example: "hatsune-miku" },
                   prompt: { type: :string, example: "紫色の推し活ルームにしたい" },
                   budget: { type: :integer, description: "追加・入れ替え商品の予算 (円・送料別)", example: 30_000 },
                   kept_object_ids: { type: :array, items: { type: :string }, description: "活かす家具の id。空なら全部活かす", example: %w[bed-1 desk-1 shelf-1] },
@@ -466,6 +475,7 @@ RSpec.configure do |config|
               id: { type: :integer, example: 1 },
               room_id: { type: :integer, example: 1 },
               status: { type: :string, enum: %w[pending processing done failed], example: "done" },
+              character_theme_id: { type: :string, nullable: true, enum: [ nil, *CharacterRoomTheme::CATALOGUE.keys ], example: "hatsune-miku" },
               prompt: { type: :string, example: "紫色の推し活ルームにしたい" },
               budget: { type: :integer, example: 30_000 },
               kept_object_ids: { type: :array, items: { type: :string }, example: %w[bed-1 desk-1 shelf-1] },
@@ -479,6 +489,7 @@ RSpec.configure do |config|
               after_scene: { allOf: [ { "$ref" => "#/components/schemas/Scene" } ], nullable: true, description: "status が done になると入る" },
               items: { type: :array, items: { "$ref" => "#/components/schemas/CoordinationItem" }, description: "購入リンク一覧。after_scene の suggested と marker で対応する" },
               total_price: { type: :integer, nullable: true, example: 26_840 },
+              room_palette_id: { type: :string, nullable: true, enum: [ nil, *RoomPalette::CATALOGUE.keys ], example: "warm-ivory" },
               planned_by: { type: :string, nullable: true, enum: [ nil, "gemini", "mock" ], description: "gemini: 要望文から AI が商品を選んだ / mock: キーワードでテーマを決めたモック。生成が終わると入る", example: "gemini" },
               base_coordination_id: { type: :integer, nullable: true, description: "追加の指示で作り直したときの前回のコーデ", example: nil },
               error_message: { type: :string, nullable: true, example: nil },

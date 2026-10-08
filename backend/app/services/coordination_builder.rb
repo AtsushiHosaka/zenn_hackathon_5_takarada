@@ -11,6 +11,11 @@ class CoordinationBuilder
   def initialize(coordination)
     @coordination = coordination
     @scene = coordination.input_scene
+    if (palette = RoomPalette.find(coordination.room_palette_id))
+      @scene["room"].merge!("wall_color" => palette.fetch("base"), "floor_color" => palette.fetch("secondary"))
+    elsif (theme = CharacterRoomTheme.find(coordination.character_theme_id))
+      @scene["room"].merge!("wall_color" => theme.fetch("base"), "floor_color" => theme.fetch("secondary"))
+    end
     @scene["objects"].map! do |object|
       edit = coordination.edited_objects.find { |value| value["id"] == object["id"] }
       edit ? object.merge(edit.slice("position", "size", "rotation_y", "color")) : object
@@ -26,7 +31,7 @@ class CoordinationBuilder
     client = FurnitureSelectedProductClient.new(client, selected) if selected.any?
     candidate_limit = GeminiClient.configured?(user_id: @coordination.room.user_id) ? CoordinationPlanner::Gemini::CANDIDATES_PER_GROUP : 3
     floor_candidates = FurnitureOperationPlanner.call(@coordination, @scene, client:, candidate_limit:)
-    plan = CoordinationPlanner.call(prompt: @coordination.prompt, budget: @coordination.budget, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id, client:, additional_candidates: floor_candidates, previous:,
+    plan = CoordinationPlanner.call(prompt: @coordination.generation_prompt, budget: @coordination.budget, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id, client:, additional_candidates: floor_candidates, previous:,
                                     slots: SlotLayout.placeable_slots(@scene["room"], kept))
     removed, kept = kept.partition { |object| plan.removed_object_ids.include?(object["id"]) }
     # 従来の空配列は「全部活かす」。明示操作がある場合は、全置換・全除外も許可する。
@@ -76,20 +81,30 @@ class CoordinationBuilder
     diagnostics = client.respond_to?(:diagnostics) ? client.diagnostics.except("search_entry_point") : {}
 
     Result.new(
-      title: plan.title,
-      comment: [ comment(plan, placed, active, removed), *failures ].join,
+      title: result_title(plan),
+      comment: [ @coordination.character_theme_id ? "#{CharacterRoomTheme.find(@coordination.character_theme_id).fetch('name')}をイメージしたインテリアです。" : nil, comment(plan, placed, active, removed), *failures ].compact.join,
       after_scene: appearance.fetch(:scene),
       items: appearance.fetch(:items),
       total_price: placed.sum { |p| p[:item].price },
       planned_by: plan.planned_by,
       # 精度の確認用: Gemini の回答と、実際に採用した商品
-      analysis: plan.analysis.deep_merge("placed_item_ids" => placed.map { |p| p[:item].id }, "base_coordination_id" => @coordination.base_coordination_id, "budget_adjusted_groups" => @budget_adjusted_groups || [], "meta" => { "product_source" => product_source }, "operation_failures" => failures, "ec_search" => diagnostics, "search_entry_points" => client.respond_to?(:search_entry_points) ? client.search_entry_points : []),
+      analysis: (@coordination.analysis || {}).deep_merge(plan.analysis).deep_merge("placed_item_ids" => placed.map { |p| p[:item].id }, "base_coordination_id" => @coordination.base_coordination_id, "budget_adjusted_groups" => @budget_adjusted_groups || [], "meta" => { "product_source" => product_source }, "operation_failures" => failures, "ec_search" => diagnostics, "search_entry_points" => client.respond_to?(:search_entry_points) ? client.search_entry_points : []),
       kept_object_ids: active.pluck("id"),
       furniture_operations: result_operations(active, removed)
     )
   end
 
   private
+
+  def result_title(plan)
+    if (theme = CharacterRoomTheme.find(@coordination.character_theme_id))
+      theme.fetch("title")
+    elsif plan.planned_by == "mock" && (palette = RoomPalette.find(@coordination.room_palette_id))
+      "#{palette.fetch('name')}の部屋"
+    else
+      plan.title
+    end
+  end
 
   def result_operations(active, removed)
     if @coordination.furniture_operations.empty?

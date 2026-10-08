@@ -1,3 +1,6 @@
+import { roomPalette } from "./roomPalette";
+
+import { characterTheme } from "./characterTheme";
 export type Style = "botanical" | "oshi" | "natural";
 export type RoomShape = "square" | "standard" | "long";
 export const furnitureCategories = ["sofa", "bed", "desk", "chair", "shelf", "table"] as const;
@@ -43,7 +46,17 @@ export type RoomGeometry = {
   windows: RoomWindow[];
 };
 
+export const imageGoodsCategories = ["poster", "acrylic_stand"] as const;
+export type ImageGoodsCategory = typeof imageGoodsCategories[number];
+export type ImageArtwork = { dataUrl: string };
+export const MAX_ARTWORK_DATA_LENGTH = 262144;
+
+export function isImageArtwork(value: unknown): value is ImageArtwork {
+  return isRecord(value) && typeof value.dataUrl === "string" && value.dataUrl.length <= MAX_ARTWORK_DATA_LENGTH && /^data:image\/png;base64,iVBORw0KGgo[A-Za-z0-9+/]*={0,2}$/.test(value.dataUrl);
+}
+
 export type RoomItem = {
+  artwork?: ImageArtwork;
   id: string;
   name: string;
   category: string;
@@ -81,12 +94,14 @@ export function isManualFurniture(item: RoomItem): boolean {
 export type RoomSnapshot = { room: RoomGeometry; items: RoomItem[]; wallColor?: string };
 
 export type RoomDesign = {
+  characterThemeId?: string;
   kind?: "analysis" | "coordination";
   source: "demo" | "api";
   id: string;
   title: string;
   description: string;
   style: Style;
+  roomPaletteId?: string;
   items: RoomItem[];
   modelUrl?: string;
   // modelUrlがある場合、未指定なら家具を含む完成モデルとして扱う。
@@ -115,10 +130,12 @@ export type RoomDesign = {
 // ブラウザに保存されたデータも、復元時には信頼しない。
 export function isRoomDesign(value: unknown): value is RoomDesign {
   if (!isRecord(value)) return false;
+  if (value.characterThemeId !== undefined && !characterTheme(value.characterThemeId)) return false;
   if (value.source !== "demo" && value.source !== "api") return false;
   if (value.kind !== undefined && value.kind !== "analysis" && value.kind !== "coordination") return false;
   if (value.style !== "botanical" && value.style !== "oshi" && value.style !== "natural") return false;
   if (!nonemptyString(value.id) || !nonemptyString(value.title) || !nonemptyString(value.description)) return false;
+  if (value.roomPaletteId !== undefined && !roomPalette(value.roomPaletteId)) return false;
   if (value.modelKind !== undefined && value.modelKind !== "complete" && value.modelKind !== "shell") return false;
   if (value.wallColor !== undefined && (typeof value.wallColor !== "string" || !/^#[0-9a-f]{6}$/i.test(value.wallColor))) return false;
   if (value.room !== undefined && !isRoomGeometry(value.room)) return false;
@@ -201,6 +218,7 @@ export function isRoomItem(value: unknown): value is RoomItem {
   if (value.shop !== undefined && !nonemptyString(value.shop)) return false;
   if (value.productId !== undefined && (typeof value.productId !== "string" || !/^[1-9]\d*$/.test(value.productId))) return false;
   if (value.ecProductId !== undefined && (typeof value.ecProductId !== "string" || !/^[1-9]\d*$/.test(value.ecProductId))) return false;
+  if (value.artwork !== undefined && (!isManualFurniture(value as RoomItem) || !imageGoodsCategories.some(category => category === value.category) || !isImageArtwork(value.artwork))) return false;
   if (value.materialOverrides !== undefined && !isMaterialOverrides(value.materialOverrides)) return false;
   if (value.textureStatus !== undefined && !isTextureStatus(value.textureStatus)) return false;
   if (value.textureSource !== undefined && value.textureSource !== "description") return false;
