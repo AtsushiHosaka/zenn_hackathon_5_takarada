@@ -152,7 +152,7 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean, manager?
         const texture = new THREE.TextureLoader(manager).load(item.artwork.dataUrl);
         texture.colorSpace = THREE.SRGBColorSpace;
         const art = new THREE.Mesh(new THREE.PlaneGeometry(stand ? w : w * .96, stand ? h - baseHeight : h * .96), new THREE.MeshBasicMaterial({
-          map: texture, transparent: stand, alphaTest: stand ? .1 : 0, side: THREE.DoubleSide, toneMapped: false,
+          map: texture, transparent: true, alphaTest: stand ? .1 : 0, side: THREE.DoubleSide, toneMapped: false,
         }));
         art.position.set(0, (h + baseHeight) / 2, stand ? 0 : d / 2 + .0005);
         group.add(art);

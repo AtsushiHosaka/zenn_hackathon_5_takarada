@@ -19,4 +19,4 @@ The backend accepts poster/acrylic_stand as manual categories while leaving furn
 - Existing coordination/room request specs passed: 13 examples, 0 failures, isolated `issue72_checks_test` DB. The existing successful coordination contract now covers both imported categories and artwork in the response.
 - Full backend RuboCop passed.
 - A temporary rolled-back Rails transaction verified mock generation, database reload of both PNG images, elevation/rotation preservation and malformed-art rejection.
-- Browser interaction, rendered transparency, save/reload, and screenshots remain for the root agent's shared browser review. Live Gemini, production and native iOS behavior are unverified.
+- Root browser review used an original transparent geometric image fixture: imported both goods through UI controls, raised the poster, moved the stand, saved, and verified two artworks/positions after reload. Screenshot is in docs/pr-evidence/issue-72/imported-poster-and-stand.png. Transparent poster pixels reveal their backing; stand pixels reveal the room. Live Gemini, production and native iOS behavior are unverified.
