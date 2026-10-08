@@ -1,3 +1,4 @@
+import { remapTemplateItems } from "../../domain/roomTemplate";
 import { characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
 import { roomPhotoLimits, roomPhotoValidationError } from "../../domain/roomPhoto";
@@ -73,7 +74,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
       if (config.contract === "legacy" || !config.generationPath) throw new DomainError("この接続先ではテンプレートから部屋を作成できません");
       const snapshot = structuredClone(template);
       // Newly added manual furniture is already part of this copied base scene.
-      snapshot.items = snapshot.items.map(item => ({...item, id: `template-object-${crypto.randomUUID()}`, existing: true,
+      snapshot.items = remapTemplateItems(snapshot.items).map(item => ({...item, existing: true,
         marker: undefined, productId: undefined, ecProductId: undefined, replacesObjectId: undefined}));
       const record = toAnalysisRoomRecord(await api.send<unknown>(config.generationPath, {
         method: "POST", body: templateRequest(snapshot), requiresAuth: true, signal,
@@ -278,7 +279,7 @@ function templateRequest(template: import("../../domain/room").RoomDesign): comp
   const {room,analysisInput} = template;
   if (!room || !analysisInput || template.items.length > 100) throw new DomainError("テンプレートの内容を確認してください");
   return {room: {...analysisInput, template_scene: {
-    room: {width: room.width, depth: room.depth, height: room.height, wall_color: template.wallColor ?? "#F0ECE5", floor_color: room.floorColor, windows: room.windows},
+    room: {width: room.width, depth: room.depth, height: room.height, wall_color: template.wallColor ?? "#F0ECE5", floor_color: template.floorColor ?? room.floorColor, windows: room.windows},
     objects: template.items.map(item => ({id: item.id, source: "existing", category: item.category, label: item.name,
       size: {w: item.size[0], h: item.size[1], d: item.size[2]}, position: {x: item.position[0] + room.width / 2, y: item.position[1] - item.size[1] / 2, z: item.position[2] + room.depth / 2},
       rotation_y: item.rotation ?? 0, color: item.color, model_url: null, slot: null, attach_to: null, item_id: null, marker: null}))

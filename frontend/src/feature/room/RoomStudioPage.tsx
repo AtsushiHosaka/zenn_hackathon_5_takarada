@@ -150,8 +150,8 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const placementDisabled=before||Boolean(design.modelUrl&&design.modelKind!=='shell');
   const [filter,setFilter]=useState('all');
   const [templateName,setTemplateName]=useState<string|null>(null);
-  const templateDialog=useRef<HTMLDialogElement>(null);
-  useEffect(()=>{if(templateName!==null)templateDialog.current?.showModal();else templateDialog.current?.close();},[templateName]);
+  const templateDialogRef=useRef<HTMLDialogElement>(null);
+  const templateDialog=useMotionDialog(templateDialogRef,templateName!==null,()=>setTemplateName(null));
   const [rename,setRename]=useState(false);
   const [title,setTitle]=useState(design.title);
   const upload=useRef<HTMLInputElement>(null);
@@ -375,8 +375,8 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
     </div>
     {notice&&<div key={notice} className="rc-notice motion-fade" role="status">{notice}<button className="motion-control" type="button" aria-label="通知を閉じる" onClick={()=>setNotice('')}>×</button></div>}
     {rooms.persistenceWarning?.()&&<div className="rc-notice motion-fade" role="alert">{rooms.persistenceWarning()}</div>}
-    {templateWarning&&<div className="rc-notice" role="alert">{templateWarning}</div>}
-    <dialog ref={templateDialog} className="rc-dialog" onCancel={()=>setTemplateName(null)}><form onSubmit={saveAsTemplate}><div className="rc-dialog-heading"><h2>テンプレートに保存</h2><button type="button" aria-label="閉じる" onClick={()=>setTemplateName(null)}>×</button></div><label className="rc-setting">テンプレート名<input value={templateName??''} onChange={event=>setTemplateName(event.target.value)} maxLength={80} required autoFocus/></label><p>現在の配置と色を、このブラウザに保存します。元の部屋は変更しません。</p><button className="rc-primary" type="submit">保存</button></form></dialog>
+    {templateWarning&&<div className="rc-notice motion-fade" role="alert">{templateWarning}</div>}
+    <dialog ref={templateDialogRef} className="rc-dialog motion-dialog motion-presence" data-motion-state={templateDialog.state} tabIndex={-1} aria-labelledby="save-template-title" onKeyDown={templateDialog.onKeyDown} onCancel={templateDialog.onCancel} onClose={templateDialog.onClose} onClick={templateDialog.onClick}><form inert={templateDialog.closing} aria-hidden={templateDialog.closing} onSubmit={saveAsTemplate}><div className="rc-dialog-heading"><h2 id="save-template-title">テンプレートに保存</h2><button type="button" aria-label="閉じる" onClick={()=>setTemplateName(null)}>×</button></div><label className="rc-setting">テンプレート名<input value={templateName??''} onChange={event=>setTemplateName(event.target.value)} maxLength={80} required autoFocus/></label><p>現在の配置と色を、このブラウザに保存します。元の部屋は変更しません。</p><button className="rc-primary" type="submit">保存</button></form></dialog>
     <dialog ref={renameDialogRef} className="rc-dialog motion-dialog motion-presence" data-motion-state={renameDialog.state} tabIndex={-1} aria-labelledby="rename-room-title" onKeyDown={renameDialog.onKeyDown} onCancel={renameDialog.onCancel} onClose={renameDialog.onClose} onClick={renameDialog.onClick}><form inert={renameDialog.closing} aria-hidden={renameDialog.closing} onSubmit={changeTitle}><div className="rc-dialog-heading"><h2 id="rename-room-title">ルーム名を変更</h2><button type="button" aria-label="閉じる" onClick={()=>setRename(false)}>×</button></div><label className="rc-setting">ルーム名<input className="motion-field" value={title} onChange={event=>setTitle(event.target.value)} maxLength={80} required autoFocus/></label><p/><button className="rc-primary" type="submit">保存</button></form></dialog>
   </div>;
 }
