@@ -610,7 +610,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     const savedCamera = cameraState.current?.id === design.id ? cameraState.current : null;
     const referenceRoom = reference ? buildReferenceRoom(scene, design) : null;
     const architecture = design.room
-      ? buildMeasuredRoom(scene, {...design.room, floorColor: design.floorColor ?? design.room.floorColor}, design.wallColor ?? "#f5f1e8")
+      ? buildMeasuredRoom(scene, {...design.room, floorColor: design.floorColor ?? design.room.floorColor}, design.wallColor ?? "#f5f1e8", design.room.floorColor)
       : referenceRoom?.architecture ?? buildRoom(scene, accent, baseRoomBounds, oshi, design.wallColor, design.floorColor);
     if (referenceRoom) cameraBounds.copy(referenceRoom.bounds);
     let proceduralRoomVisible = true;
@@ -686,9 +686,10 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       if (shellFloor) shellFloor.visible = !currentBefore;
       if (floorNotice.current) floorNotice.current.hidden = currentBefore || !shellFloorUnavailable;
       layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel;
-      proceduralRoomVisible = currentBefore || !loadedRoom;
+      const originalShellVisible = Boolean(currentBefore && loadedRoom && !completeRoomModel);
+      proceduralRoomVisible = (currentBefore && !originalShellVisible) || !loadedRoom;
       architecture.visible = proceduralRoomVisible;
-      if (loadedRoom) loadedRoom.visible = !currentBefore;
+      if (loadedRoom) loadedRoom.visible = originalShellVisible || !currentBefore;
       for (const [id, group] of furniture) {
         group.visible = currentBefore ? existingIds.has(id) : !loadedRoom || !completeRoomModel;
         group.traverse(object => { if (object.userData.afterAccent) object.visible = !currentBefore; });
@@ -706,7 +707,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       for (const marker of markers.values()) marker.visible = markersVisible;
       architecture.traverse(object => {
         if (object.userData.afterAccent) object.visible = !currentBefore;
-        if (object instanceof THREE.Mesh) {
+        if (object instanceof THREE.Mesh || object instanceof THREE.Line) {
           for (const surface of Array.isArray(object.material) ? object.material : [object.material]) {
             const original = surface.userData.beforeColor ?? object.userData.beforeColor;
             if (!original || !('color' in surface)) continue;
