@@ -4,6 +4,7 @@ import type { RoomDesign } from '../../domain/room';
 import AccountMenu from './AccountMenu';
 import { useRoomPlans } from './plans';
 import ReferenceSvg from './ReferenceSvg';
+import { roomDescription } from './roomDescription';
 import './room-list.css';
 
 type RoomCard = {
@@ -27,7 +28,7 @@ function savedRoomCard(room: RoomDesign): RoomCard {
   return {
     id: room.id,
     title: room.title,
-    description: room.description,
+    description: roomDescription(room.description),
     image: room.style === 'oshi' ? 5 : room.style === 'botanical' ? 6 : 7,
     count: room.items.filter(item => !item.existing).length,
     updated: '保存済み',
@@ -53,7 +54,6 @@ export default function RoomListPage() {
       <div className="room-list-heading">
         <div className="room-list-intro">
           <h1>マイルーム<span>{rooms.length}</span></h1>
-          <p>部屋の情報と希望から、コーディネートを3Dで確認。</p>
         </div>
         <div className="room-list-actions">
           <div className="room-list-search">
@@ -68,7 +68,6 @@ export default function RoomListPage() {
         <Link to="/rooms/new" className="room-list-new-card">
           <span className="room-list-new-icon"><ReferenceSvg page={2} index={4} /></span>
           <span className="room-list-new-title">新しいルームを作る</span>
-          <span className="room-list-new-description">部屋の情報と、どんな部屋にしたいかを入力します。</span>
         </Link>
         {filtered.map(room => <Link key={room.id} to={`/rooms/${encodeURIComponent(room.id)}`} className="room-list-card" aria-label={`${room.title}${room.id.startsWith('sample-') ? '（サンプル）' : ''}`}>
           <div className={`room-list-scene${room.generating ? ' room-list-generating' : ''}`}>

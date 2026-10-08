@@ -397,9 +397,17 @@ module InteriorLinks
     end
 
     def image_url(product)
-      image = Array(product["image"]).first
-      value = image.is_a?(Hash) ? image["contentUrl"] || image["url"] : image
-      value if value.to_s.start_with?("https://")
+      images = product["image"].is_a?(Array) ? product["image"] : [ product["image"] ]
+      values = images.map { |image| image.is_a?(Hash) ? image["contentUrl"] || image["url"] : image }
+      values << @document.at_css('meta[property="og:image"], meta[name="og:image"]')&.[]("content")
+      values.filter_map do |value|
+        next unless value.is_a?(String) && value.present?
+
+        parsed = URI.join(@url, value)
+        parsed.to_s if parsed.is_a?(URI::HTTPS) && parsed.host.present? && parsed.userinfo.nil?
+      rescue URI::InvalidURIError
+        nil
+      end.first
     end
   end
 end

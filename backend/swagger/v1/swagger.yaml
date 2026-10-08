@@ -142,7 +142,7 @@ paths:
       summary: コーデ提案の生成を始める
       tags:
       - Coordinations
-      description: GET /api/v1/coordinations/{id} で status が done / failed になるまで待つ。本番inline実行ではPOSTも処理完了を待つ。Geminiの設定とownerの利用許可があれば公式EC商品を検索し、配置後に既存モデルの素材テクスチャを生成する。未設定時はモック。furniture_operationsで既存家具のkeep/replace、additionsで最大6点の大型家具追加を指定できる。本人の部屋・提案だけ扱う
+      description: GET /api/v1/coordinations/{id} で status が done / failed になるまで待つ。本番inline実行ではPOSTも処理完了を待つ。Geminiの設定とownerの利用許可があれば公式EC商品を検索し、配置後に既存モデルの素材テクスチャを生成する。未設定時はモック。furniture_operationsで既存家具のkeep/replace/remove、additionsで最大6点の大型家具追加を指定できる。写真で見つからなかった所有家具はedited_objectsにmanual-UUIDのidとlabel/categoryを含める。本人の部屋・提案だけ扱う
       security:
       - bearerAuth: []
       parameters: []
@@ -202,6 +202,39 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/NotFound"
+  "/api/v1/furniture_imports":
+    post:
+      summary: 商品リンクから所有家具の情報を取得する
+      tags:
+      - FurnitureImports
+      description: 対応ショップの商品詳細HTMLを取得・検証する。取得と解析は最大45秒。実商品名・円価格・寸法の根拠を確認できない場合や対応外カテゴリは422。未掲載の寸法は推定軸として明示する。モデルが無い場合はnullを返す。購入提案や予算の合計には追加しない。
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: 商品情報を確認できた
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ImportedFurniture"
+        '401':
+          description: ログインが必要
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Unauthorized"
+        '422':
+          description: 商品を取得・確認できない
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationErrors"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/FurnitureImportInput"
   "/api/v1/furniture_models":
     get:
       summary: 利用できる 3D 家具モデルを一覧で取得する
@@ -832,6 +865,29 @@ components:
         color:
           type: string
           example: "#f2f0eb"
+        ec_product_id:
+          type: integer
+          minimum: 1
+          description: リンクから補完した所有家具のEcProduct ID
+          example: 1
+        price:
+          type: integer
+          minimum: 1
+          description: 所有家具の参考価格。今回の購入商品合計には含めない
+          example: 7990
+        shop:
+          type: string
+          example: IKEA
+        url:
+          type: string
+          example: https://www.ikea.com/jp/ja/p/example-chair-12345678/
+        image_url:
+          type: string
+          nullable: true
+          description: 商品ページに掲載された写真URL
+          example: https://www.ikea.com/jp/ja/images/products/teodores-chair-white__0727344_pe735616_s5.jpg
+        product_metadata:
+          "$ref": "#/components/schemas/ProductMetadata"
         model_url:
           type: string
           nullable: true
@@ -1054,12 +1110,33 @@ components:
       - created_at
     FurnitureEdit:
       type: object
-      description: 編集した家具・商品の配置。元の解析結果は変更しない
+      description: 編集した家具・商品の配置。写真で見つからなかった所有家具はmanual-UUIDのidとlabel/categoryで補完する。元の解析結果は変更しない
       properties:
         id:
           type: string
-          description: 元の家具またはこの部屋で採用済みの商品 id
+          description: 元の家具、この部屋で採用済みの商品、またはmanual-UUID形式の所有家具id
           example: bed-1
+        label:
+          type: string
+          maxLength: 100
+          description: 手動で補完した所有家具では必須
+          example: 今ある椅子
+        category:
+          type: string
+          enum:
+          - sofa
+          - bed
+          - desk
+          - chair
+          - shelf
+          - table
+          description: 手動で補完した所有家具では必須
+          example: chair
+        ec_product_id:
+          type: integer
+          minimum: 1
+          description: 商品リンクのインポート結果のID。商品・モデル情報はサーバー側で復元する
+          example: 1
         position:
           "$ref": "#/components/schemas/Position"
         size:
@@ -1111,6 +1188,94 @@ components:
           example: sofa
       required:
       - category
+    FurnitureImportInput:
+      type: object
+      properties:
+        url:
+          type: string
+          maxLength: 2048
+          description: 対応するショップの商品詳細URL
+          example: https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/
+      required:
+      - url
+    ImportedFurniture:
+      type: object
+      description: 実ページで確認した所有家具。寸法・色・モデルは近似で、推定した軸はproduct_metadataに記録する
+      properties:
+        ec_product_id:
+          type: integer
+          minimum: 1
+          example: 1
+        name:
+          type: string
+          example: ホワイトチェア
+        category:
+          type: string
+          enum:
+          - sofa
+          - bed
+          - desk
+          - chair
+          - shelf
+          - table
+          example: chair
+        color:
+          type: string
+          example: "#f2efe8"
+        size:
+          "$ref": "#/components/schemas/Size"
+        price:
+          type: integer
+          minimum: 1
+          example: 7990
+        shop:
+          type: string
+          example: IKEA
+        url:
+          type: string
+          example: https://www.ikea.com/jp/ja/p/example-chair-12345678/
+        image_url:
+          type: string
+          nullable: true
+          description: 商品ページのJSON-LDまたはog:imageで確認した写真URL。なければnull
+          example: https://www.ikea.com/jp/ja/images/products/teodores-chair-white__0727344_pe735616_s5.jpg
+        product_metadata:
+          "$ref": "#/components/schemas/ProductMetadata"
+        model_url:
+          type: string
+          nullable: true
+          example:
+        model_match:
+          allOf:
+          - "$ref": "#/components/schemas/ModelMatch"
+          nullable: true
+          example:
+        model_size:
+          allOf:
+          - "$ref": "#/components/schemas/Size"
+          nullable: true
+          example:
+        model_fit:
+          type: string
+          enum:
+          - contain
+          -
+          nullable: true
+          example:
+      required:
+      - ec_product_id
+      - name
+      - category
+      - color
+      - size
+      - price
+      - shop
+      - url
+      - product_metadata
+      - model_url
+      - model_match
+      - model_size
+      - model_fit
     MaterialOverride:
       type: object
       properties:

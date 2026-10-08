@@ -1,6 +1,6 @@
 import { DomainError } from "../../domain/error";
 import type { RoomDesign, RoomItem, Style } from "../../domain/room";
-import { isRoomShape } from "../../domain/room";
+import { isManualFurniture, isRoomShape } from "../../domain/room";
 import type { RoomRepository } from "../../domain/roomRepository";
 import { toAnalyzedRoomDesign } from "../records/room";
 import { demoProductReference } from "./demoProductReferences";
@@ -32,7 +32,7 @@ export function createDemoRoom(style: Style = "oshi", budget = Infinity): RoomDe
     id: `demo-${style}-${Number.isFinite(budget) ? budget : "all"}`,
     source: "demo",
     title: palette.title,
-    description: `${palette.description} 商品情報は2026年10月5日時点の参考値です。3Dの形・色・寸法・数量は近似で、商品の再現ではありません。`,
+    description: palette.description,
     style,
     items: items.filter(item => {
       if (item.existing) return true;
@@ -46,6 +46,9 @@ export function createDemoRoom(style: Style = "oshi", budget = Infinity): RoomDe
 export function createDummyRoomRepository(): RoomRepository {
   return {
     demo: createDemoRoom,
+    async importFurniture() {
+      throw new DomainError("商品リンクからの追加にはAPI接続が必要です。接続設定をAPIに切り替えてください。");
+    },
     analyze: (input, signal) => createDummyRoomRepository().generate(input, signal),
     async capabilities() {
       return { generation: true, coordination: false, input: "dimensions", photos: false, message: "オフラインモックでは畳数と形から部屋の寸法とベッド・デスク・本棚を表示します。写真・希望・スタイルの解析と、商品生成は行いません。商品付きの提案はAPI接続で確認できます。" };
@@ -57,12 +60,12 @@ export function createDummyRoomRepository(): RoomRepository {
       const design = toAnalyzedRoomDesign(createAnalyzedRoomFixture(input.tatami, input.shape), "");
       return {
         ...design,
-        items: design.items.map(item => input.editedItems?.find(edited => edited.id === item.id) ?? item),
+        items: [...design.items.map(item => input.editedItems?.find(edited => edited.id === item.id) ?? item), ...(input.editedItems ?? []).filter(isManualFurniture)],
         editedItems: input.editedItems,
         source: "demo",
         id: `demo-analysis-${input.tatami}-${input.shape}`,
         backendRoomId: undefined,
-        description: "畳数と部屋の形から寸法とベッド・デスク・本棚を配置したモックです。写真・希望・スタイルの解析と、商品生成は行っていません。",
+        description: `${input.tatami}畳の部屋を作成しました。`,
       };
     },
   };

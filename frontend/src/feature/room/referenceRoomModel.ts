@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import type { RoomDesign } from "../../domain/room";
+import { REFERENCE_FLOOR_BOUNDS } from './roomBounds';
 
 // The supplied isometric drawing is reconstructed as editable 3D geometry.
 // Face colors are unlit so the reference palette survives camera changes.
@@ -203,10 +204,9 @@ export function buildReferenceRoom(scene: THREE.Scene, design: RoomDesign): { ar
     group.rotation.y = THREE.MathUtils.degToRad(item.rotation ?? 0);
     group.scale.set(...item.size.map((value, index) => value / anchor.size[index]) as [number, number, number]);
   }
-  const floor = boxes[0];
   const floorBounds = new THREE.Box3(
-    new THREE.Vector3(floor.position[0] - floor.size[0] / 2, 0, floor.position[2] - floor.size[2] / 2),
-    new THREE.Vector3(floor.position[0] + floor.size[0] / 2, 0, floor.position[2] + floor.size[2] / 2),
+    new THREE.Vector3(...REFERENCE_FLOOR_BOUNDS.min),
+    new THREE.Vector3(...REFERENCE_FLOOR_BOUNDS.max),
   );
   return { architecture, furniture, floorBounds, bounds: new THREE.Box3(new THREE.Vector3(-3.856, -.52, -3.856), new THREE.Vector3(3.656, 2.6, 3.656)) };
 }
