@@ -10,6 +10,10 @@ class WholeObjectOutlinePass extends OutlinePass {
   override render(renderer: THREE.WebGLRenderer, write: THREE.WebGLRenderTarget, read: THREE.WebGLRenderTarget, delta: number, mask: boolean) {
     const autoUpdate = renderer.shadowMap.autoUpdate;
     renderer.shadowMap.autoUpdate = false;
+    const nonPhysical: THREE.Object3D[] = [];
+    this.renderScene.traverse(object => {
+      if (object.userData.nonPhysical && object.visible) { nonPhysical.push(object); object.visible = false; }
+    });
     try {
       for (const target of this.targets) {
         this.selectedObjects = target;
@@ -18,6 +22,7 @@ class WholeObjectOutlinePass extends OutlinePass {
     } finally {
       this.selectedObjects = [];
       renderer.shadowMap.autoUpdate = autoUpdate;
+      nonPhysical.forEach(object => { object.visible = true; });
     }
   }
 }
@@ -96,8 +101,12 @@ export function completeFurnitureMeshes(root: THREE.Object3D, items: RoomItem[])
   const ambiguous = new Set<string>();
   root.updateWorldMatrix(true, true);
   const names = (item: RoomItem) => {
-    const modelName = item.modelUrl ? new URL(item.modelUrl).pathname.split('/').pop()?.replace(/\.glb$/i, '') : undefined;
-    return [item.id, THREE.PropertyBinding.sanitizeNodeName(item.id), THREE.PropertyBinding.sanitizeNodeName(item.name), modelName].filter(Boolean);
+    let modelName: string | undefined;
+    if (item.modelUrl) {
+      try { modelName = decodeURIComponent(new URL(item.modelUrl).pathname.split('/').pop() ?? '').replace(/\.glb$/i, ''); }
+      catch { /* Invalid URLs are handled by the model loader. */ }
+    }
+    return [item.id, THREE.PropertyBinding.sanitizeNodeName(item.id), THREE.PropertyBinding.sanitizeNodeName(item.name), modelName && THREE.PropertyBinding.sanitizeNodeName(modelName)].filter(Boolean);
   };
   const contains = (mesh: THREE.Mesh, item: RoomItem) => {
     mesh.geometry.computeBoundingBox();
@@ -113,15 +122,20 @@ export function completeFurnitureMeshes(root: THREE.Object3D, items: RoomItem[])
   root.traverseVisible(object => {
     if (!(object instanceof THREE.Mesh)) return;
     let explicit: RoomItem | undefined;
+    // Authoritative ancestor IDs win over a descendant's catalog-name alias.
     for (let ancestor: THREE.Object3D | null = object; ancestor && ancestor !== root.parent; ancestor = ancestor.parent) {
-      const identity = ancestor.userData.itemId ?? ancestor.userData.object_id ?? ancestor.userData.item_id;
-      const ids = identity === undefined || identity === null ? [] : items.filter(item => item.id === String(identity));
-      const matches = ids.length ? ids : items.filter(item => names(item).includes(ancestor.name));
-      if (matches.length === 1) {
-        explicit = matches[0];
-        if (!(ancestor instanceof THREE.Mesh)) wholeSubtrees.add(explicit.id);
+      const identity = ancestor.userData.itemId ?? ancestor.userData.object_id ?? ancestor.userData.item_id ?? ancestor.name;
+      const owner = items.find(item => item.id === String(identity));
+      if (owner) {
+        explicit = owner;
+        if (!(ancestor instanceof THREE.Mesh)) wholeSubtrees.add(owner.id);
         break;
       }
+    }
+    if (!explicit) for (let ancestor: THREE.Object3D | null = object; ancestor && ancestor !== root.parent; ancestor = ancestor.parent) {
+      const matches = items.filter(item => names(item).includes(ancestor.name));
+      if (matches.length === 1) { explicit = matches[0]; break; }
+      if (matches.length > 1) { matches.forEach(item => ambiguous.add(item.id)); break; }
     }
     const candidates = explicit ? [explicit] : items.filter(item => contains(object, item));
     if (candidates.length > 1) candidates.forEach(item => ambiguous.add(item.id));
