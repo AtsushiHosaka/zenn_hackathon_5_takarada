@@ -1,0 +1,14 @@
+[
+  {
+    "query": "椅子",
+    "category": null,
+    "color": null,
+    "result": [
+      "chair",
+      "chair",
+      "bed",
+      "table"
+    ],
+    "discovery_categories": []
+  }
+]
