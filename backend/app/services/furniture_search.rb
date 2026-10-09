@@ -6,9 +6,9 @@ class FurnitureSearch
   Result = Data.define(:products, :color, :failures, :search_entry_points)
   CATEGORIES = (InteriorLinks::ProductParser::CATEGORY_RULES.map(&:first) + [ "small_plant" ]).uniq.freeze
   QUERY_CATEGORY_NAMES = {
-    "sofa" => /\b(?:sofas?|couches?)\b/i, "bed" => /\bbeds?\b/i,
+    "sofa" => /\b(?:sofas?|couch(?:es)?)\b/i, "bed" => /\bbeds?\b/i,
     "desk" => /\bdesks?\b/i, "chair" => /\b(?:chairs?|stools?)\b/i,
-    "shelf" => /\b(?:shelf|shelves|bookcases?|bookshelves?)\b/i,
+    "shelf" => /\b(?:shelf|shelves|bookcases?|bookshelf|bookshelves)\b/i,
     "table" => /\btables?\b/i
   }.freeze
   class Error < StandardError; end
@@ -44,14 +44,15 @@ class FurnitureSearch
     text = query.unicode_normalize(:nfkc).strip
     rules = InteriorLinks::ProductParser::CATEGORY_RULES.map { |value, _, pattern| [ value, pattern ] } + QUERY_CATEGORY_NAMES.to_a
     matches = rules.filter_map do |value, pattern|
-      match = pattern.match(text)
-      [ value, match ] if match
+      [ value, pattern ] if pattern.match?(text)
     end
     categories = matches.map(&:first).uniq
     # Constrain simple searches such as "white chair" or "白い椅子". A noun
     # used as context ("chair cushion", "机に合わせる収納") must not narrow
     # the request to that noun. Ambiguous prose retains the broad search.
-    categories.length == 1 && matches.any? { |_, match| match.post_match.empty? } ? categories : []
+    # Anchor before matching so alternatives such as ソファ|ソファー can
+    # backtrack to the complete terminal noun instead of stopping early.
+    categories.length == 1 && matches.any? { |_, pattern| Regexp.new("(?:#{pattern.source})\\z", pattern.options).match?(text) } ? categories : []
   end
   private_class_method :requested_categories
 end
