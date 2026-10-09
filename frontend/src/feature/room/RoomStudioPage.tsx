@@ -16,6 +16,7 @@ import RecommendationPanel from './RecommendationPanel';
 import RoomGenerating from './RoomGenerating';
 import RoomPalettePicker from './RoomPalettePicker';
 import { defaultRoomPaletteId } from '../../domain/roomPalette';
+import { suggestedRoomPaletteId } from '../../domain/roomPaletteSuggestions';
 import PlannerPanel, { type PlannerView } from './PlannerPanel';
 import { furniturePositionInRoom, getFurniturePlacementBounds, furnitureSurfaceHeight, snapFurnitureEditPosition } from './roomBounds';
 import { roomDescription } from './roomDescription';
@@ -61,10 +62,10 @@ function PhotoTile({entry,index,onRemove,onExit}:{entry:PhotoEntry;index:number;
   </div>;
 }
 type InputStep = 'tatami' | 'shape' | 'photos' | 'request';
-const stepLabels: Record<InputStep,string> = {tatami:'広さ',shape:'形',photos:'写真',request:'希望'};
+const stepLabels: Record<InputStep,string> = {tatami:'広さ',shape:'形',photos:'写真',request:'雰囲気'};
 function Intro({step,analysis}:{step:InputStep|undefined;analysis:boolean}) {
   return <div className="rc-assistant motion-enter"><span className="rc-assistant-icon"><ReferenceSvg page={3} index={2}/></span><div className="rc-assistant-body" aria-live="polite"><span className="rc-assistant-name">へやいろ</span>
-    {step==='tatami'?<p>お部屋は何畳くらいですか？</p>:step==='shape'?<p>お部屋の形を教えてください。</p>:step==='photos'?<p>{analysis?'お部屋の写真はありますか？':'お部屋の写真を追加してください。'}</p>:step==='request'?<p>どんなお部屋にしたいですか？</p>:<p>入力できる項目を確認しています。</p>}
+    {step==='tatami'?<p>お部屋は何畳くらいですか？</p>:step==='shape'?<p>お部屋の形を教えてください。</p>:step==='photos'?<p>{analysis?'お部屋の写真はありますか？':'お部屋の写真を追加してください。'}</p>:step==='request'?<p>どんな雰囲気のお部屋にしたいですか？</p>:<p>入力できる項目を確認しています。</p>}
   </div></div>;
 }
 type FollowupMode = 'current' | 'new';
@@ -129,7 +130,8 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const [style,setStyle]=useState<Style>(isNew?'oshi':design.style);
   const [preset,setPreset]=useState<number|null>(null);
   const [stepIndex,setStepIndex]=useState(0);
-  const inputSteps: InputStep[]=capability.data?(analysisMode?['tatami','shape',...(acceptsPhotos?['photos' as const]:[])]:[...(acceptsPhotos?['photos' as const]:[]),...(canCoordinate?['request' as const]:[])]):[];
+  const wantsPalette=canCoordinate||loadConnection()==='dummy';
+  const inputSteps: InputStep[]=capability.data?[...(wantsPalette?['request' as const]:[]),...(analysisMode?['tatami' as const,'shape' as const]:[]),...(acceptsPhotos?['photos' as const]:[])]:[];
   const inputStep=inputSteps[stepIndex];
   const lastInputStep=stepIndex===inputSteps.length-1;
   const [photoEntries,setPhotoEntries]=useState<PhotoEntry[]>(()=>{const files=inputState?.photos?.filter(file=>file instanceof File)??[];return files.length?files.map(file=>({id:crypto.randomUUID(),file,removing:false})):loadConnection()==='dummy'?[0,1,2].map(sample=>({id:`sample-${sample}`,sample,removing:false})):[];});
@@ -197,7 +199,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
         ? design.backendRoomId??(loadConnection()==='dummy'&&design.id.startsWith('dummy-room-')?design.id:undefined)
         : undefined;
       const useCurrentFurniture=selectsFurniture&&!createNew;
-      const input={characterThemeId,roomPaletteId,onProgress:(phase:RoomGenerationPhase)=>{if(!controller.signal.aborted)setGenerationPhase(phase);},baseCoordinationId,photos:createNew?[]:photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId,keptObjectIds:useCurrentFurniture?existingFurniture.filter(item=>(furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep')==='keep').map(item=>item.id):undefined,furnitureOperations:useCurrentFurniture?existingFurniture.map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'})):undefined,furnitureAdditions:useCurrentFurniture?furnitureAdditions:undefined,editedItems:useCurrentFurniture?[...new Map([...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))].map(item=>{const original=existingFurniture.find(value=>value.id===item.id);return [item.id,original&&isManualFurniture(original)&&!item.existing?{...original,position:item.position,size:item.size,rotation:item.rotation,color:item.color,replacementEcProductId:Number(item.ecProductId)}:item] as const;})).values()]:undefined};
+      const input={characterThemeId,roomPaletteId:suggestedRoomPaletteId(request,roomPaletteId)??roomPaletteId,onProgress:(phase:RoomGenerationPhase)=>{if(!controller.signal.aborted)setGenerationPhase(phase);},baseCoordinationId,photos:createNew?[]:photos,prompt:request,style:targetStyle??style,budget,tatami,shape,roomId,keptObjectIds:useCurrentFurniture?existingFurniture.filter(item=>(furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep')==='keep').map(item=>item.id):undefined,furnitureOperations:useCurrentFurniture?existingFurniture.map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'})):undefined,furnitureAdditions:useCurrentFurniture?furnitureAdditions:undefined,editedItems:useCurrentFurniture?[...new Map([...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))].map(item=>{const original=existingFurniture.find(value=>value.id===item.id);return [item.id,original&&isManualFurniture(original)&&!item.existing?{...original,position:item.position,size:item.size,rotation:item.rotation,color:item.color,replacementEcProductId:Number(item.ecProductId)}:item] as const;})).values()]:undefined};
       const result=await (analyzeOnly?rooms.analyze(input,controller.signal):rooms.generate(input,controller.signal));
       if(controller.signal.aborted||tokenStore.load()!==token) throw new DomainError("ログイン状態が変わりました。もう一度お試しください。");
       return result;
@@ -206,7 +208,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
       const editedItems=(variables.createNew?[]:design.editedItems??[]).filter(item=>item.existing||result.items.some(current=>current.id===item.id));
       const references=new Map((variables.createNew?[]:existingFurniture).filter(item=>item.referenceImage||item.artwork).map(item=>[item.id,{referenceImage:item.referenceImage,artwork:item.artwork}]));
       const preserveReference=(item:RoomItem):RoomItem=>references.has(item.id)&&(isManualFurniture(item)||isTemplateFurniture(item))?{...item,...references.get(item.id)}:item;
-      const saved={...result,items:result.items.map(preserveReference),...(result.before?{before:{...result.before,items:result.before.items.map(preserveReference)}}:{}),characterThemeId:result.characterThemeId??characterThemeId,roomPaletteId:result.roomPaletteId??roomPaletteId,...(!variables.analyzeOnly&&editedItems.length?{editedItems}:{}),...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request.trim()||undefined,budget:variables.budget}:{}),id:result.id};
+      const saved={...result,items:result.items.map(preserveReference),...(result.before?{before:{...result.before,items:result.before.items.map(preserveReference)}}:{}),characterThemeId:result.characterThemeId??characterThemeId,roomPaletteId:result.roomPaletteId??suggestedRoomPaletteId(variables.request,roomPaletteId)??roomPaletteId,...(!variables.analyzeOnly&&editedItems.length?{editedItems}:{}),...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request.trim()||undefined,budget:variables.budget}:{}),id:result.id};
       let storageNotice: string|undefined;
       try {saveRoomPlan(client,saved,scope);}catch{client.setQueryData(roomPlanKeys.detail(saved.id),saved);if(!rooms.persistenceWarning?.()){storageNotice='ブラウザに保存できませんでした。保存容量を確認してください。';setNotice(storageNotice);}}
       setSavedFingerprint(JSON.stringify(saved));setHistory({past:[],future:[]});
@@ -240,15 +242,17 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   function start(event:FormEvent) {
     event.preventDefault();setNotice('');
     if(!capability.data||!inputStep)return;
+    if(inputStep==='request'&&!prompt.trim()){setPhotoError('作りたい部屋の雰囲気を入力してください。');return;}
+    if(inputStep==='request'&&prompt.length>(analysisMode?500:2000)){setPhotoError(`雰囲気は${analysisMode?500:2000}文字以内で入力してください。`);return;}
     if(inputStep==='tatami'&&(!Number.isFinite(tatami)||tatami<3||tatami>30)){setPhotoError('部屋の広さは3〜30畳で入力してください。');return;}
     if(inputStep==='photos'&&!analysisMode&&photos.length<3&&samplePhotos.length<3){setPhotoError('部屋の写真を3〜4枚追加してください。');return;}
     if(!lastInputStep){changeStep(stepIndex+1);return;}
     if(!capability.data.generation){setPhotoError(capability.data.message);return;}
     if(analysisMode){
-      if(!Number.isFinite(tatami)||tatami<3||tatami>30){changeStep(0);setPhotoError('部屋の広さは3〜30畳で入力してください。');return;}
-      setPhotoError('');generation.mutate({request:canCoordinate?prompt.trim():analysisPrompt,budget,analyzeOnly:canCoordinate});return;
+      if(!Number.isFinite(tatami)||tatami<3||tatami>30){changeStep(inputSteps.indexOf('tatami'));setPhotoError('部屋の広さは3〜30畳で入力してください。');return;}
+      setPhotoError('');generation.mutate({request:wantsPalette?prompt.trim():analysisPrompt,budget,analyzeOnly:canCoordinate});return;
     }
-    if(!prompt.trim()){setPhotoError('どんな部屋にしたいかを入力してください。');return;}
+    if(!prompt.trim()){setPhotoError('作りたい部屋の雰囲気を入力してください。');return;}
     setPhotoError('');generation.mutate({request:prompt.trim(),budget:100000});
   }
   function followup(event:FormEvent) {
@@ -261,7 +265,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   function coordinate(event:FormEvent) {
     event.preventDefault();
     if(!requireOwner())return;
-    if(!prompt.trim()){setPhotoError('どんな部屋にしたいかを入力してください。');return;}
+    if(!prompt.trim()){setPhotoError('作りたい部屋の雰囲気を入力してください。');return;}
     if(!Number.isSafeInteger(budget)||budget<=0){setPhotoError('予算は1円以上の整数で入力してください。');return;}
     setPhotoError('');generation.mutate({request:prompt.trim(),budget,createNew:followupMode==='new'});
   }
@@ -357,9 +361,9 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
               <p id="room-photo-requirements" className="rc-photo-requirements">{roomPhotoRequirements}</p>
               <div className="rc-photos">{photoEntries.map((entry,index)=><PhotoTile key={entry.id} entry={entry} index={index} onRemove={()=>{focusPhoto.current=true;setPhotoEntries(previous=>previous.map(item=>item.id===entry.id?{...item,removing:true}:item));}} onExit={()=>setPhotoEntries(previous=>previous.filter(item=>item.id!==entry.id))}/>)}{(photos.length||samplePhotos.length)<roomPhotoLimits.maxCount&&<button type="button" className="rc-photo-add" aria-label="写真を追加（撮影またはライブラリ）" aria-describedby="room-photo-requirements" onClick={()=>upload.current?.click()}><ReferenceSvg page={3} index={9}/>追加</button>}</div>
               </>}
-              {inputStep==='request'&&<><div className="rc-presets">{presets.map((item,index)=><button type="button" className="motion-control" key={item.label} aria-pressed={preset===index} onClick={()=>{setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</div><div className="rc-request-box"><label className="rc-sr-only" htmlFor="new-request">どんな部屋にしたいか</label><textarea id="new-request" rows={3} placeholder="例：紫色の推し活ルームにしたい" value={prompt} maxLength={2000} onChange={event=>setPrompt(event.target.value)} required/></div></>}
-              {lastInputStep&&(canCoordinate||loadConnection()==='dummy')&&<CharacterThemePicker value={characterThemeId} onChange={value=>{setCharacterThemeId(value);if(value){setStyle('oshi');if(!prompt.trim())setPrompt('推しグッズを飾れる部屋にしたい。');}}}/>}
-              {lastInputStep&&(canCoordinate||loadConnection()==='dummy')&&<RoomPalettePicker value={roomPaletteId} onChange={setRoomPaletteId}/>}
+              {inputStep==='request'&&<><div className="rc-presets">{presets.map((item,index)=><button type="button" className="motion-control" key={item.label} aria-pressed={preset===index} onClick={()=>{setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</div><div className="rc-request-box"><label className="rc-sr-only" htmlFor="new-request">作りたい部屋の雰囲気</label><textarea id="new-request" rows={3} placeholder="例：木の温もりを感じる、落ち着いた部屋にしたい" value={prompt} maxLength={analysisMode?500:2000} onChange={event=>setPrompt(event.target.value)} required/></div></>}
+              {inputStep==='request'&&<RoomPalettePicker atmosphere={prompt} value={roomPaletteId} onChange={setRoomPaletteId}/>}
+              {inputStep==='request'&&prompt.trim()&&<CharacterThemePicker value={characterThemeId} onChange={value=>{setCharacterThemeId(value);if(value)setStyle('oshi');}}/>}
               </div><div className="rc-input-actions">{stepIndex>0&&<button type="button" className="rc-secondary" onClick={()=>changeStep(stepIndex-1)}>戻る</button>}<button type="submit" className="rc-primary" disabled={!inputStep}>{!lastInputStep?'次へ':analysisMode?canCoordinate?'部屋を解析する':'部屋を作成する':'コーディネートを始める'}<ReferenceSvg page={3} index={10}/></button></div>
 
               <ErrorText error={capability.error}/>
@@ -373,14 +377,13 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
                 {!analyzed&&<div className="rc-summary motion-fade"><div className="rc-summary-heading"><span>コーディネート案</span><span>{additions.length}アイテム · <span className="rc-money">{money(total)}</span></span></div><div className="rc-summary-actions"><button type="button" className="rc-primary" onClick={()=>{setEditing(false);setFocusPanel(true);setPanel(true);}}><ReferenceSvg page={5} index={9}/>アイテム一覧</button><button type="button" className="rc-secondary" onClick={()=>setBefore(old=>!old)}>Before / After</button></div></div>}
               </div></div>
               {canCoordinate&&!analyzed&&<CharacterThemePicker value={characterThemeId} onChange={setCharacterThemeId}/>}
-              {canCoordinate&&!analyzed&&<RoomPalettePicker value={roomPaletteId} onChange={setRoomPaletteId}/>}
               {canCoordinate&&!analyzed&&<div className="rc-followups">{['もう少し落ち着いた紫に','予算を2万円以内に','グリーンも足したい'].map(text=><button type="button" className="motion-control" key={text} onClick={()=>setMessage(text)}>{text}</button>)}</div>}
               {canCoordinate&&analyzed&&<form className="rc-coordinate-form" onSubmit={coordinate}>
                 <FollowupModePicker value={followupMode} onChange={setFollowupMode} canModify={canModify}/>
                 <div className="rc-presets">{presets.map((item,index)=><button type="button" className="motion-control" key={item.label} aria-pressed={preset===index} onClick={()=>{setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</div>
-                <CharacterThemePicker value={characterThemeId} onChange={value=>{setCharacterThemeId(value);if(value){setStyle('oshi');if(!prompt.trim())setPrompt('推しグッズを飾れる部屋にしたい。');}}}/>
-                <label className="rc-setting" htmlFor="coordinate-request">どんな部屋にしたいか<textarea id="coordinate-request" rows={3} value={prompt} maxLength={500} onChange={event=>setPrompt(event.target.value)} required/></label>
-                <RoomPalettePicker value={roomPaletteId} onChange={setRoomPaletteId}/>
+                <label className="rc-setting" htmlFor="coordinate-request">作りたい部屋の雰囲気<textarea id="coordinate-request" rows={3} value={prompt} maxLength={500} onChange={event=>setPrompt(event.target.value)} required/></label>
+                <RoomPalettePicker atmosphere={prompt} value={roomPaletteId} onChange={setRoomPaletteId}/>
+                {prompt.trim()&&<CharacterThemePicker value={characterThemeId} onChange={value=>{setCharacterThemeId(value);if(value)setStyle('oshi');}}/>}
                 <label className="rc-setting" htmlFor="coordinate-budget">入れ替え・追加商品の予算（送料別）<span className="rc-tatami-input"><input id="coordinate-budget" type="number" min={1} step={1} value={Number.isNaN(budget)?'':budget} onChange={event=>setBudget(event.target.valueAsNumber)} required/>円</span></label>
                 <button type="submit" className="rc-primary" >この家具でコーディネート</button>
 
@@ -388,7 +391,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
               </form>}
               <ErrorText error={generation.error}/>
             </div>
-            {canCoordinate&&analyzed?null:canCoordinate?<form className="rc-followup-composer" onSubmit={followup}><FollowupModePicker value={followupMode} onChange={setFollowupMode} canModify={canModify}/><div className="rc-followup-input">{!analysisMode&&<button type="button" aria-label="写真を追加" onClick={()=>upload.current?.click()}><ReferenceSvg page={5} index={10}/></button>}<label className="rc-sr-only" htmlFor="res-msg">メッセージ</label><textarea id="res-msg" rows={1} placeholder="変えたいところを伝えてください" value={message} maxLength={analysisMode?500:2000} onChange={event=>setMessage(event.target.value)}/><button type="submit" aria-label="送信" ><ReferenceSvg page={5} index={11}/></button></div>{photoError&&<p className="rc-error" role="alert">{photoError}</p>}</form>:<div className="rc-followup-composer rc-analysis-note">{isTemplate?'配置と色を編集し、変更を保存してください。部屋の作成はテンプレート一覧から行えます。':'コーディネートは利用できません。'}</div>}
+            {canCoordinate&&analyzed?null:canCoordinate?<form className="rc-followup-composer" onSubmit={followup}><FollowupModePicker value={followupMode} onChange={setFollowupMode} canModify={canModify}/><div className="rc-followup-input">{!analysisMode&&<button type="button" aria-label="写真を追加" onClick={()=>upload.current?.click()}><ReferenceSvg page={5} index={10}/></button>}<label className="rc-sr-only" htmlFor="res-msg">メッセージ</label><textarea id="res-msg" rows={1} placeholder="変えたいところを伝えてください" value={message} maxLength={analysisMode?500:2000} onChange={event=>setMessage(event.target.value)}/><button type="submit" aria-label="送信" ><ReferenceSvg page={5} index={11}/></button></div><RoomPalettePicker atmosphere={message} value={roomPaletteId} onChange={setRoomPaletteId}/>{photoError&&<p className="rc-error" role="alert">{photoError}</p>}</form>:<div className="rc-followup-composer rc-analysis-note">{isTemplate?'配置と色を編集し、変更を保存してください。部屋の作成はテンプレート一覧から行えます。':'コーディネートは利用できません。'}</div>}
           </>}
         </section>
         {isNew?<EmptyScene/>:<RoomScene key={design.id} design={design} panel={panelPresence.isPresent} before={before} filter={filter} selectedId={selectedId} referenceLayout={referenceLayout} editing={editing} view={view} dimensions={dimensions} onSelect={value=>{setSelectedId(value);setFocusPanel(true);setPanel(true);setFilter('all');const item=design.items.find(item=>item.id===value);if(analyzed||item){setEditing(true);setBefore(false);}}} onBefore={value=>{setPlacementItem(null);setBefore(value);}} onMoveItem={moveItem} placementItem={placementItem} onPlaceItem={(position,supportObjectId,supportSurface)=>{if(placementItem)addItem(placementItem,position,supportObjectId,supportSurface);}} onOpenPanel={()=>{setFocusPanel(true);setPanel(true);if(analyzed)setEditing(true);}}>{panelPresence.isPresent&&<RoomPanelTransition open={panel} focusOnMount={focusPanel} mode={editing?'edit':'products'} scrollPositions={panelScroll} onScrollPositionChange={savePanelScroll}>{shownMode=>shownMode==='edit'?<PlannerPanel onAddItem={addItem} onDragItem={startPlacement} onRemoveItem={removeItem} placementDisabled={placementDisabled} placementHint={before?'Afterに切り替えると家具を追加できます。':undefined} design={design} templateEditing={isTemplate} selectedId={selectedId} onSelect={setSelectedId} furnitureRequests={selectsFurniture?{existingItems:existingFurniture,operations:furnitureOperations,additions:furnitureAdditions,onOperationChange:(objectId,action)=>setFurnitureOperations(previous=>[...previous.filter(operation=>operation.objectId!==objectId),{objectId,action}]),onAdditionsChange:setFurnitureAdditions}:undefined} onChange={editDesign} onUndo={undo} onRedo={redo} canUndo={history.past.length>0} canRedo={history.future.length>0} dirty={dirty} onSave={saveEdits} onClose={()=>{setPlacementItem(null);setEditing(false);setPanel(false);}} onProducts={()=>{setPlacementItem(null);setEditing(false);}} view={view} onView={setView} dimensions={dimensions} onDimensions={setDimensions}/>:<RecommendationPanel onEditLayout={()=>{setEditing(true);setBefore(false);}} searchEntryPoints={design.searchEntryPoints} originalItems={design.before?.items} items={additions} selectedId={selectedId} filter={filter} onSelect={setSelectedId} onFilter={setFilter} onClose={()=>setPanel(false)}/> }</RoomPanelTransition>}</RoomScene>}
