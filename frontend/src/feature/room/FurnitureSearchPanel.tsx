@@ -57,7 +57,9 @@ const sizeLabel = (size: RoomItem['size']) => `幅${Math.round(size[0]*100)} × 
 
 function variantLabel(variant: FurnitureDetailChoice, variants: FurnitureDetailChoice[]) {
   const { item } = variant;
-  const parts = [variant.colorName ?? item.name];
+  // 同じ家具 (3Dモデル) には別の商品も並ぶので、商品名を必ず出す。色名は商品名に無いときだけ足す
+  const parts = [item.name];
+  if (variant.colorName && !item.name.includes(variant.colorName)) parts.push(variant.colorName);
   if (new Set(variants.map(value => sizeLabel(value.item.size))).size > 1) parts.push(`${Math.round(item.size[0]*100)}×${Math.round(item.size[1]*100)}×${Math.round(item.size[2]*100)}cm`);
   if (new Set(variants.map(value => value.item.price)).size > 1) parts.push(`¥${item.price?.toLocaleString('ja-JP')}`);
   if (new Set(variants.map(value => value.item.shop)).size > 1 && item.shop) parts.push(item.shop);

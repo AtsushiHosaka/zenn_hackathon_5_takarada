@@ -2161,9 +2161,9 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "stool_round",
-      "symbolic_color": "#fdfdfd",
+      "symbolic_color": "#303030",
       "color_materials": {
-        "tint": "#fdfdfd"
+        "tint": "#303030"
       },
       "color_name": "ブラック",
       "size": {
@@ -3142,9 +3142,9 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_dining",
-      "symbolic_color": "#fdfdfd",
+      "symbolic_color": "#303030",
       "color_materials": {
-        "tint": "#fdfdfd"
+        "tint": "#303030"
       },
       "color_name": "ブラック",
       "size": {
@@ -3227,9 +3227,9 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_folding",
-      "symbolic_color": "#fefefe",
+      "symbolic_color": "#303030",
       "color_materials": {
-        "tint": "#fefefe"
+        "tint": "#303030"
       },
       "color_name": "ブラック",
       "size": {
@@ -3312,9 +3312,9 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "stool_bar",
-      "symbolic_color": "#fefefe",
+      "symbolic_color": "#303030",
       "color_materials": {
-        "tint": "#fefefe"
+        "tint": "#303030"
       },
       "color_name": "ブラック",
       "size": {
