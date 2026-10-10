@@ -1,7 +1,7 @@
 # 保存済みシーンの家具に、今の家具のモデル URL を付ける (配置寸法はシーンの値を保つ)。
 # モデルの無い家具には、同じカテゴリ (または形) で寸法比が一番近いモデルを付ける。
 # 付けられないものは null のままで、クライアントが category と size から簡易形状で描く。
-class SceneModelResolver
+class FurnitureModelMatcher
   def self.call(scene)
     return nil if scene.nil?
 
@@ -23,8 +23,8 @@ class SceneModelResolver
     return if missing.empty?
 
     categories = missing.map { |object| object["category"] }.uniq
-    models = Furniture3DModel.joins(:furniture).merge(Furniture.available).includes(:furniture)
-      .where(furniture: { category: categories }).or(Furniture3DModel.joins(:furniture).merge(Furniture.available).where(shape: categories)).to_a
+    available = Furniture3DModel.joins(:furniture).merge(Furniture.available)
+    models = available.where(furnitures: { category: categories }).or(available.where(shape: categories)).preload(:furniture).to_a
     missing.each do |object|
       candidates = models.select { |model| model.furniture.category == object["category"] || model.shape == object["category"] }
       best = candidates.min_by { |model| model.size_distance(object["size"]) }

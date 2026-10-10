@@ -22,7 +22,7 @@
 - 対応表 (`existing`のID・`product`の商品ID) が常に優先する。推測は対応表で見つからないものだけに使う。
 - シーンの`category`と、モデルの`category`か`shape`が一致するもののうち、幅・高さ・奥行きの比率のずれ (倍率の対数の絶対値の合計) が一番小さいモデルを選ぶ。例: 幅1.3mのソファは`sofa_2seat__w130`、高さ0.1mのベッドは`futon_floor`、`wardrobe`は`storage`カテゴリの`wardrobe`。
 - 一致するモデルが無ければ割り当てず、簡易形状のままにする。
-- 実装は`SceneModelResolver`（`fill_by_category`）。
+- 実装は`FurnitureModelMatcher`（`fill_by_category`）。
 
 ## 生成したGLBを公開バケットへ置く
 
