@@ -10,7 +10,6 @@ export function toUser(record: UserRecord): User {
     id: record.id,
     name: record.name,
     email: record.email,
-    admin: record.admin,
     createdAt: new Date(record.created_at),
     updatedAt: new Date(record.updated_at),
   };

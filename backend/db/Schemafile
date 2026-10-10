@@ -5,7 +5,7 @@
 # プロフィール。認証情報は持たない
 create_table "users", force: :cascade do |t|
   t.string "name", null: false
-  t.boolean "admin", null: false, default: false # 家具・商品の管理画面 (/admin) を使えるか。rails admin:grant[メールアドレス] で付ける
+  t.boolean "admin", null: false, default: false # 家具・商品の管理画面 (/admin) を使えるか。rails admin:grant[メールアドレス] で付ける。API の応答には出さない
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
 end

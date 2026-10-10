@@ -9,8 +9,7 @@ const STORAGE_KEY = "hack.dummy.database.v1";
 // 初期ユーザーのパスワードは全員 password。
 const INITIAL_PASSWORD_DIGEST = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8";
 
-// admin は保存せず、初期データのメールアドレスから決める (publicUser)
-type DummyUser = Omit<User, "admin"> & { passwordDigest: string };
+type DummyUser = User & { passwordDigest: string };
 type StoredUser = Omit<DummyUser, "createdAt" | "updatedAt"> & {
   createdAt: string;
   updatedAt: string;
@@ -29,7 +28,6 @@ function isStoredUser(value: unknown): value is StoredUser {
 function publicUser(user: DummyUser): User {
   return {
     id: user.id, name: user.name, email: user.email,
-    admin: dummyUsers.some((initial) => initial.admin && initial.email === user.email),
     createdAt: new Date(user.createdAt), updatedAt: new Date(user.updatedAt),
   };
 }

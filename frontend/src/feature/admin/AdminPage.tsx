@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
 import { Link } from "react-router";
-import { useSession } from "../../core/session";
+import { toDomainError } from "../../domain/error";
 import type { AdminFurnitureDetail, AdminFurnitureDetailInput, AdminFurnitureModel, FurnitureAdminCatalog, FurnitureSize } from "../../domain/furnitureAdmin";
 import ErrorText from "../shared/ErrorText";
 import ModelPreview from "./ModelPreview";
@@ -25,13 +25,15 @@ function revealPanel(panel: RefObject<HTMLElement | null>) {
   });
 }
 
-// 家具・商品の管理画面。管理者 (User.admin) だけが使える (API 側でも 403 にしている)
+// 家具・商品の管理画面。入口のリンクは置かず、/admin を直接開く。
+// 管理者かどうかは API (/api/v1/admin/*) が 403 を返すかどうかで決まる (ユーザー情報の応答には出さない)
 export default function AdminPage() {
-  const session = useSession();
   const [tab, setTab] = useState<"details" | "models">("details");
-  if (session.status !== "authenticated") return null;
-  if (!session.user.admin) {
-    return <main className="mx-auto max-w-lg space-y-4 px-6 py-16"><h1 className="text-xl font-semibold">管理画面は管理者だけが使えます</h1><Link className="text-violet-700" to="/rooms">ルーム一覧へ戻る</Link></main>;
+  // 両方のタブが使う一覧。ここで先に読み、管理者でなければ中身を出さない
+  const access = useAdminFurnitureModels();
+  if (access.isPending) return <div className="grid min-h-dvh place-items-center text-slate-500" role="status">管理画面を開いています…</div>;
+  if (access.error && toDomainError(access.error).status === 403) {
+    return <main className="mx-auto max-w-lg space-y-4 px-6 py-16"><h1 className="text-xl font-semibold">管理画面は管理者だけが使えます</h1><p className="text-sm text-slate-600">このアカウントには管理者の権限がありません。</p><Link className="text-violet-700" to="/rooms">ルーム一覧へ戻る</Link></main>;
   }
   return <div className="min-h-dvh bg-[#F5F4F8] text-[#1D1B26]">
     <header className="border-b border-[#E4E1EC] bg-white">

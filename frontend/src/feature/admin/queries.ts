@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRepositories } from "../../core/repositories";
+import { toDomainError } from "../../domain/error";
 import type { AdminFurnitureDetail, AdminFurnitureDetailInput, AdminFurnitureModel, FurnitureAdminCatalog } from "../../domain/furnitureAdmin";
 
 export const adminKeys = {
@@ -14,7 +15,7 @@ export function useAdminFurnitureDetails() {
 
 export function useAdminFurnitureModels() {
   const { furnitureAdmin } = useRepositories();
-  return useQuery({ queryKey: adminKeys.models, queryFn: () => furnitureAdmin.listModels() });
+  return useQuery({ queryKey: adminKeys.models, queryFn: () => furnitureAdmin.listModels(), retry: (count, error) => toDomainError(error).status !== 403 && count < 1 });
 }
 
 // id が null なら新規作成

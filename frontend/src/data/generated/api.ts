@@ -1150,11 +1150,6 @@ export interface components {
              * @example taro@example.com
              */
             email: string;
-            /**
-             * @description 家具・商品の管理画面を使えるか。API からは変えられない
-             * @example false
-             */
-            admin: boolean;
             /** Format: date-time */
             created_at: string;
             /** Format: date-time */
