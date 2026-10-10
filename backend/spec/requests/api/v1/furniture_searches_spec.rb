@@ -18,7 +18,7 @@ RSpec.describe "Api::V1::FurnitureSearches", type: :request do
         let(:params) { { query: "テーブル", color: "blue" } }
         before do
           FurnitureImporter.call
-          furniture = Furniture.find_by!(model_key: "table_low_rect")
+          furniture = Furniture3DModel.find_by!(model_key: "table_low_rect").furniture
           FurnitureDetail.create!(key: "spec:table", furniture:, name: "ローテーブル ブルー", category: "table", slot: "floor", symbolic_color: "#778da6", color_materials: { "wood" => "#778da6" },
                                   color_name: "ブルー", width: 0.9, height: 0.38, depth: 0.5, price: 9990, shop: "IKEA", url: "https://www.ikea.com/jp/ja/p/example-table-12345678/")
         end

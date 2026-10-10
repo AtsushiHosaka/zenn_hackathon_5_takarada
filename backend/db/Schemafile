@@ -64,12 +64,21 @@ create_table "coordinations", force: :cascade do |t|
   t.datetime "updated_at", null: false
 end
 
-# 家具。1 件 = 3D モデル (GLB) 1 つ。GLB 本体は GCS。db/furnitures.json から rails furniture:import で入れる
+# 家具。detail (色・寸法・購入リンク) が指す。3D モデルは furniture_3d_models (1 : 1)。
+# db/furnitures.json から rails furniture:import で入れる
 create_table "furnitures", force: :cascade do |t|
-  t.string "model_key", null: false # モデルの安定 ID。GLB のファイル名 (例: sofa_2seat__w130)。API の id。GLB のパスもここから決まる
   t.string "name", null: false # 表示名 (例: 2人掛けソファ)
-  t.string "category", null: false # 家具の種類 (sofa, chair, rug など)。写真の家具の照合に使う
-  t.string "shape", null: false # 形の種類 (sofa_2seat, rug_round など)。同じ形の寸法・色違いで共通
+  t.string "category", null: false # 家具の種類 (sofa, chair, rug など)。写真の家具にモデルを付けるときにも使う
+  t.boolean "enabled", null: false, default: true # false なら使わない (API・提案から外す)
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+end
+
+# 家具の 3D モデル (GLB)。GLB 本体は GCS の models/furniture/v1/<model_key>.glb
+create_table "furniture_3d_models", force: :cascade do |t|
+  t.references "furniture", null: false, foreign_key: true, index: { unique: true }
+  t.string "model_key", null: false # モデルの安定 ID。GLB のファイル名 (例: sofa_2seat__w130)。家具を指すキーにも使う
+  t.string "shape", null: false # 形の種類 (sofa_2seat, rug_round など)。同じ形の寸法違いで共通
   t.string "variant" # 同じ形の中の違い (w130 など)。無ければ null
   t.string "format", null: false, default: "glb" # ファイル形式。glb のみ
   t.decimal "width", precision: 10, scale: 6, null: false # モデルの幅 (m)
@@ -79,28 +88,13 @@ create_table "furnitures", force: :cascade do |t|
   t.bigint "byte_size", null: false # GLB のバイト数
   t.string "sha256", null: false # GLB のハッシュ。ファイルとの照合用
   t.jsonb "color_material_keys", null: false, default: [] # 色が分かれている部位の名前 (GLB の素材名。例: ["tint", "wood"])
-  t.boolean "enabled", null: false, default: true # false なら使わない (API・提案から外す)
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
 
   t.index [ "model_key" ], unique: true
-  t.check_constraint "width > 0::numeric AND width < 10000::numeric AND height > 0::numeric AND height < 10000::numeric AND depth > 0::numeric AND depth < 10000::numeric", name: "furnitures_positive_dimensions"
-  t.check_constraint "triangle_count >= 0 AND byte_size > 0", name: "furnitures_valid_counts"
-  t.check_constraint "format::text = 'glb'::text", name: "furnitures_glb_format"
-end
-
-# 家具 ID とモデルの対応。existing: 写真で認識した家具 ID (bed-1 など) / product: 保存済みコーデの商品 ID
-create_table "furniture_bindings", force: :cascade do |t|
-  t.references "furniture", null: false, foreign_key: true
-  t.string "kind", null: false
-  t.string "reference", null: false
-  t.string "managed_by", null: false, default: "manifest"
-  t.jsonb "match_metadata", null: false, default: {}
-  t.datetime "created_at", null: false
-  t.datetime "updated_at", null: false
-
-  t.index [ "kind", "reference" ], unique: true
-  t.check_constraint "kind::text = ANY (ARRAY['existing'::character varying::text, 'product'::character varying::text])", name: "furniture_bindings_valid_kind"
+  t.check_constraint "width > 0::numeric AND width < 10000::numeric AND height > 0::numeric AND height < 10000::numeric AND depth > 0::numeric AND depth < 10000::numeric", name: "furniture_3d_models_positive_dimensions"
+  t.check_constraint "triangle_count >= 0 AND byte_size > 0", name: "furniture_3d_models_valid_counts"
+  t.check_constraint "format::text = 'glb'::text", name: "furniture_3d_models_glb_format"
 end
 
 # 家具の色・寸法・購入リンク 1 つ (家具 1 : 多)。3D は家具のモデルを部位ごとに color_materials で塗る。価格はリンク先の参考価格 (税込)。

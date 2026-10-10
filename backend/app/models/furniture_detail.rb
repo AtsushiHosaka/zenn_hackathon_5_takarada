@@ -17,14 +17,14 @@ class FurnitureDetail < ApplicationRecord
 
   # シーンの家具・検索結果に載せる商品とモデルの情報。寸法は商品、形は家具のモデルを使う
   def scene_attributes
-    model = furniture if furniture.enabled?
-    model_url = model&.model_url
+    model = furniture.model if furniture.enabled?
+    model_url = model&.url
     {
       "furniture_detail_id" => id, "label" => name, "category" => category, "color" => symbolic_color, "color_materials" => color_materials, "size" => size,
       "price" => price, "shop" => shop, "url" => url, "image_url" => image_url, "product_metadata" => metadata,
       "model_url" => model_url,
       "model_match" => model && { "model_id" => model.id, "reason" => "furniture_detail", "approximate" => true },
-      "model_size" => model && { "w" => model.width.to_f, "h" => model.height.to_f, "d" => model.depth.to_f },
+      "model_size" => model&.size,
       "model_fit" => model ? "contain" : nil,
       "texture_status" => model_url ? "disabled" : "unmatched"
     }
@@ -37,7 +37,7 @@ class FurnitureDetail < ApplicationRecord
       return errors.add(:color_materials, "must map part names to #rrggbb colors")
     end
 
-    unknown = color_materials.keys - Array(furniture&.color_material_keys)
+    unknown = color_materials.keys - Array(furniture&.model&.color_material_keys)
     errors.add(:color_materials, "has parts the furniture does not have: #{unknown.join(', ')}") if unknown.any?
   end
 

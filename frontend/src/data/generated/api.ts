@@ -932,18 +932,6 @@ export interface components {
             /** @example 1.95 */
             d: number;
         };
-        FurnitureModelBinding: {
-            /**
-             * @example existing
-             * @enum {string}
-             */
-            kind: "existing" | "product";
-            /**
-             * @description 既存家具の object ID または商品の ID
-             * @example bed-1
-             */
-            reference: string;
-        };
         FurnitureModel: {
             /**
              * @description 安定 ID。GLB ファイル名から拡張子を除いた値
@@ -998,7 +986,6 @@ export interface components {
              * @example null
              */
             model_url: string | null;
-            bindings: components["schemas"]["FurnitureModelBinding"][];
         };
         /** @description 物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き */
         Position: {

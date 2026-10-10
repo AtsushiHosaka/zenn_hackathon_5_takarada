@@ -118,14 +118,6 @@ RSpec.configure do |config|
             },
             required: %w[w h d]
           },
-          FurnitureModelBinding: {
-            type: :object,
-            properties: {
-              kind: { type: :string, enum: %w[existing product], example: "existing" },
-              reference: { type: :string, description: "既存家具の object ID または商品の ID", example: "bed-1" }
-            },
-            required: %w[kind reference]
-          },
           FurnitureModel: {
             type: :object,
             properties: {
@@ -143,10 +135,9 @@ RSpec.configure do |config|
               byte_size: { type: :integer, minimum: 1, example: 48000 },
               sha256: { type: :string, pattern: "^[0-9a-f]{64}$", example: "a" * 64 },
               color_material_keys: { type: :array, items: { type: :string }, description: "色が分かれている部位の名前 (GLB の素材名)", example: [ "tint", "wood" ] },
-              model_url: { type: :string, nullable: true, description: "GCS の公開 GLB URL。ベース URL が未設定なら null", example: nil },
-              bindings: { type: :array, items: { "$ref" => "#/components/schemas/FurnitureModelBinding" } }
+              model_url: { type: :string, nullable: true, description: "GCS の公開 GLB URL。ベース URL が未設定なら null", example: nil }
             },
-            required: %w[id name category shape variant format object_key size unit axes triangle_count byte_size sha256 color_material_keys model_url bindings]
+            required: %w[id name category shape variant format object_key size unit axes triangle_count byte_size sha256 color_material_keys model_url]
           },
           Position: {
             type: :object,

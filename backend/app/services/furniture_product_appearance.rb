@@ -17,15 +17,15 @@ class FurnitureProductAppearance
       item = by_marker[object["marker"]]
       next unless item && item["product_metadata"].is_a?(Hash) && item["product_metadata"].present?
 
-      model = Furniture.available.find_by(id: item.dig("product_metadata", "furniture_id"))
+      model = Furniture.available.find_by(id: item.dig("product_metadata", "furniture_id"))&.model
       unless model
         object["model_url"] = nil
         object["texture_status"] = item["texture_status"] = "unmatched"
         next
       end
       object["model_match"] = item["model_match"] = { "model_id" => model.id, "reason" => "furniture_detail", "approximate" => true }
-      object["model_url"] = model.model_url
-      object["model_size"] = { "w" => model.width.to_f, "h" => model.height.to_f, "d" => model.depth.to_f }
+      object["model_url"] = model.url
+      object["model_size"] = model.size
       object["model_fit"] = "contain"
       object["color"] ||= item["color"]
       overrides = material_overrides(item, model, edited_color: object["color"] == item["color"] ? nil : object["color"])

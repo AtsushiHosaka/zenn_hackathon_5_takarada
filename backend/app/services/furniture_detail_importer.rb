@@ -20,7 +20,7 @@ class FurnitureDetailImporter
     rows = @source.is_a?(Hash) && @source["details"]
     raise InvalidDetails, "details must be an array" unless rows.is_a?(Array)
 
-    furnitures = Furniture.where(model_key: rows.map { |row| row["model_key"] }).index_by(&:model_key)
+    furnitures = Furniture3DModel.includes(:furniture).where(model_key: rows.map { |row| row["model_key"] }).to_h { |model| [ model.model_key, model.furniture ] }
     textures = FurnitureTexture.all.index_by(&:texture_key)
     FurnitureDetail.transaction do
       keys = rows.each_with_index.map do |row, index|

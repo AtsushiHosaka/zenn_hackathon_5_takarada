@@ -9,7 +9,7 @@ class FurnitureDetailTexture < ApplicationRecord
   private
 
   def material_key_in_furniture
-    keys = Array(furniture_detail&.furniture&.color_material_keys)
+    keys = Array(furniture_detail&.furniture&.model&.color_material_keys)
     errors.add(:material_key, "is not a part of the furniture: #{material_key}") unless keys.include?(material_key)
   end
 end

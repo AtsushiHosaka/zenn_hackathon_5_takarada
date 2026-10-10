@@ -11,7 +11,7 @@ end
 puts "seeded #{User.count} users"
 
 furnitures = FurnitureImporter.call
-puts "seeded #{furnitures.fetch(:models)} furnitures and #{furnitures.fetch(:bindings)} bindings"
+puts "seeded #{furnitures.fetch(:models)} furnitures"
 
 textures = FurnitureTextureImporter.call
 puts "seeded #{textures.fetch(:textures)} furniture textures"

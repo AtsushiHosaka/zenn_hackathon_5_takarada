@@ -83,7 +83,7 @@ flowchart TD
   - 箱への収め方はモデルごとに `fit: stretch` (縦横奥行きを個別に合わせる: 家具・ラグ・カーテン) か
     `fit: contain` (縦横比を保つ: 植物・照明・小物)
   - 見た目はローポリ・フラット色を基本にそろえる。専用モデル (リアル寄り) と混ぜて違和感がないかは試作で確認
-- 対応表はDBの`furnitures / furniture_bindings`を使い、`SceneModelResolver`がシーンのモデルURLを補う。GCS配信と台帳管理は[家具モデルSpec](../furniture-models/spec.md)を参照する。実商品からのモデル照合は未実装。
+- モデルはDBの`furnitures / furniture_3d_models`を使い、`SceneModelResolver`がシーンのモデルURLを補う。GCS配信と台帳管理は[家具モデルSpec](../furniture-models/spec.md)を参照する。実商品からのモデル照合は未実装。
 - 商品データは現在モック。追加要求では日本向けECを検索し、商品バリエーション・出典・取得日時を保持する。専用GLBや静的商品DBだけを前提にしない。
 
 座標系: 単位はメートル。y が上、原点は北西の床の角、x は東、z は南。position は底面中心。
