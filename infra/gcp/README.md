@@ -87,7 +87,7 @@ Serverless VPC コネクタと常時稼働の worker も要るので、月 ¥8,0
 開発側は本物の非同期で動く。
 
 `AnalyzeRoomJob` / `GenerateCoordinationJob` はGeminiの接続設定とownerの利用許可がある場合に実AIを呼び、それ以外はmockで動く。
-解析Geminiは再試行込み90秒。EC検索とテクスチャ生成を含むコーデ生成ジョブは240秒、Web nginxは260秒、コーデPOSTは270秒、画面の完了待ちは360秒の期限を持つ。
+解析Geminiは再試行込み90秒。商品選定とテクスチャ生成を含むコーデ生成ジョブは240秒、Web nginxは260秒、コーデPOSTは270秒、画面の完了待ちは360秒の期限を持つ。
 `status` をポーリングするAPI契約は維持しているが、本番inlineではPOST自体が処理を待つ。
 
 **長い生成や同時利用が増えたときは要再検討。**
@@ -190,14 +190,14 @@ Cloud Run がゼロまで縮んでいるためのコールドスタート。常�
 
 公開モデル用バケットはTerraformの `models_bucket` 出力で確認できます。BlenderでGLBを生成した後、`make infra-models-publish` で台帳と照合してアップロードします。Terraformのローカル設定がない場合は `MODELS_BUCKET=<バケット名> make infra-models-publish` を使います。
 
-`make infra-release` とGitHub Actionsは、スキーマ適用に続けて `furniture_models:import` を実行し、87モデルの台帳と家具・商品の対応をDBへ取り込んでからCloud Runを更新します。APIは既存の `MODELS_BUCKET` から公開URLを作るため、本番への新しい秘密情報の登録は不要です。GLBのアップロードはリリース前に行います。詳しくは[家具モデルの運用](../../docs/furniture-models.md)を参照してください。
+`make infra-release` とGitHub Actionsは、スキーマ適用に続けて `furniture:import` と `furniture_detail:import` を実行し、家具（3Dモデルの台帳）と家具ごとの色・寸法・購入リンクをDBへ取り込んでからCloud Runを更新します。APIは既存の `MODELS_BUCKET` から公開URLを作るため、本番への新しい秘密情報の登録は不要です。GLBのアップロードはリリース前に行います。詳しくは[家具モデルの運用](../../docs/furniture-models.md)を参照してください。
 
-## EC検索と生成テクスチャを接続する
+## 登録された家具と生成テクスチャ
 
-コーデ生成は、既存Gemini認証とownerの利用許可があれば実EC検索を使う。未設定時は従来のmockで動く。`EC_PROVIDER=live`で実検索を明示し、認証不足・検索失敗をmockの成功へ置き換えず検出できる。`EC_PROVIDER=mock`はデモ用の固定商品を使う。
+コーデ生成と家具検索は、DBに登録した家具（`furnitures`・`furniture_details`）だけを使い、外部のECは検索しない。登録内容は`backend/db/furnitures.json`と`backend/db/furniture_details.json`が正で、リリース時に取り込む。Gemini認証とownerの利用許可があれば商品選定をGeminiで行い、未設定時はモックのプランナーで動く。
 
-`EC_SEARCH_MODEL`は検索専用で、未指定なら`gemini-3.5-flash`を使う。商品選定用の`GEMINI_MODEL`とは分ける。用途・店舗・価格帯を分けて最大6検索・36URLを比較する。構造化情報が不足した場合は取得HTMLをGeminiで抽出し、`EC_EXTRACTION_MODEL`未設定時は`gemini-3.1-flash-lite`を使う。不明な寸法は推定軸を明示してプレビューする。画像生成は`GEMINI_IMAGE_MODEL=gemini-3.1-flash-image`、`GEMINI_IMAGE_LOCATION=global`が既定で、`FURNITURE_TEXTURES_ENABLED=false`で停止できる。商品写真は入力せず、公式の色・素材の説明から近似テクスチャを生成する。1コーデにつき生成試行は最大3回、画像生成全体の期限は90秒。
+画像生成は`GEMINI_IMAGE_MODEL=gemini-3.1-flash-image`、`GEMINI_IMAGE_LOCATION=global`が既定で、`FURNITURE_TEXTURES_ENABLED=false`で停止できる。商品写真は入力せず、公式の色・素材の説明から近似テクスチャを生成する。1コーデにつき生成試行は最大3回、画像生成全体の期限は90秒。
 
-生成結果は既存`MODELS_BUCKET`の`textures/description-seamless-v1/`へ保存する。`storage.tf`はAPIサービスアカウントに、この接頭辞だけの`roles/storage.objectCreator`を追加する。既存GLBへの書き込み権限は付けない。このIAM変更の本番適用は通常のインフラ反映で行う。DBには`ec_products / furniture_textures`と家具操作・モデル対応の管理情報を追加したため、リリース前に`db:apply`が必要。
+生成結果は既存`MODELS_BUCKET`の`textures/description-seamless-v1/`へ保存する。`storage.tf`はAPIサービスアカウントに、この接頭辞だけの`roles/storage.objectCreator`を追加する。既存GLBへの書き込み権限は付けない。このIAM変更の本番適用は通常のインフラ反映で行う。`ec_products`・`furniture_models`・`furniture_model_bindings`は旧データの確認用に残しており、コードからは参照しない。
 
 ローカルでは画像を`backend/tmp/storage`へ保存し、開発限定の`GET /api/v1/assets/{key}`から配信する。`DEV_API_ORIGIN`にはブラウザから到達できるAPIのURLを設定する。本番ではこの配信APIは404となり、GCSの公開URLを使う。

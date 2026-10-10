@@ -80,11 +80,8 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
   };
   const repository: RoomRepository = {
     demo: createDemoRoom,
-    async importFurniture() {
-      throw new DomainError("商品リンクからの追加にはAPI接続が必要です。接続設定をAPIに切り替えてください。");
-    },
     async searchFurniture() {
-      throw new DomainError("実商品の検索にはAPI接続が必要です。接続設定をAPIに切り替えてください。");
+      throw new DomainError("登録された家具の検索にはAPI接続が必要です。接続設定をAPIに切り替えてください。");
     },
     persistenceWarning() {
       if (!tokenStore.load()) return undefined;

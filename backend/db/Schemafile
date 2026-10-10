@@ -78,7 +78,7 @@ create_table "ec_products", force: :cascade do |t|
   t.index [ "provider", "provider_product_id", "variant_id" ], unique: true, name: "index_ec_products_on_identity"
 end
 
-# GLB 本体は GCS に置き、DB には検索・描画に必要なメタデータを持つ
+# 旧: 3D モデルの台帳。furnitures へ置き換えた。デプロイ後に保存済みデータを確認してから削除する
 create_table "furniture_models", force: :cascade do |t|
   t.string "key", null: false
   t.string "name", null: false
@@ -104,7 +104,7 @@ create_table "furniture_models", force: :cascade do |t|
   t.check_constraint "format::text = 'glb'::text", name: "furniture_models_glb_format"
 end
 
-# 認識済み家具 ID / 商品 ID とモデルを明示的に対応させる
+# 旧: furniture_bindings へ置き換えた。furniture_models と一緒に削除する
 create_table "furniture_model_bindings", force: :cascade do |t|
   t.references "furniture_model", null: false, foreign_key: true
   t.string "kind", null: false
@@ -130,4 +130,75 @@ create_table "furniture_textures", force: :cascade do |t|
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
   t.index [ "generation_key" ], unique: true
+end
+
+# 家具 1 件 = 3D モデル 1 つ。GLB 本体は GCS に置き、DB には検索・描画に必要なメタデータを持つ。
+# 中身は db/furnitures.json を正とし、rails furniture:import で取り込む
+create_table "furnitures", force: :cascade do |t|
+  t.string "key", null: false
+  t.string "name", null: false
+  t.string "category", null: false
+  t.string "shape", null: false
+  t.string "variant"
+  t.string "format", null: false, default: "glb"
+  t.string "object_key", null: false
+  t.decimal "width", precision: 10, scale: 6, null: false
+  t.decimal "height", precision: 10, scale: 6, null: false
+  t.decimal "depth", precision: 10, scale: 6, null: false
+  t.integer "triangle_count", null: false
+  t.bigint "byte_size", null: false
+  t.string "sha256", null: false
+  t.jsonb "materials", null: false, default: []
+  t.boolean "enabled", null: false, default: true
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+
+  t.index [ "key" ], unique: true
+  t.check_constraint "width > 0::numeric AND width < 10000::numeric AND height > 0::numeric AND height < 10000::numeric AND depth > 0::numeric AND depth < 10000::numeric", name: "furnitures_positive_dimensions"
+  t.check_constraint "triangle_count >= 0 AND byte_size > 0", name: "furnitures_valid_counts"
+  t.check_constraint "format::text = 'glb'::text", name: "furnitures_glb_format"
+end
+
+# 写真で認識した家具 ID (existing) / 保存済みコーデの商品 ID (product) を家具のモデルに対応させる
+create_table "furniture_bindings", force: :cascade do |t|
+  t.references "furniture", null: false, foreign_key: true
+  t.string "kind", null: false
+  t.string "reference", null: false
+  t.string "managed_by", null: false, default: "manifest"
+  t.jsonb "match_metadata", null: false, default: {}
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+
+  t.index [ "kind", "reference" ], unique: true
+  t.check_constraint "kind::text = ANY (ARRAY['existing'::character varying::text, 'product'::character varying::text])", name: "furniture_bindings_valid_kind"
+end
+
+# 家具の色・寸法・購入リンク 1 つ (家具 1 : 多)。3D は家具のモデルの形を使い、color で塗る。
+# 中身は db/furniture_details.json を正とし、rails furniture_detail:import で取り込む (自動EC検索はしない)。価格はリンク先の参考価格 (税込)
+create_table "furniture_details", force: :cascade do |t|
+  t.string "key", null: false
+  t.references "furniture", null: false, foreign_key: true
+  t.string "name", null: false
+  t.string "category", null: false
+  t.string "slot", null: false
+  t.string "color", null: false
+  t.string "color_name"
+  t.decimal "width", precision: 10, scale: 6, null: false
+  t.decimal "height", precision: 10, scale: 6, null: false
+  t.decimal "depth", precision: 10, scale: 6, null: false
+  t.integer "price", null: false
+  t.string "shop", null: false
+  t.string "url", null: false
+  t.string "image_url"
+  t.jsonb "themes", null: false, default: []
+  t.jsonb "metadata", null: false, default: {} # 出典・推定した軸など。ECで確認した商品は確認時の記録を残す
+  t.integer "position", null: false, default: 0 # 候補の並び順 (小さいほど先)。AI は枠ごとに先頭から一定数だけ見る
+  t.datetime "checked_at"
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+
+  t.index [ "key" ], unique: true
+  t.index [ "slot", "position" ]
+  t.check_constraint "price > 0", name: "furniture_details_positive_price"
+  t.check_constraint "width > 0::numeric AND height > 0::numeric AND depth > 0::numeric", name: "furniture_details_positive_dimensions"
 end

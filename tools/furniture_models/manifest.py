@@ -282,7 +282,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--models-dir", type=Path, default=ROOT / "output/furniture_models/furniture")
     parser.add_argument("--report", type=Path, default=HERE / "build_report.json")
-    parser.add_argument("--output", type=Path, default=ROOT / "backend/db/furniture_models.json")
+    parser.add_argument("--output", type=Path, default=ROOT / "backend/db/furnitures.json")
     args = parser.parse_args()
     report = json.loads(args.report.read_text())
     models = []

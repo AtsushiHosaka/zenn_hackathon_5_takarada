@@ -31,11 +31,11 @@ GLBの座標は`+Y`が上、`+Z`が正面、底面中心を原点とする。制
 
 2026年10月5日の追加要求では、日本向けECの実商品を用途・形状・寸法から照合し、採用したモデルを商品バリエーションの明示対応として保存する。表示時にカテゴリだけから推測する処理は追加しない。生成するのはテクスチャだけで、元のGLBを共用する。詳細は[EC家具Spec](../ec-furniture/spec.md)を参照する。照合・生成処理は実装済み。`managed_by`で台帳とEC照合の管理元を分け、台帳取り込みはEC照合の対応を維持する。
 
-取り込みの正本は`backend/db/furniture_models.json`。生成ツールはGLBを照合し、メタデータと対応表を出力する。入力から外した対応関係はDBから削除する。入力にないDBのモデルは削除せず、無効化したモデルも再有効化しない。
+取り込みの正本は`backend/db/furnitures.json`（`furnitures`テーブル。旧`furniture_models`から置き換え）。生成ツールはGLBを照合し、メタデータと対応表を出力する。入力から外した対応関係はDBから削除する。入力にないDBのモデルは削除せず、無効化したモデルも再有効化しない。
 
 公開モデル用バケットは`infra/gcp/storage.tf`で`${project_id}-models`として定義済み。`allUsers`の読み取り権限と、すべてのオリジンからの`GET`・`HEAD`を許可するCORSを利用する。部屋写真の非公開バケットとは分ける。署名付きURLやWeb向けのGCP認証情報は発行しない。
 
-`make infra-models-publish`は、`output/furniture_models/furniture/`から台帳に載ったGLBだけを一時ディレクトリへ複製し、検証したファイルを`gs://<bucket>/models/furniture/v1/`へアップロードする。`MODELS_BUCKET`を指定でき、未指定時はTerraformの`models_bucket`出力を使う。デプロイCIと`make infra-release`は、Cloud Runジョブで`db:apply`と`furniture_models:import`を順に実行してからサービスを更新する。
+`make infra-models-publish`は、`output/furniture_models/furniture/`から台帳に載ったGLBだけを一時ディレクトリへ複製し、検証したファイルを`gs://<bucket>/models/furniture/v1/`へアップロードする。`MODELS_BUCKET`を指定でき、未指定時はTerraformの`models_bucket`出力を使う。デプロイCIと`make infra-release`は、Cloud Runジョブで`db:apply`・`furniture:import`・`furniture_detail:import`を順に実行してからサービスを更新する。
 
 GCS上のファイル一覧を自動収集する処理と管理画面は含めない。運用手順は`docs/furniture-models.md`に記す。
 

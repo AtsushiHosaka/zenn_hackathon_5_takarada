@@ -24,10 +24,8 @@ class CoordinationBuilder
 
   def call
     kept = kept_objects
-    replacement_ids = @coordination.furniture_operations.select { |operation| operation["action"] == "replace" }.pluck("object_id")
-    preferred_categories = (@scene["objects"].select { |object| replacement_ids.include?(object["id"]) }.pluck("category") + @coordination.additions.pluck("category")).uniq
     selected = selected_product_items
-    client = InteriorLinks.client(user_id: @coordination.room.user_id, preferred_categories:, previous_items: effective_previous_items)
+    client = InteriorLinks.client
     client = FurnitureSelectedProductClient.new(client, selected) if selected.any?
     candidate_limit = GeminiClient.configured?(user_id: @coordination.room.user_id) ? CoordinationPlanner::Gemini::CANDIDATES_PER_GROUP : 3
     floor_candidates = FurnitureOperationPlanner.call(@coordination, @scene, client:, candidate_limit:)
@@ -65,20 +63,15 @@ class CoordinationBuilder
 
     placed.each.with_index(1) do |entry, marker|
       entry[:placement].object["marker"] = marker
-      if entry[:item].metadata["provider"].present? && entry[:item].id > EcProduct::PUBLIC_ID_OFFSET
-        entry[:placement].object["ec_product_id"] = entry[:item].id - EcProduct::PUBLIC_ID_OFFSET
-      end
+      entry[:placement].object["furniture_detail_id"] = entry[:item].metadata["furniture_detail_id"] if entry[:item].metadata["furniture_detail_id"]
     end
     scene = { "room" => @scene["room"], "objects" => active + placed.map { |entry| entry[:placement].object } }
     items = placed.map.with_index(1) { |entry, marker| item_json(entry[:item], entry[:placement].note, marker) }
     appearance = FurnitureProductAppearance.call(scene:, items:, user_id: @coordination.room.user_id)
-    product_source = InteriorLinks.provider(user_id: @coordination.room.user_id) == "live" ? "ec" : "mock"
+    product_source = InteriorLinks.provider
     failures = operation_failures(floor_placed)
     failures << "商品価格の合計を予算内に収めるため、提案の一部を調整しました。" if @budget_adjusted_groups&.any?
-    if product_source == "ec" && placed.empty?
-      failures << "条件と配置に合う実商品を確認できませんでした。希望や予算を変更して再提案してください。"
-    end
-    diagnostics = client.respond_to?(:diagnostics) ? client.diagnostics.except("search_entry_point") : {}
+    failures << "条件と配置に合う家具が登録されていませんでした。希望や予算を変更して再提案してください。" if placed.empty?
 
     Result.new(
       title: result_title(plan),
@@ -88,7 +81,7 @@ class CoordinationBuilder
       total_price: placed.sum { |p| p[:item].price },
       planned_by: plan.planned_by,
       # 精度の確認用: Gemini の回答と、実際に採用した商品
-      analysis: (@coordination.analysis || {}).deep_merge(plan.analysis).deep_merge("placed_item_ids" => placed.map { |p| p[:item].id }, "base_coordination_id" => @coordination.base_coordination_id, "budget_adjusted_groups" => @budget_adjusted_groups || [], "meta" => { "product_source" => product_source }, "operation_failures" => failures, "ec_search" => diagnostics, "search_entry_points" => client.respond_to?(:search_entry_points) ? client.search_entry_points : []),
+      analysis: (@coordination.analysis || {}).deep_merge(plan.analysis).deep_merge("placed_item_ids" => placed.map { |p| p[:item].id }, "base_coordination_id" => @coordination.base_coordination_id, "budget_adjusted_groups" => @budget_adjusted_groups || [], "meta" => { "product_source" => product_source }, "operation_failures" => failures),
       kept_object_ids: active.pluck("id"),
       furniture_operations: result_operations(active, removed)
     )
@@ -149,12 +142,16 @@ class CoordinationBuilder
       next if done.include?("replace:#{operation['object_id']}")
 
       original = @scene["objects"].find { |object| object["id"] == operation["object_id"] }
-      "#{original['label']}は予算内で配置できる商品が見つからなかったため、そのまま残しました。"
+      "#{original['label']}は#{unavailable_reason(original['category'])}ため、そのまま残しました。"
     end
     additions = @coordination.additions.each_with_index.filter_map do |addition, index|
-      "追加する#{ { 'sofa' => 'ソファ', 'bed' => 'ベッド', 'desk' => 'デスク', 'chair' => '椅子', 'shelf' => '収納棚', 'table' => 'テーブル' }.fetch(addition['category']) }は予算内で配置できる商品が見つかりませんでした。" unless done.include?("add:#{index}")
+      "追加する#{ { 'sofa' => 'ソファ', 'bed' => 'ベッド', 'desk' => 'デスク', 'chair' => '椅子', 'shelf' => '収納棚', 'table' => 'テーブル' }.fetch(addition['category']) }は#{unavailable_reason(addition['category'])}ため、追加しませんでした。" unless done.include?("add:#{index}")
     end
     replacements + additions
+  end
+
+  def unavailable_reason(category)
+    FurnitureDetail.exists?(category:) ? "予算内で配置できる商品が見つからなかった" : "この種類の家具がまだ登録されていない"
   end
 
   def place_choices(chosen, by_slot, kept, coherent: false, reserved_budget: 0)
@@ -239,20 +236,18 @@ class CoordinationBuilder
       originals = Array(base&.after_scene&.fetch("objects", [])) + @coordination.input_scene.fetch("objects")
       @coordination.edited_objects.filter_map do |edit|
         original = originals.find { |object| object["id"] == edit["id"] }
-        product_id = edit["replacement_ec_product_id"] || edit["ec_product_id"]
-        product = EcProduct.find_by(id: product_id) if product_id.is_a?(Integer)
+        product = InteriorLinks::FurnitureDetailClient.find_item(edit["replacement_furniture_detail_id"] || edit["furniture_detail_id"])
         next unless original && product
-        next if original["id"].match?(Coordination::MANUAL_OBJECT_ID) && edit["replacement_ec_product_id"].nil?
+        next if original["id"].match?(Coordination::MANUAL_OBJECT_ID) && edit["replacement_furniture_detail_id"].nil?
 
         next if original["source"] == "existing" && @coordination.furniture_operations.any? { |operation| operation["object_id"] == original["id"] && operation["action"] != "replace" }
 
         previous = Array(base&.items).find { |item| item["item_id"] == original["item_id"] && (original["marker"].nil? || item["marker"] == original["marker"]) }
-        data = product.data.symbolize_keys.except(:metadata, :slot)
-        metadata = product.data.fetch("metadata").merge(previous&.fetch("product_metadata", {})&.slice("group_id", "replaces_object_id") || {})
+        metadata = product.metadata.merge(previous&.fetch("product_metadata", {})&.slice("group_id", "replaces_object_id") || {})
         if original["source"] == "existing"
           metadata = metadata.merge("group_id" => "replace:#{original['id']}", "replaces_object_id" => original["id"], "preferred_position" => edit["position"], "preferred_rotation" => edit["rotation_y"], "target_size" => original["size"])
         end
-        item = InteriorLinks::Item.build(id: product.product_id, **data, slot: original["slot"] || "floor", metadata:)
+        item = product.with(slot: original["slot"] || "floor", metadata:)
         @selected_products_by_edit[edit["id"]] = item
         item
       end
@@ -272,8 +267,8 @@ class CoordinationBuilder
     previous_items = Array(base&.items).map do |item|
       original = Array(base.after_scene&.fetch("objects", [])).find { |object| object["item_id"] == item["item_id"] && (item["marker"].nil? || object["marker"] == item["marker"]) }
       edit = original && @coordination.edited_objects.find { |value| value["id"] == original["id"] }
-      product = edit && EcProduct.find_by(id: edit["ec_product_id"])
-      product ? item.merge(product.data.except("slot", "metadata")).merge("item_id" => product.product_id, "product_metadata" => product.data["metadata"].merge(item.fetch("product_metadata", {}).slice("group_id", "replaces_object_id"))) : item
+      product = edit && InteriorLinks::FurnitureDetailClient.find_item(edit["furniture_detail_id"])
+      product ? item.merge(product.to_h.stringify_keys.except("id", "slot", "metadata")).merge("item_id" => product.id, "product_metadata" => product.metadata.merge(item.fetch("product_metadata", {}).slice("group_id", "replaces_object_id"))) : item
     end
     previous_items + selected_product_items.reject { |selected| previous_items.any? { |item| item["item_id"] == selected.id && item.dig("product_metadata", "group_id") == selected.metadata["group_id"] } }.map do |item|
       item.to_h.stringify_keys.except("id", "metadata").merge("item_id" => item.id, "product_metadata" => item.metadata)

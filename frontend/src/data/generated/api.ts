@@ -373,67 +373,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/furniture_imports": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * 商品リンクから所有家具の情報を取得する
-         * @description 対応ショップの商品詳細HTMLを取得・検証する。取得と解析は最大45秒。実商品名・円価格・寸法の根拠を確認できない場合や対応外カテゴリは422。未掲載の寸法は推定軸として明示する。モデルが無い場合はnullを返す。購入提案や予算の合計には追加しない。
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["FurnitureImportInput"];
-                };
-            };
-            responses: {
-                /** @description 商品情報を確認できた */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ImportedFurniture"];
-                    };
-                };
-                /** @description ログインが必要 */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Unauthorized"];
-                    };
-                };
-                /** @description 商品を取得・確認できない */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ValidationErrors"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/furniture_models": {
         parameters: {
             query?: never;
@@ -534,8 +473,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 家具を検索し公式の色で絞り込む
-         * @description 公式商品ページを検証し、掲載されている色名で絞り込む。最大24件。色違いは公式の選択欄・ProductGroupにあるURLとSKUを返し、選択時にfurniture_importsで商品情報を再確認する。検索は最大130秒。
+         * 登録された家具を検索し色で絞り込む
+         * @description DBに登録された家具 (furniture_details) を検索する。外部ECは検索しない。商品名に検索語を含むものを優先し、無ければ推定したカテゴリ (なければ床置き家具) 全体を返す。色は公式の色名・商品名で絞り込む。家具ごとに1件で最大24件。同じ家具の他の色・寸法・購入先はvariantsに入る。
          */
         post: {
             parameters: {
@@ -1215,10 +1154,10 @@ export interface components {
             /** @example #f2f0eb */
             color: string;
             /**
-             * @description リンクから補完した所有家具のEcProduct ID
+             * @description 家具の色・寸法・購入リンク (FurnitureDetail) のID。登録された家具から選んだ所有家具・提案商品に付く
              * @example 1
              */
-            ec_product_id?: number;
+            furniture_detail_id?: number;
             /**
              * @description 所有家具の参考価格。今回の購入商品合計には含めない
              * @example 7990
@@ -1391,15 +1330,15 @@ export interface components {
             category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table" | "poster" | "acrylic_stand" | "mirror";
             artwork?: components["schemas"]["ImageArtwork"];
             /**
-             * @description 手動の所有家具を置き換える購入商品のID。所有家具のec_product_idは変更しない
+             * @description 手動の所有家具を置き換える購入商品 (FurnitureDetail) のID。所有家具のfurniture_detail_idは変更しない
              * @example 2
              */
-            replacement_ec_product_id?: number;
+            replacement_furniture_detail_id?: number;
             /**
-             * @description 商品検索・インポート結果のID。元の家具と同じカテゴリの商品に限り、商品・モデル情報をサーバー側で復元する
+             * @description 家具検索結果 (FurnitureDetail) のID。元の家具と同じカテゴリの商品に限り、商品・モデル情報をサーバー側で復元する
              * @example 1
              */
-            ec_product_id?: number;
+            furniture_detail_id?: number;
             position: components["schemas"]["Position"];
             size: components["schemas"]["Size"];
             /** @example 15 */
@@ -1423,24 +1362,6 @@ export interface components {
              */
             category: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table";
         };
-        FurnitureImportInput: {
-            /**
-             * @description 置換用の取得では床家具以外の対応商品も返す
-             * @example replacement
-             * @enum {string}
-             */
-            purpose?: "replacement";
-            /**
-             * @description 同じ商品ページで選ぶ場合の公式バリエーションSKU
-             * @example 50337820
-             */
-            variant_id?: string;
-            /**
-             * @description 対応するショップの商品詳細URL
-             * @example https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/
-             */
-            url: string;
-        };
         FurnitureSearchInput: {
             /** @example 丸いサイドテーブル */
             query: string;
@@ -1456,13 +1377,10 @@ export interface components {
             category?: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
         };
         FurnitureSearchResult: {
-            products: components["schemas"]["ImportedFurniture"][];
+            /** @description 家具ごとに1件。同じ家具の他の色・寸法・購入先はvariants */
+            products: components["schemas"]["FurnitureSearchProduct"][];
             /** @example blue */
             color: string | null;
-            /** @example 0 */
-            failures: number;
-            /** @example [] */
-            search_entry_points: string[];
         };
         ProductColorVariant: {
             /** @example ホワイト */
@@ -1477,11 +1395,13 @@ export interface components {
              */
             source: "official_color_picker" | "official_product_group";
         };
-        /** @description 実ページで確認した所有家具。寸法・色・モデルは近似で、推定した軸はproduct_metadataに記録する */
-        ImportedFurniture: {
+        /** @description 家具の色・寸法・購入リンク1つ。3Dは家具 (furniture_id) のモデルの形を使い、colorで塗る。推定した軸はproduct_metadataに記録する */
+        FurnitureDetail: {
             /** @example 1 */
-            ec_product_id: number;
-            /** @example ホワイトチェア */
+            furniture_detail_id: number;
+            /** @example 1 */
+            furniture_id: number;
+            /** @example SANDSBERG サンドスベリ チェア - ホワイト */
             name: string;
             /**
              * @example chair
@@ -1490,18 +1410,20 @@ export interface components {
             category: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
             /** @example #f2efe8 */
             color: string;
+            /** @example ホワイト */
+            color_name: string | null;
             size: components["schemas"]["Size"];
-            /** @example 7990 */
+            /**
+             * @description リンク先の参考価格 (税込)
+             * @example 2000
+             */
             price: number;
             /** @example IKEA */
             shop: string;
-            /** @example https://www.ikea.com/jp/ja/p/example-chair-12345678/ */
+            /** @example https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/ */
             url: string;
-            /**
-             * @description 商品ページのJSON-LDまたはog:imageで確認した写真URL。なければnull
-             * @example https://www.ikea.com/jp/ja/images/products/teodores-chair-white__0727344_pe735616_s5.jpg
-             */
-            image_url?: string | null;
+            /** @example null */
+            image_url: string | null;
             product_metadata: components["schemas"]["ProductMetadata"];
             /** @example null */
             model_url: string | null;
@@ -1514,6 +1436,10 @@ export interface components {
              * @enum {string|null}
              */
             model_fit: "contain" | null;
+        };
+        FurnitureSearchProduct: components["schemas"]["FurnitureDetail"] & {
+            /** @description 同じ家具の全detail (自身を含む) */
+            variants: components["schemas"]["FurnitureDetail"][];
         };
         MaterialOverride: {
             /** @example #ffffff */
@@ -1727,10 +1653,11 @@ export interface components {
              */
             search_entry_points?: string[];
             /**
-             * @example ec
+             * @description db: 登録された家具から選んだ / ec・mock: 以前の実EC検索・モックで作った提案
+             * @example db
              * @enum {string|null}
              */
-            product_source?: null | "ec" | "mock";
+            product_source?: null | "db" | "ec" | "mock";
             /** @example ラベンダーの推し活ルーム */
             title: string | null;
             /** @example ラベンダー 布団カバー3点セット シングル (ベッドに掛ける) などを追加しました。今のベッドとデスクと本棚はそのまま活かしています。 */

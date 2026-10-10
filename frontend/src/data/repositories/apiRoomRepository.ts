@@ -6,7 +6,7 @@ import { manualFurnitureCategories, imageGoodsCategories, isFurnitureAdditions, 
 import type { GenerateRoomInput, RoomRepository } from "../../domain/roomRepository";
 import type { ApiClient } from "../apiClient";
 import { createDemoRoom } from "../dummy/dummyRoomRepository";
-import { toRoomPaletteId, toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toImportedFurniture, toFurnitureSearch, toRoomDesign, toSavedRoom, toSavedRooms, toUploadRecords } from "../records/room";
+import { toRoomPaletteId, toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toFurnitureSearch, toRoomDesign, toSavedRoom, toSavedRooms, toUploadRecords } from "../records/room";
 import type { components } from "../generated/api";
 
 export type RoomApiConfig = {
@@ -28,17 +28,9 @@ const unavailableMessage = "部屋APIの接続先が設定されていません�
 export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, baseUrl: string): RoomRepository {
   return {
     demo: createDemoRoom,
-    async importFurniture(url, signal, variantId, purpose) {
-      let parsed: URL;
-      try { parsed = new URL(url.trim()); } catch { throw new DomainError("商品ページのURLを入力してください"); }
-      if (parsed.protocol !== "https:" || parsed.username || parsed.password || url.length > 2048) throw new DomainError("HTTPSの商品ページURLを入力してください");
-      return toImportedFurniture(await api.send<unknown>("/api/v1/furniture_imports", {
-        method: "POST", body: { url: parsed.href, ...(purpose ? { purpose } : {}), ...(variantId ? { variant_id: variantId } : {}) }, signal, timeoutMs: 60_000,
-      }), baseUrl);
-    },
     async searchFurniture(input, signal) {
       return toFurnitureSearch(await api.send<unknown>("/api/v1/furniture_searches", {
-        method: "POST", body: input, signal, timeoutMs: 150_000,
+        method: "POST", body: input, signal,
       }), baseUrl);
     },
     async list(signal) {
@@ -75,7 +67,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
       const snapshot = structuredClone(template);
       // Newly added manual furniture is already part of this copied base scene.
       snapshot.items = copyFurniture(snapshot.items).map(item => ({...item, existing: true,
-        marker: undefined, productId: undefined, ecProductId: undefined, replacesObjectId: undefined}));
+        marker: undefined, productId: undefined, furnitureDetailId: undefined, replacesObjectId: undefined}));
       const record = toAnalysisRoomRecord(await api.send<unknown>(config.generationPath, {
         method: "POST", body: templateRequest(snapshot), requiresAuth: true, signal,
       }));
@@ -188,7 +180,7 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
 function editedObjects(input: GenerateRoomInput, record: components["schemas"]["Room"]): components["schemas"]["FurnitureEdit"][] {
   if (!input.editedItems) return [];
   if (!Array.isArray(input.editedItems) || input.editedItems.length > 100 || !input.editedItems.every(isRoomItem) || new Set(input.editedItems.map(item => item.id)).size !== input.editedItems.length || !record.scene) throw new DomainError("家具の編集内容が正しくありません");
-  if (input.editedItems.some(item => isManualFurniture(item) && (![...manualFurnitureCategories, ...imageGoodsCategories].some(category => category === item.category) || !item.ecProductId && item.name.length > 100))) throw new DomainError("手動で追加した家具の種類または名前が正しくありません");
+  if (input.editedItems.some(item => isManualFurniture(item) && (![...manualFurnitureCategories, ...imageGoodsCategories].some(category => category === item.category) || !item.furnitureDetailId && item.name.length > 100))) throw new DomainError("手動で追加した家具の種類または名前が正しくありません");
   const { room } = record.scene;
   return input.editedItems.map(item => ({
     id: item.id,
@@ -197,9 +189,9 @@ function editedObjects(input: GenerateRoomInput, record: components["schemas"]["
     rotation_y: item.rotation ?? 0,
     color: item.color,
     ...(item.artwork && isManualFurniture(item) ? { artwork: { data_url: item.artwork.dataUrl } } : {}),
-    ...(isManualFurniture(item) ? { category: item.category as components["schemas"]["FurnitureEdit"]["category"], ...(!item.ecProductId ? { label: item.name } : {}) } : {}),
-    ...(item.ecProductId ? { ec_product_id: Number(item.ecProductId) } : {}),
-    ...(item.replacementEcProductId ? { replacement_ec_product_id: item.replacementEcProductId } : {}),
+    ...(isManualFurniture(item) ? { category: item.category as components["schemas"]["FurnitureEdit"]["category"], ...(!item.furnitureDetailId ? { label: item.name } : {}) } : {}),
+    ...(item.furnitureDetailId ? { furniture_detail_id: Number(item.furnitureDetailId) } : {}),
+    ...(item.replacementFurnitureDetailId ? { replacement_furniture_detail_id: item.replacementFurnitureDetailId } : {}),
   }));
 }
 

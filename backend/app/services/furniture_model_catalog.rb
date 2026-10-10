@@ -29,7 +29,7 @@ class FurnitureModelCatalog
   def self.model_url(model, base: base_url)
     return nil if base.nil? || !model.enabled?
 
-    unless FurnitureModel.valid_object_key?(model.object_key)
+    unless Furniture.valid_object_key?(model.object_key)
       raise ConfigurationError, "Furniture model #{model.key} has an invalid object_key"
     end
 
@@ -56,9 +56,9 @@ class FurnitureModelCatalog
 
     existing = references.select { |kind, _| kind == "existing" }.map(&:last)
     products = references.select { |kind, _| kind == "product" }.map(&:last)
-    bindings = FurnitureModelBinding.where(kind: "existing", reference: existing)
-      .or(FurnitureModelBinding.where(kind: "product", reference: products))
-      .joins(:furniture_model).merge(FurnitureModel.available).includes(:furniture_model)
+    bindings = FurnitureBinding.where(kind: "existing", reference: existing)
+      .or(FurnitureBinding.where(kind: "product", reference: products))
+      .joins(:furniture).merge(Furniture.available).includes(:furniture)
       .index_by { |binding| [ binding.kind, binding.reference ] }
 
     objects.each do |object|
@@ -66,7 +66,7 @@ class FurnitureModelCatalog
       next unless replaceable_url?(object["model_url"])
 
       binding = bindings[binding_reference(object)]
-      object["model_url"] = model_url(binding.furniture_model, base: base) if binding
+      object["model_url"] = model_url(binding.furniture, base: base) if binding
     end
     fill_by_category(objects, base)
     resolved
@@ -81,7 +81,7 @@ class FurnitureModelCatalog
     return if missing.empty?
 
     categories = missing.map { |object| object["category"] }.uniq
-    models = FurnitureModel.available.where(category: categories).or(FurnitureModel.available.where(shape: categories)).to_a
+    models = Furniture.available.where(category: categories).or(Furniture.available.where(shape: categories)).to_a
     missing.each do |object|
       candidates = models.select { |model| model.category == object["category"] || model.shape == object["category"] }
       best = candidates.min_by { |model| size_distance(model, object["size"]) }

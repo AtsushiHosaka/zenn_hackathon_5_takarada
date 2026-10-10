@@ -1,8 +1,5 @@
 import { useRef, useState, type DragEvent } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { useRepositories } from '../../core/repositories';
 import { isManualFurniture, isTemplateFurniture, replacementFurnitureCategories, productCategories, type ManualFurnitureCategory, type FurnitureAddition, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
-import ErrorText from '../shared/ErrorText';
 import FurnitureAdditionRows from './FurnitureAdditionRows';
 import { downloadShoppingCsv } from './exports';
 import { LAYOUT_GRID_STEP, snapToLayoutGrid } from './layoutGrid';
@@ -119,20 +116,9 @@ function FurniturePalette({ design, disabled, hint, onAddItem, onDragItem, onVie
   onView: PlannerPanelProps['onView'];
   view: PlannerView;
 }) {
-  const { rooms } = useRepositories();
-  const [source, setSource] = useState<'link' | 'manual' | 'search' | 'image' | 'photo' | 'library'>('link');
+  const [source, setSource] = useState<'manual' | 'search' | 'image' | 'photo' | 'library'>('search');
   const library = useImportedFurniture();
   const [libraryError, setLibraryError] = useState('');
-  const [link, setLink] = useState('');
-  const submittedLink = furnitureLink(link.trim());
-  const imported = useMutation({
-    mutationFn: async (url: string) => { const scope = library.scope; return { url, item: await rooms.importFurniture(url), scope }; },
-    onSuccess: result => { if (result.scope !== library.scope) return; try { library.register(result.item); setLibraryError(''); } catch (cause) { setLibraryError(cause instanceof Error ? cause.message : '家具を保存できませんでした。'); } },
-  });
-  const linkedItem = imported.data && imported.data.scope === library.scope && imported.data.url === submittedLink ? imported.data.item : undefined;
-  const linkedItemFits = linkedItem ? Boolean(furniturePositionInRoom(linkedItem, linkedItem.position, design)) : false;
-  const canAddLinkedItem = Boolean(linkedItem && linkedItemFits && !disabled && !imported.isPending);
-  const productLink = furnitureLink(linkedItem?.productUrl);
   const [category, setCategory] = useState<ManualFurnitureCategory>('sofa');
   const [values, setValues] = useState(() => sizeValues(furnitureTemplates[0].size));
   const size = parseSize(values);
@@ -160,31 +146,11 @@ function FurniturePalette({ design, disabled, hint, onAddItem, onDragItem, onVie
     <div className="rc-planner-segments rc-furniture-source" role="group" aria-label="家具の追加方法">
       <button className="motion-control" type="button" aria-pressed={source === 'photo'} onClick={() => setSource('photo')}>画像から家具</button>
       <button className="motion-control" type="button" aria-pressed={source === 'library'} onClick={() => setSource('library')}>取り込んだ家具</button>
-      <button className="motion-control" type="button" aria-pressed={source === 'link'} onClick={() => setSource('link')}>リンクから追加</button>
-      <button className="motion-control" type="button" aria-pressed={source === 'search'} onClick={() => setSource('search')}>色で探す</button>
-      <button className="motion-control" type="button" aria-pressed={source === 'manual'} onClick={() => setSource('manual')}>リンクなしで選ぶ</button>
+      <button className="motion-control" type="button" aria-pressed={source === 'search'} onClick={() => setSource('search')}>登録家具から探す</button>
+      <button className="motion-control" type="button" aria-pressed={source === 'manual'} onClick={() => setSource('manual')}>種類と寸法で選ぶ</button>
       <button className="motion-control" type="button" aria-pressed={source === 'image'} onClick={() => setSource('image')}>画像から推しグッズ</button>
     </div>
-    {source === 'search' ? <FurnitureSearchPanel design={design} disabled={disabled} onAddItem={onAddItem}/> : source === 'photo' ? <ImageFurniturePalette disabled={disabled || !library.authenticated} onImport={item => { library.register(item); setSource('library'); setLibraryError(''); }} /> : source === 'library' ? <ImportedFurniturePalette key={library.scope} design={design} disabled={disabled} library={library} onAddItem={onAddItem} onDragStart={startItemDrag} onDragEnd={() => onDragItem(null)} /> : source === 'image' ? <ImageGoodsPalette design={design} disabled={disabled} onAddItem={onAddItem} onDragStart={startItemDrag} onDragEnd={() => onDragItem(null)} /> : source === 'link' ? <div className="rc-furniture-link-panel">
-      <form className="rc-furniture-link-form" onSubmit={event => { event.preventDefault(); if (submittedLink && !disabled && !imported.isPending) imported.mutate(submittedLink); }}>
-        <label htmlFor="planner-product-link">商品リンク</label>
-        <input id="planner-product-link" type="url" inputMode="url" placeholder="https://…" required value={link} disabled={disabled || imported.isPending} onChange={event => setLink(event.target.value)} />
-        <button className="motion-control" type="submit" disabled={disabled || !submittedLink || imported.isPending}>{imported.isPending ? '家具を作成中…' : 'リンクから家具を作成'}</button>
-      </form>
-      {imported.isPending && <p className="rc-planner-note" role="status">商品ページから家具の情報を取得しています。</p>}
-      {imported.isError && imported.variables === submittedLink && <ErrorText error={imported.error} />}
-      {linkedItem && <div className="rc-furniture-imported">
-        <button className="rc-furniture-imported-card motion-control" type="button" disabled={!canAddLinkedItem} draggable={canAddLinkedItem} aria-label={`${linkedItem.name}を床へドラッグ、またはクリックして中央に追加`} onClick={() => { if (canAddLinkedItem) onAddItem(linkedItem); }} onDragStart={event => { if (canAddLinkedItem) startItemDrag(event, linkedItem); else event.preventDefault(); }} onDragEnd={() => onDragItem(null)}>
-          <FurniturePhoto key={linkedItem.imageUrl ?? 'no-image'} item={linkedItem} />
-          <span>{linkedItem.name}</span>
-        </button>
-        <dl className="rc-planner-size">{dimensionLabels.map((label, index) => <div key={label}><dt>{label}</dt><dd>{cm(linkedItem.size[index])}<span>cm</span></dd></div>)}</dl>
-        {(linkedItem.price !== undefined || linkedItem.shop) && <p className="rc-furniture-product-meta">{linkedItem.price !== undefined && <span>¥{linkedItem.price.toLocaleString('ja-JP')}</span>}{linkedItem.shop && <span>{linkedItem.shop}</span>}</p>}
-        {productLink && <a className="rc-furniture-product-link" href={productLink} target="_blank" rel="noopener noreferrer">商品ページを見る</a>}
-        {!linkedItemFits && <p className="rc-planner-input-error" role="status">この家具は部屋の寸法に収まりません。</p>}
-        <button className="rc-furniture-add motion-control" type="button" disabled={!canAddLinkedItem} onClick={() => { if (canAddLinkedItem) onAddItem(linkedItem); }}>＋ 部屋の中央に追加</button>
-      </div>}
-    </div> : <>
+    {source === 'search' ? <FurnitureSearchPanel design={design} disabled={disabled} onAddItem={onAddItem}/> : source === 'photo' ? <ImageFurniturePalette disabled={disabled || !library.authenticated} onImport={item => { library.register(item); setSource('library'); setLibraryError(''); }} /> : source === 'library' ? <ImportedFurniturePalette key={library.scope} design={design} disabled={disabled} library={library} onAddItem={onAddItem} onDragStart={startItemDrag} onDragEnd={() => onDragItem(null)} /> : source === 'image' ? <ImageGoodsPalette design={design} disabled={disabled} onAddItem={onAddItem} onDragStart={startItemDrag} onDragEnd={() => onDragItem(null)} /> : <>
     <div className="rc-furniture-cards motion-control" role="group" aria-label="追加する家具を選ぶ">
       {furnitureTemplates.map(candidate => <button key={candidate.category} type="button" className="rc-furniture-card motion-control"
         disabled={disabled} draggable={!disabled} aria-pressed={category === candidate.category}
@@ -321,8 +287,8 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
           {isProductCategory(selected.category) && <FurnitureSearchPanel key={`${selected.id}:${selected.productMetadata?.variantId ?? selected.productUrl ?? selected.name}`} replacementTarget={selected} design={design} disabled={itemDisabled} onAddItem={product => {
             const position = productReplacementPosition(product, selected, design);
             if (!position) return;
-            const { ecProductId, ...details } = product;
-            const replacement: RoomItem = { ...details, id: selected.id, existing: false, position, rotation: selected.rotation, marker: selected.marker, ...((selected.replacesObjectId || selected.existing) ? { replacesObjectId: selected.replacesObjectId ?? selected.id } : {}), ecProductId, ...(!isManualFurniture(selected) ? { productId: String(1_000_000_000 + Number(ecProductId)) } : {}) };
+            const { furnitureDetailId, ...details } = product;
+            const replacement: RoomItem = { ...details, id: selected.id, existing: false, position, rotation: selected.rotation, marker: selected.marker, ...((selected.replacesObjectId || selected.existing) ? { replacesObjectId: selected.replacesObjectId ?? selected.id } : {}), furnitureDetailId, ...(!isManualFurniture(selected) ? { productId: String(1_000_000_000 + Number(furnitureDetailId)) } : {}) };
             const originalId = selected.replacesObjectId ?? (selected.existing ? selected.id : undefined);
             if (originalId && furnitureRequests) furnitureRequests.onOperationChange(originalId, 'replace');
             const operations = design.furnitureOperations ?? furnitureRequests?.operations ?? (design.before?.items ?? design.items).filter(item => item.existing).map(item => ({ objectId: item.id, action: 'keep' as const }));

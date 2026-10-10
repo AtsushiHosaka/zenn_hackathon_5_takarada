@@ -28,7 +28,7 @@ export default function ImportedFurniturePalette({ design, disabled, library, on
     <ErrorText error={library.error} />
     {error && <p className="rc-planner-input-error" role="alert">{error}</p>}
     <p className="rc-planner-note" role="status">{items.length}件 / 保存済み{library.data.length}件</p>
-    {library.authenticated && !library.isPending && !library.error && items.length === 0 && <p className="rc-planner-note">{library.data.length ? '一致する家具がありません。' : '画像や商品リンクから家具を取り込むと、ここに表示します。'}</p>}
+    {library.authenticated && !library.isPending && !library.error && items.length === 0 && <p className="rc-planner-note">{library.data.length ? '一致する家具がありません。' : '画像から家具を取り込むと、ここに表示します。'}</p>}
     {items.map(item => {
       const fits = Boolean(furniturePositionInRoom(item, [0, item.size[1] / 2, 0], design));
       const available = !disabled && fits;

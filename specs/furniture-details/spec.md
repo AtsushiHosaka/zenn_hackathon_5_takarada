@@ -1,0 +1,53 @@
+# 家具と色・寸法・購入リンクをDBで持つ
+
+ECサイトの自動検索をいったん止め、DBに登録した家具だけでコーデ提案・家具検索を行う。
+
+## 根拠
+
+2026-10-10のユーザー依頼（チャット）を根拠とする。Google Docs URLは`docs/project.md`に未設定で、Docsは未確認・未反映。
+
+- 「ECサイトのリンク自動検索いったんやめてDBに保存されているものを使う」
+- 「1家具 - 1 3Dモデル - 多リンク」。リンク先の商品と3Dモデルは十分似ている前提で、リンクを別テーブルに分けない。
+- 構造は`Furniture`（3Dモデル）と`FurnitureDetail`（色・寸法・リンク）。`furniture_models`は`furnitures`に置き換える。
+- 商品URLを貼って所有家具を取り込む機能（`furniture_imports`）も止める。
+- 既存データはJSONにまとめ、Rakeタスクで新テーブルへ反映する。床置き家具は本番DBで取得済みの商品から移す。
+
+## データ
+
+```
+furnitures          1件 = 3Dモデル1つ (GLBのキー・寸法・素材)。db/furnitures.json → rails furniture:import
+  ├─ furniture_bindings  写真の家具ID / 保存済みコーデの商品ID → 家具。同じJSONから取り込む
+  └─ furniture_details   色・寸法・価格(税込の参考価格)・店・URL・画像・テーマ。db/furniture_details.json → rails furniture_detail:import
+```
+
+- 両JSONを正とする。`furniture_detail:import`はJSONにないdetailを消す。先に`furniture:import`が必要。
+- デプロイ・`compose`・`make furniture-import`・seedは両タスクを順に流す。
+- 3Dは家具のモデルの形を使い、detailの`color`を主素材に上書きして塗る。商品からモデルを寸法比で推定する照合（`FurnitureProductMatcher`）は削除した。
+- 写真の家具の照合（`FurnitureModelCatalog.fill_by_category`・`existing`の対応）は`furnitures`を引くだけで、ロジックは変えていない。
+- 旧`furniture_models`・`furniture_model_bindings`・`ec_products`のテーブルは保存済みデータの確認用に残す。コード（モデルクラス含む）からは参照しない。削除は別作業で行う。
+- `/api/v1/furniture_models`のパスと応答の形は変えていない（中身は`furnitures`）。
+
+## 初期データ（`db/furniture_details.json`、92件・家具57件）
+
+- 手入力の静的カタログ（旧`config/interior_links_mock.yml`）37件。テーマと並び順を保つ。URLのない参考モック3件は、検索リンクをURLにしている。
+- 本番`ec_products`（2026-10-10時点で73件。読み取りのみ）から60件。同じURLの静的行5件は統合した。
+- 除外した13件：自動検索でのカテゴリ誤り（ペンダントランプ→カーテン/タペストリー/フロアランプ、マットレスプロテクター→ベッド、デスクチェア→デスク、ランプシェード→ベッドカバー、パズルマット→ラグ、飾り棚→タペストリー）、奥行きが幅と同値の壁棚3件。
+- モデルは静的行では従来の対応表、本番分では照合結果を使う。照合が外れた16件と、似ていないモデルが付いた椅子などは、商品名を見て手で割り当てた。
+- 床置きの家具は椅子30件・棚1件・テーブル1件だけ。**ソファ・ベッド・机はdetailがなく、追加・入れ替えでは候補0件**になる。
+- 生成に使ったスクリプトは本番ダンプに依存するため、コミットしていない。
+
+## API・挙動の変更
+
+- `ec_product_id` / `replacement_ec_product_id` → `furniture_detail_id` / `replacement_furniture_detail_id`（SceneObject・FurnitureEdit）。
+- `POST /furniture_searches`はDB検索。商品名の一致を優先し、一致がなければ推定カテゴリ（なければ床置き）全体を返す。家具ごとに1件で、同じ家具のdetailを`variants`で返す。`failures`・`search_entry_points`は削除。
+- `POST /furniture_imports`は削除。
+- `Coordination.product_source`に`db`を追加。`ec`・`mock`は過去の提案用。
+- Geminiの説明文によるテクスチャ生成は、ECで確認した商品（metadataに`provider`がある）だけに行う。手入力の行は色の上書きのみ。
+
+- 実EC検索のコード（検索・ページ取得・HTML解析・商品画像の色抽出・`RealClient`・`MockClient`・`interior_links_mock.yml`）と関連の環境変数（`EC_PROVIDER`・`EC_SEARCH_MODEL`・`EC_EXTRACTION_MODEL`）を削除した。カテゴリ判定規則と色名は`InteriorLinks::ProductCategories`・`ProductColors`に残す。
+- 追加・入れ替えで候補がないとき、そのカテゴリが未登録なら「まだ登録されていない」と断る（予算・配置の都合と区別する）。
+
+## 未対応・未検証
+
+- ローカル（Geminiなし・モックのプランナー）で、テーマ提案・椅子の追加・棚の入れ替え・選んだdetailでの入れ替え・カテゴリ違いの拒否を確認した。Geminiのプランナー、本番データ、Web/iOSの実画面では未確認。
+- iOSは家具検索・取り込みのAPIを使っていないため変更していない。

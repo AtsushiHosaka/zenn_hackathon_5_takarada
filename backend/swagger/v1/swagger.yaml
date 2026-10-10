@@ -208,39 +208,6 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/NotFound"
-  "/api/v1/furniture_imports":
-    post:
-      summary: 商品リンクから所有家具の情報を取得する
-      tags:
-      - FurnitureImports
-      description: 対応ショップの商品詳細HTMLを取得・検証する。取得と解析は最大45秒。実商品名・円価格・寸法の根拠を確認できない場合や対応外カテゴリは422。未掲載の寸法は推定軸として明示する。モデルが無い場合はnullを返す。購入提案や予算の合計には追加しない。
-      security:
-      - bearerAuth: []
-      parameters: []
-      responses:
-        '201':
-          description: 商品情報を確認できた
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/ImportedFurniture"
-        '401':
-          description: ログインが必要
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/Unauthorized"
-        '422':
-          description: 商品を取得・確認できない
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/ValidationErrors"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/FurnitureImportInput"
   "/api/v1/furniture_models":
     get:
       summary: 利用できる 3D 家具モデルを一覧で取得する
@@ -285,10 +252,11 @@ paths:
                 "$ref": "#/components/schemas/NotFound"
   "/api/v1/furniture_searches":
     post:
-      summary: 家具を検索し公式の色で絞り込む
+      summary: 登録された家具を検索し色で絞り込む
       tags:
       - FurnitureSearches
-      description: 公式商品ページを検証し、掲載されている色名で絞り込む。最大24件。色違いは公式の選択欄・ProductGroupにあるURLとSKUを返し、選択時にfurniture_importsで商品情報を再確認する。検索は最大130秒。
+      description: DBに登録された家具 (furniture_details) を検索する。外部ECは検索しない。商品名に検索語を含むものを優先し、無ければ推定したカテゴリ
+        (なければ床置き家具) 全体を返す。色は公式の色名・商品名で絞り込む。家具ごとに1件で最大24件。同じ家具の他の色・寸法・購入先はvariantsに入る。
       security:
       - bearerAuth: []
       parameters: []
@@ -939,10 +907,10 @@ components:
         color:
           type: string
           example: "#f2f0eb"
-        ec_product_id:
+        furniture_detail_id:
           type: integer
           minimum: 1
-          description: リンクから補完した所有家具のEcProduct ID
+          description: 家具の色・寸法・購入リンク (FurnitureDetail) のID。登録された家具から選んだ所有家具・提案商品に付く
           example: 1
         price:
           type: integer
@@ -1234,15 +1202,15 @@ components:
           example: chair
         artwork:
           "$ref": "#/components/schemas/ImageArtwork"
-        replacement_ec_product_id:
+        replacement_furniture_detail_id:
           type: integer
           minimum: 1
-          description: 手動の所有家具を置き換える購入商品のID。所有家具のec_product_idは変更しない
+          description: 手動の所有家具を置き換える購入商品 (FurnitureDetail) のID。所有家具のfurniture_detail_idは変更しない
           example: 2
-        ec_product_id:
+        furniture_detail_id:
           type: integer
           minimum: 1
-          description: 商品検索・インポート結果のID。元の家具と同じカテゴリの商品に限り、商品・モデル情報をサーバー側で復元する
+          description: 家具検索結果 (FurnitureDetail) のID。元の家具と同じカテゴリの商品に限り、商品・モデル情報をサーバー側で復元する
           example: 1
         position:
           "$ref": "#/components/schemas/Position"
@@ -1295,27 +1263,6 @@ components:
           example: sofa
       required:
       - category
-    FurnitureImportInput:
-      type: object
-      properties:
-        purpose:
-          type: string
-          enum:
-          - replacement
-          description: 置換用の取得では床家具以外の対応商品も返す
-          example: replacement
-        variant_id:
-          type: string
-          maxLength: 120
-          description: 同じ商品ページで選ぶ場合の公式バリエーションSKU
-          example: '50337820'
-        url:
-          type: string
-          maxLength: 2048
-          description: 対応するショップの商品詳細URL
-          example: https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/
-      required:
-      - url
     FurnitureSearchInput:
       type: object
       properties:
@@ -1380,26 +1327,16 @@ components:
         products:
           type: array
           maxItems: 24
+          description: 家具ごとに1件。同じ家具の他の色・寸法・購入先はvariants
           items:
-            "$ref": "#/components/schemas/ImportedFurniture"
+            "$ref": "#/components/schemas/FurnitureSearchProduct"
         color:
           type: string
           nullable: true
           example: blue
-        failures:
-          type: integer
-          minimum: 0
-          example: 0
-        search_entry_points:
-          type: array
-          items:
-            type: string
-          example: []
       required:
       - products
       - color
-      - failures
-      - search_entry_points
     ProductColorVariant:
       type: object
       properties:
@@ -1424,17 +1361,21 @@ components:
       - url
       - variant_id
       - source
-    ImportedFurniture:
+    FurnitureDetail:
       type: object
-      description: 実ページで確認した所有家具。寸法・色・モデルは近似で、推定した軸はproduct_metadataに記録する
+      description: 家具の色・寸法・購入リンク1つ。3Dは家具 (furniture_id) のモデルの形を使い、colorで塗る。推定した軸はproduct_metadataに記録する
       properties:
-        ec_product_id:
+        furniture_detail_id:
+          type: integer
+          minimum: 1
+          example: 1
+        furniture_id:
           type: integer
           minimum: 1
           example: 1
         name:
           type: string
-          example: ホワイトチェア
+          example: SANDSBERG サンドスベリ チェア - ホワイト
         category:
           type: string
           enum:
@@ -1470,23 +1411,27 @@ components:
         color:
           type: string
           example: "#f2efe8"
+        color_name:
+          type: string
+          nullable: true
+          example: ホワイト
         size:
           "$ref": "#/components/schemas/Size"
         price:
           type: integer
           minimum: 1
-          example: 7990
+          description: リンク先の参考価格 (税込)
+          example: 2000
         shop:
           type: string
           example: IKEA
         url:
           type: string
-          example: https://www.ikea.com/jp/ja/p/example-chair-12345678/
+          example: https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/
         image_url:
           type: string
           nullable: true
-          description: 商品ページのJSON-LDまたはog:imageで確認した写真URL。なければnull
-          example: https://www.ikea.com/jp/ja/images/products/teodores-chair-white__0727344_pe735616_s5.jpg
+          example:
         product_metadata:
           "$ref": "#/components/schemas/ProductMetadata"
         model_url:
@@ -1511,19 +1456,34 @@ components:
           nullable: true
           example:
       required:
-      - ec_product_id
+      - furniture_detail_id
+      - furniture_id
       - name
       - category
       - color
+      - color_name
       - size
       - price
       - shop
       - url
+      - image_url
       - product_metadata
       - model_url
       - model_match
       - model_size
       - model_fit
+    FurnitureSearchProduct:
+      allOf:
+      - "$ref": "#/components/schemas/FurnitureDetail"
+      - type: object
+        properties:
+          variants:
+            type: array
+            description: 同じ家具の全detail (自身を含む)
+            items:
+              "$ref": "#/components/schemas/FurnitureDetail"
+        required:
+        - variants
     MaterialOverride:
       type: object
       properties:
@@ -1907,9 +1867,11 @@ components:
           nullable: true
           enum:
           -
+          - db
           - ec
           - mock
-          example: ec
+          description: 'db: 登録された家具から選んだ / ec・mock: 以前の実EC検索・モックで作った提案'
+          example: db
         title:
           type: string
           nullable: true

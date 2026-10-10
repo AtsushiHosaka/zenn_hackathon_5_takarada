@@ -13,7 +13,7 @@ fi
 [[ "$bucket" =~ ^[a-z0-9][a-z0-9._-]{1,220}[a-z0-9]$ ]] || die "MODELS_BUCKETにはGCSのバケット名を指定してください。"
 
 models_dir="$ROOT/output/furniture_models/furniture"
-manifest="$ROOT/backend/db/furniture_models.json"
+manifest="$ROOT/backend/db/furnitures.json"
 [ -d "$models_dir" ] || die "GLBがありません。tools/furniture_models/README.mdの生成手順を実行してください。"
 staging_dir="$(mktemp -d)"
 trap 'rm -rf "$staging_dir"' EXIT

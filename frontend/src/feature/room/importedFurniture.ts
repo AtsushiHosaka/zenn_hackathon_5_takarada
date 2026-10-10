@@ -8,7 +8,7 @@ import { useRoomPlanScope } from './plans';
 const MAX_ITEMS = 30;
 const MAX_STORAGE_LENGTH = 4 * 1024 * 1024;
 const storageKey = (scope: string) => `room-coordinator.imported-furniture.v1:${scope}`;
-const itemIdentity = (item: RoomItem) => item.ecProductId ? `ec:${item.ecProductId}` : item.id;
+const itemIdentity = (item: RoomItem) => item.furnitureDetailId ? `detail:${item.furnitureDetailId}` : item.id;
 
 export function readImportedFurniture(scope: string): RoomItem[] {
   try {

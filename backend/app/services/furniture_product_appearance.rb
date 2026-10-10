@@ -30,14 +30,13 @@ class FurnitureProductAppearance
       next if item.dig("product_metadata", "source") == "mock"
 
       begin
-        match = FurnitureProductMatcher.call(item: item, object: object)
-        unless match
+        model = Furniture.available.find_by(id: item.dig("product_metadata", "furniture_id"))
+        unless model
           object["model_url"] = nil
           object["texture_status"] = item["texture_status"] = "unmatched"
           next
         end
-        model = match.model
-        model_match = { "model_id" => model.id, "reason" => match.reason, "approximate" => match.approximate }
+        model_match = { "model_id" => model.id, "reason" => "furniture_detail", "approximate" => true }
         object["model_match"] = item["model_match"] = model_match
         object["model_url"] = FurnitureModelCatalog.model_url(model)
         object["model_size"] = { "w" => model.width.to_f, "h" => model.height.to_f, "d" => model.depth.to_f }
@@ -48,7 +47,8 @@ class FurnitureProductAppearance
         # Apply the product color even without image generation or its dependencies.
         object["material_overrides"] = overrides if overrides.present?
         status = overrides.present? ? "ready" : "disabled"
-        if !edited_color && !image_color?(item) && object["model_url"].present? && ENV["MODELS_BUCKET"].present? && GeminiImageClient.configured?(user_id: @user_id)
+        # Hand-entered details have no verified product page to describe materials from.
+        if !edited_color && !image_color?(item) && item.dig("product_metadata", "provider").present? && object["model_url"].present? && ENV["MODELS_BUCKET"].present? && GeminiImageClient.configured?(user_id: @user_id)
           object["texture_source"] = item["texture_source"] = "description"
           @generator ||= FurnitureTextureGenerator.new
           generated = @generator.call(item: item, model: model, max_images: MAX_IMAGES - @generator.attempts, deadline: deadline)
@@ -80,7 +80,7 @@ class FurnitureProductAppearance
 
     overrides = { material => { "color" => color } }
     metadata = item.fetch("product_metadata", {})
-    colors = InteriorLinks::ProductParser::COLORS.keys.count { |pattern| pattern.match?(metadata["color_name"].to_s) }
+    colors = InteriorLinks::ProductColors::NAMES.keys.count { |pattern| pattern.match?(metadata["color_name"].to_s) }
     # Upholstered templates may also represent a painted wooden frame. Recolor
     # that region only with published coating evidence and a single color name.
     material_description = metadata["material"].to_s

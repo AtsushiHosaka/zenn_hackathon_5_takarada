@@ -1,4 +1,4 @@
-# インテリアリンク取得 (EC 連携・うらっしゅ担当) との境界。
+# コーデの商品候補を出す境界。
 #
 #   InteriorLinks.client.search(prompt:, theme:, slots:, max_price:)
 #     => { "curtain" => [InteriorLinks::Item, ...], ... }
@@ -6,7 +6,7 @@
 # 枠 (slot) ごとに、おすすめ順の商品候補を返す。価格は max_price 以下に絞る。
 # theme が nil なら、テーマで絞らずに返す (要望文から Gemini が選ぶときに使う)。
 # 選ぶ・置く・予算に収めるのは呼び出し側 (CoordinationBuilder) の責務で、ここは候補を出すだけ。
-# 認証と利用許可がある場合は実EC検索、未設定時はMockClientへ切り替える。
+# 候補は DB の furniture_details (FurnitureDetailClient) から出す。外部の EC は検索しない。
 module InteriorLinks
   SLOTS = %w[bed_cover curtain rug wall_decor light display cushion desk_top floor].freeze
   FLOOR_CATEGORIES = %w[sofa bed desk chair shelf table storage tv_stand wardrobe].freeze
@@ -22,14 +22,11 @@ module InteriorLinks
   }.freeze
   FALLBACK_SIZE = { "w" => 0.3, "h" => 0.3, "d" => 0.3 }.freeze
 
-  def self.provider(user_id: nil)
-    selected = ENV["EC_PROVIDER"].presence
-    raise ArgumentError, "EC_PROVIDER は live / mock のどちらか" if selected && !%w[live mock].include?(selected)
-
-    selected || (GeminiClient.configured?(user_id:) ? "live" : "mock")
+  def self.provider(**)
+    "db"
   end
 
-  def self.client(user_id: nil, preferred_categories: nil, previous_items: [])
-    provider(user_id:) == "live" ? RealClient.new(user_id:, preferred_categories:, previous_items:) : MockClient.new
+  def self.client(**)
+    FurnitureDetailClient.new
   end
 end

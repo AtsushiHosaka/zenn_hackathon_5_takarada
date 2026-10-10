@@ -1,9 +1,12 @@
-class FurnitureModel < ApplicationRecord
+# 家具 1 件 = 3D モデル 1 つ。買える商品 (色・寸法・購入リンク) は details に持つ
+class Furniture < ApplicationRecord
   UNIT = "meter".freeze
   AXES = "+Y up, +Z front, origin bottom center".freeze
   KEY_PATTERN = /\A[a-zA-Z0-9][a-zA-Z0-9_-]*\z/
 
-  has_many :bindings, class_name: "FurnitureModelBinding", dependent: :destroy
+  has_many :bindings, class_name: "FurnitureBinding", dependent: :destroy, inverse_of: :furniture
+  # 写真の家具にだけ使うモデルは details を持たない
+  has_many :details, class_name: "FurnitureDetail", dependent: :restrict_with_exception, inverse_of: :furniture
   scope :available, -> { where(enabled: true) }
 
   validates :key, presence: true, uniqueness: true, format: { with: KEY_PATTERN }

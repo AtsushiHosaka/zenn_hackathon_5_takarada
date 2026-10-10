@@ -37,7 +37,7 @@
 python3 tools/furniture_models/manifest.py
 ```
 
-生成したJSONは`backend/db/furniture_models.json`に保存する。モデル定義やGLBを変更したときは、このJSONも更新して変更に含める。
+生成したJSONは`backend/db/furnitures.json`に保存する。モデル定義やGLBを変更したときは、このJSONも更新して変更に含める。
 
 GCPにログイン済みの環境で、生成済みのGLBをアップロードする。`infra/gcp/bin/models-publish.sh`は台帳に載ったGLBだけを一時ディレクトリへ複製し、その内容を検証して`gs://<bucket>/models/furniture/v1/`へ配置する。生成先に余分なGLBがあっても公開しない。バケット名は`MODELS_BUCKET`、未設定ならTerraformの`models_bucket`出力から取得する。
 
@@ -83,7 +83,7 @@ make db-apply
 make furniture-models-import
 ```
 
-本番ではデプロイCIと`make infra-release`が、Cloud Runジョブで`db:apply`と`furniture_models:import`を順に実行する。その後、APIとWebのサービスを新しいイメージへ更新する。
+本番ではデプロイCIと`make infra-release`が、Cloud Runジョブで`db:apply`・`furniture:import`・`furniture_detail:import`を順に実行する。その後、APIとWebのサービスを新しいイメージへ更新する。
 
 取り込みはJSON全体を検証してからトランザクション内で更新する。同じモデルIDや対応IDを再取り込みしても行は増えない。入力から外した対応関係はDBから削除する。入力にないモデルは削除せず、手動で無効にしたモデルは無効のまま保つ。
 

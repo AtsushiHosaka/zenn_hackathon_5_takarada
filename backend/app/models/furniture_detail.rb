@@ -1,0 +1,36 @@
+class FurnitureDetail < ApplicationRecord
+  belongs_to :furniture, inverse_of: :details
+
+  validates :key, presence: true, uniqueness: true
+  validates :name, :category, :shop, :url, presence: true
+  validates :slot, inclusion: { in: InteriorLinks::SLOTS }
+  validates :color, format: { with: /\A#[0-9a-f]{6}\z/i }
+  validates :price, numericality: { only_integer: true, greater_than: 0 }
+  validates :width, :height, :depth, numericality: { greater_than: 0 }
+  validate :valid_themes
+
+  def size
+    { "w" => width.to_f, "h" => height.to_f, "d" => depth.to_f }
+  end
+
+  # シーンの家具・検索結果に載せる商品とモデルの情報。寸法は商品、形は家具のモデルを使う
+  def scene_attributes
+    model = furniture if furniture.enabled?
+    model_url = model && FurnitureModelCatalog.model_url(model)
+    {
+      "furniture_detail_id" => id, "label" => name, "category" => category, "color" => color, "size" => size,
+      "price" => price, "shop" => shop, "url" => url, "image_url" => image_url, "product_metadata" => metadata,
+      "model_url" => model_url,
+      "model_match" => model && { "model_id" => model.id, "reason" => "furniture_detail", "approximate" => true },
+      "model_size" => model && { "w" => model.width.to_f, "h" => model.height.to_f, "d" => model.depth.to_f },
+      "model_fit" => model ? "contain" : nil,
+      "texture_status" => model_url ? "disabled" : "unmatched"
+    }
+  end
+
+  private
+
+  def valid_themes
+    errors.add(:themes, "must be an array of strings") unless themes.is_a?(Array) && themes.all? { |theme| theme.is_a?(String) }
+  end
+end

@@ -1,10 +1,10 @@
 require "json"
 
-# メタデータ全体を検証してから取り込む。GLB のアップロードは行わない。
-class FurnitureModelImporter
+# db/furnitures.json (家具 = 3D モデルの台帳) を検証してから furnitures / furniture_bindings に取り込む。GLB のアップロードは行わない。
+class FurnitureImporter
   class InvalidManifest < StandardError; end
 
-  def self.call(path = Rails.root.join("db/furniture_models.json"))
+  def self.call(path = Rails.root.join("db/furnitures.json"))
     new(JSON.parse(File.read(path))).call
   rescue JSON::ParserError => error
     raise InvalidManifest, "Invalid JSON: #{error.message}"
@@ -17,19 +17,19 @@ class FurnitureModelImporter
   def call
     models, bindings = validate_manifest
 
-    FurnitureModel.transaction do
+    Furniture.transaction do
       imported = models.to_h do |attributes|
-        model = FurnitureModel.find_or_initialize_by(key: attributes.fetch(:key))
+        model = Furniture.find_or_initialize_by(key: attributes.fetch(:key))
         model.update!(attributes)
         [ model.key, model ]
       end
       retained_binding_ids = bindings.map do |attributes|
-        binding = FurnitureModelBinding.find_or_initialize_by(kind: attributes.fetch("kind"), reference: attributes.fetch("reference"))
-        binding.update!(furniture_model: imported.fetch(attributes.fetch("model_id")), managed_by: "manifest", match_metadata: {})
+        binding = FurnitureBinding.find_or_initialize_by(kind: attributes.fetch("kind"), reference: attributes.fetch("reference"))
+        binding.update!(furniture: imported.fetch(attributes.fetch("model_id")), managed_by: "manifest", match_metadata: {})
         binding.id
       end
       # 対応表はmanifestを正とする。用途が外れたモデル本体の履歴は残す。
-      FurnitureModelBinding.where(managed_by: "manifest").where.not(id: retained_binding_ids).delete_all
+      FurnitureBinding.where(managed_by: "manifest").where.not(id: retained_binding_ids).delete_all
     end
 
     { models: models.length, bindings: bindings.length }
@@ -39,8 +39,8 @@ class FurnitureModelImporter
 
   def validate_manifest
     check(@manifest.is_a?(Hash), "manifest must be an object")
-    check(@manifest["unit"] == FurnitureModel::UNIT, "unit must be #{FurnitureModel::UNIT}")
-    check(@manifest["axes"] == FurnitureModel::AXES, "axes must be #{FurnitureModel::AXES}")
+    check(@manifest["unit"] == Furniture::UNIT, "unit must be #{Furniture::UNIT}")
+    check(@manifest["axes"] == Furniture::AXES, "axes must be #{Furniture::AXES}")
     check(@manifest["models"].is_a?(Array), "models must be an array")
     check(@manifest["bindings"].is_a?(Array), "bindings must be an array")
 
@@ -59,9 +59,9 @@ class FurnitureModelImporter
     %w[id name category shape format object_key sha256].each do |key|
       check(model[key].is_a?(String) && model[key].present?, "#{label}.#{key} must be a nonempty string")
     end
-    check(model["id"].match?(FurnitureModel::KEY_PATTERN), "#{label}.id must be a stable filename key")
+    check(model["id"].match?(Furniture::KEY_PATTERN), "#{label}.id must be a stable filename key")
     check(model["format"] == "glb", "#{label}.format must be glb")
-    check(FurnitureModel.valid_object_key?(model["object_key"]), "#{label}.object_key must be a safe relative GLB path")
+    check(Furniture.valid_object_key?(model["object_key"]), "#{label}.object_key must be a safe relative GLB path")
     check(model["sha256"].match?(/\A[0-9a-f]{64}\z/), "#{label}.sha256 must be 64 lowercase hex characters")
     check(model["variant"].nil? || model["variant"].is_a?(String), "#{label}.variant must be a string or null")
     size = model["size"]
@@ -83,7 +83,7 @@ class FurnitureModelImporter
   def validate_binding(binding, model_keys, index)
     label = "bindings[#{index}]"
     check(binding.is_a?(Hash), "#{label} must be an object")
-    check(FurnitureModelBinding::KINDS.include?(binding["kind"]), "#{label}.kind must be existing or product")
+    check(FurnitureBinding::KINDS.include?(binding["kind"]), "#{label}.kind must be existing or product")
     check(binding["reference"].is_a?(String) && binding["reference"].present?, "#{label}.reference must be a nonempty string")
     if binding["kind"] == "product"
       check(binding["reference"].match?(/\A[1-9][0-9]*\z/), "#{label}.reference must be a positive product ID")
