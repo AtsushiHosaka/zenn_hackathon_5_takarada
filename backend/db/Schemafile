@@ -1,4 +1,4 @@
-# ridgepole のスキーマ定義。**DB の唯一の正はこのファイル**。
+# ridgepole のスキーマ定義。**DB の唯一の正はこのファイル**。ここに無いテーブルは db:apply で削除される (--drop-table)。
 # 変更したら `make db-apply` (中身は ridgepole --apply) で DB に反映する。
 # マイグレーションファイルは作らない。
 
@@ -62,60 +62,6 @@ create_table "coordinations", force: :cascade do |t|
   t.text "error_message"
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
-end
-
-# 公式ECで確認した商品・バリエーションの安定した内部IDと取得情報を保存する
-create_table "ec_products", force: :cascade do |t|
-  t.string "provider", null: false
-  t.string "provider_product_id", null: false
-  t.string "variant_id", null: false
-  t.string "source_url", null: false
-  t.jsonb "data", null: false, default: {}
-  t.datetime "fetched_at", null: false
-  t.datetime "created_at", null: false
-  t.datetime "updated_at", null: false
-
-  t.index [ "provider", "provider_product_id", "variant_id" ], unique: true, name: "index_ec_products_on_identity"
-end
-
-# 旧: 3D モデルの台帳。furnitures へ置き換えた。デプロイ後に保存済みデータを確認してから削除する
-create_table "furniture_models", force: :cascade do |t|
-  t.string "key", null: false
-  t.string "name", null: false
-  t.string "category", null: false
-  t.string "shape", null: false
-  t.string "variant"
-  t.string "format", null: false, default: "glb"
-  t.string "object_key", null: false
-  t.decimal "width", precision: 10, scale: 6, null: false
-  t.decimal "height", precision: 10, scale: 6, null: false
-  t.decimal "depth", precision: 10, scale: 6, null: false
-  t.integer "triangle_count", null: false
-  t.bigint "byte_size", null: false
-  t.string "sha256", null: false
-  t.jsonb "materials", null: false, default: []
-  t.boolean "enabled", null: false, default: true
-  t.datetime "created_at", null: false
-  t.datetime "updated_at", null: false
-
-  t.index [ "key" ], unique: true
-  t.check_constraint "width > 0::numeric AND width < 10000::numeric AND height > 0::numeric AND height < 10000::numeric AND depth > 0::numeric AND depth < 10000::numeric", name: "furniture_models_positive_dimensions"
-  t.check_constraint "triangle_count >= 0 AND byte_size > 0", name: "furniture_models_valid_counts"
-  t.check_constraint "format::text = 'glb'::text", name: "furniture_models_glb_format"
-end
-
-# 旧: furniture_bindings へ置き換えた。furniture_models と一緒に削除する
-create_table "furniture_model_bindings", force: :cascade do |t|
-  t.references "furniture_model", null: false, foreign_key: true
-  t.string "kind", null: false
-  t.string "reference", null: false
-  t.string "managed_by", null: false, default: "manifest"
-  t.jsonb "match_metadata", null: false, default: {}
-  t.datetime "created_at", null: false
-  t.datetime "updated_at", null: false
-
-  t.index [ "kind", "reference" ], unique: true
-  t.check_constraint "kind::text = ANY (ARRAY['existing'::character varying::text, 'product'::character varying::text])", name: "furniture_model_bindings_valid_kind"
 end
 
 # Description-derived images are immutable and shared by their complete generation key.

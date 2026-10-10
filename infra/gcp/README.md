@@ -198,6 +198,6 @@ Cloud Run がゼロまで縮んでいるためのコールドスタート。常�
 
 画像生成は`GEMINI_IMAGE_MODEL=gemini-3.1-flash-image`、`GEMINI_IMAGE_LOCATION=global`が既定で、`FURNITURE_TEXTURES_ENABLED=false`で停止できる。商品写真は入力せず、公式の色・素材の説明から近似テクスチャを生成する。1コーデにつき生成試行は最大3回、画像生成全体の期限は90秒。
 
-生成結果は既存`MODELS_BUCKET`の`textures/description-seamless-v1/`へ保存する。`storage.tf`はAPIサービスアカウントに、この接頭辞だけの`roles/storage.objectCreator`を追加する。既存GLBへの書き込み権限は付けない。このIAM変更の本番適用は通常のインフラ反映で行う。`ec_products`・`furniture_models`・`furniture_model_bindings`は旧データの確認用に残しており、コードからは参照しない。
+生成結果は既存`MODELS_BUCKET`の`textures/description-seamless-v1/`へ保存する。`storage.tf`はAPIサービスアカウントに、この接頭辞だけの`roles/storage.objectCreator`を追加する。既存GLBへの書き込み権限は付けない。このIAM変更の本番適用は通常のインフラ反映で行う。旧`ec_products`・`furniture_models`・`furniture_model_bindings`は2026-10-10にJSONへ移行して削除した。`db:apply`はSchemafileにないテーブルを削除する（`--drop-table`）。
 
 ローカルでは画像を`backend/tmp/storage`へ保存し、開発限定の`GET /api/v1/assets/{key}`から配信する。`DEV_API_ORIGIN`にはブラウザから到達できるAPIのURLを設定する。本番ではこの配信APIは404となり、GCSの公開URLを使う。

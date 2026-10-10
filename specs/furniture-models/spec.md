@@ -21,7 +21,7 @@ Google DocsのURLは`docs/project.md`に未設定のため、Docsは未確認。
 
 ## DBと配信の判断
 
-`backend/db/Schemafile`に`furniture_models`と`furniture_model_bindings`を定義する。モデルIDと、対応の種類・参照IDには一意制約を置く。バリエーションはGLBごとに一行とする。`object_key`は`models/furniture/v1/<file>.glb`とする。
+`backend/db/Schemafile`に`furnitures`と`furniture_bindings`を定義する（2026-10-10に旧`furniture_models`・`furniture_model_bindings`から移行）。モデルIDと、対応の種類・参照IDには一意制約を置く。バリエーションはGLBごとに一行とする。`object_key`は`models/furniture/v1/<file>.glb`とする。
 
 公開APIと`ModelResolver`は`FURNITURE_MODEL_BASE_URL`を優先し、未設定なら`MODELS_BUCKET`から`https://storage.googleapis.com/<bucket>`を組み立てる。この配信元へ`object_key`を連結する。両方未設定ならURLを返さない。
 

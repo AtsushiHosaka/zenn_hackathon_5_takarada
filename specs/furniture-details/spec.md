@@ -24,7 +24,10 @@ furnitures          1件 = 3Dモデル1つ (GLBのキー・寸法・素材)。db
 - デプロイ・`compose`・`make furniture-import`・seedは両タスクを順に流す。
 - 3Dは家具のモデルの形を使い、detailの`color`を主素材に上書きして塗る。商品からモデルを寸法比で推定する照合（`FurnitureProductMatcher`）は削除した。
 - 写真の家具の照合（`FurnitureModelCatalog.fill_by_category`・`existing`の対応）は`furnitures`を引くだけで、ロジックは変えていない。
-- 旧`furniture_models`・`furniture_model_bindings`・`ec_products`のテーブルは保存済みデータの確認用に残す。コード（モデルクラス含む）からは参照しない。削除は別作業で行う。
+- 旧`furniture_models`・`furniture_model_bindings`・`ec_products`はSchemafileから削除した。`db:apply`・`db:dry_run`は`--drop-table`付きになり、Schemafileにないテーブルを削除する。
+- 削除前の2026-10-10に、Cloud SQLのオンデマンドバックアップ（ID `1791628305175`）を取得した。旧3テーブルの`pg_dump`も作業者のローカル（`backend/tmp/backups/`、git管理外）に保存した。
+- 移行は`backend/script/export_legacy_furniture_details.rb`で行った。旧テーブルを読み取り専用で読み、`db/furniture_details.json`へ書く。2026-10-10の本番に対して、73件中60件を反映・13件を除外し、未割り当ては0件。結果はコミット済みのJSONと一致した。
+- 本番のモデル台帳259件は`db/furnitures.json`と一致した。本番だけにあった自動照合の対応7件（`ec_matcher`）は移していない。保存済みコーデでモデルURLが空のEC商品は、すべて照合なし（`unmatched`）で、対応表を参照しないため。
 - `/api/v1/furniture_models`のパスと応答の形は変えていない（中身は`furnitures`）。
 
 ## 初期データ（`db/furniture_details.json`、92件・家具57件）
