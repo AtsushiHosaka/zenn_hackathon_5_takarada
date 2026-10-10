@@ -12,7 +12,10 @@ class FurnitureSearch
   GOODS_CATEGORIES = { "acrylic_stand" => "oshi_goods", "can_badge" => "oshi_goods", "uchiwa" => "oshi_goods",
                        "rubber_mat" => "oshi_goods", "acrylic_panel" => "oshi_goods", "figure" => "oshi_goods",
                        "tapestry" => "tapestry", "plush" => "plush", "cushion" => "cushion",
-                       "poster" => "wall_art", "blanket" => "blanket" }.freeze
+                       "poster" => "wall_art", "blanket" => "blanket", "body_pillow" => "cushion",
+                       "standee" => "oshi_goods", "acrylic_diorama" => "oshi_goods", "penlight" => "oshi_goods",
+                       "bed_cover" => "bed_cover", "rug" => "rug" }.freeze
+  # 掛け時計・マグカップ・ルームライトはEC商品のカテゴリがないため、台帳のモデルだけを返す
   MAX_MODELS = 24
   CATEGORIES = (InteriorLinks::ProductParser::CATEGORY_RULES.map(&:first) + [ "small_plant" ]).uniq.freeze
   QUERY_CATEGORY_NAMES = {

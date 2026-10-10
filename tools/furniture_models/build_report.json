@@ -1172,6 +1172,106 @@
   "bytes": 54472
  },
  {
+  "name": "char_hatsune_miku_bed_cover",
+  "tris": 3178,
+  "actual": [
+   1.0003864765167236,
+   0.042551209102384746,
+   1.9992318153381348
+  ],
+  "materials": [
+   "fabric",
+   "fabric_back",
+   "fabric_patch",
+   "hair",
+   "cloth_top",
+   "skin",
+   "tie",
+   "skirt",
+   "trim",
+   "boots",
+   "hair_tie",
+   "hair_tie_accent",
+   "eyes",
+   "eye_highlight",
+   "mouth",
+   "note_light"
+  ],
+  "sha256": "a1dcc600660e7f8f086cc74e78b294a377770b424063813b06e32b247417b581",
+  "file": "char_hatsune_miku_bed_cover.glb",
+  "target": [
+   1.0,
+   0.04,
+   2.0
+  ],
+  "bytes": 219048
+ },
+ {
+  "name": "char_hatsune_miku_blanket",
+  "tris": 916,
+  "actual": [
+   0.6987816095352173,
+   0.007100035016978978,
+   1.0011765360832214
+  ],
+  "materials": [
+   "fabric",
+   "stripe_teal",
+   "stripe_gray",
+   "hair",
+   "cloth_top",
+   "skin",
+   "tie",
+   "skirt",
+   "trim",
+   "boots",
+   "hair_tie",
+   "hair_tie_accent",
+   "eyes",
+   "eye_highlight",
+   "mouth"
+  ],
+  "sha256": "0e3add40aca1b621463da01d013c0bb1d5eef8a368a86c28b84ed74939f432f5",
+  "file": "char_hatsune_miku_blanket.glb",
+  "target": [
+   0.7,
+   0.008,
+   1.0
+  ],
+  "bytes": 74976
+ },
+ {
+  "name": "char_hatsune_miku_can_badge",
+  "tris": 2664,
+  "actual": [
+   0.05700000002980232,
+   0.05700000044504078,
+   0.013195110484957695
+  ],
+  "materials": [
+   "trim",
+   "print_bg",
+   "hair",
+   "cloth_top",
+   "skin",
+   "tie",
+   "hair_tie",
+   "hair_tie_accent",
+   "eyes",
+   "eye_highlight",
+   "mouth",
+   "acrylic"
+  ],
+  "sha256": "89de19bbb2c11d7531be495057edd15da1a47701e5b3503d21a300465bcad82b",
+  "file": "char_hatsune_miku_can_badge.glb",
+  "target": [
+   0.057,
+   0.057,
+   0.012
+  ],
+  "bytes": 201408
+ },
+ {
   "name": "char_hatsune_miku_cushion",
   "tris": 624,
   "actual": [
@@ -1196,6 +1296,205 @@
    0.12
   ],
   "bytes": 52620
+ },
+ {
+  "name": "char_hatsune_miku_cushion_body",
+  "tris": 4654,
+  "actual": [
+   0.2978183329105377,
+   0.606665022438392,
+   0.12789694964885712
+  ],
+  "materials": [
+   "hair",
+   "cloth_top",
+   "skin",
+   "tie",
+   "skirt",
+   "trim",
+   "boots",
+   "hair_tie",
+   "hair_tie_accent",
+   "eyes",
+   "eye_highlight",
+   "mouth",
+   "fabric",
+   "fabric_back"
+  ],
+  "sha256": "576bbf824fc4062defc459b1cea178c7a5adbcb94b2cf03c30b9f878ffa0752e",
+  "file": "char_hatsune_miku_cushion_body.glb",
+  "target": [
+   0.3,
+   0.6,
+   0.12
+  ],
+  "bytes": 316036
+ },
+ {
+  "name": "char_hatsune_miku_cushion_round",
+  "tris": 1762,
+  "actual": [
+   0.44690538942813873,
+   0.147858084179461,
+   0.4470915049314499
+  ],
+  "materials": [
+   "fabric",
+   "fabric_back",
+   "piping",
+   "hair",
+   "skin",
+   "hair_tie",
+   "hair_tie_accent",
+   "eyes",
+   "eye_highlight",
+   "mouth",
+   "tie"
+  ],
+  "sha256": "7ed8ad7f1503a61b70e99d974e4c2536d333be7c6cee6c80428e20846087b76f",
+  "file": "char_hatsune_miku_cushion_round.glb",
+  "target": [
+   0.45,
+   0.14,
+   0.45
+  ],
+  "bytes": 148948
+ },
+ {
+  "name": "char_hatsune_miku_cushion_square",
+  "tris": 2432,
+  "actual": [
+   0.4491804242134094,
+   0.1579138885717839,
+   0.44943785667419434
+  ],
+  "materials": [
+   "fabric",
+   "fabric_back",
+   "piping",
+   "hair",
+   "cloth_top",
+   "skin",
+   "tie",
+   "skirt",
+   "trim",
+   "boots",
+   "hair_tie",
+   "hair_tie_accent",
+   "eyes",
+   "eye_highlight",
+   "mouth"
+  ],
+  "sha256": "586523a302c7bf30f1a84a4240a9088b45a8d4f162aaca1ec0217ccf7d9811da",
+  "file": "char_hatsune_miku_cushion_square.glb",
+  "target": [
+   0.45,
+   0.15,
+   0.45
+  ],
+  "bytes": 202360
+ },
+ {
+  "name": "char_hatsune_miku_dakimakura",
+  "tris": 4244,
+  "actual": [
+   1.601410686969757,
+   0.18896457878872752,
+   0.5010797083377838
+  ],
+  "materials": [
+   "fabric",
+   "fabric_back",
+   "hair",
+   "cloth_top",
+   "skin",
+   "tie",
+   "skirt",
+   "trim",
+   "boots",
+   "hair_tie",
+   "hair_tie_accent",
+   "eyes",
+   "eye_highlight",
+   "mouth"
+  ],
+  "sha256": "191933a8d58cbe6f10cb6430b8e95ee391d43b70b7f56543aebb3ca351ab4e31",
+  "file": "char_hatsune_miku_dakimakura.glb",
+  "target": [
+   1.6,
+   0.18,
+   0.5
+  ],
+  "bytes": 301776
+ },
+ {
+  "name": "char_hatsune_miku_desk_mat",
+  "tris": 944,
+  "actual": [
+   0.6000000238418579,
+   0.0029000080281766927,
+   0.30000001192092896
+  ],
+  "materials": [
+   "rubber",
+   "print_bg",
+   "print_pattern",
+   "hair",
+   "cloth_top",
+   "skin",
+   "tie",
+   "skirt",
+   "trim",
+   "boots",
+   "hair_tie",
+   "hair_tie_accent",
+   "eyes",
+   "eye_highlight",
+   "mouth"
+  ],
+  "sha256": "513904d00a567921dd950fa8b08a498e091c35c06ad3616be3cfef62ed855de0",
+  "file": "char_hatsune_miku_desk_mat.glb",
+  "target": [
+   0.6,
+   0.003,
+   0.3
+  ],
+  "bytes": 75620
+ },
+ {
+  "name": "char_hatsune_miku_diorama",
+  "tris": 944,
+  "actual": [
+   0.1599999964237213,
+   0.14000000361596232,
+   0.07999999821186066
+  ],
+  "materials": [
+   "acrylic",
+   "print_bg",
+   "print_floor",
+   "print_light",
+   "hair",
+   "hair_tie_accent",
+   "cloth_top",
+   "skin",
+   "tie",
+   "skirt",
+   "trim",
+   "boots",
+   "hair_tie",
+   "eyes",
+   "eye_highlight",
+   "mouth"
+  ],
+  "sha256": "b2cb3703d90a0d5acd3c1b493b1dec412d9707915edeb67b8f7fb79fc8a2d19e",
+  "file": "char_hatsune_miku_diorama.glb",
+  "target": [
+   0.16,
+   0.14,
+   0.08
+  ],
+  "bytes": 77596
  },
  {
   "name": "char_hatsune_miku_figure",
@@ -1228,6 +1527,122 @@
    0.1
   ],
   "bytes": 93484
+ },
+ {
+  "name": "char_hatsune_miku_led_light",
+  "tris": 1596,
+  "actual": [
+   0.15000000596046448,
+   0.2000000060001481,
+   0.08000000193715096
+  ],
+  "materials": [
+   "base",
+   "light",
+   "acrylic"
+  ],
+  "sha256": "1a7900d44916d4d1a7d16dfae6c85c85a5dc1cbf46c15acc08466b802fff9dcc",
+  "file": "char_hatsune_miku_led_light.glb",
+  "target": [
+   0.15,
+   0.2,
+   0.08
+  ],
+  "bytes": 113896
+ },
+ {
+  "name": "char_hatsune_miku_mug",
+  "tris": 2568,
+  "actual": [
+   0.11973156780004501,
+   0.10000000451003199,
+   0.08883044868707657
+  ],
+  "materials": [
+   "mug",
+   "trim",
+   "hair",
+   "cloth_top",
+   "skin",
+   "tie",
+   "hair_tie",
+   "hair_tie_accent",
+   "eyes",
+   "eye_highlight",
+   "mouth"
+  ],
+  "sha256": "bb5ab268720e6f271817ccdbf185f27a93b8660abce0673cb2c9fc4bcae281ec",
+  "file": "char_hatsune_miku_mug.glb",
+  "target": [
+   0.12,
+   0.1,
+   0.09
+  ],
+  "bytes": 198104
+ },
+ {
+  "name": "char_hatsune_miku_pc_cushion",
+  "tris": 1250,
+  "actual": [
+   0.5522407293319702,
+   0.46951498673297465,
+   0.33398377895355225
+  ],
+  "materials": [
+   "bolster",
+   "trim",
+   "cloth_top",
+   "skirt",
+   "skin",
+   "boots",
+   "hair",
+   "eyes",
+   "eye_highlight",
+   "mouth",
+   "hair_tie",
+   "hair_tie_accent"
+  ],
+  "sha256": "335b31c4b824ae5f7bc2a764cf9fdd77cbd77ea9a08d56b68827b9ede5d4b68f",
+  "file": "char_hatsune_miku_pc_cushion.glb",
+  "target": [
+   0.55,
+   0.47,
+   0.3
+  ],
+  "bytes": 101712
+ },
+ {
+  "name": "char_hatsune_miku_penlight",
+  "tris": 2720,
+  "actual": [
+   0.05706338956952095,
+   0.2495000100992224,
+   0.05999999865889549
+  ],
+  "materials": [
+   "stand",
+   "grip",
+   "trim",
+   "hair_tie_accent",
+   "hair_tie",
+   "light",
+   "acrylic",
+   "hair",
+   "cloth_top",
+   "skin",
+   "tie",
+   "eyes",
+   "eye_highlight",
+   "mouth"
+  ],
+  "sha256": "ee9cd872afd6e8465be9ab516e9d636466ee2d3ca88b5659ae9ea32f38a996fa",
+  "file": "char_hatsune_miku_penlight.glb",
+  "target": [
+   0.06,
+   0.25,
+   0.06
+  ],
+  "bytes": 211184
  },
  {
   "name": "char_hatsune_miku_plush",
@@ -1292,6 +1707,194 @@
   "bytes": 89124
  },
  {
+  "name": "char_hatsune_miku_plush_lying",
+  "tris": 1154,
+  "actual": [
+   0.2896810956299305,
+   0.13638087300932966,
+   0.18185658007860184
+  ],
+  "materials": [
+   "hair",
+   "skin",
+   "eyes",
+   "eye_highlight",
+   "mouth",
+   "hair_tie",
+   "hair_tie_accent",
+   "cloth_top",
+   "tie",
+   "skirt",
+   "trim",
+   "boots"
+  ],
+  "sha256": "6607ca2f7046b5ce832bedc51c8c355c34090af057b8cd3084eeefa4eea1db00",
+  "file": "char_hatsune_miku_plush_lying.glb",
+  "target": [
+   0.3,
+   0.14,
+   0.16
+  ],
+  "bytes": 95788
+ },
+ {
+  "name": "char_hatsune_miku_plush_negi",
+  "tris": 1248,
+  "actual": [
+   0.22866015136241913,
+   0.23414743947796524,
+   0.13724961876869202
+  ],
+  "materials": [
+   "cloth_top",
+   "skin",
+   "tie",
+   "skirt",
+   "trim",
+   "boots",
+   "hair",
+   "eyes",
+   "eye_highlight",
+   "mouth",
+   "hair_tie",
+   "hair_tie_accent",
+   "negi_white",
+   "negi_light",
+   "negi_green",
+   "negi_root"
+  ],
+  "sha256": "e6913615618748724b83cb09540e041a39a2aa668808fc2bb712df844b687c32",
+  "file": "char_hatsune_miku_plush_negi.glb",
+  "target": [
+   0.22,
+   0.24,
+   0.14
+  ],
+  "bytes": 103820
+ },
+ {
+  "name": "char_hatsune_miku_poster_a3",
+  "tris": 928,
+  "actual": [
+   0.3199999928474426,
+   0.4399999983707932,
+   0.02000003308057785
+  ],
+  "materials": [
+   "frame",
+   "paper",
+   "paper_pattern",
+   "hair",
+   "cloth_top",
+   "skin",
+   "tie",
+   "skirt",
+   "trim",
+   "boots",
+   "hair_tie",
+   "hair_tie_accent",
+   "eyes",
+   "eye_highlight",
+   "mouth"
+  ],
+  "sha256": "4ce8dd0057722c4c47a12fd6dfb0b3c8657c436d0a1d744492d98598ca0ba764",
+  "file": "char_hatsune_miku_poster_a3.glb",
+  "target": [
+   0.32,
+   0.44,
+   0.02
+  ],
+  "bytes": 75888
+ },
+ {
+  "name": "char_hatsune_miku_rug",
+  "tris": 528,
+  "actual": [
+   1.005185306072235,
+   0.01780003215036885,
+   1.4039080739021301
+  ],
+  "materials": [
+   "rug_trim",
+   "rug",
+   "hair",
+   "hair_tie",
+   "hair_tie_accent",
+   "tie"
+  ],
+  "sha256": "c8bb127a083058fc2933d12b528fbf379eb7d018dd656d5a1c53e13afefd221c",
+  "file": "char_hatsune_miku_rug.glb",
+  "target": [
+   1.0,
+   0.02,
+   1.4
+  ],
+  "bytes": 39896
+ },
+ {
+  "name": "char_hatsune_miku_seat_cushion",
+  "tris": 2410,
+  "actual": [
+   0.546684056520462,
+   0.07245316926855594,
+   0.5879292786121368
+  ],
+  "materials": [
+   "fabric",
+   "fabric_patch",
+   "hair",
+   "skin",
+   "hair_tie",
+   "hair_tie_accent",
+   "eyes",
+   "eye_highlight",
+   "mouth",
+   "tie",
+   "tassel"
+  ],
+  "sha256": "d000cf603b7e57c60d8720b0ca004e008e410615230e6ba59ddfcd8a8d20461e",
+  "file": "char_hatsune_miku_seat_cushion.glb",
+  "target": [
+   0.55,
+   0.07,
+   0.59
+  ],
+  "bytes": 193764
+ },
+ {
+  "name": "char_hatsune_miku_standee",
+  "tris": 876,
+  "actual": [
+   0.6000000238418579,
+   1.5805539673892781,
+   0.29892176762223244
+  ],
+  "materials": [
+   "cardboard",
+   "print_bg",
+   "hair",
+   "skin",
+   "cloth_top",
+   "skirt",
+   "boots",
+   "tie",
+   "trim",
+   "mouth",
+   "hair_tie",
+   "eyes",
+   "hair_tie_accent",
+   "eye_highlight"
+  ],
+  "sha256": "21136d8faee12d4200ccb99657ec0e1f3dc3b1809596868a4aa9c5b06c2483e8",
+  "file": "char_hatsune_miku_standee.glb",
+  "target": [
+   0.6,
+   1.58,
+   0.3
+  ],
+  "bytes": 69156
+ },
+ {
   "name": "char_hatsune_miku_tapestry_b2",
   "tris": 900,
   "actual": [
@@ -1325,6 +1928,106 @@
    0.015
   ],
   "bytes": 75124
+ },
+ {
+  "name": "char_hatsune_miku_tapestry_life",
+  "tris": 1084,
+  "actual": [
+   0.6000000238418579,
+   1.5799332857131976,
+   0.012990540359169245
+  ],
+  "materials": [
+   "fabric",
+   "fabric_pattern",
+   "trim",
+   "hair",
+   "skin",
+   "cloth_top",
+   "skirt",
+   "boots",
+   "tie",
+   "mouth",
+   "hair_tie",
+   "eyes",
+   "hair_tie_accent",
+   "eye_highlight",
+   "rod",
+   "string"
+  ],
+  "sha256": "d47238296e2ca78fdf11d42a419a410123e4fa2267e94adf639d5956f4454ebf",
+  "file": "char_hatsune_miku_tapestry_life.glb",
+  "target": [
+   0.6,
+   1.58,
+   0.015
+  ],
+  "bytes": 86840
+ },
+ {
+  "name": "char_hatsune_miku_uchiwa",
+  "tris": 1260,
+  "actual": [
+   0.24699999392032623,
+   0.3834999837477344,
+   0.10000000149011612
+  ],
+  "materials": [
+   "print_bg",
+   "trim",
+   "frame",
+   "hair",
+   "cloth_top",
+   "skin",
+   "tie",
+   "skirt",
+   "boots",
+   "hair_tie",
+   "hair_tie_accent",
+   "eyes",
+   "eye_highlight",
+   "mouth",
+   "stand"
+  ],
+  "sha256": "1209fa5e7be28a84e2206bc5f611cc516dd0aa90996f0e962ba23ce2ee9189b1",
+  "file": "char_hatsune_miku_uchiwa.glb",
+  "target": [
+   0.25,
+   0.38,
+   0.1
+  ],
+  "bytes": 95244
+ },
+ {
+  "name": "char_hatsune_miku_wall_clock",
+  "tris": 948,
+  "actual": [
+   0.3020285964012146,
+   0.34259391494560987,
+   0.04150001332163811
+  ],
+  "materials": [
+   "hair",
+   "hair_tie",
+   "hair_tie_accent",
+   "dial",
+   "trim",
+   "cloth_top",
+   "skin",
+   "tie",
+   "eyes",
+   "eye_highlight",
+   "mouth",
+   "ink"
+  ],
+  "sha256": "bdd2075c369627f676f1353f1241c8fc73c05a6f097d693ec77076ce7468a50f",
+  "file": "char_hatsune_miku_wall_clock.glb",
+  "target": [
+   0.3,
+   0.34,
+   0.04
+  ],
+  "bytes": 72824
  },
  {
   "name": "chest_drawers",

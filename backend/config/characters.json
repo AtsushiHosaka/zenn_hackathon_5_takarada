@@ -1161,7 +1161,9 @@
     "ラバーマット",
     "プレイマット",
     "rubber mat",
-    "playmat"
+    "playmat",
+    "デスクマット",
+    "desk mat"
    ],
    "standalone": true
   },
@@ -1193,6 +1195,99 @@
     "プライズフィギュア",
     "figure",
     "figurine"
+   ],
+   "standalone": false
+  },
+  {
+   "id": "body_pillow",
+   "name": "抱き枕",
+   "synonyms": [
+    "抱き枕",
+    "抱き枕カバー",
+    "body pillow",
+    "dakimakura"
+   ],
+   "standalone": false
+  },
+  {
+   "id": "standee",
+   "name": "等身大パネル",
+   "synonyms": [
+    "等身大パネル",
+    "等身大スタンディ",
+    "スタンドパネル",
+    "standee"
+   ],
+   "standalone": true
+  },
+  {
+   "id": "wall_clock",
+   "name": "掛け時計",
+   "synonyms": [
+    "掛け時計",
+    "壁掛け時計",
+    "時計",
+    "clock"
+   ],
+   "standalone": false
+  },
+  {
+   "id": "mug",
+   "name": "マグカップ",
+   "synonyms": [
+    "マグカップ",
+    "mug"
+   ],
+   "standalone": false
+  },
+  {
+   "id": "acrylic_diorama",
+   "name": "アクリルジオラマ",
+   "synonyms": [
+    "アクリルジオラマ",
+    "ジオラマスタンド",
+    "acrylic diorama"
+   ],
+   "standalone": true
+  },
+  {
+   "id": "penlight",
+   "name": "ペンライト",
+   "synonyms": [
+    "ペンライト",
+    "penlight"
+   ],
+   "standalone": true
+  },
+  {
+   "id": "room_light",
+   "name": "ルームライト",
+   "synonyms": [
+    "ルームライト",
+    "ledアクリルライト",
+    "アクリルライト",
+    "room light"
+   ],
+   "standalone": false
+  },
+  {
+   "id": "bed_cover",
+   "name": "布団カバー",
+   "synonyms": [
+    "布団カバー",
+    "掛け布団カバー",
+    "ベッドカバー",
+    "bed cover"
+   ],
+   "standalone": false
+  },
+  {
+   "id": "rug",
+   "name": "ラグ",
+   "synonyms": [
+    "ラグ",
+    "カーペット",
+    "rug"
    ],
    "standalone": false
   }

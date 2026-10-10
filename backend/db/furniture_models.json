@@ -1375,6 +1375,136 @@
    ]
   },
   {
+   "id": "char_hatsune_miku_bed_cover",
+   "name": "初音ミク 布団カバー",
+   "category": "bed_cover",
+   "shape": "char_hatsune_miku_bed_cover",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_bed_cover.glb",
+   "size": [
+    1.0,
+    0.04,
+    2.0
+   ],
+   "triangles": 3178,
+   "materials": [
+    "fabric",
+    "fabric_back",
+    "fabric_patch",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "note_light"
+   ],
+   "bytes": 219048,
+   "sha256": "a1dcc600660e7f8f086cc74e78b294a377770b424063813b06e32b247417b581",
+   "goods_type": "bed_cover",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "布団カバー",
+    "掛け布団カバー"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_blanket",
+   "name": "初音ミク ブランケット",
+   "category": "blanket",
+   "shape": "char_hatsune_miku_blanket",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_blanket.glb",
+   "size": [
+    0.7,
+    0.008,
+    1.0
+   ],
+   "triangles": 916,
+   "materials": [
+    "fabric",
+    "stripe_teal",
+    "stripe_gray",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 74976,
+   "sha256": "0e3add40aca1b621463da01d013c0bb1d5eef8a368a86c28b84ed74939f432f5",
+   "goods_type": "blanket",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "ブランケット",
+    "ひざ掛け"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_can_badge",
+   "name": "初音ミク 缶バッジ",
+   "category": "oshi_goods",
+   "shape": "char_hatsune_miku_can_badge",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_can_badge.glb",
+   "size": [
+    0.057,
+    0.057,
+    0.012
+   ],
+   "triangles": 2664,
+   "materials": [
+    "trim",
+    "print_bg",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "acrylic"
+   ],
+   "bytes": 201408,
+   "sha256": "89de19bbb2c11d7531be495057edd15da1a47701e5b3503d21a300465bcad82b",
+   "goods_type": "can_badge",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "缶バッジ",
+    "バッジ"
+   ]
+  },
+  {
    "id": "char_hatsune_miku_cushion",
    "name": "初音ミク ダイカットクッション",
    "category": "cushion",
@@ -1408,6 +1538,267 @@
     "ミク",
     "ダイカットクッション",
     "miku cushion"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_cushion_body",
+   "name": "初音ミク 全身ダイカットクッション",
+   "category": "cushion",
+   "shape": "char_hatsune_miku_cushion_body",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_cushion_body.glb",
+   "size": [
+    0.3,
+    0.6,
+    0.12
+   ],
+   "triangles": 4654,
+   "materials": [
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "fabric",
+    "fabric_back"
+   ],
+   "bytes": 316036,
+   "sha256": "576bbf824fc4062defc459b1cea178c7a5adbcb94b2cf03c30b9f878ffa0752e",
+   "goods_type": "cushion",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "ダイカットクッション",
+    "全身クッション"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_cushion_round",
+   "name": "初音ミク 丸クッション",
+   "category": "cushion",
+   "shape": "char_hatsune_miku_cushion_round",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_cushion_round.glb",
+   "size": [
+    0.45,
+    0.14,
+    0.45
+   ],
+   "triangles": 1762,
+   "materials": [
+    "fabric",
+    "fabric_back",
+    "piping",
+    "hair",
+    "skin",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "tie"
+   ],
+   "bytes": 148948,
+   "sha256": "7ed8ad7f1503a61b70e99d974e4c2536d333be7c6cee6c80428e20846087b76f",
+   "goods_type": "cushion",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "丸クッション",
+    "ラウンドクッション",
+    "クッション"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_cushion_square",
+   "name": "初音ミク スクエアクッション",
+   "category": "cushion",
+   "shape": "char_hatsune_miku_cushion_square",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_cushion_square.glb",
+   "size": [
+    0.45,
+    0.15,
+    0.45
+   ],
+   "triangles": 2432,
+   "materials": [
+    "fabric",
+    "fabric_back",
+    "piping",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 202360,
+   "sha256": "586523a302c7bf30f1a84a4240a9088b45a8d4f162aaca1ec0217ccf7d9811da",
+   "goods_type": "cushion",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "スクエアクッション",
+    "四角クッション",
+    "クッション"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_dakimakura",
+   "name": "初音ミク 抱き枕",
+   "category": "bedding",
+   "shape": "char_hatsune_miku_dakimakura",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_dakimakura.glb",
+   "size": [
+    1.6,
+    0.18,
+    0.5
+   ],
+   "triangles": 4244,
+   "materials": [
+    "fabric",
+    "fabric_back",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 301776,
+   "sha256": "191933a8d58cbe6f10cb6430b8e95ee391d43b70b7f56543aebb3ca351ab4e31",
+   "goods_type": "body_pillow",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "抱き枕",
+    "抱き枕カバー"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_desk_mat",
+   "name": "初音ミク デスクマット",
+   "category": "oshi_goods",
+   "shape": "char_hatsune_miku_desk_mat",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_desk_mat.glb",
+   "size": [
+    0.6,
+    0.003,
+    0.3
+   ],
+   "triangles": 944,
+   "materials": [
+    "rubber",
+    "print_bg",
+    "print_pattern",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 75620,
+   "sha256": "513904d00a567921dd950fa8b08a498e091c35c06ad3616be3cfef62ed855de0",
+   "goods_type": "rubber_mat",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "デスクマット",
+    "ラバーマット"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_diorama",
+   "name": "初音ミク アクリルジオラマ",
+   "category": "oshi_goods",
+   "shape": "char_hatsune_miku_diorama",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_diorama.glb",
+   "size": [
+    0.16,
+    0.14,
+    0.08
+   ],
+   "triangles": 944,
+   "materials": [
+    "acrylic",
+    "print_bg",
+    "print_floor",
+    "print_light",
+    "hair",
+    "hair_tie_accent",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 77596,
+   "sha256": "b2cb3703d90a0d5acd3c1b493b1dec412d9707915edeb67b8f7fb79fc8a2d19e",
+   "goods_type": "acrylic_diorama",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "アクリルジオラマ",
+    "アクスタ"
    ]
   },
   {
@@ -1450,6 +1841,163 @@
     "ミク",
     "フィギュア",
     "miku figure"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_led_light",
+   "name": "初音ミク LEDアクリルライト",
+   "category": "desk_lamp",
+   "shape": "char_hatsune_miku_led_light",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_led_light.glb",
+   "size": [
+    0.15,
+    0.2,
+    0.08
+   ],
+   "triangles": 1596,
+   "materials": [
+    "base",
+    "light",
+    "acrylic"
+   ],
+   "bytes": 113896,
+   "sha256": "1a7900d44916d4d1a7d16dfae6c85c85a5dc1cbf46c15acc08466b802fff9dcc",
+   "goods_type": "room_light",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "LEDアクリルライト",
+    "アクリルライト",
+    "ルームライト"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_mug",
+   "name": "初音ミク マグカップ",
+   "category": "tableware",
+   "shape": "char_hatsune_miku_mug",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_mug.glb",
+   "size": [
+    0.12,
+    0.1,
+    0.09
+   ],
+   "triangles": 2568,
+   "materials": [
+    "mug",
+    "trim",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 198104,
+   "sha256": "bb5ab268720e6f271817ccdbf185f27a93b8660abce0673cb2c9fc4bcae281ec",
+   "goods_type": "mug",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "マグカップ"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_pc_cushion",
+   "name": "初音ミク PCクッション",
+   "category": "cushion",
+   "shape": "char_hatsune_miku_pc_cushion",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_pc_cushion.glb",
+   "size": [
+    0.55,
+    0.47,
+    0.3
+   ],
+   "triangles": 1250,
+   "materials": [
+    "bolster",
+    "trim",
+    "cloth_top",
+    "skirt",
+    "skin",
+    "boots",
+    "hair",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "hair_tie",
+    "hair_tie_accent"
+   ],
+   "bytes": 101712,
+   "sha256": "335b31c4b824ae5f7bc2a764cf9fdd77cbd77ea9a08d56b68827b9ede5d4b68f",
+   "goods_type": "cushion",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "PCクッション",
+    "アームレスト",
+    "腕置きクッション"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_penlight",
+   "name": "初音ミク ペンライト（スタンド付き）",
+   "category": "oshi_goods",
+   "shape": "char_hatsune_miku_penlight",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_penlight.glb",
+   "size": [
+    0.06,
+    0.25,
+    0.06
+   ],
+   "triangles": 2720,
+   "materials": [
+    "stand",
+    "grip",
+    "trim",
+    "hair_tie_accent",
+    "hair_tie",
+    "light",
+    "acrylic",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 211184,
+   "sha256": "ee9cd872afd6e8465be9ab516e9d636466ee2d3ca88b5659ae9ea32f38a996fa",
+   "goods_type": "penlight",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "ペンライト",
+    "ライブ"
    ]
   },
   {
@@ -1536,6 +2084,256 @@
    ]
   },
   {
+   "id": "char_hatsune_miku_plush_lying",
+   "name": "初音ミク 寝そべりぬいぐるみ",
+   "category": "plush",
+   "shape": "char_hatsune_miku_plush_lying",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_plush_lying.glb",
+   "size": [
+    0.3,
+    0.14,
+    0.16
+   ],
+   "triangles": 1154,
+   "materials": [
+    "hair",
+    "skin",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "hair_tie",
+    "hair_tie_accent",
+    "cloth_top",
+    "tie",
+    "skirt",
+    "trim",
+    "boots"
+   ],
+   "bytes": 95788,
+   "sha256": "6607ca2f7046b5ce832bedc51c8c355c34090af057b8cd3084eeefa4eea1db00",
+   "goods_type": "plush",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "寝そべり",
+    "寝そべりぬいぐるみ",
+    "ぬいぐるみ"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_plush_negi",
+   "name": "初音ミク ネギ持ちぬいぐるみ",
+   "category": "plush",
+   "shape": "char_hatsune_miku_plush_negi",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_plush_negi.glb",
+   "size": [
+    0.22,
+    0.24,
+    0.14
+   ],
+   "triangles": 1248,
+   "materials": [
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "hair_tie",
+    "hair_tie_accent",
+    "negi_white",
+    "negi_light",
+    "negi_green",
+    "negi_root"
+   ],
+   "bytes": 103820,
+   "sha256": "e6913615618748724b83cb09540e041a39a2aa668808fc2bb712df844b687c32",
+   "goods_type": "plush",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "ネギ",
+    "ぬいぐるみ"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_poster_a3",
+   "name": "初音ミク A3ポスター（額装）",
+   "category": "wall_art",
+   "shape": "char_hatsune_miku_poster_a3",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_poster_a3.glb",
+   "size": [
+    0.32,
+    0.44,
+    0.02
+   ],
+   "triangles": 928,
+   "materials": [
+    "frame",
+    "paper",
+    "paper_pattern",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 75888,
+   "sha256": "4ce8dd0057722c4c47a12fd6dfb0b3c8657c436d0a1d744492d98598ca0ba764",
+   "goods_type": "poster",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "ポスター",
+    "A3",
+    "額装"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_rug",
+   "name": "初音ミク ラグ",
+   "category": "rug",
+   "shape": "char_hatsune_miku_rug",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_rug.glb",
+   "size": [
+    1.0,
+    0.02,
+    1.4
+   ],
+   "triangles": 528,
+   "materials": [
+    "rug_trim",
+    "rug",
+    "hair",
+    "hair_tie",
+    "hair_tie_accent",
+    "tie"
+   ],
+   "bytes": 39896,
+   "sha256": "c8bb127a083058fc2933d12b528fbf379eb7d018dd656d5a1c53e13afefd221c",
+   "goods_type": "rug",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "ラグ",
+    "カーペット"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_seat_cushion",
+   "name": "初音ミク 座布団",
+   "category": "cushion",
+   "shape": "char_hatsune_miku_seat_cushion",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_seat_cushion.glb",
+   "size": [
+    0.55,
+    0.07,
+    0.59
+   ],
+   "triangles": 2410,
+   "materials": [
+    "fabric",
+    "fabric_patch",
+    "hair",
+    "skin",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "tie",
+    "tassel"
+   ],
+   "bytes": 193764,
+   "sha256": "d000cf603b7e57c60d8720b0ca004e008e410615230e6ba59ddfcd8a8d20461e",
+   "goods_type": "cushion",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "座布団",
+    "シートクッション"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_standee",
+   "name": "初音ミク 等身大パネル",
+   "category": "oshi_goods",
+   "shape": "char_hatsune_miku_standee",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_standee.glb",
+   "size": [
+    0.6,
+    1.58,
+    0.3
+   ],
+   "triangles": 876,
+   "materials": [
+    "cardboard",
+    "print_bg",
+    "hair",
+    "skin",
+    "cloth_top",
+    "skirt",
+    "boots",
+    "tie",
+    "trim",
+    "mouth",
+    "hair_tie",
+    "eyes",
+    "hair_tie_accent",
+    "eye_highlight"
+   ],
+   "bytes": 69156,
+   "sha256": "21136d8faee12d4200ccb99657ec0e1f3dc3b1809596868a4aa9c5b06c2483e8",
+   "goods_type": "standee",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "等身大パネル",
+    "スタンドパネル"
+   ]
+  },
+  {
    "id": "char_hatsune_miku_tapestry_b2",
    "name": "初音ミク B2タペストリー",
    "category": "tapestry",
@@ -1578,6 +2376,137 @@
     "ミク",
     "タペストリー",
     "miku tapestry"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_tapestry_life",
+   "name": "初音ミク 等身大タペストリー",
+   "category": "tapestry",
+   "shape": "char_hatsune_miku_tapestry_life",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_tapestry_life.glb",
+   "size": [
+    0.6,
+    1.58,
+    0.015
+   ],
+   "triangles": 1084,
+   "materials": [
+    "fabric",
+    "fabric_pattern",
+    "trim",
+    "hair",
+    "skin",
+    "cloth_top",
+    "skirt",
+    "boots",
+    "tie",
+    "mouth",
+    "hair_tie",
+    "eyes",
+    "hair_tie_accent",
+    "eye_highlight",
+    "rod",
+    "string"
+   ],
+   "bytes": 86840,
+   "sha256": "d47238296e2ca78fdf11d42a419a410123e4fa2267e94adf639d5956f4454ebf",
+   "goods_type": "tapestry",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "等身大",
+    "タペストリー"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_uchiwa",
+   "name": "初音ミク うちわ（スタンド付き）",
+   "category": "oshi_goods",
+   "shape": "char_hatsune_miku_uchiwa",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_uchiwa.glb",
+   "size": [
+    0.25,
+    0.38,
+    0.1
+   ],
+   "triangles": 1260,
+   "materials": [
+    "print_bg",
+    "trim",
+    "frame",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "stand"
+   ],
+   "bytes": 95244,
+   "sha256": "1209fa5e7be28a84e2206bc5f611cc516dd0aa90996f0e962ba23ce2ee9189b1",
+   "goods_type": "uchiwa",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "うちわ",
+    "団扇"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_wall_clock",
+   "name": "初音ミク 壁掛け時計",
+   "category": "wall_clock",
+   "shape": "char_hatsune_miku_wall_clock",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_wall_clock.glb",
+   "size": [
+    0.3,
+    0.34,
+    0.04
+   ],
+   "triangles": 948,
+   "materials": [
+    "hair",
+    "hair_tie",
+    "hair_tie_accent",
+    "dial",
+    "trim",
+    "cloth_top",
+    "skin",
+    "tie",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "ink"
+   ],
+   "bytes": 72824,
+   "sha256": "bdd2075c369627f676f1353f1241c8fc73c05a6f097d693ec77076ce7468a50f",
+   "goods_type": "wall_clock",
+   "characters": [
+    "hatsune_miku"
+   ],
+   "search_terms": [
+    "初音ミク",
+    "ミク",
+    "壁掛け時計",
+    "掛け時計",
+    "時計"
    ]
   },
   {
