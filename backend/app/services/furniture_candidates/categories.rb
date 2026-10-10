@@ -1,6 +1,6 @@
-module InteriorLinks
+module FurnitureCandidates
   # 商品名からカテゴリと置き場所の枠を決める規則。家具検索の検索語の解釈に使う
-  module ProductCategories
+  module Categories
     RULES = [
     # Oshi-katsu and display goods come first: their names often also contain ラック/シェルフ/ミラー.
     [ "oshi_goods", "desk_top", /うちわ(?:スタンド|立て|ホルダー)|団扇立て|アクスタ(?:スタンド|台座|ステージ)|アクリルスタンド(?:用)?\s?(?:台座|ステージ|ひな壇)|ひな壇/ ],

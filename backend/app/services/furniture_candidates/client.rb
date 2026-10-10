@@ -1,7 +1,7 @@
-module InteriorLinks
-  # DB の furniture_details から候補を返す。外部の EC は検索しない。
-  # 枠ごとに position 順。theme を渡すとそのテーマの商品だけに絞る (モック用)。
-  class FurnitureDetailClient
+module FurnitureCandidates
+  # DB の furniture_details から候補を返す。枠ごとに position 順。theme を渡すとそのテーマの商品だけに絞る (モック用)。
+  # ユーザーが選んだ候補 (selected) は先頭に混ぜる。AI が後の指示で外す・入れ替えることはできる
+  class Client
     def self.item(detail)
       Item.build(
         id: detail.id, slot: detail.slot, category: detail.category, name: detail.name, price: detail.price,
@@ -16,13 +16,21 @@ module InteriorLinks
       detail && item(detail)
     end
 
+    def initialize(selected: [])
+      @selected = selected
+    end
+
     def search(slots:, max_price:, theme: nil, categories: nil, **)
+      slots = Array(slots).map(&:to_s)
       categories = Array(categories).map(&:to_s)
       scope = FurnitureDetail.joins(:furniture).merge(Furniture.available).includes(detail_textures: :furniture_texture)
-        .where(slot: Array(slots).map(&:to_s)).where(price: ..max_price).order(:position, :id)
+        .where(slot: slots).where(price: ..max_price).order(:position, :id)
       scope = scope.where("furniture_details.themes @> ?", [ theme ].to_json) if theme
       scope = scope.where.not(slot: "floor").or(scope.where(category: categories)) if categories.any?
-      scope.map { |detail| self.class.item(detail) }.group_by(&:slot)
+      selected = @selected.select do |item|
+        slots.include?(item.slot) && item.price <= max_price && (item.slot != "floor" || categories.empty? || categories.include?(item.category))
+      end
+      (selected + scope.map { |detail| self.class.item(detail) }).uniq { |item| [ item.metadata["group_id"], item.id ] }.group_by(&:slot)
     end
   end
 end

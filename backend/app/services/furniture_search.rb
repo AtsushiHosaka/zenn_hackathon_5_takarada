@@ -4,7 +4,7 @@ class FurnitureSearch
   MAX_RESULTS = 24
   Result = Data.define(:products, :color)
   Product = Data.define(:detail, :variants)
-  CATEGORIES = (InteriorLinks::ProductCategories::RULES.map(&:first) + [ "small_plant" ]).uniq.freeze
+  CATEGORIES = (FurnitureCandidates::Categories::RULES.map(&:first) + [ "small_plant" ]).uniq.freeze
   QUERY_CATEGORY_NAMES = {
     "sofa" => /\b(?:sofas?|couch(?:es)?)\b/i, "bed" => /\bbeds?\b/i,
     "desk" => /\bdesks?\b/i, "chair" => /\b(?:chairs?|stools?)\b/i,
@@ -15,7 +15,7 @@ class FurnitureSearch
 
   def self.call(query:, color:, category:, **)
     raise Error, "検索語を1〜200文字で入力してください" unless query.is_a?(String) && query.strip.length.between?(1, 200)
-    raise Error, "検索する色を確認してください" unless color.blank? || InteriorLinks::ProductColors::PATTERNS.key?(color)
+    raise Error, "検索する色を確認してください" unless color.blank? || FurnitureCandidates::Colors::PATTERNS.key?(color)
     raise Error, "家具の種類を確認してください" unless category.blank? || CATEGORIES.include?(category)
 
     categories = requested_categories(query, category)
@@ -26,7 +26,7 @@ class FurnitureSearch
     # No name contains the words (e.g. "白い椅子"): the category alone narrows the results.
     scored = scored.select { |_, score| score.positive? } if scored.any? { |_, score| score.positive? }
     matches = scored.sort_by.with_index { |(_, score), index| [ -score, index ] }.map(&:first)
-      .select { |detail| InteriorLinks::ProductColors.matches?(detail.metadata["official_color"].presence || detail.color_name.presence || detail.name, color) }
+      .select { |detail| FurnitureCandidates::Colors.matches?(detail.metadata["official_color"].presence || detail.color_name.presence || detail.name, color) }
     siblings = details.group_by { |detail| [ detail.furniture_id, detail.category ] }
     products = matches.uniq { |detail| [ detail.furniture_id, detail.category ] }.first(MAX_RESULTS)
       .map { |detail| Product.new(detail:, variants: siblings.fetch([ detail.furniture_id, detail.category ])) }
@@ -36,14 +36,14 @@ class FurnitureSearch
   def self.slot_for(category)
     return "desk_top" if category == "small_plant"
 
-    InteriorLinks::ProductCategories::RULES.find { |rule| rule.first == category }&.fetch(1) || "floor"
+    FurnitureCandidates::Categories::RULES.find { |rule| rule.first == category }&.fetch(1) || "floor"
   end
 
   def self.requested_categories(query, category)
     return [ category ] if category.present?
 
     text = query.unicode_normalize(:nfkc).strip
-    rules = InteriorLinks::ProductCategories::RULES.map { |value, _, pattern| [ value, pattern ] } + QUERY_CATEGORY_NAMES.to_a
+    rules = FurnitureCandidates::Categories::RULES.map { |value, _, pattern| [ value, pattern ] } + QUERY_CATEGORY_NAMES.to_a
     matches = rules.filter_map do |value, pattern|
       [ value, pattern ] if pattern.match?(text)
     end

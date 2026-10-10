@@ -1,6 +1,6 @@
-module InteriorLinks
+module FurnitureCandidates
   # Filtering uses published color text, never the preview's image-derived RGB.
-  module ProductColors
+  module Colors
     PATTERNS = {
       "white" => /ホワイト|白|アイボリー|white|ivory/i,
       "black" => /ブラック|黒|black/i,

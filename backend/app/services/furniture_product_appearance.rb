@@ -24,7 +24,7 @@ class FurnitureProductAppearance
         next
       end
       object["model_match"] = item["model_match"] = { "model_id" => model.id, "reason" => "furniture_detail", "approximate" => true }
-      object["model_url"] = FurnitureModelCatalog.model_url(model)
+      object["model_url"] = model.model_url
       object["model_size"] = { "w" => model.width.to_f, "h" => model.height.to_f, "d" => model.depth.to_f }
       object["model_fit"] = "contain"
       object["color"] ||= item["color"]

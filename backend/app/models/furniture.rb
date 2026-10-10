@@ -1,5 +1,9 @@
+require "uri"
+
 # 家具 1 件 = 3D モデル 1 つ。買える商品 (色・寸法・購入リンク) は details に持つ
 class Furniture < ApplicationRecord
+  class ConfigurationError < StandardError; end
+
   UNIT = "meter".freeze
   AXES = "+Y up, +Z front, origin bottom center".freeze
   KEY_PATTERN = /\A[a-zA-Z0-9][a-zA-Z0-9_-]*\z/
@@ -28,9 +32,39 @@ class Furniture < ApplicationRecord
     "#{OBJECT_KEY_PREFIX}/#{model_key}.glb"
   end
 
+  # GLB・模様の画像の配信元。FURNITURE_MODEL_BASE_URL、無ければ MODELS_BUCKET の公開 URL。どちらも無ければ nil
+  def self.asset_base_url
+    value = ENV["FURNITURE_MODEL_BASE_URL"]
+    if value.blank?
+      bucket = ENV["MODELS_BUCKET"]
+      return nil if bucket.blank?
+
+      unless bucket.match?(/\A[a-z0-9][a-z0-9._-]{1,220}[a-z0-9]\z/)
+        raise ConfigurationError, "MODELS_BUCKET must be a GCS bucket name"
+      end
+      value = "https://storage.googleapis.com/#{bucket}"
+    end
+
+    uri = URI.parse(value)
+    unless uri.is_a?(URI::HTTPS) && uri.host.present? && uri.userinfo.nil? && uri.query.nil? && uri.fragment.nil?
+      raise ConfigurationError, "FURNITURE_MODEL_BASE_URL must be an HTTPS base URL without credentials, query or fragment"
+    end
+
+    value.delete_suffix("/")
+  rescue URI::InvalidURIError
+    raise ConfigurationError, "FURNITURE_MODEL_BASE_URL is not a valid URL"
+  end
+
   # バケット内の GLB のパス
   def object_key
     self.class.object_key_for(model_key)
+  end
+
+  # GLB の URL。配信元が無い・使わないモデルなら nil
+  def model_url(base: self.class.asset_base_url)
+    return nil if base.nil? || !enabled?
+
+    "#{base}/#{object_key.split('/').map { |segment| URI.encode_www_form_component(segment) }.join('/')}"
   end
 
   # 主な部位。画面で色を変えた家具はこの部位を塗り替える

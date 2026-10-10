@@ -24,9 +24,7 @@ class CoordinationBuilder
 
   def call
     kept = kept_objects
-    selected = selected_product_items
-    client = InteriorLinks.client
-    client = FurnitureSelectedProductClient.new(client, selected) if selected.any?
+    client = FurnitureCandidates.client(selected: selected_product_items)
     candidate_limit = GeminiClient.configured?(user_id: @coordination.room.user_id) ? CoordinationPlanner::Gemini::CANDIDATES_PER_GROUP : 3
     floor_candidates = FurnitureOperationPlanner.call(@coordination, @scene, client:, candidate_limit:)
     plan = CoordinationPlanner.call(prompt: @coordination.generation_prompt, budget: @coordination.budget, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id, client:, additional_candidates: floor_candidates, previous:,
@@ -68,7 +66,6 @@ class CoordinationBuilder
     scene = { "room" => @scene["room"], "objects" => active + placed.map { |entry| entry[:placement].object } }
     items = placed.map.with_index(1) { |entry, marker| item_json(entry[:item], entry[:placement].note, marker) }
     appearance = FurnitureProductAppearance.call(scene:, items:)
-    product_source = InteriorLinks.provider
     failures = operation_failures(floor_placed)
     failures << "商品価格の合計を予算内に収めるため、提案の一部を調整しました。" if @budget_adjusted_groups&.any?
     failures << "条件と配置に合う家具が登録されていませんでした。希望や予算を変更して再提案してください。" if placed.empty?
@@ -81,7 +78,7 @@ class CoordinationBuilder
       total_price: placed.sum { |p| p[:item].price },
       planned_by: plan.planned_by,
       # 精度の確認用: Gemini の回答と、実際に採用した商品
-      analysis: (@coordination.analysis || {}).deep_merge(plan.analysis).deep_merge("placed_item_ids" => placed.map { |p| p[:item].id }, "base_coordination_id" => @coordination.base_coordination_id, "budget_adjusted_groups" => @budget_adjusted_groups || [], "meta" => { "product_source" => product_source }, "operation_failures" => failures),
+      analysis: (@coordination.analysis || {}).deep_merge(plan.analysis).deep_merge("placed_item_ids" => placed.map { |p| p[:item].id }, "base_coordination_id" => @coordination.base_coordination_id, "budget_adjusted_groups" => @budget_adjusted_groups || [], "meta" => { "product_source" => "db" }, "operation_failures" => failures),
       kept_object_ids: active.pluck("id"),
       furniture_operations: result_operations(active, removed)
     )
@@ -236,7 +233,7 @@ class CoordinationBuilder
       originals = Array(base&.after_scene&.fetch("objects", [])) + @coordination.input_scene.fetch("objects")
       @coordination.edited_objects.filter_map do |edit|
         original = originals.find { |object| object["id"] == edit["id"] }
-        product = InteriorLinks::FurnitureDetailClient.find_item(edit["replacement_furniture_detail_id"] || edit["furniture_detail_id"])
+        product = FurnitureCandidates::Client.find_item(edit["replacement_furniture_detail_id"] || edit["furniture_detail_id"])
         next unless original && product
         next if original["id"].match?(Coordination::MANUAL_OBJECT_ID) && edit["replacement_furniture_detail_id"].nil?
 
@@ -267,7 +264,7 @@ class CoordinationBuilder
     previous_items = Array(base&.items).map do |item|
       original = Array(base.after_scene&.fetch("objects", [])).find { |object| object["item_id"] == item["item_id"] && (item["marker"].nil? || object["marker"] == item["marker"]) }
       edit = original && @coordination.edited_objects.find { |value| value["id"] == original["id"] }
-      product = edit && InteriorLinks::FurnitureDetailClient.find_item(edit["furniture_detail_id"])
+      product = edit && FurnitureCandidates::Client.find_item(edit["furniture_detail_id"])
       product ? item.merge(product.to_h.stringify_keys.except("id", "slot", "metadata")).merge("item_id" => product.id, "product_metadata" => product.metadata.merge(item.fetch("product_metadata", {}).slice("group_id", "replaces_object_id"))) : item
     end
     previous_items + selected_product_items.reject { |selected| previous_items.any? { |item| item["item_id"] == selected.id && item.dig("product_metadata", "group_id") == selected.metadata["group_id"] } }.map do |item|

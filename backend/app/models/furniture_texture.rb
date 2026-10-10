@@ -16,7 +16,7 @@ class FurnitureTexture < ApplicationRecord
 
   # 部位の色と合わせた material_overrides の 1 件。配信元が未設定なら nil
   def material_override(color)
-    base = FurnitureModelCatalog.base_url or return
+    base = Furniture.asset_base_url or return
     { "texture_url" => "#{base}/#{object_key}", "tile_size_m" => tile_size_m.to_f, "color" => tinted ? color : "#ffffff" }
   end
 end

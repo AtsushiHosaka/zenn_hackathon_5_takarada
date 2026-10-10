@@ -1,54 +1,30 @@
-require "uri"
-
-# 保存済みシーンにも最新のカタログを適用する。配置寸法はシーンの値を保つ。
-class FurnitureModelCatalog
-  class ConfigurationError < StandardError; end
-
-  def self.base_url
-    value = ENV["FURNITURE_MODEL_BASE_URL"]
-    if value.blank?
-      bucket = ENV["MODELS_BUCKET"]
-      return nil if bucket.blank?
-
-      unless bucket.match?(/\A[a-z0-9][a-z0-9._-]{1,220}[a-z0-9]\z/)
-        raise ConfigurationError, "MODELS_BUCKET must be a GCS bucket name"
-      end
-      value = "https://storage.googleapis.com/#{bucket}"
-    end
-
-    uri = URI.parse(value)
-    unless uri.is_a?(URI::HTTPS) && uri.host.present? && uri.userinfo.nil? && uri.query.nil? && uri.fragment.nil?
-      raise ConfigurationError, "FURNITURE_MODEL_BASE_URL must be an HTTPS base URL without credentials, query or fragment"
-    end
-
-    value.delete_suffix("/")
-  rescue URI::InvalidURIError
-    raise ConfigurationError, "FURNITURE_MODEL_BASE_URL is not a valid URL"
-  end
-
-  def self.model_url(model, base: base_url)
-    return nil if base.nil? || !model.enabled?
-
-    "#{base}/#{model.object_key.split('/').map { |segment| URI.encode_www_form_component(segment) }.join('/')}"
-  end
-
-  def self.enrich_scene(scene)
+# 保存済みシーンの家具に、今の家具のモデル URL を付ける (配置寸法はシーンの値を保つ)。
+# 写真の家具・古いコーデの商品は furniture_bindings、それ以外は同じカテゴリで寸法比が一番近いモデル。
+# 付けられないものは null のままで、クライアントが category と size から簡易形状で描く。
+class SceneModelResolver
+  def self.call(scene)
     return nil if scene.nil?
-
-    base = base_url
-    return scene if base.nil?
 
     resolved = scene.deep_dup
     objects = resolved.fetch("objects", [])
+    base = Furniture.asset_base_url
+    fill_by_binding(objects, base) if base
+    fill_by_category(objects, base) if base
+    # モデルが無い商品と、補えなかった旧フロント同梱モデルのパスは簡易形状で描く
+    objects.each do |object|
+      object["model_url"] = nil if object["texture_status"] == "unmatched" || legacy_path?(object["model_url"])
+    end
+    resolved
+  end
+
+  # 写真の家具 ID・保存済みコーデの商品 ID は furniture_bindings の対応を使う
+  def self.fill_by_binding(objects, base)
     references = objects.filter_map do |object|
       next if object["texture_status"] == "unmatched"
 
       binding_reference(object) if replaceable_url?(object["model_url"])
     end
-    if references.empty?
-      fill_by_category(objects, base)
-      return resolved
-    end
+    return if references.empty?
 
     existing = references.select { |kind, _| kind == "existing" }.map(&:last)
     products = references.select { |kind, _| kind == "product" }.map(&:last)
@@ -62,11 +38,10 @@ class FurnitureModelCatalog
       next unless replaceable_url?(object["model_url"])
 
       binding = bindings[binding_reference(object)]
-      object["model_url"] = model_url(binding.furniture, base: base) if binding
+      object["model_url"] = binding.furniture.model_url(base:) if binding
     end
-    fill_by_category(objects, base)
-    resolved
   end
+  private_class_method :fill_by_binding
 
   # 対応表に無い家具・商品は、カテゴリ (または形の種類) が同じモデルのうち大きさが一番近いものを使う。
   # 写真の解析で出てくる chair-1・shelf-2 などや、対応表に載る前の商品にもモデルを付けるため
@@ -81,7 +56,7 @@ class FurnitureModelCatalog
     missing.each do |object|
       candidates = models.select { |model| model.category == object["category"] || model.shape == object["category"] }
       best = candidates.min_by { |model| size_distance(model, object["size"]) }
-      object["model_url"] = model_url(best, base: base) if best
+      object["model_url"] = best.model_url(base:) if best
     end
   end
   private_class_method :fill_by_category
@@ -96,12 +71,16 @@ class FurnitureModelCatalog
   end
   private_class_method :size_distance
 
-  # 旧フロント同梱モデルのパスは、対応するGCSモデルへ移行する。
-  # 利用者が指定した外部モデルのURLは維持する。
+  # 旧フロント同梱モデルのパスは GCS のモデルに置き換える。利用者が指定した外部モデルの URL は維持する
   def self.replaceable_url?(value)
-    value.nil? || (value.is_a?(String) && value.start_with?("/models/furniture/"))
+    value.nil? || legacy_path?(value)
   end
   private_class_method :replaceable_url?
+
+  def self.legacy_path?(value)
+    value.is_a?(String) && value.start_with?("/models/furniture/")
+  end
+  private_class_method :legacy_path?
 
   def self.binding_reference(object)
     case object["source"]

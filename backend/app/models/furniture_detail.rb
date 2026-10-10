@@ -4,7 +4,7 @@ class FurnitureDetail < ApplicationRecord
 
   validates :key, presence: true, uniqueness: true
   validates :name, :category, :shop, :url, presence: true
-  validates :slot, inclusion: { in: InteriorLinks::SLOTS }
+  validates :slot, inclusion: { in: FurnitureCandidates::SLOTS }
   validates :symbolic_color, format: { with: /\A#[0-9a-f]{6}\z/i }
   validates :price, numericality: { only_integer: true, greater_than: 0 }
   validates :width, :height, :depth, numericality: { greater_than: 0 }
@@ -18,7 +18,7 @@ class FurnitureDetail < ApplicationRecord
   # シーンの家具・検索結果に載せる商品とモデルの情報。寸法は商品、形は家具のモデルを使う
   def scene_attributes
     model = furniture if furniture.enabled?
-    model_url = model && FurnitureModelCatalog.model_url(model)
+    model_url = model&.model_url
     {
       "furniture_detail_id" => id, "label" => name, "category" => category, "color" => symbolic_color, "color_materials" => color_materials, "size" => size,
       "price" => price, "shop" => shop, "url" => url, "image_url" => image_url, "product_metadata" => metadata,

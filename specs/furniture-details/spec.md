@@ -29,7 +29,7 @@ furnitures          1件 = 3Dモデル1つ (GLBのキー・寸法・素材)。db
 - 表示では模様に部位の色を掛ける。`tinted: false`（柄物）は色を掛けず、画像の色のまま。模様は2026-10-10時点で0件（色だけ）。
 - 提案ごとの画像生成（Gemini画像生成・`FurnitureTextureGenerator`）と、生成画像を開発環境で配信するAPIは削除した。旧`furniture_textures`の行（生成画像の記録）は、リリース時に`furniture_texture:clear_legacy`が`db:apply`の前に消す。GCSの生成画像と、保存済みシーンの画像URLは残る。
 - 商品からモデルを寸法比で推定する照合（`FurnitureProductMatcher`）は削除した。
-- 写真の家具の照合（`FurnitureModelCatalog.fill_by_category`・`existing`の対応）は`furnitures`を引くだけで、ロジックは変えていない。
+- 写真の家具の照合（`SceneModelResolver`・`existing`の対応）は`furnitures`を引くだけで、ロジックは変えていない。
 - 旧`furniture_models`・`furniture_model_bindings`・`ec_products`はSchemafileから削除した。`db:apply`・`db:dry_run`は`--drop-table`付きになり、Schemafileにないテーブルを削除する。
 - 削除前の2026-10-10に、Cloud SQLのオンデマンドバックアップ（ID `1791628305175`）を取得した。旧3テーブルの`pg_dump`も作業者のローカル（`backend/tmp/backups/`、git管理外）に保存した。
 - 移行は`backend/script/export_legacy_furniture_details.rb`で行った。旧テーブルを読み取り専用で読み、`db/furniture_details.json`へ書く。2026-10-10の本番に対して、73件中60件を反映・13件を除外し、未割り当ては0件。結果はコミット済みのJSONと一致した。
