@@ -21,6 +21,9 @@ github_repository = "AtsushiHosaka/zenn_hackathon_5_takarada"
 # ローカルの Vite から実 API を叩くなら足す
 # cors_origins = "http://localhost:5173"
 
+# 家具・商品の管理画面 (/admin) を使える人のメールアドレス (カンマ区切り)。空なら誰も使えない
+# admin_emails = "you@example.com"
+
 # 2026-10-05の本番GCP切替を再現する場合は、project_idを
 # "zenn-hackathon-takarada" にし、次の3項目を有効にする。実呼出成功は未確認。
 # Vertex の API と API 用 SA の権限も追加する。

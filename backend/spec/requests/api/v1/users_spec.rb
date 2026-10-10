@@ -25,7 +25,7 @@ RSpec.describe "Api::V1::Users", type: :request do
         run_test! do |response|
           body = JSON.parse(response.body)
           expect(body.map { |user| user["id"] }).to eq([ current.id ])
-          expect(body.first.keys).to contain_exactly("id", "name", "email", "created_at", "updated_at")
+          expect(body.first.keys).to contain_exactly("id", "name", "email", "admin", "created_at", "updated_at")
         end
       end
 

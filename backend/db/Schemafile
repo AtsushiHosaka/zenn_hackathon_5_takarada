@@ -98,7 +98,7 @@ create_table "furniture_3d_models", force: :cascade do |t|
 end
 
 # 家具の色・寸法・購入リンク 1 つ (家具 1 : 多)。3D は家具のモデルを部位ごとに color_materials で塗る。価格はリンク先の参考価格 (税込)。
-# db/furniture_details.json から rails furniture_detail:import で入れる
+# db/furniture_details.json から rails furniture_detail:import で入れる。管理画面 (/admin) でも編集できる
 create_table "furniture_details", force: :cascade do |t|
   t.string "key", null: false
   t.references "furniture", null: false, foreign_key: true
@@ -118,6 +118,8 @@ create_table "furniture_details", force: :cascade do |t|
   t.jsonb "themes", null: false, default: []
   t.jsonb "metadata", null: false, default: {} # 出典・推定した寸法の軸など
   t.integer "position", null: false, default: 0 # 候補の並び順 (小さいほど先)。AI は枠ごとに先頭から一定数だけ見る
+  t.boolean "enabled", null: false, default: true # false なら提案・検索に出さない (管理画面の「非表示」)
+  t.datetime "admin_edited_at" # 管理画面で作成・編集した時刻。入っている detail は furniture_detail:import が上書き・削除しない
   t.datetime "checked_at"
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false

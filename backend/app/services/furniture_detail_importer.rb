@@ -2,6 +2,8 @@ require "json"
 
 # db/furniture_details.json (家具の色・寸法・購入リンク) を furniture_details に取り込む。
 # JSON を正とし、載っていない detail は消す。家具と模様は先に FurnitureImporter / FurnitureTextureImporter で入れておく。
+# 管理画面で作成・編集した detail (admin_edited_at あり) は DB を正とし、上書きも削除もしない。
+# JSON へ戻すには管理画面の「JSON を書き出す」(FurnitureDetailExporter) の結果をコミットする。
 # texture_materials は部位ごとの模様 ({"tint": "linen"})。
 class FurnitureDetailImporter
   class InvalidDetails < StandardError; end
@@ -27,6 +29,8 @@ class FurnitureDetailImporter
         furniture = furnitures[row["model_key"]] or raise InvalidDetails, "details[#{index}].model_key #{row["model_key"].inspect} is not imported"
         size = row["size"].to_h
         detail = FurnitureDetail.find_or_initialize_by(key: row["key"])
+        next detail.key if detail.admin_edited_at
+
         detail.update!(
           furniture:, position: index,
           **row.slice("name", "category", "slot", "symbolic_color", "color_materials", "color_name", "price", "shop", "url", "image_url", "themes", "metadata", "checked_at").symbolize_keys,
@@ -41,7 +45,7 @@ class FurnitureDetailImporter
       rescue ActiveRecord::RecordInvalid => error
         raise InvalidDetails, "details[#{index}] (#{row['key']}): #{error.record.errors.full_messages.join(', ')}"
       end
-      removed = FurnitureDetail.where.not(key: keys)
+      removed = FurnitureDetail.where.not(key: keys).where(admin_edited_at: nil)
       FurnitureDetailTexture.where(furniture_detail: removed).delete_all
       removed.delete_all
       { details: keys.size, furnitures: rows.map { |row| row["model_key"] }.uniq.size }

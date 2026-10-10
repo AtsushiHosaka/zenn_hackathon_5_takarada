@@ -45,6 +45,8 @@ services:
       MODELS_BUCKET: ${MODELS_BUCKET:-}
       FURNITURE_MODEL_BASE_URL: ${FURNITURE_MODEL_BASE_URL:-}
       UPLOADS_BUCKET: local-uploads
+      # 家具・商品の管理画面 (/admin) を使える人のメールアドレス (カンマ区切り)。ローカルの既定はデモユーザー
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-user1@example.com}
       VITE_TERMS_URL: ${VITE_TERMS_URL:-}
       VITE_PRIVACY_URL: ${VITE_PRIVACY_URL:-}
     ports:

@@ -12,7 +12,7 @@ module FurnitureCandidates
     end
 
     def self.find_item(id)
-      detail = id.is_a?(Integer) && FurnitureDetail.joins(:furniture).merge(Furniture.available).includes(detail_textures: :furniture_texture).find_by(id:)
+      detail = id.is_a?(Integer) && FurnitureDetail.available.joins(:furniture).merge(Furniture.available).includes(detail_textures: :furniture_texture).find_by(id:)
       detail && item(detail)
     end
 
@@ -24,7 +24,7 @@ module FurnitureCandidates
       slots = Array(slots).map(&:to_s)
       categories = Array(categories).map(&:to_s)
       max_price ||= Float::INFINITY
-      scope = FurnitureDetail.joins(:furniture).merge(Furniture.available).includes(detail_textures: :furniture_texture)
+      scope = FurnitureDetail.available.joins(:furniture).merge(Furniture.available).includes(detail_textures: :furniture_texture)
         .where(slot: slots).where(price: ..max_price).order(:position, :id)
       scope = scope.where("furniture_details.themes @> ?", [ theme ].to_json) if theme
       scope = scope.where.not(slot: "floor").or(scope.where(category: categories)) if categories.any?
