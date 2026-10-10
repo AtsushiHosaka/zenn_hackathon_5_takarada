@@ -15,6 +15,7 @@ import { useImportedFurniture } from './importedFurniture';
 import { useRoomPlanScope } from './plans';
 import './planner.css';
 import FurnitureSearchPanel from './FurnitureSearchPanel';
+import { PlacedModelCredits } from './ModelCredits';
 import { productReplacementPosition } from './productReplacement';
 
 export type PlannerView = 'perspective' | 'top' | 'front';
@@ -344,6 +345,7 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
             if (!Number.isFinite(bottom) || bottom < 0 || bounds.floor + bottom + selected.size[1] > bounds.max[1]) return;
             changeItem({ supportObjectId: undefined, supportSurface: undefined, position: [selected.position[0], bounds.floor + bottom + selected.size[1] / 2, selected.position[2]] });
           }} /></label>}
+          <PlacedModelCredits modelUrl={selected.modelUrl} />
           {selectedProductLink && <a className="rc-furniture-product-link" href={selectedProductLink} target="_blank" rel="noopener noreferrer">商品ページを見る</a>}
           {(selected.id.startsWith('manual-') || templateEditing) && !completeModel && <>
             {!itemDisabled && <FurnitureSizeEditor key={`${selected.id}:${selected.size.join(',')}`} item={selected} design={design} onChange={changeItem} />}

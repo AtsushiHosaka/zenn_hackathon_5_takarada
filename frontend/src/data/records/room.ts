@@ -3,7 +3,9 @@ import { characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
 import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
 import { productCategories, furnitureCategories, isManualFurniture, isImageArtwork, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
-import type { FurnitureSearchResult, SavedRoom } from "../../domain/roomRepository";
+import type { FurnitureSearchInterpretation, FurnitureSearchResult, SavedRoom } from "../../domain/roomRepository";
+import type { FurnitureModel } from "../../domain/furnitureModel";
+import { toFurnitureModel } from "./furnitureModel";
 import type { components } from "../generated/api";
 
 export type AnalysisRoomRecord = components["schemas"]["Room"];
@@ -19,7 +21,27 @@ export type UploadRecord = components["schemas"]["Upload"];
 export function toFurnitureSearch(value: unknown, baseUrl: string): FurnitureSearchResult {
   const record = object(value, "FurnitureSearch");
   if (!Array.isArray(record.products) || record.products.length > 24 || !Array.isArray(record.search_entry_points)) invalid("FurnitureSearch");
-  return { products: record.products.map(product => toImportedFurniture(product, baseUrl)), failures: nonnegativeInteger(record.failures, "FurnitureSearch.failures"), searchEntryPoints: record.search_entry_points.map(entry => text(entry, "search_entry_point")) };
+  if (record.models != null && !Array.isArray(record.models)) invalid("FurnitureSearch.models");
+  // 台帳モデルは描画の補助情報。壊れた行だけを除く。
+  const models = (record.models ?? []).map(toFurnitureModel).filter((model): model is FurnitureModel => Boolean(model));
+  return { products: record.products.map(product => toImportedFurniture(product, baseUrl)), failures: nonnegativeInteger(record.failures, "FurnitureSearch.failures"), searchEntryPoints: record.search_entry_points.map(entry => text(entry, "search_entry_point")), interpretation: searchInterpretation(record.interpretation), models };
+}
+
+// 古いAPIは解釈を返さないため、家具検索(source=none)として扱う。
+function searchInterpretation(value: unknown): FurnitureSearchInterpretation {
+  if (value == null) return { characters: [], franchises: [], goodsTypes: [], source: "none" };
+  const record = object(value, "FurnitureSearch.interpretation");
+  if (record.source !== "dictionary" && record.source !== "llm" && record.source !== "none") invalid("FurnitureSearch.interpretation.source");
+  const list = (entries: unknown, name: string) => {
+    if (!Array.isArray(entries)) invalid(`FurnitureSearch.interpretation.${name}`);
+    return entries.map(entry => object(entry, `FurnitureSearch.interpretation.${name}`));
+  };
+  return {
+    characters: list(record.characters, "characters").map(entry => ({ id: text(entry.id, "interpretation.characters.id"), name: text(entry.name, "interpretation.characters.name"), franchise: text(entry.franchise, "interpretation.characters.franchise") })),
+    franchises: list(record.franchises, "franchises").map(entry => ({ id: text(entry.id, "interpretation.franchises.id"), name: text(entry.name, "interpretation.franchises.name") })),
+    goodsTypes: list(record.goods_types, "goods_types").map(entry => ({ id: text(entry.id, "interpretation.goods_types.id"), name: text(entry.name, "interpretation.goods_types.name") })),
+    source: record.source,
+  };
 }
 
 export function toImportedFurniture(value: unknown, baseUrl: string): RoomItem {
@@ -382,6 +404,10 @@ function productMetadata(value: unknown, baseUrl: string): ProductMetadata | und
   if (metadata.availability != null) result.availability = text(metadata.availability, "availability");
   if (metadata.image_usage != null) result.imageDisplayAllowed = object(metadata.image_usage, "image_usage").display === "allowed";
   if (metadata.search_entry_point_html != null) result.searchEntryPointHtml = text(metadata.search_entry_point_html, "search_entry_point_html");
+  if (metadata.characters != null) {
+    if (!Array.isArray(metadata.characters)) invalid("product_metadata.characters");
+    result.characters = metadata.characters.map(character => text(character, "product_metadata.characters"));
+  }
   return result;
 }
 

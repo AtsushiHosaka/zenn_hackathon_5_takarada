@@ -1,4 +1,4 @@
-import type { FurnitureModel } from "../../domain/furnitureModel";
+import type { FurnitureModel, FurnitureModelCredit } from "../../domain/furnitureModel";
 import type { components } from "../generated/api";
 
 export type FurnitureModelRecord = components["schemas"]["FurnitureModel"];
@@ -24,6 +24,11 @@ export function toFurnitureModel(value: unknown): FurnitureModel | undefined {
     materials: record.materials,
     modelUrl: record.model_url,
     bindings: record.bindings,
+    // 推し活グッズ以前の台帳・APIでは省略されるため、空として扱う。
+    goodsType: record.goods_type ?? null,
+    characters: record.characters ?? [],
+    searchTerms: record.search_terms ?? [],
+    credits: (record.credits ?? []).map((credit): FurnitureModelCredit => ({ franchise: credit.franchise, credit: credit.credit?.trim() || null, notice: credit.notice?.trim() || null, licenseUrl: credit.license_url ?? null })),
   };
 }
 
@@ -37,10 +42,20 @@ function isFurnitureModelRecord(value: unknown): value is FurnitureModelRecord {
   if (typeof value.sha256 !== "string" || !/^[0-9a-f]{64}$/.test(value.sha256)) return false;
   if (!Array.isArray(value.materials) || !value.materials.every(material => typeof material === "string")) return false;
   if (value.model_url !== null && !isHttpUrl(value.model_url)) return false;
+  if (value.goods_type != null && !nonemptyString(value.goods_type)) return false;
+  if (!optionalStrings(value.characters) || !optionalStrings(value.search_terms)) return false;
+  // クレジットは権利表記のため、壊れていればモデルごと使わない。
+  if (value.credits != null && (!Array.isArray(value.credits) || !value.credits.every(credit => isRecord(credit) && nonemptyString(credit.franchise)
+    && [credit.credit, credit.notice].every(field => field == null || typeof field === "string")
+    && (credit.license_url == null || isHttpUrl(credit.license_url))))) return false;
   return Array.isArray(value.bindings) && value.bindings.every(binding => {
     if (!isRecord(binding) || !nonemptyString(binding.reference)) return false;
     return binding.kind === "existing" || (binding.kind === "product" && /^[1-9]\d*$/.test(binding.reference));
   });
+}
+
+function optionalStrings(value: unknown): boolean {
+  return value == null || Array.isArray(value) && value.every(nonemptyString);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

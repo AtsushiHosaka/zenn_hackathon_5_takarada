@@ -3,6 +3,14 @@ export type FurnitureModelBinding = {
   reference: string;
 };
 
+// 権利者が求めるクレジットと注意書き。モデルを表示する画面で必ず併記する。
+export type FurnitureModelCredit = {
+  franchise: string;
+  credit: string | null;
+  notice: string | null;
+  licenseUrl: string | null;
+};
+
 export type FurnitureModel = {
   id: string;
   name: string;
@@ -21,4 +29,9 @@ export type FurnitureModel = {
   materials: string[];
   modelUrl: string | null;
   bindings: FurnitureModelBinding[];
+  // 推し活グッズの種別ID。家具はnull。
+  goodsType: string | null;
+  characters: string[];
+  searchTerms: string[];
+  credits: FurnitureModelCredit[];
 };

@@ -2,7 +2,10 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRepositories } from '../../core/repositories';
 import { furnitureCategories, type ProductColorVariant, type RoomDesign, type RoomItem } from '../../domain/room';
+import type { FurnitureModel } from '../../domain/furnitureModel';
+import type { FurnitureSearchInterpretation } from '../../domain/roomRepository';
 import ErrorText from '../shared/ErrorText';
+import ModelCredits from './ModelCredits';
 import { furniturePositionInRoom } from './roomBounds';
 import { productReplacementPosition } from './productReplacement';
 
@@ -44,15 +47,56 @@ export default function FurnitureSearchPanel({ design, disabled, onAddItem, repl
     {search.isPending && <p role="status" className="rc-planner-note">公式の商品ページで色・価格・寸法を確認しています。</p>}
     {search.isError && <ErrorText error={search.error}/>}
     {search.data && currentResults && !search.isPending && <>
+      <SearchInterpretation interpretation={search.data.interpretation}/>
+      {!!search.data.models.length && <SearchModels models={search.data.models} interpretation={search.data.interpretation}/>}
       <p role="status" className="rc-planner-note">{search.data.products.length ? `${search.data.products.length}件の商品` : 'この条件の商品は見つかりませんでした。検索語や色を変えてお試しください。'}</p>
       {!!search.data.failures && <p className="rc-planner-note">取得できなかった商品ページがあります。</p>}
       <div className="rc-furniture-search-results">{search.data.products.map(item => <button key={item.ecProductId} type="button" className="rc-furniture-search-card" aria-pressed={selectedId === item.ecProductId} disabled={disabled} onClick={() => setSelectedId(item.ecProductId)}>
-        <ProductPhoto key={item.imageUrl} src={item.imageUrl} name={item.name}/><span>{item.name}</span><span>{item.productMetadata?.officialColor ?? '色の掲載なし'} · ¥{item.price?.toLocaleString('ja-JP')}</span>
+        <ProductPhoto key={item.imageUrl} src={item.imageUrl} name={item.name}/><span>{item.name}</span><CharacterChips ids={item.productMetadata?.characters} interpretation={search.data!.interpretation}/><span>{item.productMetadata?.officialColor ?? '色の掲載なし'} · ¥{item.price?.toLocaleString('ja-JP')}</span>
       </button>)}</div>
       {selected && <FurnitureSearchSelection key={selected.ecProductId} product={selected} design={design} disabled={disabled} onAddItem={onAddItem} replacementTarget={replacementTarget}/>}
       {search.data.searchEntryPoints.map((html,index) => <iframe key={html} title={`家具検索のGoogle検索候補 ${index+1}`} srcDoc={`<base target="_blank">${html}`} sandbox="allow-popups allow-popups-to-escape-sandbox" referrerPolicy="no-referrer" className="rc-furniture-search-attribution"/>) }
     </>}
   </div>;
+}
+
+function characterNames(ids: string[] | undefined, interpretation: FurnitureSearchInterpretation): string[] {
+  return (ids ?? []).flatMap(id => interpretation.characters.find(character => character.id === id)?.name ?? []);
+}
+
+// 自然言語の検索語をどう解釈したかを示す。家具検索(source=none)では何も出さない。
+function SearchInterpretation({ interpretation }: { interpretation: FurnitureSearchInterpretation }) {
+  const characterFranchises = new Set(interpretation.characters.map(character => character.franchise));
+  const labels = [...interpretation.characters.map(character => character.name), ...interpretation.franchises.filter(franchise => !characterFranchises.has(franchise.id)).map(franchise => franchise.name), ...interpretation.goodsTypes.map(goods => goods.name)];
+  if (interpretation.source === 'none' || !labels.length) return null;
+  return <div className="rc-search-interpretation">
+    <span className="rc-planner-note">{interpretation.source === 'llm' ? 'AIが読み取った条件' : '読み取った条件'}</span>
+    <ul className="rc-search-chips" aria-label="検索語から読み取った条件">{labels.map(label => <li key={label}>{label}</li>)}</ul>
+  </div>;
+}
+
+function CharacterChips({ ids, interpretation }: { ids?: string[]; interpretation: FurnitureSearchInterpretation }) {
+  const names = characterNames(ids, interpretation);
+  if (!names.length) return null;
+  return <span className="rc-search-chips rc-search-chips-compact" aria-label="商品名で確認したキャラクター">{names.map(name => <span key={name}>{name}</span>)}</span>;
+}
+
+// 台帳の3Dモデル。ECに依存しないため、商品が見つからなくても表示する。
+function SearchModels({ models, interpretation }: { models: FurnitureModel[]; interpretation: FurnitureSearchInterpretation }) {
+  const headingId = useId();
+  return <section className="rc-search-models" aria-labelledby={headingId}>
+    <h4 id={headingId}>3Dモデル</h4>
+    <ul>{models.map(model => {
+      const goodsType = interpretation.goodsTypes.find(goods => goods.id === model.goodsType)?.name;
+      const characters = characterNames(model.characters, interpretation);
+      return <li key={model.id} className="rc-search-model">
+        <span className="rc-search-model-name">{model.name}</span>
+        {(goodsType || !!characters.length) && <span className="rc-search-chips rc-search-chips-compact">{goodsType && <span>{goodsType}</span>}{characters.map(name => <span key={name}>{name}</span>)}</span>}
+        <span className="rc-planner-note">幅{Math.round(model.size.w*100)} × 高さ{Math.round(model.size.h*100)} × 奥行き{Math.round(model.size.d*100)}cm</span>
+        <ModelCredits credits={model.credits}/>
+      </li>;
+    })}</ul>
+  </section>;
 }
 
 function FurnitureSearchSelection({ product, design, disabled, onAddItem, replacementTarget }: { product: RoomItem; design: RoomDesign; disabled: boolean; onAddItem: (item: RoomItem) => void; replacementTarget?: RoomItem }) {

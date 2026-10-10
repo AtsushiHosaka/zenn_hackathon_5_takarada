@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRepositories } from "../../core/repositories";
-import type { FurnitureModel } from "../../domain/furnitureModel";
+import type { FurnitureModel, FurnitureModelCredit } from "../../domain/furnitureModel";
 import type { RoomDesign, RoomItem } from "../../domain/room";
 
 export const furnitureModelKeys = {
@@ -72,4 +72,20 @@ export function useRoomFurnitureModels(design: RoomDesign) {
 }
 export function useFurnitureModelsForDesign(design: RoomDesign): RoomDesign {
   return useRoomFurnitureModels(design).design;
+}
+
+const noCredits: FurnitureModelCredit[] = [];
+
+// 部屋に置いたモデルの権利表記。カタログのURLと一致したモデルだけを対象にする。
+export function useFurnitureModelCredits(modelUrl?: string): FurnitureModelCredit[] {
+  const { furnitureModels } = useRepositories();
+  const { data } = useQuery({
+    queryKey: furnitureModelKeys.all,
+    queryFn: () => furnitureModels.list(),
+    enabled: Boolean(modelUrl),
+    staleTime: Infinity,
+    gcTime: Infinity,
+    retry: false,
+  });
+  return useMemo(() => modelUrl && data?.find(model => model.modelUrl === modelUrl)?.credits || noCredits, [data, modelUrl]);
 }

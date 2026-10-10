@@ -31,6 +31,8 @@ export type ProductMetadata = {
   size?: { w: number | null; h: number | null; d: number | null };
   imageDisplayAllowed?: boolean;
   searchEntryPointHtml?: string;
+  // 商品名で確認できたキャラクターID。
+  characters?: string[];
 };
 export type RoomWindow = {
   id: string;
@@ -295,6 +297,7 @@ function isProductMetadata(value: unknown): value is ProductMetadata {
   if (value.size !== undefined && (!isRecord(value.size) || ![value.size.w, value.size.h, value.size.d].every(axis => axis === null || positiveNumber(axis)))) return false;
   if (value.imageDisplayAllowed !== undefined && typeof value.imageDisplayAllowed !== "boolean") return false;
   if (value.searchEntryPointHtml !== undefined && !nonemptyString(value.searchEntryPointHtml)) return false;
+  if (value.characters !== undefined && (!Array.isArray(value.characters) || !value.characters.every(nonemptyString))) return false;
   if (value.sizeSource !== undefined && !nonemptyString(value.sizeSource)) {
     if (!isRecord(value.sizeSource) || !optionalHttpUrl(value.sizeSource.url) || value.sizeSource.kind !== undefined && !nonemptyString(value.sizeSource.kind)) return false;
     const evidence = value.sizeSource.evidence;

@@ -1,3 +1,4 @@
+import type { FurnitureModel } from "./furnitureModel";
 import type { FurnitureAddition, FurnitureOperation, RoomDesign, RoomItem, RoomShape, Style } from "./room";
 
 export type RoomGenerationPhase = "uploading" | "analyzing" | "coordinating" | "preview";
@@ -35,7 +36,14 @@ export type SavedRoom = {
 };
 
 export type FurnitureSearchInput = { query: string; color?: string; category?: string };
-export type FurnitureSearchResult = { products: RoomItem[]; failures: number; searchEntryPoints: string[] };
+// 検索語を推し活グッズとしてどう解釈したか。家具検索ではsource="none"で各一覧は空。
+export type FurnitureSearchInterpretation = {
+  characters: { id: string; name: string; franchise: string }[];
+  franchises: { id: string; name: string }[];
+  goodsTypes: { id: string; name: string }[];
+  source: "dictionary" | "llm" | "none";
+};
+export type FurnitureSearchResult = { products: RoomItem[]; failures: number; searchEntryPoints: string[]; interpretation: FurnitureSearchInterpretation; models: FurnitureModel[] };
 
 export type RoomRepository = {
   demo(style?: Style): RoomDesign;
