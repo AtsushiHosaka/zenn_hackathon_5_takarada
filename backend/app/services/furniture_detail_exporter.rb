@@ -2,7 +2,7 @@
 # 並びは position 順。取り込むと先頭から 0, 1, 2… と振り直すので順序は同じになる。非表示の detail は出さない
 class FurnitureDetailExporter
   def self.call
-    details = FurnitureDetail.available.includes(furniture: :model, detail_textures: :furniture_texture).order(:position, :id)
+    details = FurnitureDetail.available.preload(furniture: :model, detail_textures: :furniture_texture).order(:position, :id)
     { "details" => details.map { |detail| row(detail) } }
   end
 

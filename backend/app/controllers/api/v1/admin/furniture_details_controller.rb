@@ -6,7 +6,7 @@ module Api
       class FurnitureDetailsController < BaseController
         # GET /api/v1/admin/furniture_details : 非表示のものも含む全件
         def index
-          details = FurnitureDetail.includes(furniture: :model, detail_textures: :furniture_texture).order(:slot, :position, :id)
+          details = FurnitureDetail.preload(furniture: :model, detail_textures: :furniture_texture).order(:slot, :position, :id)
           render json: { details: AdminFurnitureDetailSerializer.new(details).serializable_hash,
                          slots: FurnitureCandidates::SLOTS, categories: FurnitureSearch::CATEGORIES }
         end

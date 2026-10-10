@@ -6,13 +6,13 @@ module Api
       class FurnitureModelsController < BaseController
         # GET /api/v1/admin/furniture_models
         def index
-          models = Furniture3DModel.includes(furniture: :details).order(:model_key)
+          models = Furniture3DModel.preload(furniture: :details).order(:model_key)
           render json: AdminFurnitureModelSerializer.new(models)
         end
 
         # PATCH /api/v1/admin/furniture_models/:id (:id はモデル ID)
         def update
-          model = Furniture3DModel.includes(furniture: :details).find_by!(model_key: params[:id])
+          model = Furniture3DModel.preload(furniture: :details).find_by!(model_key: params[:id])
           enabled = ActiveModel::Type::Boolean.new.cast(params.dig(:furniture_model, :enabled))
           raise ActionController::ParameterMissing, :enabled if enabled.nil?
 
