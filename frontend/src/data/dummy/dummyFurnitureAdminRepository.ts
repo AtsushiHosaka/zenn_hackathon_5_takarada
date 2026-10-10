@@ -18,9 +18,9 @@ const initialDetails: AdminFurnitureDetail[] = [
 export function createDummyFurnitureAdminRepository(tokenStore: TokenStore): FurnitureAdminRepository {
   let details = initialDetails;
   let models = initialModels;
-  // 実 API と同じように、管理者でなければ 403 で弾く。管理者は backend/db/seeds.rb (手元では user1) に合わせてある
+  // 実 API と同じように、管理者でなければ 403 で弾く。管理者は backend/db/seeds.rb の admin@example.com に合わせてある
   const requireAdmin = () => {
-    if (dummyDatabase.userOf(tokenStore.load()).email !== "user1@example.com") throw new DomainError("管理者だけが使えます", 403);
+    if (dummyDatabase.userOf(tokenStore.load()).email !== "admin@example.com") throw new DomainError("管理者だけが使えます", 403);
   };
 
   return {

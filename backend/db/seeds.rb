@@ -8,9 +8,10 @@
   )
 end
 
-# 手元では user1 を管理者にして、管理画面 (/admin) をすぐ使えるようにする。本番は rails admin:grant で付ける
-if Rails.env.development?
-  User.joins(:identity).where(identities: { email: "user1@example.com" }).update_all(admin: true)
+# 手元だけ: 管理画面 (/admin) 用の管理者 admin@example.com / password。
+# パスワードが公開されているので本番には作らない (本番は実在のアカウントに rails admin:grant で付ける)
+if Rails.env.development? && !Identity.exists?(email: "admin@example.com")
+  User.create!(name: "Admin", admin: true, identity_attributes: { email: "admin@example.com", password: "password" })
 end
 
 puts "seeded #{User.count} users"
