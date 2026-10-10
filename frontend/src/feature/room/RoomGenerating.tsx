@@ -1,9 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { RoomDesign } from '../../domain/room';
 import type { RoomGenerationPhase } from '../../domain/roomRepository';
 import ReferenceSvg from './ReferenceSvg';
+import RoomPreview from './RoomPreview';
+import './room-list.css';
 import './generating.css';
 
 type RoomGeneratingProps = {
+  // 作り直す元の部屋。あれば例の絵の代わりに、その3Dモデルを見せる。
+  design?: RoomDesign;
   phase?: RoomGenerationPhase;
   prompt: string;
   photos: File[];
@@ -21,6 +26,26 @@ const furnitureLabels = [
   { name: 'ローテーブル', left: '51.8%', top: '60%' },
 ];
 
+// 待っている間に順に見せる、使い方のヒント。
+const hints = [
+  '家具はドラッグで動かせます。',
+  '家具を選ぶと、色違いや別の商品に入れ替えられます。',
+  '「真上」の視点にすると、配置を調整しやすくなります。',
+  'できあがった部屋は、Before / After で見比べられます。',
+  '気になる商品は、アイテム一覧から商品ページを開けます。',
+  '仕上がりが違うときは、変えたいところを言葉で伝えると作り直せます。',
+];
+const hintInterval = 6000;
+
+function Hint() {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    const timer = window.setInterval(() => setIndex(value => (value + 1) % hints.length), hintInterval);
+    return () => window.clearInterval(timer);
+  }, []);
+  return <p className="room-generating-hint"><span>ヒント</span><span key={index} className="motion-fade">{hints[index]}</span></p>;
+}
+
 function PhotoPreview({ file }: { file: File }) {
   const image = useRef<HTMLImageElement>(null);
   useEffect(() => {
@@ -32,7 +57,7 @@ function PhotoPreview({ file }: { file: File }) {
   return <img ref={image} alt={file.name} />;
 }
 
-export default function RoomGenerating({ phase = 'analyzing', prompt, photos, sample, dimensions = false, coordination = true, onCancel }: RoomGeneratingProps) {
+export default function RoomGenerating({ design, phase = 'analyzing', prompt, photos, sample, dimensions = false, coordination = true, onCancel }: RoomGeneratingProps) {
   const stages: {phase:RoomGenerationPhase;title:string}[] = [
     ...(photos.length && dimensions && !sample ? [{phase:'uploading' as const,title:'写真を送信'}] : []),
     {phase:'analyzing',title:sample?'部屋を準備':dimensions?'部屋を解析':'生成結果を待機'},
@@ -74,9 +99,9 @@ export default function RoomGenerating({ phase = 'analyzing', prompt, photos, sa
     </section>
     <section aria-label="3Dプレビュー" className="room-generating-stage">
       <div className="room-generating-stage-tags">
-        <span><ReferenceSvg page={4} index={10} />{sample ? 'サンプルルーム' : 'プレビュー例'}</span>
+        <span><ReferenceSvg page={4} index={10} />{design ? '今の部屋' : sample ? 'サンプルルーム' : 'プレビュー例'}</span>
       </div>
-      <div className="room-generating-scene-wrap">
+      {design ? <div className="room-generating-room"><RoomPreview design={design}/></div> : <div className="room-generating-scene-wrap">
         <div className="room-generating-scene">
           <ReferenceSvg page={4} index={11} />
           {sample && !dimensions && <>
@@ -84,10 +109,11 @@ export default function RoomGenerating({ phase = 'analyzing', prompt, photos, sa
             {furnitureLabels.map(label => <span key={label.name} className="room-generating-furniture" style={{ left: label.left, top: label.top }}><span />{label.name}（例）</span>)}
           </>}
         </div>
-      </div>
+      </div>}
       <div className="room-generating-status motion-fade" role="status" aria-live="polite">
         <div><span>{sample ? 'サンプル準備中' : '生成中'} · {stages[activeIndex].title}</span><span><><strong>{activeIndex+1}</strong> / {steps.length} ステップ</></span></div>
         <div className="room-generating-progress" role="progressbar" aria-label={sample ? 'サンプルの準備状況' : 'APIからの応答待ち'}><div className="room-generating-progress-waiting" /></div>
+        <Hint/>
       </div>
     </section>
   </>;

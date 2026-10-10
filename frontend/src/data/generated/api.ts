@@ -1546,10 +1546,10 @@ export interface components {
                 /** @example 紫色の推し活ルームにしたい */
                 prompt: string;
                 /**
-                 * @description 追加・入れ替え商品の予算 (円・送料別)
+                 * @description 追加・入れ替え商品の予算 (円・送料別)。省略すると上限なしで選ぶ
                  * @example 30000
                  */
-                budget: number;
+                budget?: number | null;
                 /**
                  * @description 活かす家具の id。空なら全部活かす
                  * @example [
@@ -1637,8 +1637,11 @@ export interface components {
             character_theme_id?: null | "hatsune-miku" | "sanrio" | "hello-kitty" | "my-melody" | "kuromi" | "cinnamoroll" | "pompompurin" | "pochacco";
             /** @example 紫色の推し活ルームにしたい */
             prompt: string;
-            /** @example 30000 */
-            budget: number;
+            /**
+             * @description 省略したコーデでは null
+             * @example 30000
+             */
+            budget: number | null;
             /**
              * @example [
              *       "bed-1",

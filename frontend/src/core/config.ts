@@ -44,6 +44,5 @@ export const appConfig = {
     photoField: import.meta.env.VITE_ROOM_PHOTO_FIELD || "photos[]",
     promptField: import.meta.env.VITE_ROOM_PROMPT_FIELD || "prompt",
     styleField: import.meta.env.VITE_ROOM_STYLE_FIELD || "style",
-    budgetField: import.meta.env.VITE_ROOM_BUDGET_FIELD || "budget",
   },
 } as const;

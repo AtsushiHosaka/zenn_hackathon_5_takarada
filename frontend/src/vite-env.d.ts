@@ -16,7 +16,6 @@ interface ImportMetaEnv {
   readonly VITE_ROOM_PHOTO_FIELD?: string;
   readonly VITE_ROOM_PROMPT_FIELD?: string;
   readonly VITE_ROOM_STYLE_FIELD?: string;
-  readonly VITE_ROOM_BUDGET_FIELD?: string;
 }
 
 interface ImportMeta {

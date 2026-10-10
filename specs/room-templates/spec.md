@@ -32,3 +32,6 @@ Initial compatibility correction for floor-color editing (#59): inferred/sample 
 
 
 Complete integration verification at `297b2515213a0a6efb1b4a10b2509d4fa25179ed` confirms that both inferred and measured templates capture the current visible floor while leaving the source original unchanged. The shared `copyFurniture` helper remaps support IDs and translates captured affine offsets, contact heights and supporting positions when inferred rooms are recentered; API reuse invokes the same helper. Image references use narrowly validated owned template IDs, preserving the existing category/image validation and avoiding duplicate manual input. Template artwork stays in scoped browser overlays and is omitted from coordination edits, while newly added manual artwork retains the existing API payload. Existing lint/build and temporary exact-source theme, floor, image and 64 surface-profile cases passed. See `docs/pr-evidence/issue-66/integration-retention.md`; no new browser, server, API/database or production verification is claimed.
+
+
+2026-10-10: この仕様の画面まわりは `specs/screen-refactor/spec.md` で置き換えた。

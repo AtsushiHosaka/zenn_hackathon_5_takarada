@@ -136,7 +136,6 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
         backendRoomId: undefined,
         style: input.style,
         prompt: input.prompt.trim() || undefined,
-        budget: input.budget,
         description: "畳数と部屋の形から寸法とベッド・デスク・本棚を配置したモックです。写真・希望・スタイルの解析と、商品生成は行っていません。",
       }, input.characterThemeId);
       const paletteId = input.roomPaletteId ?? (input.characterThemeId ? undefined : defaultRoomPaletteId);

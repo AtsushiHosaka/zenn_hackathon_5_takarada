@@ -9,7 +9,6 @@ export type GenerateRoomInput = {
   prompt: string;
   style: Style;
   roomPaletteId?: string;
-  budget: number;
   tatami?: number;
   shape?: RoomShape;
   roomId?: string;

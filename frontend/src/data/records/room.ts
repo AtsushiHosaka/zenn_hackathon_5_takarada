@@ -165,7 +165,7 @@ export function toCoordinationRecord(value: unknown): CoordinationRecord {
     status: record.status,
     prompt: text(record.prompt, "Coordination.prompt"),
     character_theme_id: record.character_theme_id == null ? undefined : characterThemeRecord(record.character_theme_id),
-    budget: integer(record.budget, "Coordination.budget"),
+    budget: record.budget == null ? null : integer(record.budget, "Coordination.budget"),
     room_palette_id: record.room_palette_id == null ? null : toRoomPaletteId(record.room_palette_id),
     kept_object_ids: record.kept_object_ids as string[],
     title: nullableText(record.title, "Coordination.title"),
@@ -194,7 +194,7 @@ export function toCoordinationRecord(value: unknown): CoordinationRecord {
     suggestions.forEach(item => {
       if (!parsed.items.some(product => product.marker === item.marker && product.item_id === item.item_id)) invalid("Coordination.marker/item_id");
     });
-    if (parsed.total_price !== parsed.items.reduce((sum, item) => sum + item.price, 0) || parsed.total_price > parsed.budget) invalid("Coordination.total_price");
+    if (parsed.total_price !== parsed.items.reduce((sum, item) => sum + item.price, 0) || (parsed.budget != null && parsed.total_price > parsed.budget)) invalid("Coordination.total_price");
   }
   return parsed;
 }
@@ -235,7 +235,7 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     analysisInput,
     prompt: record.prompt,
     roomPaletteId: record.room_palette_id ?? undefined,
-    budget: record.budget,
+    budget: record.budget ?? undefined,
     keptObjectIds: record.furniture_operations !== undefined ? record.furniture_operations.filter(operation => operation.action === "keep").map(operation => operation.object_id) : record.kept_object_ids.length > 0 ? record.kept_object_ids : record.before_scene.objects.filter(item => item.source === "existing").map(item => item.id),
     furnitureOperations: record.furniture_operations?.map(operation => ({ objectId: operation.object_id, action: operation.action })),
     furnitureAdditions: record.additions,

@@ -11,7 +11,7 @@ class FurnitureOperationPlanner
     by_category = {}
     operations.flat_map do |operation|
       category = operation[:category]
-      candidates = by_category[category] ||= client.search(prompt: coordination.generation_prompt, theme: nil, slots: [ "floor" ], categories: [ category ], max_price: coordination.budget).fetch("floor", [])
+      candidates = by_category[category] ||= client.search(prompt: coordination.generation_prompt, theme: nil, slots: [ "floor" ], categories: [ category ], max_price: coordination.budget_limit).fetch("floor", [])
       candidates.select { |item| item.category == category }.first(candidate_limit).map do |item|
         original = operation[:original]
         item.with(metadata: item.metadata.merge(
