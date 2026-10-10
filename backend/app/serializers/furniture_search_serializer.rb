@@ -1,28 +1,32 @@
 class FurnitureSearchSerializer
   include Alba::Resource
 
-  attributes :color, :failures, :search_entry_points
+  attributes :color
   attribute :products do |result|
-    result.products.map do |item|
-      { "ec_product_id" => item.id - EcProduct::PUBLIC_ID_OFFSET, "name" => item.name,
-        "category" => item.category, "color" => item.color, "size" => item.size,
-        "price" => item.price, "shop" => item.shop, "url" => item.url,
-        "image_url" => item.image_url, "product_metadata" => item.metadata,
-        "model_url" => nil, "model_match" => nil, "model_size" => nil, "model_fit" => nil }
+    result.products.map do |product|
+      FurnitureSearchSerializer.detail_attributes(product.detail).merge(
+        "variants" => product.variants.map { |detail| FurnitureSearchSerializer.detail_attributes(detail) }
+      )
     end
   end
-  # 推し活グッズとしての解釈 (specs/character-goods/spec.md)。家具検索では空で source は none
+
+  # 推し活グッズとしての解釈。家具検索では各一覧が空で source は none
   attribute :interpretation do |result|
     interpretation = result.interpretation
-    { "characters" => interpretation.characters.map do |id|
-        row = CharacterCatalog.character(id)
-        { "id" => id, "name" => row["name"], "franchise" => row["franchise"] }
-      end,
-      "franchises" => interpretation.franchises.map { |id| { "id" => id, "name" => CharacterCatalog.franchise(id)["name"] } },
-      "goods_types" => interpretation.goods_types.map { |id| { "id" => id, "name" => CharacterCatalog.goods_type(id)["name"] } },
+    characters = Character.includes(:franchise).where(character_key: interpretation.characters).index_by(&:character_key)
+    franchises = Franchise.where(franchise_key: interpretation.franchises).index_by(&:franchise_key)
+    { "characters" => interpretation.characters.filter_map { |key| (row = characters[key]) && { "id" => key, "name" => row.name, "franchise" => row.franchise.franchise_key } },
+      "franchises" => interpretation.franchises.filter_map { |key| (row = franchises[key]) && { "id" => key, "name" => row.name } },
+      "categories" => interpretation.categories.map { |key| { "id" => key, "name" => GoodsCategories.find(key)["name"] } },
       "source" => interpretation.source }
   end
   attribute :models do |result|
     FurnitureModelSerializer.new(result.models).serializable_hash
+  end
+
+  def self.detail_attributes(detail)
+    detail.scene_attributes.except("label", "texture_status", "color")
+      .merge("name" => detail.name, "furniture_id" => detail.furniture_id, "symbolic_color" => detail.symbolic_color, "color_name" => detail.color_name,
+             "characters" => detail.furniture.characters.map(&:character_key), "credits" => FurnitureModelSerializer.credits(detail.furniture))
   end
 end

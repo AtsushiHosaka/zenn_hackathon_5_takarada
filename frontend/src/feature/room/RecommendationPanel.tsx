@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { RoomItem } from '../../domain/room';
 import ReferenceSvg from './ReferenceSvg';
-import { PlacedModelCredits } from './ModelCredits';
 import { categoryOf } from './itemCategory';
 import { motionScrollIntoView, motionStaggerStyle, prefersReducedMotion, useReducedMotion } from '../../core/motion';
 const money=(value:number)=>`¥${value.toLocaleString('ja-JP')}`;
@@ -66,7 +65,7 @@ export default function RecommendationPanel({items,originalItems,searchEntryPoin
     <ul ref={listRef} className="rc-items">{visible.map((item,index)=>{const url=productLink(item.productUrl);const body=<>
       <span className="rc-item-art"><ProductImage key={item.imageUrl??item.id} item={item}/><span className="rc-item-number">{item.marker??items.indexOf(item)+1}</span></span>
       <span className="rc-item-copy"><span className="rc-item-name clamp2">{item.name}</span><span className="rc-item-shop">{labels.find(([key])=>key===categoryOf(item))?.[1]} · {item.shop??'購入先未登録'}</span><span className="rc-money">{item.price===undefined?'価格未登録':money(item.price)}</span><ProductDetails item={item} originalItems={originalItems}/></span><span className="rc-item-external">{url&&<ReferenceSvg page={5} index={22}/>}</span>
-    </>;return <li key={item.id} data-product-id={item.id} style={motionStaggerStyle(index)}>{url?<a href={url} target="_blank" rel="noopener noreferrer" className={`rc-item-link motion-control${selectedId===item.id?' is-selected':''}`} onMouseEnter={()=>onSelect(item.id)} onFocus={()=>onSelect(item.id)} onClick={()=>onSelect(item.id)}>{body}</a>:<button type="button" className={`rc-item-link motion-control${selectedId===item.id?' is-selected':''}`} onFocus={()=>onSelect(item.id)} onClick={()=>onSelect(item.id)} aria-label={`${index+1}. ${item.name}（購入リンク未登録）`}>{body}</button>}<PlacedModelCredits modelUrl={item.modelUrl}/></li>;})}</ul>
+    </>;return <li key={item.id} data-product-id={item.id} style={motionStaggerStyle(index)}>{url?<a href={url} target="_blank" rel="noopener noreferrer" className={`rc-item-link motion-control${selectedId===item.id?' is-selected':''}`} onMouseEnter={()=>onSelect(item.id)} onFocus={()=>onSelect(item.id)} onClick={()=>onSelect(item.id)}>{body}</a>:<button type="button" className={`rc-item-link motion-control${selectedId===item.id?' is-selected':''}`} onFocus={()=>onSelect(item.id)} onClick={()=>onSelect(item.id)} aria-label={`${index+1}. ${item.name}（購入リンク未登録）`}>{body}</button>}</li>;})}</ul>
     {/* google.com refuses to render inside a frame, so suggestion links open in a new tab. */}
     {!!searchSuggestions.length&&<div className="rc-panel-note" style={{maxHeight:220,overflowY:"auto"}}><span>Googleの検索候補</span>{searchSuggestions.map((html,index)=><iframe key={html} title={`Googleの検索候補 ${index+1}`} srcDoc={`<base target="_blank">${html}`} sandbox="allow-popups allow-popups-to-escape-sandbox" referrerPolicy="no-referrer" style={{display:'block',width:'100%',height:160,border:0,background:'#fff'}}/>)}</div>}
   </aside>;

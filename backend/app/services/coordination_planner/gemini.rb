@@ -19,7 +19,7 @@ class CoordinationPlanner
           items: {
             type: "object",
             properties: {
-              slot: { type: "string", enum: InteriorLinks::SLOTS },
+              slot: { type: "string", enum: FurnitureCandidates::SLOTS },
               group_id: { type: "string", description: "候補にあるgroup_id。床の追加・交換は各操作を別グループとして扱う" },
               selected_item_id: { type: "integer", description: "この一式で購入する商品id。採用しないグループは0" },
               item_ids: { type: "array", items: { type: "integer" }, description: "この一式と相性がよい配置用の代替候補をおすすめ順に最大6件" }
@@ -92,7 +92,7 @@ class CoordinationPlanner
       @kept_objects = kept_objects
       @previous = previous
       @user_id = user_id
-      @client = client || InteriorLinks.client(user_id: user_id)
+      @client = client || FurnitureCandidates.client(user_id: user_id)
       @additional_candidates = additional_candidates
     end
 

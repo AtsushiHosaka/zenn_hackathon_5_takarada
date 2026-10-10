@@ -1,0 +1,7110 @@
+{
+ "unit": "meter",
+ "axes": "+Y up, +Z front, origin bottom center",
+ "models": [
+  {
+   "id": "acrylic_panel",
+   "name": "アクリルパネル",
+   "category": "acrylic_panel",
+   "shape": "acrylic_panel",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/acrylic_panel.glb",
+   "size": [
+    0.15,
+    0.2,
+    0.06
+   ],
+   "triangles": 228,
+   "color_material_keys": [
+    "acrylic",
+    "print"
+   ],
+   "bytes": 10500,
+   "sha256": "f1d73105a0d15d6dedcb10e15b9cb116ff8ef293b8b439caa1e50633ef6d4f4e",
+   "characters": []
+  },
+  {
+   "id": "acrylic_stand",
+   "name": "アクリルスタンド",
+   "category": "acrylic_stand",
+   "shape": "acrylic_stand",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/acrylic_stand.glb",
+   "size": [
+    0.08,
+    0.15,
+    0.05
+   ],
+   "triangles": 1156,
+   "color_material_keys": [
+    "acrylic",
+    "tint",
+    "print"
+   ],
+   "bytes": 50684,
+   "sha256": "cbedf4a6bdaf5fbbab8bc30d315a6ea1a6bb1eb2da8944b82c4973754d143e3a",
+   "characters": []
+  },
+  {
+   "id": "acrylic_stand_big",
+   "name": "BIGアクリルスタンド",
+   "category": "acrylic_stand",
+   "shape": "acrylic_stand_big",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/acrylic_stand_big.glb",
+   "size": [
+    0.18,
+    0.3,
+    0.1
+   ],
+   "triangles": 700,
+   "color_material_keys": [
+    "acrylic",
+    "print"
+   ],
+   "bytes": 29192,
+   "sha256": "c8ee5507f44c066ecb506e20ca1677c3e50b5a514e623bb3116381515fa02bcc",
+   "characters": []
+  },
+  {
+   "id": "acrylic_stand_case",
+   "name": "卓上ひな壇",
+   "category": "acrylic_stand_case",
+   "shape": "acrylic_stand_case",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/acrylic_stand_case.glb",
+   "size": [
+    0.3,
+    0.15,
+    0.15
+   ],
+   "triangles": 1196,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 42648,
+   "sha256": "e34e7c24ce2d4f2ce3db18e5ee6047560ba4e94d3df09dab445e34a54bd1a6d5",
+   "characters": []
+  },
+  {
+   "id": "acrylic_stand_l",
+   "name": "アクリルスタンド L",
+   "category": "acrylic_stand",
+   "shape": "acrylic_stand_l",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/acrylic_stand_l.glb",
+   "size": [
+    0.12,
+    0.2,
+    0.07
+   ],
+   "triangles": 700,
+   "color_material_keys": [
+    "acrylic",
+    "print"
+   ],
+   "bytes": 29444,
+   "sha256": "30ab1b1162ec2eb048436978252e3839a0f12c48db9e14dcbd5f6cf2d7a51edb",
+   "characters": []
+  },
+  {
+   "id": "acrylic_stand_m",
+   "name": "アクリルスタンド M",
+   "category": "acrylic_stand",
+   "shape": "acrylic_stand_m",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/acrylic_stand_m.glb",
+   "size": [
+    0.09,
+    0.15,
+    0.06
+   ],
+   "triangles": 700,
+   "color_material_keys": [
+    "acrylic",
+    "print"
+   ],
+   "bytes": 29444,
+   "sha256": "d7d4f881c05b8e1c33c423ecc61281ca8fea044a7d53b7af56f8246aaafe924a",
+   "characters": []
+  },
+  {
+   "id": "acrylic_stand_s",
+   "name": "アクリルスタンド S",
+   "category": "acrylic_stand",
+   "shape": "acrylic_stand_s",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/acrylic_stand_s.glb",
+   "size": [
+    0.07,
+    0.1,
+    0.05
+   ],
+   "triangles": 700,
+   "color_material_keys": [
+    "acrylic",
+    "print"
+   ],
+   "bytes": 29476,
+   "sha256": "901f83a03bc74a5653e26faf177aa4a6856f4a89f1d7869ad7e620436651bdb0",
+   "characters": []
+  },
+  {
+   "id": "air_purifier",
+   "name": "空気清浄機",
+   "category": "appliance",
+   "shape": "air_purifier",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/air_purifier.glb",
+   "size": [
+    0.3,
+    0.55,
+    0.3
+   ],
+   "triangles": 3204,
+   "color_material_keys": [
+    "tint",
+    "grille",
+    "light"
+   ],
+   "bytes": 140524,
+   "sha256": "258e875889ff423bc3850d21059477313ce4fe802a7aaca0363e3c3b0d8ce478",
+   "characters": []
+  },
+  {
+   "id": "aquarium",
+   "name": "水槽",
+   "category": "aquarium",
+   "shape": "aquarium",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/aquarium.glb",
+   "size": [
+    0.45,
+    0.35,
+    0.25
+   ],
+   "triangles": 6636,
+   "color_material_keys": [
+    "tint",
+    "water",
+    "gravel",
+    "leaf",
+    "fish"
+   ],
+   "bytes": 325236,
+   "sha256": "a10567b2d41cf1ebf86e7d89fb94a9cdcdabac7cd762847e550b1ed329214ca0",
+   "characters": []
+  },
+  {
+   "id": "armchair_wing",
+   "name": "ウイングチェア",
+   "category": "chair",
+   "shape": "armchair_wing",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/armchair_wing.glb",
+   "size": [
+    0.8,
+    1.0,
+    0.85
+   ],
+   "triangles": 4412,
+   "color_material_keys": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 158984,
+   "sha256": "77b50ca16679e0eefdf9d6d44f134cb31b3ba4f6692ae81f6b348d23232fed28",
+   "characters": []
+  },
+  {
+   "id": "badge_display",
+   "name": "缶バッジディスプレイ",
+   "category": "can_badge",
+   "shape": "badge_display",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/badge_display.glb",
+   "size": [
+    0.4,
+    0.3,
+    0.02
+   ],
+   "triangles": 4316,
+   "color_material_keys": [
+    "tint",
+    "badge",
+    "print",
+    "badge2",
+    "badge3"
+   ],
+   "bytes": 165692,
+   "sha256": "87ebc43b39ecec832df938368266ab5e11c5fe73e8e1ef43985c35517e864972",
+   "characters": []
+  },
+  {
+   "id": "balcony_set",
+   "name": "バルコニー用テーブルとチェア2脚",
+   "category": "outdoor",
+   "shape": "balcony_set",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/balcony_set.glb",
+   "size": [
+    1.2,
+    0.8,
+    0.6
+   ],
+   "triangles": 2824,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 131756,
+   "sha256": "4f36e3ee58961aead3dd09739b83bb24ab60c05166f8979ac7c865f5a7bbe741",
+   "characters": []
+  },
+  {
+   "id": "beanbag",
+   "name": "ビーズクッション",
+   "category": "beanbag",
+   "shape": "beanbag",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/beanbag.glb",
+   "size": [
+    0.65,
+    0.45,
+    0.65
+   ],
+   "triangles": 504,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 15188,
+   "sha256": "4eaf9deb534a665b980e965507edbff8556b973baa2c0a8616a21de418903ed6",
+   "characters": []
+  },
+  {
+   "id": "bed_bunk",
+   "name": "2段ベッド",
+   "category": "bed",
+   "shape": "bed_bunk",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bed_bunk.glb",
+   "size": [
+    1.0,
+    1.6,
+    2.05
+   ],
+   "triangles": 5756,
+   "color_material_keys": [
+    "wood",
+    "mattress_side",
+    "tint"
+   ],
+   "bytes": 223284,
+   "sha256": "802756d05829d7cdbbf36cce8459f86b3f02847eb0dbecc0e95514b13bc5b570",
+   "characters": []
+  },
+  {
+   "id": "bed_canopy",
+   "name": "天蓋付きベッド",
+   "category": "bed",
+   "shape": "bed_canopy",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bed_canopy.glb",
+   "size": [
+    1.1,
+    2.0,
+    2.05
+   ],
+   "triangles": 8444,
+   "color_material_keys": [
+    "wood",
+    "mattress_side",
+    "mattress",
+    "tint"
+   ],
+   "bytes": 319424,
+   "sha256": "a8e57f7a2517205b71fdb1989f3c10d2d6b76b53a1766bd05132ec31748f71e8",
+   "characters": []
+  },
+  {
+   "id": "bed_cover",
+   "name": "ベッドカバー",
+   "category": "bed_cover",
+   "shape": "bed_cover",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bed_cover.glb",
+   "size": [
+    1.0,
+    0.04,
+    2.0
+   ],
+   "triangles": 2348,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 66968,
+   "sha256": "2956ab8924c55d2d7544ac0225bf0f556bf17f06c9b118f7761c4d1685b44544",
+   "characters": []
+  },
+  {
+   "id": "bed_cover__101",
+   "name": "ベッドカバー",
+   "category": "bed_cover",
+   "shape": "bed_cover",
+   "variant": "101",
+   "format": "glb",
+   "object_key": "models/furniture/v1/bed_cover__101.glb",
+   "size": [
+    1.0,
+    0.04,
+    2.0
+   ],
+   "triangles": 2348,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 66976,
+   "sha256": "39812e8d3238c3d7a1ed3913fc64e924582553cea79afbf98f00d527aec0c7a0",
+   "characters": []
+  },
+  {
+   "id": "bed_cover__201",
+   "name": "ベッドカバー",
+   "category": "bed_cover",
+   "shape": "bed_cover",
+   "variant": "201",
+   "format": "glb",
+   "object_key": "models/furniture/v1/bed_cover__201.glb",
+   "size": [
+    1.0,
+    0.04,
+    2.0
+   ],
+   "triangles": 2348,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 66976,
+   "sha256": "ab4dffd69bf3aee75ab2a6823735fea9e623192a2f7a2cf60a7e2372f4a99d74",
+   "characters": []
+  },
+  {
+   "id": "bed_cover__301",
+   "name": "ベッドカバー",
+   "category": "bed_cover",
+   "shape": "bed_cover",
+   "variant": "301",
+   "format": "glb",
+   "object_key": "models/furniture/v1/bed_cover__301.glb",
+   "size": [
+    1.0,
+    0.04,
+    2.0
+   ],
+   "triangles": 2348,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 66976,
+   "sha256": "caf32e2de88a465bb713db2df54574a99a0b148d4b388589e4e02f3578fee83f",
+   "characters": []
+  },
+  {
+   "id": "bed_double",
+   "name": "ダブルベッド",
+   "category": "bed",
+   "shape": "bed_double",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bed_double.glb",
+   "size": [
+    1.4,
+    0.45,
+    1.95
+   ],
+   "triangles": 2368,
+   "color_material_keys": [
+    "wood",
+    "mattress_side",
+    "tint"
+   ],
+   "bytes": 82348,
+   "sha256": "eeb845691502522dbd1bf7cbf3fc1606dfa43947ab73e0c366a332efc5c9a407",
+   "characters": []
+  },
+  {
+   "id": "bed_headboard_double",
+   "name": "ヘッドボード付きダブルベッド",
+   "category": "bed",
+   "shape": "bed_headboard_double",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bed_headboard_double.glb",
+   "size": [
+    1.4,
+    0.9,
+    2.1
+   ],
+   "triangles": 7332,
+   "color_material_keys": [
+    "wood",
+    "tint",
+    "mattress_side",
+    "mattress"
+   ],
+   "bytes": 250296,
+   "sha256": "e11c7d4ef45cf983394ec41832169f213faa3101b045b56b22a31dd0fd778bec",
+   "characters": []
+  },
+  {
+   "id": "bed_kids",
+   "name": "キッズベッド",
+   "category": "bed",
+   "shape": "bed_kids",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bed_kids.glb",
+   "size": [
+    0.8,
+    0.7,
+    1.5
+   ],
+   "triangles": 3752,
+   "color_material_keys": [
+    "tint",
+    "trim",
+    "mattress_side",
+    "mattress"
+   ],
+   "bytes": 148480,
+   "sha256": "4d92d928e2b0be408fd8bb690650939bfdbe83df443064c80bdea3ab84618a6f",
+   "characters": []
+  },
+  {
+   "id": "bed_loft",
+   "name": "ロフトベッド",
+   "category": "bed",
+   "shape": "bed_loft",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bed_loft.glb",
+   "size": [
+    1.05,
+    1.8,
+    2.05
+   ],
+   "triangles": 3904,
+   "color_material_keys": [
+    "metal",
+    "mattress_side",
+    "tint"
+   ],
+   "bytes": 160376,
+   "sha256": "b0782c373e5a5928ef280c2b0093a5f4e1d80e7dbe6748b71343e9f663d6c119",
+   "characters": []
+  },
+  {
+   "id": "bed_semidouble",
+   "name": "セミダブルベッド",
+   "category": "bed",
+   "shape": "bed_semidouble",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bed_semidouble.glb",
+   "size": [
+    1.2,
+    0.45,
+    1.95
+   ],
+   "triangles": 2032,
+   "color_material_keys": [
+    "wood",
+    "mattress_side",
+    "tint"
+   ],
+   "bytes": 70448,
+   "sha256": "2c2cb119746fde1fdadc00762338232f7b680e1b6c287ef2e269362789544ca0",
+   "characters": []
+  },
+  {
+   "id": "bed_single",
+   "name": "シングルベッド",
+   "category": "bed",
+   "shape": "bed_single",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bed_single.glb",
+   "size": [
+    0.97,
+    0.45,
+    1.95
+   ],
+   "triangles": 2032,
+   "color_material_keys": [
+    "wood",
+    "mattress_side",
+    "tint"
+   ],
+   "bytes": 70540,
+   "sha256": "da0f7f15fd82c7341aa53ef49a9a520c42293ec5d0ba91d581de4339c1f32031",
+   "characters": []
+  },
+  {
+   "id": "bed_slatted",
+   "name": "すのこベッド（低床）",
+   "category": "bed",
+   "shape": "bed_slatted",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bed_slatted.glb",
+   "size": [
+    1.0,
+    0.3,
+    2.0
+   ],
+   "triangles": 4396,
+   "color_material_keys": [
+    "wood_dark",
+    "wood",
+    "mattress_side",
+    "tint"
+   ],
+   "bytes": 175804,
+   "sha256": "4df336071c742007eb7c02c33ea71b398e5d091c19c53a6db72cf5c084b2f0f6",
+   "characters": []
+  },
+  {
+   "id": "bed_storage",
+   "name": "収納付きベッド",
+   "category": "bed",
+   "shape": "bed_storage",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bed_storage.glb",
+   "size": [
+    1.0,
+    0.45,
+    2.0
+   ],
+   "triangles": 1804,
+   "color_material_keys": [
+    "handle",
+    "wood",
+    "mattress_side",
+    "tint"
+   ],
+   "bytes": 68364,
+   "sha256": "728093f221f62d3af81061ea2a7e3b9a37565b8754f8982696b4c51d9b1b900c",
+   "characters": []
+  },
+  {
+   "id": "bench_upholstered",
+   "name": "布張りベンチ",
+   "category": "bench",
+   "shape": "bench_upholstered",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bench_upholstered.glb",
+   "size": [
+    1.2,
+    0.45,
+    0.4
+   ],
+   "triangles": 1628,
+   "color_material_keys": [
+    "wood",
+    "tint",
+    "button"
+   ],
+   "bytes": 63520,
+   "sha256": "42804194e96c9fafc24b48624e9951ef6b3d1344aeae08b13dbf30477acb6910",
+   "characters": []
+  },
+  {
+   "id": "bench_wood",
+   "name": "木製ベンチ",
+   "category": "bench",
+   "shape": "bench_wood",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bench_wood.glb",
+   "size": [
+    1.0,
+    0.45,
+    0.35
+   ],
+   "triangles": 368,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 21068,
+   "sha256": "9c2dc2f6ccf4eb6beecebed8af530b77c21373ee83b58f60cf77313ad5aea95d",
+   "characters": []
+  },
+  {
+   "id": "blanket_folded",
+   "name": "たたんだブランケット",
+   "category": "blanket",
+   "shape": "blanket_folded",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/blanket_folded.glb",
+   "size": [
+    0.5,
+    0.08,
+    0.35
+   ],
+   "triangles": 2292,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 76920,
+   "sha256": "460c31c3594cf33c1123842368f789d3daa7d9d4b54a470bf41b3a6275a1d3ab",
+   "characters": []
+  },
+  {
+   "id": "blanket_print",
+   "name": "プリントブランケット",
+   "category": "blanket",
+   "shape": "blanket_print",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/blanket_print.glb",
+   "size": [
+    0.7,
+    0.008,
+    1.0
+   ],
+   "triangles": 1588,
+   "color_material_keys": [
+    "tint",
+    "print"
+   ],
+   "bytes": 47968,
+   "sha256": "2139a37467a590861072d2be0983bda3d954e7700e0c739807436b5b132005dd",
+   "characters": []
+  },
+  {
+   "id": "blind_roller",
+   "name": "ロールスクリーン",
+   "category": "blind",
+   "shape": "blind_roller",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/blind_roller.glb",
+   "size": [
+    1.0,
+    1.8,
+    0.08
+   ],
+   "triangles": 1080,
+   "color_material_keys": [
+    "frame",
+    "tint",
+    "cord"
+   ],
+   "bytes": 39012,
+   "sha256": "0292a0d10f85cf9fe52345ce4fb844dc1c437f0efeee110816c51b46bf3cacf7",
+   "characters": []
+  },
+  {
+   "id": "body_pillow",
+   "name": "抱き枕",
+   "category": "bedding",
+   "shape": "body_pillow",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/body_pillow.glb",
+   "size": [
+    1.2,
+    0.25,
+    0.3
+   ],
+   "triangles": 1296,
+   "color_material_keys": [
+    "tint",
+    "trim"
+   ],
+   "bytes": 41344,
+   "sha256": "04ef4aa84ea7c469efa12a160a77fa85cb0c7e975f40115b585a474ea1c42ad3",
+   "characters": []
+  },
+  {
+   "id": "books_row",
+   "name": "本の列（ブックエンド付き）",
+   "category": "books",
+   "shape": "books_row",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/books_row.glb",
+   "size": [
+    0.4,
+    0.25,
+    0.2
+   ],
+   "triangles": 4536,
+   "color_material_keys": [
+    "tint",
+    "paper",
+    "book2",
+    "book3"
+   ],
+   "bytes": 196664,
+   "sha256": "20d7cb5f4c61f9f73d4e0d09f9b9d6e069cbba2bb3d4602ef9a5bd22b5842feb",
+   "characters": []
+  },
+  {
+   "id": "books_stack",
+   "name": "積んだ本",
+   "category": "books",
+   "shape": "books_stack",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/books_stack.glb",
+   "size": [
+    0.25,
+    0.15,
+    0.18
+   ],
+   "triangles": 1680,
+   "color_material_keys": [
+    "tint",
+    "paper",
+    "book2",
+    "book3"
+   ],
+   "bytes": 75556,
+   "sha256": "c83232e0943a6e7575c7c79ac9b3b6edc486d55a6a9778e04c0f768c9c923608",
+   "characters": []
+  },
+  {
+   "id": "bookshelf",
+   "name": "本棚",
+   "category": "shelf",
+   "shape": "bookshelf",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/bookshelf.glb",
+   "size": [
+    0.8,
+    1.8,
+    0.3
+   ],
+   "triangles": 888,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 33492,
+   "sha256": "6c203164f840d876f51632203227aabe9a5b57c9cc52657579b735fac0152978",
+   "characters": []
+  },
+  {
+   "id": "bookshelf__w060",
+   "name": "本棚",
+   "category": "shelf",
+   "shape": "bookshelf",
+   "variant": "w060",
+   "format": "glb",
+   "object_key": "models/furniture/v1/bookshelf__w060.glb",
+   "size": [
+    0.6,
+    1.8,
+    0.3
+   ],
+   "triangles": 888,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 33244,
+   "sha256": "ecc4ec349fc657519a2cd9c8681f7672f5f88aef07a58baf32d1c76e875101c8",
+   "characters": []
+  },
+  {
+   "id": "bookshelf__w100",
+   "name": "本棚",
+   "category": "shelf",
+   "shape": "bookshelf",
+   "variant": "w100",
+   "format": "glb",
+   "object_key": "models/furniture/v1/bookshelf__w100.glb",
+   "size": [
+    1.0,
+    1.8,
+    0.3
+   ],
+   "triangles": 888,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 33376,
+   "sha256": "c42f325fdebb55aafe5e72700352403414840199b906fc2f905247d575910351",
+   "characters": []
+  },
+  {
+   "id": "cabinet_glass",
+   "name": "ガラス扉キャビネット",
+   "category": "display_case",
+   "shape": "cabinet_glass",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/cabinet_glass.glb",
+   "size": [
+    0.8,
+    1.2,
+    0.4
+   ],
+   "triangles": 1984,
+   "color_material_keys": [
+    "tint",
+    "knob",
+    "glass"
+   ],
+   "bytes": 88496,
+   "sha256": "1494434eeecb0992ec11aed32c6a3c7b6aae737ab9b038bd04766316f4c948e1",
+   "characters": []
+  },
+  {
+   "id": "can_badge",
+   "name": "缶バッジ（イーゼル付き）",
+   "category": "can_badge",
+   "shape": "can_badge",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/can_badge.glb",
+   "size": [
+    0.057,
+    0.057,
+    0.012
+   ],
+   "triangles": 516,
+   "color_material_keys": [
+    "tint",
+    "print",
+    "acrylic"
+   ],
+   "bytes": 20636,
+   "sha256": "8dba80ab7144cc7c6cd715a04160daedee352e19293d0adf345dbdd8c61733b1",
+   "characters": []
+  },
+  {
+   "id": "candle",
+   "name": "キャンドル",
+   "category": "candle",
+   "shape": "candle",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/candle.glb",
+   "size": [
+    0.1,
+    0.12,
+    0.1
+   ],
+   "triangles": 508,
+   "color_material_keys": [
+    "tint",
+    "wick"
+   ],
+   "bytes": 20008,
+   "sha256": "d2b927db8413c62de7f30c0e9e9506f91d00138901a74c11903ed788e0f2dc49",
+   "characters": []
+  },
+  {
+   "id": "cat_tower",
+   "name": "キャットタワー",
+   "category": "pet",
+   "shape": "cat_tower",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/cat_tower.glb",
+   "size": [
+    0.55,
+    1.4,
+    0.45
+   ],
+   "triangles": 6788,
+   "color_material_keys": [
+    "tint",
+    "cushion",
+    "sisal"
+   ],
+   "bytes": 298576,
+   "sha256": "c1ac7ee00b013d2c406a9be5f5c1a2fd73e17c0b415f0712f7f227888e569da5",
+   "characters": []
+  },
+  {
+   "id": "ceiling_light",
+   "name": "シーリングライト",
+   "category": "ceiling_light",
+   "shape": "ceiling_light",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/ceiling_light.glb",
+   "size": [
+    0.5,
+    0.12,
+    0.5
+   ],
+   "triangles": 2678,
+   "color_material_keys": [
+    "light",
+    "tint",
+    "plastic"
+   ],
+   "bytes": 87304,
+   "sha256": "59acad32a11f9c045a899669d7a39d69d73e3c717d3880c56dd808cbbffe37ff",
+   "characters": []
+  },
+  {
+   "id": "chair_dining",
+   "name": "木製ダイニングチェア",
+   "category": "chair",
+   "shape": "chair_dining",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/chair_dining.glb",
+   "size": [
+    0.45,
+    0.8,
+    0.5
+   ],
+   "triangles": 1844,
+   "color_material_keys": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 72592,
+   "sha256": "fa3e660276162bb8300be88c8066bd9b51538f6b3ff5e4c2c8d341ff44e57ca1",
+   "characters": []
+  },
+  {
+   "id": "chair_folding",
+   "name": "折り畳みチェア",
+   "category": "chair",
+   "shape": "chair_folding",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/chair_folding.glb",
+   "size": [
+    0.45,
+    0.8,
+    0.48
+   ],
+   "triangles": 680,
+   "color_material_keys": [
+    "metal",
+    "plastic",
+    "tint"
+   ],
+   "bytes": 39828,
+   "sha256": "c02a840a56c64278382782404b89acdbd4e36c3ee0c124a9cd32f205f537f215",
+   "characters": []
+  },
+  {
+   "id": "chair_gaming",
+   "name": "ゲーミングチェア",
+   "category": "chair",
+   "shape": "chair_gaming",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/chair_gaming.glb",
+   "size": [
+    0.65,
+    1.3,
+    0.65
+   ],
+   "triangles": 7468,
+   "color_material_keys": [
+    "plastic",
+    "metal",
+    "tint",
+    "accent"
+   ],
+   "bytes": 284108,
+   "sha256": "86b82713de6dc3dc2c402c5db1f6f4b0f8f04ef643ade9913e8fd0859a179ca8",
+   "characters": []
+  },
+  {
+   "id": "chair_lounge",
+   "name": "ラウンジチェア",
+   "category": "chair",
+   "shape": "chair_lounge",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/chair_lounge.glb",
+   "size": [
+    0.7,
+    0.75,
+    0.75
+   ],
+   "triangles": 2716,
+   "color_material_keys": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 101576,
+   "sha256": "9ad2d78ce455e5920442b96f550fdcf2ad062161ab72f0cfc9aaa93211bcd887",
+   "characters": []
+  },
+  {
+   "id": "chair_office",
+   "name": "デスクチェア",
+   "category": "chair",
+   "shape": "chair_office",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/chair_office.glb",
+   "size": [
+    0.5,
+    1.1,
+    0.5
+   ],
+   "triangles": 2572,
+   "color_material_keys": [
+    "plastic",
+    "metal",
+    "tint"
+   ],
+   "bytes": 106940,
+   "sha256": "f7e9100ed72f5029914bac6dc65c5d4767926fcf755e86ba93e46e20b0d46604",
+   "characters": []
+  },
+  {
+   "id": "chair_rattan",
+   "name": "ラタンチェア",
+   "category": "chair",
+   "shape": "chair_rattan",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/chair_rattan.glb",
+   "size": [
+    0.6,
+    0.8,
+    0.6
+   ],
+   "triangles": 6544,
+   "color_material_keys": [
+    "rattan",
+    "tint"
+   ],
+   "bytes": 257824,
+   "sha256": "ae32f309770c70015e529e8dbe8aa83bcc64048d51bc0da93c5e7ca0378ec5cd",
+   "characters": []
+  },
+  {
+   "id": "chair_shell",
+   "name": "シェルチェア",
+   "category": "chair",
+   "shape": "chair_shell",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/chair_shell.glb",
+   "size": [
+    0.47,
+    0.8,
+    0.52
+   ],
+   "triangles": 2128,
+   "color_material_keys": [
+    "tint",
+    "metal",
+    "wood"
+   ],
+   "bytes": 68864,
+   "sha256": "957dc30cb46e61d62f5f0c69967f823476e4678acab3440b29cd1fbf8831b4c5",
+   "characters": []
+  },
+  {
+   "id": "chair_windsor",
+   "name": "ウィンザーチェア",
+   "category": "chair",
+   "shape": "chair_windsor",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/chair_windsor.glb",
+   "size": [
+    0.5,
+    0.9,
+    0.5
+   ],
+   "triangles": 1392,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 64288,
+   "sha256": "d1f29a3c0584f1fb0e88a9a4db87dbeed6b935ee991228d95ac51eaf244cf8b5",
+   "characters": []
+  },
+  {
+   "id": "chair_wishbone",
+   "name": "Yチェア風チェア",
+   "category": "chair",
+   "shape": "chair_wishbone",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/chair_wishbone.glb",
+   "size": [
+    0.55,
+    0.75,
+    0.52
+   ],
+   "triangles": 2336,
+   "color_material_keys": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 116372,
+   "sha256": "cb160a29ad5a1f679c053fee9b5585412b7019fbc736b279b509eec0fff8ae5d",
+   "characters": []
+  },
+  {
+   "id": "chaise_longue",
+   "name": "寝椅子（シェーズロング）",
+   "category": "sofa",
+   "shape": "chaise_longue",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/chaise_longue.glb",
+   "size": [
+    0.65,
+    0.8,
+    1.55
+   ],
+   "triangles": 2844,
+   "color_material_keys": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 102620,
+   "sha256": "34cee4865abf28856919441ce52b64747504f759dbf86d3bc73ef9653cb382fa",
+   "characters": []
+  },
+  {
+   "id": "char_hatsune_miku_acrylic_stand",
+   "name": "初音ミク アクリルスタンド",
+   "category": "acrylic_stand",
+   "shape": "char_hatsune_miku_acrylic_stand",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_acrylic_stand.glb",
+   "size": [
+    0.09,
+    0.15,
+    0.06
+   ],
+   "triangles": 644,
+   "color_material_keys": [
+    "acrylic",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 54472,
+   "sha256": "3fb83a1d733add7b9b4c9e64f62d380b783147c286f54373e84a47de235564a7",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_bed_cover",
+   "name": "初音ミク 布団カバー",
+   "category": "bed_cover",
+   "shape": "char_hatsune_miku_bed_cover",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_bed_cover.glb",
+   "size": [
+    1.0,
+    0.04,
+    2.0
+   ],
+   "triangles": 3178,
+   "color_material_keys": [
+    "fabric",
+    "fabric_back",
+    "fabric_patch",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "note_light"
+   ],
+   "bytes": 219048,
+   "sha256": "a1dcc600660e7f8f086cc74e78b294a377770b424063813b06e32b247417b581",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_blanket",
+   "name": "初音ミク ブランケット",
+   "category": "blanket",
+   "shape": "char_hatsune_miku_blanket",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_blanket.glb",
+   "size": [
+    0.7,
+    0.008,
+    1.0
+   ],
+   "triangles": 916,
+   "color_material_keys": [
+    "fabric",
+    "stripe_teal",
+    "stripe_gray",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 74976,
+   "sha256": "0e3add40aca1b621463da01d013c0bb1d5eef8a368a86c28b84ed74939f432f5",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_can_badge",
+   "name": "初音ミク 缶バッジ",
+   "category": "can_badge",
+   "shape": "char_hatsune_miku_can_badge",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_can_badge.glb",
+   "size": [
+    0.057,
+    0.057,
+    0.012
+   ],
+   "triangles": 2664,
+   "color_material_keys": [
+    "trim",
+    "print_bg",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "acrylic"
+   ],
+   "bytes": 201408,
+   "sha256": "89de19bbb2c11d7531be495057edd15da1a47701e5b3503d21a300465bcad82b",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_cushion",
+   "name": "初音ミク ダイカットクッション",
+   "category": "cushion",
+   "shape": "char_hatsune_miku_cushion",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_cushion.glb",
+   "size": [
+    0.4,
+    0.45,
+    0.12
+   ],
+   "triangles": 624,
+   "color_material_keys": [
+    "hair",
+    "skin",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "hair_tie",
+    "hair_tie_accent"
+   ],
+   "bytes": 52620,
+   "sha256": "03baba4baddb97e86bb87db9ead39afdd52299577e4afa994411005bd2203c00",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_cushion_body",
+   "name": "初音ミク 全身ダイカットクッション",
+   "category": "cushion",
+   "shape": "char_hatsune_miku_cushion_body",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_cushion_body.glb",
+   "size": [
+    0.3,
+    0.6,
+    0.12
+   ],
+   "triangles": 4654,
+   "color_material_keys": [
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "fabric",
+    "fabric_back"
+   ],
+   "bytes": 316036,
+   "sha256": "576bbf824fc4062defc459b1cea178c7a5adbcb94b2cf03c30b9f878ffa0752e",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_cushion_round",
+   "name": "初音ミク 丸クッション",
+   "category": "cushion",
+   "shape": "char_hatsune_miku_cushion_round",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_cushion_round.glb",
+   "size": [
+    0.45,
+    0.14,
+    0.45
+   ],
+   "triangles": 1762,
+   "color_material_keys": [
+    "fabric",
+    "fabric_back",
+    "piping",
+    "hair",
+    "skin",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "tie"
+   ],
+   "bytes": 148948,
+   "sha256": "7ed8ad7f1503a61b70e99d974e4c2536d333be7c6cee6c80428e20846087b76f",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_cushion_square",
+   "name": "初音ミク スクエアクッション",
+   "category": "cushion",
+   "shape": "char_hatsune_miku_cushion_square",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_cushion_square.glb",
+   "size": [
+    0.45,
+    0.15,
+    0.45
+   ],
+   "triangles": 2432,
+   "color_material_keys": [
+    "fabric",
+    "fabric_back",
+    "piping",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 202360,
+   "sha256": "586523a302c7bf30f1a84a4240a9088b45a8d4f162aaca1ec0217ccf7d9811da",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_dakimakura",
+   "name": "初音ミク 抱き枕",
+   "category": "body_pillow",
+   "shape": "char_hatsune_miku_dakimakura",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_dakimakura.glb",
+   "size": [
+    1.6,
+    0.18,
+    0.5
+   ],
+   "triangles": 4244,
+   "color_material_keys": [
+    "fabric",
+    "fabric_back",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 301776,
+   "sha256": "191933a8d58cbe6f10cb6430b8e95ee391d43b70b7f56543aebb3ca351ab4e31",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_desk_mat",
+   "name": "初音ミク デスクマット",
+   "category": "rubber_mat",
+   "shape": "char_hatsune_miku_desk_mat",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_desk_mat.glb",
+   "size": [
+    0.6,
+    0.003,
+    0.3
+   ],
+   "triangles": 944,
+   "color_material_keys": [
+    "rubber",
+    "print_bg",
+    "print_pattern",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 75620,
+   "sha256": "513904d00a567921dd950fa8b08a498e091c35c06ad3616be3cfef62ed855de0",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_diorama",
+   "name": "初音ミク アクリルジオラマ",
+   "category": "acrylic_diorama",
+   "shape": "char_hatsune_miku_diorama",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_diorama.glb",
+   "size": [
+    0.16,
+    0.14,
+    0.08
+   ],
+   "triangles": 944,
+   "color_material_keys": [
+    "acrylic",
+    "print_bg",
+    "print_floor",
+    "print_light",
+    "hair",
+    "hair_tie_accent",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 77596,
+   "sha256": "b2cb3703d90a0d5acd3c1b493b1dec412d9707915edeb67b8f7fb79fc8a2d19e",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_figure",
+   "name": "初音ミク ミニフィギュア",
+   "category": "figure",
+   "shape": "char_hatsune_miku_figure",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_figure.glb",
+   "size": [
+    0.12,
+    0.22,
+    0.1
+   ],
+   "triangles": 1140,
+   "color_material_keys": [
+    "base",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "hair_tie",
+    "hair_tie_accent"
+   ],
+   "bytes": 93484,
+   "sha256": "a8ff3bba87a8bdda241c9e95548f204a17d48f45aa17a14010b550981525a743",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_led_light",
+   "name": "初音ミク LEDアクリルライト",
+   "category": "room_light",
+   "shape": "char_hatsune_miku_led_light",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_led_light.glb",
+   "size": [
+    0.15,
+    0.2,
+    0.08
+   ],
+   "triangles": 1596,
+   "color_material_keys": [
+    "base",
+    "light",
+    "acrylic"
+   ],
+   "bytes": 113896,
+   "sha256": "1a7900d44916d4d1a7d16dfae6c85c85a5dc1cbf46c15acc08466b802fff9dcc",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_mug",
+   "name": "初音ミク マグカップ",
+   "category": "mug",
+   "shape": "char_hatsune_miku_mug",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_mug.glb",
+   "size": [
+    0.12,
+    0.1,
+    0.09
+   ],
+   "triangles": 2568,
+   "color_material_keys": [
+    "mug",
+    "trim",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 198104,
+   "sha256": "bb5ab268720e6f271817ccdbf185f27a93b8660abce0673cb2c9fc4bcae281ec",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_pc_cushion",
+   "name": "初音ミク PCクッション",
+   "category": "cushion",
+   "shape": "char_hatsune_miku_pc_cushion",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_pc_cushion.glb",
+   "size": [
+    0.55,
+    0.47,
+    0.3
+   ],
+   "triangles": 1250,
+   "color_material_keys": [
+    "bolster",
+    "trim",
+    "cloth_top",
+    "skirt",
+    "skin",
+    "boots",
+    "hair",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "hair_tie",
+    "hair_tie_accent"
+   ],
+   "bytes": 101712,
+   "sha256": "335b31c4b824ae5f7bc2a764cf9fdd77cbd77ea9a08d56b68827b9ede5d4b68f",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_penlight",
+   "name": "初音ミク ペンライト（スタンド付き）",
+   "category": "penlight",
+   "shape": "char_hatsune_miku_penlight",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_penlight.glb",
+   "size": [
+    0.06,
+    0.25,
+    0.06
+   ],
+   "triangles": 2720,
+   "color_material_keys": [
+    "stand",
+    "grip",
+    "trim",
+    "hair_tie_accent",
+    "hair_tie",
+    "light",
+    "acrylic",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 211184,
+   "sha256": "ee9cd872afd6e8465be9ab516e9d636466ee2d3ca88b5659ae9ea32f38a996fa",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_plush",
+   "name": "初音ミク ぬいぐるみ",
+   "category": "plush",
+   "shape": "char_hatsune_miku_plush",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_plush.glb",
+   "size": [
+    0.2,
+    0.22,
+    0.12
+   ],
+   "triangles": 1088,
+   "color_material_keys": [
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "hair_tie",
+    "hair_tie_accent"
+   ],
+   "bytes": 89156,
+   "sha256": "cfd783e20f696d2dcfce0cc8b920bf083fc850131d1f8d70aee9b0b02a46c1fc",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_plush_big",
+   "name": "初音ミク BIGぬいぐるみ",
+   "category": "plush",
+   "shape": "char_hatsune_miku_plush_big",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_plush_big.glb",
+   "size": [
+    0.4,
+    0.45,
+    0.25
+   ],
+   "triangles": 1088,
+   "color_material_keys": [
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "hair_tie",
+    "hair_tie_accent"
+   ],
+   "bytes": 89124,
+   "sha256": "ab40d28643e67e1b21c1286c49340015814b9a09b2d906860e9a8cbfae4b3958",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_plush_lying",
+   "name": "初音ミク 寝そべりぬいぐるみ",
+   "category": "plush",
+   "shape": "char_hatsune_miku_plush_lying",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_plush_lying.glb",
+   "size": [
+    0.3,
+    0.14,
+    0.16
+   ],
+   "triangles": 1154,
+   "color_material_keys": [
+    "hair",
+    "skin",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "hair_tie",
+    "hair_tie_accent",
+    "cloth_top",
+    "tie",
+    "skirt",
+    "trim",
+    "boots"
+   ],
+   "bytes": 95788,
+   "sha256": "6607ca2f7046b5ce832bedc51c8c355c34090af057b8cd3084eeefa4eea1db00",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_plush_negi",
+   "name": "初音ミク ネギ持ちぬいぐるみ",
+   "category": "plush",
+   "shape": "char_hatsune_miku_plush_negi",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_plush_negi.glb",
+   "size": [
+    0.22,
+    0.24,
+    0.14
+   ],
+   "triangles": 1248,
+   "color_material_keys": [
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "hair_tie",
+    "hair_tie_accent",
+    "negi_white",
+    "negi_light",
+    "negi_green",
+    "negi_root"
+   ],
+   "bytes": 103820,
+   "sha256": "e6913615618748724b83cb09540e041a39a2aa668808fc2bb712df844b687c32",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_poster_a3",
+   "name": "初音ミク A3ポスター（額装）",
+   "category": "poster",
+   "shape": "char_hatsune_miku_poster_a3",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_poster_a3.glb",
+   "size": [
+    0.32,
+    0.44,
+    0.02
+   ],
+   "triangles": 928,
+   "color_material_keys": [
+    "frame",
+    "paper",
+    "paper_pattern",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth"
+   ],
+   "bytes": 75888,
+   "sha256": "4ce8dd0057722c4c47a12fd6dfb0b3c8657c436d0a1d744492d98598ca0ba764",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_rug",
+   "name": "初音ミク ラグ",
+   "category": "rug",
+   "shape": "char_hatsune_miku_rug",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_rug.glb",
+   "size": [
+    1.0,
+    0.02,
+    1.4
+   ],
+   "triangles": 528,
+   "color_material_keys": [
+    "rug_trim",
+    "rug",
+    "hair",
+    "hair_tie",
+    "hair_tie_accent",
+    "tie"
+   ],
+   "bytes": 39896,
+   "sha256": "c8bb127a083058fc2933d12b528fbf379eb7d018dd656d5a1c53e13afefd221c",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_seat_cushion",
+   "name": "初音ミク 座布団",
+   "category": "cushion",
+   "shape": "char_hatsune_miku_seat_cushion",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_seat_cushion.glb",
+   "size": [
+    0.55,
+    0.07,
+    0.59
+   ],
+   "triangles": 2410,
+   "color_material_keys": [
+    "fabric",
+    "fabric_patch",
+    "hair",
+    "skin",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "tie",
+    "tassel"
+   ],
+   "bytes": 193764,
+   "sha256": "d000cf603b7e57c60d8720b0ca004e008e410615230e6ba59ddfcd8a8d20461e",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_standee",
+   "name": "初音ミク 等身大パネル",
+   "category": "standee",
+   "shape": "char_hatsune_miku_standee",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_standee.glb",
+   "size": [
+    0.6,
+    1.58,
+    0.3
+   ],
+   "triangles": 876,
+   "color_material_keys": [
+    "cardboard",
+    "print_bg",
+    "hair",
+    "skin",
+    "cloth_top",
+    "skirt",
+    "boots",
+    "tie",
+    "trim",
+    "mouth",
+    "hair_tie",
+    "eyes",
+    "hair_tie_accent",
+    "eye_highlight"
+   ],
+   "bytes": 69156,
+   "sha256": "21136d8faee12d4200ccb99657ec0e1f3dc3b1809596868a4aa9c5b06c2483e8",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_tapestry_b2",
+   "name": "初音ミク B2タペストリー",
+   "category": "tapestry",
+   "shape": "char_hatsune_miku_tapestry_b2",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_tapestry_b2.glb",
+   "size": [
+    0.515,
+    0.728,
+    0.015
+   ],
+   "triangles": 900,
+   "color_material_keys": [
+    "fabric",
+    "fabric_pattern",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "trim",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "rod",
+    "string"
+   ],
+   "bytes": 75124,
+   "sha256": "6d3d0f871cc898e8f70bd51a38c1c1cec06b58178be3641bf05a40b03d1a94b2",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_tapestry_life",
+   "name": "初音ミク 等身大タペストリー",
+   "category": "tapestry",
+   "shape": "char_hatsune_miku_tapestry_life",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_tapestry_life.glb",
+   "size": [
+    0.6,
+    1.58,
+    0.015
+   ],
+   "triangles": 1084,
+   "color_material_keys": [
+    "fabric",
+    "fabric_pattern",
+    "trim",
+    "hair",
+    "skin",
+    "cloth_top",
+    "skirt",
+    "boots",
+    "tie",
+    "mouth",
+    "hair_tie",
+    "eyes",
+    "hair_tie_accent",
+    "eye_highlight",
+    "rod",
+    "string"
+   ],
+   "bytes": 86840,
+   "sha256": "d47238296e2ca78fdf11d42a419a410123e4fa2267e94adf639d5956f4454ebf",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_uchiwa",
+   "name": "初音ミク うちわ（スタンド付き）",
+   "category": "uchiwa",
+   "shape": "char_hatsune_miku_uchiwa",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_uchiwa.glb",
+   "size": [
+    0.25,
+    0.38,
+    0.1
+   ],
+   "triangles": 1260,
+   "color_material_keys": [
+    "print_bg",
+    "trim",
+    "frame",
+    "hair",
+    "cloth_top",
+    "skin",
+    "tie",
+    "skirt",
+    "boots",
+    "hair_tie",
+    "hair_tie_accent",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "stand"
+   ],
+   "bytes": 95244,
+   "sha256": "1209fa5e7be28a84e2206bc5f611cc516dd0aa90996f0e962ba23ce2ee9189b1",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "char_hatsune_miku_wall_clock",
+   "name": "初音ミク 壁掛け時計",
+   "category": "wall_clock",
+   "shape": "char_hatsune_miku_wall_clock",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/char_hatsune_miku_wall_clock.glb",
+   "size": [
+    0.3,
+    0.34,
+    0.04
+   ],
+   "triangles": 948,
+   "color_material_keys": [
+    "hair",
+    "hair_tie",
+    "hair_tie_accent",
+    "dial",
+    "trim",
+    "cloth_top",
+    "skin",
+    "tie",
+    "eyes",
+    "eye_highlight",
+    "mouth",
+    "ink"
+   ],
+   "bytes": 72824,
+   "sha256": "bdd2075c369627f676f1353f1241c8fc73c05a6f097d693ec77076ce7468a50f",
+   "characters": [
+    "hatsune_miku"
+   ]
+  },
+  {
+   "id": "chest_drawers",
+   "name": "チェスト",
+   "category": "storage",
+   "shape": "chest_drawers",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/chest_drawers.glb",
+   "size": [
+    0.8,
+    0.85,
+    0.4
+   ],
+   "triangles": 2028,
+   "color_material_keys": [
+    "wood",
+    "knob"
+   ],
+   "bytes": 97024,
+   "sha256": "6190585809d03db0421a55994e2dc9bec0d6e795ac2743268ec66966e697e3b3",
+   "characters": []
+  },
+  {
+   "id": "chest_low",
+   "name": "ローチェスト",
+   "category": "storage",
+   "shape": "chest_low",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/chest_low.glb",
+   "size": [
+    1.0,
+    0.6,
+    0.45
+   ],
+   "triangles": 1136,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 47900,
+   "sha256": "ab2c3acfb2bc47f3c153c84f30cee6980c5120442794b51975b4a7eaa11b88c7",
+   "characters": []
+  },
+  {
+   "id": "chest_tall",
+   "name": "縦長チェスト6段",
+   "category": "storage",
+   "shape": "chest_tall",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/chest_tall.glb",
+   "size": [
+    0.5,
+    1.2,
+    0.4
+   ],
+   "triangles": 1956,
+   "color_material_keys": [
+    "knob",
+    "tint"
+   ],
+   "bytes": 89136,
+   "sha256": "7d6490a9782bec0abc98a50f89a8e59fa789ee14ffa73e1426e76cd574dfee55",
+   "characters": []
+  },
+  {
+   "id": "coat_stand",
+   "name": "コートハンガースタンド",
+   "category": "storage",
+   "shape": "coat_stand",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/coat_stand.glb",
+   "size": [
+    0.45,
+    1.75,
+    0.45
+   ],
+   "triangles": 3092,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 129980,
+   "sha256": "1fadaeb9907cef425fbb2af2c160fcde2b277bd44c3d5067ac6ac522f912567b",
+   "characters": []
+  },
+  {
+   "id": "coffee_maker",
+   "name": "コーヒーメーカー",
+   "category": "appliance",
+   "shape": "coffee_maker",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/coffee_maker.glb",
+   "size": [
+    0.2,
+    0.3,
+    0.25
+   ],
+   "triangles": 1824,
+   "color_material_keys": [
+    "tint",
+    "plastic",
+    "glass",
+    "coffee"
+   ],
+   "bytes": 69796,
+   "sha256": "43e845ddcc2d0ae450741150b7b7eeb3e8e78bce547efc65600fec7462f13c35",
+   "characters": []
+  },
+  {
+   "id": "console_table",
+   "name": "コンソールテーブル",
+   "category": "table",
+   "shape": "console_table",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/console_table.glb",
+   "size": [
+    1.0,
+    0.75,
+    0.3
+   ],
+   "triangles": 1088,
+   "color_material_keys": [
+    "wood",
+    "metal"
+   ],
+   "bytes": 39932,
+   "sha256": "852ec2ec3354e0c6932046874b43e76c0569932a9e4dcd85c2f24e719511d98c",
+   "characters": []
+  },
+  {
+   "id": "crib",
+   "name": "ベビーベッド",
+   "category": "bed",
+   "shape": "crib",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/crib.glb",
+   "size": [
+    0.7,
+    1.0,
+    1.25
+   ],
+   "triangles": 7220,
+   "color_material_keys": [
+    "tint",
+    "caster",
+    "mattress_side",
+    "mattress"
+   ],
+   "bytes": 300504,
+   "sha256": "40ea8d9a3ef9cf66f524f5860d379e8d4fa1ea7b2c2e9159ce4944ed9fc2bc88",
+   "characters": []
+  },
+  {
+   "id": "cupboard",
+   "name": "食器棚",
+   "category": "storage",
+   "shape": "cupboard",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/cupboard.glb",
+   "size": [
+    0.8,
+    1.8,
+    0.45
+   ],
+   "triangles": 2956,
+   "color_material_keys": [
+    "wood",
+    "tint",
+    "glass"
+   ],
+   "bytes": 110952,
+   "sha256": "5f724aa42634b63e54794f91c11ef50f6d87a199ee2bb818dba24550c2c92e29",
+   "characters": []
+  },
+  {
+   "id": "curtain_pair",
+   "name": "両開きカーテン",
+   "category": "curtain",
+   "shape": "curtain_pair",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/curtain_pair.glb",
+   "size": [
+    1.6,
+    2.0,
+    0.04
+   ],
+   "triangles": 6592,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 211784,
+   "sha256": "46bf56fe5169ae52921876dd16a2264bac1d4dcab68ac2ae368708b077c149bc",
+   "characters": []
+  },
+  {
+   "id": "curtain_pair__102",
+   "name": "両開きカーテン",
+   "category": "curtain",
+   "shape": "curtain_pair",
+   "variant": "102",
+   "format": "glb",
+   "object_key": "models/furniture/v1/curtain_pair__102.glb",
+   "size": [
+    1.6,
+    2.0,
+    0.04
+   ],
+   "triangles": 6592,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 211796,
+   "sha256": "664bcaea2aa1219373f635c9bdd69c667a5eb7f66247faa09abc9847e8352b3a",
+   "characters": []
+  },
+  {
+   "id": "curtain_pair__202",
+   "name": "両開きカーテン",
+   "category": "curtain",
+   "shape": "curtain_pair",
+   "variant": "202",
+   "format": "glb",
+   "object_key": "models/furniture/v1/curtain_pair__202.glb",
+   "size": [
+    1.6,
+    2.0,
+    0.04
+   ],
+   "triangles": 6592,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 211792,
+   "sha256": "7fc9fd820ccdbefd04ff1bafd623e9f93672f8791443f94700f610382a4b0a5f",
+   "characters": []
+  },
+  {
+   "id": "curtain_sheer",
+   "name": "レースカーテン",
+   "category": "curtain",
+   "shape": "curtain_sheer",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/curtain_sheer.glb",
+   "size": [
+    1.6,
+    2.0,
+    0.04
+   ],
+   "triangles": 8384,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 329840,
+   "sha256": "16d2f74a37099164f380a6c4d10c2df7c39a9617fd8f58a0ef87d78c1680c766",
+   "characters": []
+  },
+  {
+   "id": "curtain_sheer__115",
+   "name": "レースカーテン",
+   "category": "curtain",
+   "shape": "curtain_sheer",
+   "variant": "115",
+   "format": "glb",
+   "object_key": "models/furniture/v1/curtain_sheer__115.glb",
+   "size": [
+    1.0,
+    2.0,
+    0.04
+   ],
+   "triangles": 5696,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 221360,
+   "sha256": "3cdddfe9c33862868c19884dac586a5141f552f558b42b738f4becefdea01c3e",
+   "characters": []
+  },
+  {
+   "id": "curtain_sheer__302",
+   "name": "レースカーテン",
+   "category": "curtain",
+   "shape": "curtain_sheer",
+   "variant": "302",
+   "format": "glb",
+   "object_key": "models/furniture/v1/curtain_sheer__302.glb",
+   "size": [
+    1.6,
+    2.0,
+    0.04
+   ],
+   "triangles": 8384,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 329852,
+   "sha256": "35ffa83199768abb605fd39fe4e2612d292415cea895611a36272210ba9e0755",
+   "characters": []
+  },
+  {
+   "id": "curtain_sheer__901",
+   "name": "レースカーテン",
+   "category": "curtain",
+   "shape": "curtain_sheer",
+   "variant": "901",
+   "format": "glb",
+   "object_key": "models/furniture/v1/curtain_sheer__901.glb",
+   "size": [
+    1.0,
+    2.0,
+    0.03
+   ],
+   "triangles": 5696,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 201308,
+   "sha256": "604c3ce055ada3d685f17fe42a435ca122b167c54fd9a4efc1e2a46c87fe8546",
+   "characters": []
+  },
+  {
+   "id": "curtain_tieback",
+   "name": "タッセル付きカーテン（まとめた状態）",
+   "category": "curtain",
+   "shape": "curtain_tieback",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/curtain_tieback.glb",
+   "size": [
+    1.6,
+    2.0,
+    0.12
+   ],
+   "triangles": 8104,
+   "color_material_keys": [
+    "wood",
+    "tint",
+    "trim"
+   ],
+   "bytes": 296396,
+   "sha256": "3b90b7bc770422d654225bbdecedf765891c0fc6eee1833341b7ab9989020c72",
+   "characters": []
+  },
+  {
+   "id": "cushion",
+   "name": "クッション",
+   "category": "cushion",
+   "shape": "cushion",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/cushion.glb",
+   "size": [
+    0.45,
+    0.15,
+    0.45
+   ],
+   "triangles": 1196,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 35024,
+   "sha256": "2319c20835d8664d12ff3f370eefb30de8425be9554e4101773fd199fca63818",
+   "characters": []
+  },
+  {
+   "id": "cushion__107",
+   "name": "クッション",
+   "category": "cushion",
+   "shape": "cushion",
+   "variant": "107",
+   "format": "glb",
+   "object_key": "models/furniture/v1/cushion__107.glb",
+   "size": [
+    0.45,
+    0.15,
+    0.45
+   ],
+   "triangles": 1196,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 35036,
+   "sha256": "b706239c3bb65c7951e2eec0ace1c8929a43e38b38704922c2b6109df3b29773",
+   "characters": []
+  },
+  {
+   "id": "cushion__207",
+   "name": "クッション",
+   "category": "cushion",
+   "shape": "cushion",
+   "variant": "207",
+   "format": "glb",
+   "object_key": "models/furniture/v1/cushion__207.glb",
+   "size": [
+    0.45,
+    0.15,
+    0.45
+   ],
+   "triangles": 1196,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 35032,
+   "sha256": "8a4643c5c22962ad6e2ad0c074edb27ec42a38c5ce0830cb7ae0ce3997014a9d",
+   "characters": []
+  },
+  {
+   "id": "cushion__307",
+   "name": "クッション",
+   "category": "cushion",
+   "shape": "cushion",
+   "variant": "307",
+   "format": "glb",
+   "object_key": "models/furniture/v1/cushion__307.glb",
+   "size": [
+    0.45,
+    0.15,
+    0.45
+   ],
+   "triangles": 1196,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 35032,
+   "sha256": "395059e50b229a640deacf6b903c38c91641e74ea72ef62dedeee837e54d3a3f",
+   "characters": []
+  },
+  {
+   "id": "cushion_diecut",
+   "name": "ダイカットクッション",
+   "category": "cushion",
+   "shape": "cushion_diecut",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/cushion_diecut.glb",
+   "size": [
+    0.4,
+    0.45,
+    0.12
+   ],
+   "triangles": 2048,
+   "color_material_keys": [
+    "print",
+    "tint"
+   ],
+   "bytes": 55740,
+   "sha256": "149d844397f87499baf076f18284d221863a123cb9ae7ea15fb8b59e325ac9dd",
+   "characters": []
+  },
+  {
+   "id": "cushion_round",
+   "name": "丸クッション",
+   "category": "cushion",
+   "shape": "cushion_round",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/cushion_round.glb",
+   "size": [
+    0.4,
+    0.14,
+    0.4
+   ],
+   "triangles": 828,
+   "color_material_keys": [
+    "tint",
+    "button"
+   ],
+   "bytes": 26040,
+   "sha256": "d3869988ed77cca3b185ca5ae9cbf423d84cc76da7c705c5fff04d4a60567e91",
+   "characters": []
+  },
+  {
+   "id": "daybed",
+   "name": "デイベッド",
+   "category": "bed",
+   "shape": "daybed",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/daybed.glb",
+   "size": [
+    0.9,
+    0.7,
+    2.0
+   ],
+   "triangles": 4496,
+   "color_material_keys": [
+    "wood",
+    "mattress_side",
+    "tint",
+    "fabric"
+   ],
+   "bytes": 162436,
+   "sha256": "ef55eb32ee71e80f3d2e0e942bb71536a946dd9f5b374568658163391adb591d",
+   "characters": []
+  },
+  {
+   "id": "desk_fold",
+   "name": "折り畳みデスク（使用状態）",
+   "category": "desk",
+   "shape": "desk_fold",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/desk_fold.glb",
+   "size": [
+    0.8,
+    0.7,
+    0.45
+   ],
+   "triangles": 1032,
+   "color_material_keys": [
+    "wood",
+    "metal"
+   ],
+   "bytes": 45800,
+   "sha256": "314902925cdcd17422a473f44de399eb56352b64742ae27525b4e31a36421ee2",
+   "characters": []
+  },
+  {
+   "id": "desk_l_left",
+   "name": "L字デスク（正面から見て左）",
+   "category": "desk",
+   "shape": "desk_l_left",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/desk_l_left.glb",
+   "size": [
+    1.4,
+    0.72,
+    1.2
+   ],
+   "triangles": 920,
+   "color_material_keys": [
+    "wood",
+    "metal"
+   ],
+   "bytes": 34380,
+   "sha256": "30abeda7dee4a5245f295c57c86983c99ff8be422d4de271dc45657b21211fb3",
+   "characters": []
+  },
+  {
+   "id": "desk_lamp_arm",
+   "name": "アーム式デスクライト",
+   "category": "desk_lamp",
+   "shape": "desk_lamp_arm",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/desk_lamp_arm.glb",
+   "size": [
+    0.2,
+    0.5,
+    0.4
+   ],
+   "triangles": 1784,
+   "color_material_keys": [
+    "tint",
+    "joint",
+    "light"
+   ],
+   "bytes": 76980,
+   "sha256": "a5175e47e69c10a08ec3546b320c6c6e23bb12d840142714885e985e6e7412b9",
+   "characters": []
+  },
+  {
+   "id": "desk_lamp_clip",
+   "name": "クリップライト",
+   "category": "desk_lamp",
+   "shape": "desk_lamp_clip",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/desk_lamp_clip.glb",
+   "size": [
+    0.15,
+    0.35,
+    0.15
+   ],
+   "triangles": 1196,
+   "color_material_keys": [
+    "tint",
+    "joint",
+    "light"
+   ],
+   "bytes": 62036,
+   "sha256": "dba69bb1cae9bac166aeb17f88d845226f470685427923b42bcac7bc022c448a",
+   "characters": []
+  },
+  {
+   "id": "desk_shelf",
+   "name": "机上ラック",
+   "category": "shelf",
+   "shape": "desk_shelf",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/desk_shelf.glb",
+   "size": [
+    0.8,
+    0.35,
+    0.25
+   ],
+   "triangles": 660,
+   "color_material_keys": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 25356,
+   "sha256": "8630b12d96e4a4a66a6f604414b335b42e7aefc9678f8aa9334743c998a1c3dc",
+   "characters": []
+  },
+  {
+   "id": "desk_standing",
+   "name": "昇降デスク",
+   "category": "desk",
+   "shape": "desk_standing",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/desk_standing.glb",
+   "size": [
+    1.2,
+    0.75,
+    0.7
+   ],
+   "triangles": 2384,
+   "color_material_keys": [
+    "tint",
+    "metal",
+    "plastic"
+   ],
+   "bytes": 86468,
+   "sha256": "64153cc76ab29b4c7a292058ba38db9ae4ed4ccbff31e7c395b41b03a2519589",
+   "characters": []
+  },
+  {
+   "id": "desk_wide",
+   "name": "ワイドデスク",
+   "category": "desk",
+   "shape": "desk_wide",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/desk_wide.glb",
+   "size": [
+    1.4,
+    0.72,
+    0.6
+   ],
+   "triangles": 1304,
+   "color_material_keys": [
+    "wood",
+    "metal"
+   ],
+   "bytes": 47984,
+   "sha256": "548404db7b8d4dadfee3df8ecdd576ebf2e4f910b1345e3829eaae29ae6c10dd",
+   "characters": []
+  },
+  {
+   "id": "desk_wood",
+   "name": "木製デスク",
+   "category": "desk",
+   "shape": "desk_wood",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/desk_wood.glb",
+   "size": [
+    1.0,
+    0.72,
+    0.5
+   ],
+   "triangles": 704,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 28096,
+   "sha256": "b19f113a1727277cc4d1261880730a833d7b2e6c6259764d77aa15587259553f",
+   "characters": []
+  },
+  {
+   "id": "desk_wood__w080",
+   "name": "木製デスク",
+   "category": "desk",
+   "shape": "desk_wood",
+   "variant": "w080",
+   "format": "glb",
+   "object_key": "models/furniture/v1/desk_wood__w080.glb",
+   "size": [
+    0.8,
+    0.72,
+    0.5
+   ],
+   "triangles": 704,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 28168,
+   "sha256": "07fee5e6bd3cc4a397af732e801a6065633b4def7f6c3a1b39279ae6c378f892",
+   "characters": []
+  },
+  {
+   "id": "desk_wood__w120",
+   "name": "木製デスク",
+   "category": "desk",
+   "shape": "desk_wood",
+   "variant": "w120",
+   "format": "glb",
+   "object_key": "models/furniture/v1/desk_wood__w120.glb",
+   "size": [
+    1.2,
+    0.72,
+    0.5
+   ],
+   "triangles": 704,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 28008,
+   "sha256": "35f8d39c23efdf4f647d6745acb5fe418742d6df5f558af76d459c47cd498e6e",
+   "characters": []
+  },
+  {
+   "id": "desktop_pc",
+   "name": "デスクトップPC",
+   "category": "appliance",
+   "shape": "desktop_pc",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/desktop_pc.glb",
+   "size": [
+    0.2,
+    0.45,
+    0.45
+   ],
+   "triangles": 2324,
+   "color_material_keys": [
+    "screen",
+    "tint",
+    "light",
+    "glass"
+   ],
+   "bytes": 103720,
+   "sha256": "2715d29432cd4178a91f8be7eae289205791a2f7115508c013cd5e89e8a9714f",
+   "characters": []
+  },
+  {
+   "id": "dining_set_2",
+   "name": "2人用ダイニングセット",
+   "category": "dining_set",
+   "shape": "dining_set_2",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/dining_set_2.glb",
+   "size": [
+    1.0,
+    0.75,
+    1.0
+   ],
+   "triangles": 3692,
+   "color_material_keys": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 156092,
+   "sha256": "a926282865bf656deb2127450a67f37c980aee440287fcfde60cd4a08e7f2010",
+   "characters": []
+  },
+  {
+   "id": "dish_rack",
+   "name": "水切りラック",
+   "category": "kitchen",
+   "shape": "dish_rack",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/dish_rack.glb",
+   "size": [
+    0.45,
+    0.3,
+    0.3
+   ],
+   "triangles": 4120,
+   "color_material_keys": [
+    "plastic",
+    "tint",
+    "plate",
+    "cup"
+   ],
+   "bytes": 208564,
+   "sha256": "3ee47c494409102f9650c5d9b8d8676c8a5a813a0ef2f678f164be94b87741d0",
+   "characters": []
+  },
+  {
+   "id": "display_case",
+   "name": "コレクションケース",
+   "category": "display_case",
+   "shape": "display_case",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/display_case.glb",
+   "size": [
+    0.4,
+    1.2,
+    0.3
+   ],
+   "triangles": 840,
+   "color_material_keys": [
+    "tint",
+    "glass",
+    "metal"
+   ],
+   "bytes": 40428,
+   "sha256": "4245c5665440637c242e8f26f73fb084c8db294d51919e90f63ad23c0a94b611",
+   "characters": []
+  },
+  {
+   "id": "display_rack_open",
+   "name": "オープンディスプレイラック",
+   "category": "display_case",
+   "shape": "display_rack_open",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/display_rack_open.glb",
+   "size": [
+    0.35,
+    0.9,
+    0.25
+   ],
+   "triangles": 932,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 38164,
+   "sha256": "974fd6e3fce6e7fa66e8c69d72bfb5d402ca33bc2cfcf0b475c4c0e8d5b5e649",
+   "characters": []
+  },
+  {
+   "id": "display_stand_floor",
+   "name": "床置き3段ディスプレイ棚",
+   "category": "display_stand",
+   "shape": "display_stand_floor",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/display_stand_floor.glb",
+   "size": [
+    0.65,
+    1.0,
+    0.6
+   ],
+   "triangles": 812,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 36332,
+   "sha256": "bcc92158cedd16708487fa65744bc9e22880f21e043aadb9b2420b9644f3fa6f",
+   "characters": []
+  },
+  {
+   "id": "dresser",
+   "name": "ミラー付きドレッサー",
+   "category": "dresser",
+   "shape": "dresser",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/dresser.glb",
+   "size": [
+    0.8,
+    1.4,
+    0.4
+   ],
+   "triangles": 1160,
+   "color_material_keys": [
+    "tint",
+    "knob",
+    "wood",
+    "mirror"
+   ],
+   "bytes": 55928,
+   "sha256": "a5d041a683f3c23c11fc6141c53dd4a202a6fce291b95ec2e9ea4d6ca2e2e312",
+   "characters": []
+  },
+  {
+   "id": "dried_flowers",
+   "name": "ドライフラワー（花瓶）",
+   "category": "vase",
+   "shape": "dried_flowers",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/dried_flowers.glb",
+   "size": [
+    0.2,
+    0.45,
+    0.2
+   ],
+   "triangles": 4408,
+   "color_material_keys": [
+    "tint",
+    "stem",
+    "plume",
+    "flower"
+   ],
+   "bytes": 202316,
+   "sha256": "b3fa1e2474b074e989dd8b9eda3d0ca203f60799123e2b6bab284514b4a4b098",
+   "characters": []
+  },
+  {
+   "id": "drying_rack",
+   "name": "物干しラック",
+   "category": "laundry",
+   "shape": "drying_rack",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/drying_rack.glb",
+   "size": [
+    0.9,
+    1.1,
+    0.55
+   ],
+   "triangles": 1180,
+   "color_material_keys": [
+    "tint",
+    "rail"
+   ],
+   "bytes": 64148,
+   "sha256": "53b2e51630c43f608b9d0e6b2e3f0b89eec751ae6d3fd732532b11676c5211c0",
+   "characters": []
+  },
+  {
+   "id": "duvet_set",
+   "name": "掛け布団と枕",
+   "category": "bedding",
+   "shape": "duvet_set",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/duvet_set.glb",
+   "size": [
+    1.0,
+    0.15,
+    2.0
+   ],
+   "triangles": 4740,
+   "color_material_keys": [
+    "tint",
+    "pillow"
+   ],
+   "bytes": 142228,
+   "sha256": "0e34c9fd649824247571c8cac8dab6772166873c91b07dd71f8263a5e439dbd3",
+   "characters": []
+  },
+  {
+   "id": "fairy_lights",
+   "name": "ガーランドライト",
+   "category": "led",
+   "shape": "fairy_lights",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/fairy_lights.glb",
+   "size": [
+    1.5,
+    0.3,
+    0.05
+   ],
+   "triangles": 4296,
+   "color_material_keys": [
+    "cord",
+    "light"
+   ],
+   "bytes": 173076,
+   "sha256": "aeaa16d02f95f47f8c58f53fb5031e8f9950925e625f27799234432312e1aab4",
+   "characters": []
+  },
+  {
+   "id": "fan",
+   "name": "扇風機",
+   "category": "appliance",
+   "shape": "fan",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/fan.glb",
+   "size": [
+    0.35,
+    0.9,
+    0.35
+   ],
+   "triangles": 6488,
+   "color_material_keys": [
+    "tint",
+    "grille",
+    "blade"
+   ],
+   "bytes": 336108,
+   "sha256": "9c756e8975d2a1032d8865972336c7c867ef11186b034b97a98c96c869a09099",
+   "characters": []
+  },
+  {
+   "id": "figurine",
+   "name": "オブジェ",
+   "category": "decor",
+   "shape": "figurine",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/figurine.glb",
+   "size": [
+    0.12,
+    0.25,
+    0.12
+   ],
+   "triangles": 3640,
+   "color_material_keys": [
+    "stone",
+    "tint",
+    "stone2"
+   ],
+   "bytes": 100388,
+   "sha256": "b9dd6c2bfac40fab002e679abb542a349a4f4e498cbe4711ddf3a864bc7a6682",
+   "characters": []
+  },
+  {
+   "id": "file_wagon",
+   "name": "デスク下ワゴン",
+   "category": "storage",
+   "shape": "file_wagon",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/file_wagon.glb",
+   "size": [
+    0.4,
+    0.6,
+    0.5
+   ],
+   "triangles": 1504,
+   "color_material_keys": [
+    "tint",
+    "wood",
+    "wheel"
+   ],
+   "bytes": 66196,
+   "sha256": "327f6c231c60d6ca9a7c296e343406b2b4ff2851c06ad7118b8febe746a3b969",
+   "characters": []
+  },
+  {
+   "id": "floor_chair",
+   "name": "座椅子",
+   "category": "chair",
+   "shape": "floor_chair",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/floor_chair.glb",
+   "size": [
+    0.45,
+    0.55,
+    0.55
+   ],
+   "triangles": 1744,
+   "color_material_keys": [
+    "frame",
+    "tint"
+   ],
+   "bytes": 59988,
+   "sha256": "592ac51eb8ce89fa658615fa0a946b10164221774f61391b5dd6f09e2a2a1ea1",
+   "characters": []
+  },
+  {
+   "id": "floor_lamp",
+   "name": "シェード付きフロアライト",
+   "category": "floor_lamp",
+   "shape": "floor_lamp",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/floor_lamp.glb",
+   "size": [
+    0.25,
+    1.4,
+    0.25
+   ],
+   "triangles": 1108,
+   "color_material_keys": [
+    "metal",
+    "tint",
+    "light"
+   ],
+   "bytes": 43376,
+   "sha256": "862d0026b8598fbdc250c7344ce677578c76db49e3cb0b8b7ec016acb1076763",
+   "characters": []
+  },
+  {
+   "id": "floor_lamp_arc",
+   "name": "アーチ型フロアランプ",
+   "category": "floor_lamp",
+   "shape": "floor_lamp_arc",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/floor_lamp_arc.glb",
+   "size": [
+    1.1,
+    1.9,
+    0.35
+   ],
+   "triangles": 4492,
+   "color_material_keys": [
+    "stone",
+    "metal",
+    "tint",
+    "light"
+   ],
+   "bytes": 178764,
+   "sha256": "722817b4f75ace2da1eaa1883245c1ac7d545b14d375d85db7acd652da3f7d2c",
+   "characters": []
+  },
+  {
+   "id": "floor_lamp_ball",
+   "name": "ボール型フロアライト",
+   "category": "floor_lamp",
+   "shape": "floor_lamp_ball",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/floor_lamp_ball.glb",
+   "size": [
+    0.3,
+    1.3,
+    0.3
+   ],
+   "triangles": 2276,
+   "color_material_keys": [
+    "metal",
+    "tint"
+   ],
+   "bytes": 66804,
+   "sha256": "a5d38f1c274c9771417064c34344f27e60029bb338910470176abc8ff768a934",
+   "characters": []
+  },
+  {
+   "id": "floor_lamp_pleated",
+   "name": "プリーツシェードフロアライト",
+   "category": "floor_lamp",
+   "shape": "floor_lamp_pleated",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/floor_lamp_pleated.glb",
+   "size": [
+    0.3,
+    1.4,
+    0.3
+   ],
+   "triangles": 1128,
+   "color_material_keys": [
+    "metal",
+    "tint",
+    "light"
+   ],
+   "bytes": 48912,
+   "sha256": "1a7bdaf98da885ee3b2771066d23368821f385c502ba8ec5d7e90ff00a06bef5",
+   "characters": []
+  },
+  {
+   "id": "floor_lamp_rattan",
+   "name": "ラタン調フロアライト",
+   "category": "floor_lamp",
+   "shape": "floor_lamp_rattan",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/floor_lamp_rattan.glb",
+   "size": [
+    0.35,
+    1.3,
+    0.35
+   ],
+   "triangles": 4056,
+   "color_material_keys": [
+    "wood",
+    "tint",
+    "light"
+   ],
+   "bytes": 143424,
+   "sha256": "d7cb3bfed2994b694c0cae38c408cea509d0eccb921dc9667b39262bd58afac1",
+   "characters": []
+  },
+  {
+   "id": "floor_lamp_slim",
+   "name": "スリムフロアライト",
+   "category": "floor_lamp",
+   "shape": "floor_lamp_slim",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/floor_lamp_slim.glb",
+   "size": [
+    0.2,
+    1.2,
+    0.2
+   ],
+   "triangles": 692,
+   "color_material_keys": [
+    "metal",
+    "light"
+   ],
+   "bytes": 29592,
+   "sha256": "87f3f1a3eab417205ff0703e26ae993d23bd41e6b4132f77866540063a27b54b",
+   "characters": []
+  },
+  {
+   "id": "floor_lamp_tripod",
+   "name": "三脚フロアライト",
+   "category": "floor_lamp",
+   "shape": "floor_lamp_tripod",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/floor_lamp_tripod.glb",
+   "size": [
+    0.45,
+    1.4,
+    0.45
+   ],
+   "triangles": 876,
+   "color_material_keys": [
+    "wood",
+    "metal",
+    "tint",
+    "light"
+   ],
+   "bytes": 39860,
+   "sha256": "44deabfe4f469811b5016506fdf1ddbc72b1c626cec6e89b32c47ea376cdc35a",
+   "characters": []
+  },
+  {
+   "id": "fridge",
+   "name": "2ドア冷蔵庫",
+   "category": "appliance",
+   "shape": "fridge",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/fridge.glb",
+   "size": [
+    0.48,
+    1.1,
+    0.55
+   ],
+   "triangles": 996,
+   "color_material_keys": [
+    "tint",
+    "seal",
+    "plastic"
+   ],
+   "bytes": 45152,
+   "sha256": "bde3116e09b5e96f90c6e0cf6e6db57b0f802d7ff35c3f9abf75c16582ffd761",
+   "characters": []
+  },
+  {
+   "id": "futon_floor",
+   "name": "床敷き布団",
+   "category": "bed",
+   "shape": "futon_floor",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/futon_floor.glb",
+   "size": [
+    1.0,
+    0.08,
+    2.0
+   ],
+   "triangles": 1772,
+   "color_material_keys": [
+    "tint",
+    "seam"
+   ],
+   "bytes": 51124,
+   "sha256": "ebcdebf2a9b7a31e0788e5b5800970edc0d680971609187f43f4adea002cacf2",
+   "characters": []
+  },
+  {
+   "id": "futon_set",
+   "name": "布団一式（敷布団・掛け布団・枕）",
+   "category": "bedding",
+   "shape": "futon_set",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/futon_set.glb",
+   "size": [
+    1.0,
+    0.25,
+    2.1
+   ],
+   "triangles": 6464,
+   "color_material_keys": [
+    "fabric",
+    "tint",
+    "pillow"
+   ],
+   "bytes": 188220,
+   "sha256": "f91699adadf3fbc90ecbf98fafd240bbe14f4c6091dd0d174b1a7758d1cd9992",
+   "characters": []
+  },
+  {
+   "id": "guitar",
+   "name": "ギター（スタンド付き）",
+   "category": "hobby",
+   "shape": "guitar",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/guitar.glb",
+   "size": [
+    0.38,
+    1.0,
+    0.3
+   ],
+   "triangles": 3492,
+   "color_material_keys": [
+    "tint",
+    "wood",
+    "dark",
+    "stand"
+   ],
+   "bytes": 172632,
+   "sha256": "3d660de998021bd5268f8801e874b3d26f81b534f20de4513ccdb249b39e394c",
+   "characters": []
+  },
+  {
+   "id": "hanger_rack",
+   "name": "ハンガーラック",
+   "category": "storage",
+   "shape": "hanger_rack",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/hanger_rack.glb",
+   "size": [
+    1.0,
+    1.6,
+    0.45
+   ],
+   "triangles": 528,
+   "color_material_keys": [
+    "metal",
+    "wood"
+   ],
+   "bytes": 27592,
+   "sha256": "2b34d840dac9e9d30cfb23bfe3df3262acd13030b2b9c061e9dccd4b6d267c3b",
+   "characters": []
+  },
+  {
+   "id": "headboard",
+   "name": "棚付きヘッドボード",
+   "category": "headboard",
+   "shape": "headboard",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/headboard.glb",
+   "size": [
+    1.0,
+    0.9,
+    0.2
+   ],
+   "triangles": 876,
+   "color_material_keys": [
+    "tint",
+    "inner"
+   ],
+   "bytes": 38852,
+   "sha256": "9b98886f6a3155c0f2259e3bee23788a936b973fcaee648b28e7e3e8e7f53d8b",
+   "characters": []
+  },
+  {
+   "id": "heater",
+   "name": "オイルヒーター",
+   "category": "appliance",
+   "shape": "heater",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/heater.glb",
+   "size": [
+    0.4,
+    0.65,
+    0.25
+   ],
+   "triangles": 4736,
+   "color_material_keys": [
+    "tint",
+    "plastic",
+    "light"
+   ],
+   "bytes": 201792,
+   "sha256": "59b2f5bcda926b54bbbc7ff82f2bc076587cd82293ddf1cf1aeb646e49064e96",
+   "characters": []
+  },
+  {
+   "id": "high_chair",
+   "name": "ベビーハイチェア",
+   "category": "chair",
+   "shape": "high_chair",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/high_chair.glb",
+   "size": [
+    0.55,
+    0.9,
+    0.6
+   ],
+   "triangles": 2864,
+   "color_material_keys": [
+    "wood",
+    "tint",
+    "plastic"
+   ],
+   "bytes": 115908,
+   "sha256": "aee4bb4918d60e1a54f2ddd8dad3bac22d13de2a9d23ec64fbc1f7702f7761e1",
+   "characters": []
+  },
+  {
+   "id": "humidifier",
+   "name": "加湿器",
+   "category": "appliance",
+   "shape": "humidifier",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/humidifier.glb",
+   "size": [
+    0.2,
+    0.3,
+    0.2
+   ],
+   "triangles": 1270,
+   "color_material_keys": [
+    "tint",
+    "tank",
+    "plastic",
+    "light"
+   ],
+   "bytes": 55380,
+   "sha256": "4c266862523b1529d636174bb2825ec95e8e802e654a8890844af5ec50812f16",
+   "characters": []
+  },
+  {
+   "id": "kettle",
+   "name": "電気ケトル",
+   "category": "appliance",
+   "shape": "kettle",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/kettle.glb",
+   "size": [
+    0.22,
+    0.22,
+    0.15
+   ],
+   "triangles": 2516,
+   "color_material_keys": [
+    "plastic",
+    "light",
+    "tint"
+   ],
+   "bytes": 126084,
+   "sha256": "8c14d99d451b79cb7560af2d1aa7d9f595e7d3d42f949d911bd7a66ed0fb23e4",
+   "characters": []
+  },
+  {
+   "id": "keyboard_mouse",
+   "name": "キーボードとマウス",
+   "category": "appliance",
+   "shape": "keyboard_mouse",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/keyboard_mouse.glb",
+   "size": [
+    0.45,
+    0.04,
+    0.2
+   ],
+   "triangles": 3308,
+   "color_material_keys": [
+    "tint",
+    "accent",
+    "keys",
+    "pad"
+   ],
+   "bytes": 183208,
+   "sha256": "e04517b444fbd59e1d2f5ead588a40f38ec5761f036c8828fc97fdc4fc221e31",
+   "characters": []
+  },
+  {
+   "id": "kids_chair",
+   "name": "キッズチェア",
+   "category": "chair",
+   "shape": "kids_chair",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/kids_chair.glb",
+   "size": [
+    0.3,
+    0.55,
+    0.3
+   ],
+   "triangles": 1008,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 45836,
+   "sha256": "bde90706bb49ea082230f5a1ec9471e71197239c0051682477051ba2084f0ea2",
+   "characters": []
+  },
+  {
+   "id": "kids_table",
+   "name": "キッズテーブル",
+   "category": "table",
+   "shape": "kids_table",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/kids_table.glb",
+   "size": [
+    0.6,
+    0.45,
+    0.6
+   ],
+   "triangles": 1992,
+   "color_material_keys": [
+    "tint",
+    "edge",
+    "wood"
+   ],
+   "bytes": 77772,
+   "sha256": "6b9ae82b715dedeca7ca21ca962272e6aba55c2465be9ac4cdee6e854cadb193",
+   "characters": []
+  },
+  {
+   "id": "kitchen_counter",
+   "name": "キッチンカウンター（間仕切り収納）",
+   "category": "storage",
+   "shape": "kitchen_counter",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/kitchen_counter.glb",
+   "size": [
+    1.2,
+    0.9,
+    0.4
+   ],
+   "triangles": 1200,
+   "color_material_keys": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 44104,
+   "sha256": "a88ef2ae18cc7cf5b955539ccc178c9cfaa7fe6bb73ce4b3d6b15e78bc4f1d34",
+   "characters": []
+  },
+  {
+   "id": "kotatsu",
+   "name": "こたつ（掛け布団付き）",
+   "category": "table",
+   "shape": "kotatsu",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/kotatsu.glb",
+   "size": [
+    1.8,
+    0.42,
+    1.8
+   ],
+   "triangles": 12204,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 313912,
+   "sha256": "b17c3a34bd12b34e3c55301301cd9390aae7e6d8772dc9da446744189e6d6113",
+   "characters": []
+  },
+  {
+   "id": "ladder_shelf",
+   "name": "ラダーシェルフ",
+   "category": "shelf",
+   "shape": "ladder_shelf",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/ladder_shelf.glb",
+   "size": [
+    0.6,
+    1.6,
+    0.35
+   ],
+   "triangles": 1080,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 46120,
+   "sha256": "9ecfe68734f6d20b2ceb2af7d6a0b95808fd7ebcb188ce4171926a05bc1df070",
+   "characters": []
+  },
+  {
+   "id": "lamp_lantern",
+   "name": "ランタン型ライト",
+   "category": "table_lamp",
+   "shape": "lamp_lantern",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/lamp_lantern.glb",
+   "size": [
+    0.18,
+    0.3,
+    0.18
+   ],
+   "triangles": 2256,
+   "color_material_keys": [
+    "tint",
+    "light"
+   ],
+   "bytes": 108908,
+   "sha256": "5e0d20adcf801394315cb07f8673c841aedb6305053428df558fcab97b70e16b",
+   "characters": []
+  },
+  {
+   "id": "lamp_paper",
+   "name": "和紙フロアランプ",
+   "category": "floor_lamp",
+   "shape": "lamp_paper",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/lamp_paper.glb",
+   "size": [
+    0.4,
+    1.0,
+    0.4
+   ],
+   "triangles": 7944,
+   "color_material_keys": [
+    "light",
+    "rib",
+    "tint"
+   ],
+   "bytes": 308040,
+   "sha256": "d50a7d4eb0dd245ce3ee6a13cd7b859831d6ca36b732ba504dc71504650c303a",
+   "characters": []
+  },
+  {
+   "id": "lamp_wall",
+   "name": "ブラケットライト",
+   "category": "wall_light",
+   "shape": "lamp_wall",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/lamp_wall.glb",
+   "size": [
+    0.2,
+    0.3,
+    0.2
+   ],
+   "triangles": 2068,
+   "color_material_keys": [
+    "metal",
+    "tint",
+    "light"
+   ],
+   "bytes": 81956,
+   "sha256": "f436ce1f1ae9b4d6c3648e710932a4efa972f7ec52b2be1e7a83bfb9dfa8f921",
+   "characters": []
+  },
+  {
+   "id": "laptop",
+   "name": "ノートPC（開いた状態）",
+   "category": "laptop",
+   "shape": "laptop",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/laptop.glb",
+   "size": [
+    0.33,
+    0.22,
+    0.24
+   ],
+   "triangles": 540,
+   "color_material_keys": [
+    "tint",
+    "keys",
+    "screen"
+   ],
+   "bytes": 28212,
+   "sha256": "b8046b843ee47a2f11de01e52db09f4ed59133e47daa89929f6fff072b3f4141",
+   "characters": []
+  },
+  {
+   "id": "laundry_basket",
+   "name": "ランドリーバスケット",
+   "category": "laundry",
+   "shape": "laundry_basket",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/laundry_basket.glb",
+   "size": [
+    0.45,
+    0.55,
+    0.35
+   ],
+   "triangles": 7648,
+   "color_material_keys": [
+    "tint",
+    "weave"
+   ],
+   "bytes": 256292,
+   "sha256": "2b2598dcbd7a054b410524fbcf60feb42a11fc334f56acb85c1fa3154a5a47d0",
+   "characters": []
+  },
+  {
+   "id": "led_strip_segment",
+   "name": "直線LEDテープ",
+   "category": "led",
+   "shape": "led_strip_segment",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/led_strip_segment.glb",
+   "size": [
+    1.0,
+    0.01,
+    0.01
+   ],
+   "triangles": 216,
+   "color_material_keys": [
+    "base",
+    "light"
+   ],
+   "bytes": 9792,
+   "sha256": "1e1c7a4694462fd1b68248d8273799d38d64d79ffd38d124c0664b0cf8f49b51",
+   "characters": []
+  },
+  {
+   "id": "magazine_rack",
+   "name": "マガジンラック",
+   "category": "storage",
+   "shape": "magazine_rack",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/magazine_rack.glb",
+   "size": [
+    0.4,
+    0.45,
+    0.3
+   ],
+   "triangles": 1188,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 51560,
+   "sha256": "6835fbd43addab70a91d89bae2f763989eeae7c0604deaaf9974b1e36bce7260",
+   "characters": []
+  },
+  {
+   "id": "mattress_floor",
+   "name": "床置きマットレス",
+   "category": "bed",
+   "shape": "mattress_floor",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/mattress_floor.glb",
+   "size": [
+    0.97,
+    0.2,
+    1.95
+   ],
+   "triangles": 2072,
+   "color_material_keys": [
+    "mattress_side",
+    "tint",
+    "piping"
+   ],
+   "bytes": 75184,
+   "sha256": "6c54c3b3dac12ffccaad49e39eb0f901f9516f0fdcff29279354345a28a3e003",
+   "characters": []
+  },
+  {
+   "id": "memo_board",
+   "name": "メモボード",
+   "category": "memo_board",
+   "shape": "memo_board",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/memo_board.glb",
+   "size": [
+    0.6,
+    0.45,
+    0.02
+   ],
+   "triangles": 1204,
+   "color_material_keys": [
+    "wood",
+    "tint",
+    "paper",
+    "pin"
+   ],
+   "bytes": 57360,
+   "sha256": "c908789937f9fefe436c9a3901ba5d2a340c22c5e73a33b8cdb3d9d62685ba3d",
+   "characters": []
+  },
+  {
+   "id": "microwave",
+   "name": "電子レンジ",
+   "category": "appliance",
+   "shape": "microwave",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/microwave.glb",
+   "size": [
+    0.45,
+    0.27,
+    0.35
+   ],
+   "triangles": 1416,
+   "color_material_keys": [
+    "tint",
+    "plastic",
+    "screen",
+    "light"
+   ],
+   "bytes": 64952,
+   "sha256": "aebd9b925be02fbc02e11ea3fc2ff96bba2c29def4a539c7dd581c97ec3a78a1",
+   "characters": []
+  },
+  {
+   "id": "mirror_arch",
+   "name": "アーチ型ウォールミラー",
+   "category": "wall_mirror",
+   "shape": "mirror_arch",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/mirror_arch.glb",
+   "size": [
+    0.45,
+    0.8,
+    0.03
+   ],
+   "triangles": 464,
+   "color_material_keys": [
+    "tint",
+    "mirror"
+   ],
+   "bytes": 20688,
+   "sha256": "3a32e7ee35360b976fd4fa388037997d08ed4c735c9157cfb0ddc84c1301ad4d",
+   "characters": []
+  },
+  {
+   "id": "mirror_cabinet",
+   "name": "ミラー付き収納",
+   "category": "floor_mirror",
+   "shape": "mirror_cabinet",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/mirror_cabinet.glb",
+   "size": [
+    0.4,
+    1.5,
+    0.3
+   ],
+   "triangles": 552,
+   "color_material_keys": [
+    "wood",
+    "tint",
+    "mirror"
+   ],
+   "bytes": 26356,
+   "sha256": "b9aa5828d1e3b4085cee179e8e93c9f146a0916b612b5c95a097f581a6c5706c",
+   "characters": []
+  },
+  {
+   "id": "mirror_stand",
+   "name": "スタンドミラー",
+   "category": "floor_mirror",
+   "shape": "mirror_stand",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/mirror_stand.glb",
+   "size": [
+    0.5,
+    1.6,
+    0.45
+   ],
+   "triangles": 520,
+   "color_material_keys": [
+    "wood",
+    "mirror"
+   ],
+   "bytes": 24068,
+   "sha256": "daf593c813dd0448fcd31e45b13115971fb1ef4739c30d96de44033c34e2c62c",
+   "characters": []
+  },
+  {
+   "id": "monitor",
+   "name": "デスク上モニター",
+   "category": "monitor",
+   "shape": "monitor",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/monitor.glb",
+   "size": [
+    0.55,
+    0.4,
+    0.18
+   ],
+   "triangles": 444,
+   "color_material_keys": [
+    "tint",
+    "screen"
+   ],
+   "bytes": 18024,
+   "sha256": "f750dd9554830e56758266e5c5630164e1164684df76e6d75ddf437a6842eb55",
+   "characters": []
+  },
+  {
+   "id": "neon_sign",
+   "name": "ネオンサイン（ハート）",
+   "category": "neon",
+   "shape": "neon_sign",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/neon_sign.glb",
+   "size": [
+    0.4,
+    0.35,
+    0.03
+   ],
+   "triangles": 6284,
+   "color_material_keys": [
+    "glass",
+    "plastic",
+    "light"
+   ],
+   "bytes": 361292,
+   "sha256": "8d966cc1355680508ad3de8f4ee09917a484a3ac1818dd08c2fbccfb3b3caeda",
+   "characters": []
+  },
+  {
+   "id": "nightstand",
+   "name": "ナイトテーブル",
+   "category": "side_table",
+   "shape": "nightstand",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/nightstand.glb",
+   "size": [
+    0.4,
+    0.5,
+    0.35
+   ],
+   "triangles": 1000,
+   "color_material_keys": [
+    "wood",
+    "knob"
+   ],
+   "bytes": 47952,
+   "sha256": "44d4a284986994805abdbbc55e98f4ed6f20996f50bfb6431e20ea9332120ad4",
+   "characters": []
+  },
+  {
+   "id": "oshiire_case",
+   "name": "押し入れ衣装ケース（3段積み）",
+   "category": "storage",
+   "shape": "oshiire_case",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/oshiire_case.glb",
+   "size": [
+    0.45,
+    0.7,
+    0.55
+   ],
+   "triangles": 3708,
+   "color_material_keys": [
+    "tint",
+    "body"
+   ],
+   "bytes": 160392,
+   "sha256": "c2dd56a68e399e9092ff1e0f23d8912967e8f00afcde2a55052187eae79915ad",
+   "characters": []
+  },
+  {
+   "id": "ottoman_round",
+   "name": "丸型オットマン",
+   "category": "ottoman",
+   "shape": "ottoman_round",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/ottoman_round.glb",
+   "size": [
+    0.45,
+    0.4,
+    0.45
+   ],
+   "triangles": 1020,
+   "color_material_keys": [
+    "tint",
+    "piping"
+   ],
+   "bytes": 41396,
+   "sha256": "15affc3dd5b780a7fd452babf455a2078c030d072029ff63bc6d54b41ddc1d0c",
+   "characters": []
+  },
+  {
+   "id": "pegboard",
+   "name": "有孔ボード",
+   "category": "pegboard",
+   "shape": "pegboard",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/pegboard.glb",
+   "size": [
+    0.6,
+    0.6,
+    0.03
+   ],
+   "triangles": 3712,
+   "color_material_keys": [
+    "tint",
+    "hole"
+   ],
+   "bytes": 221820,
+   "sha256": "408432a951eb7ea43f1b1bdde25f9cb65551c086cdd811382c44cdaa70d546db",
+   "characters": []
+  },
+  {
+   "id": "pendant_light",
+   "name": "ペンダントライト",
+   "category": "pendant_light",
+   "shape": "pendant_light",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/pendant_light.glb",
+   "size": [
+    0.4,
+    0.6,
+    0.4
+   ],
+   "triangles": 2988,
+   "color_material_keys": [
+    "cord",
+    "tint",
+    "light"
+   ],
+   "bytes": 109056,
+   "sha256": "1740bf6a7573c103436956bac5e843cba4bc3176dfd036f7ec0ffea27d761a1b",
+   "characters": []
+  },
+  {
+   "id": "pet_bed",
+   "name": "ペットベッド",
+   "category": "pet",
+   "shape": "pet_bed",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/pet_bed.glb",
+   "size": [
+    0.6,
+    0.2,
+    0.5
+   ],
+   "triangles": 2144,
+   "color_material_keys": [
+    "tint",
+    "cushion"
+   ],
+   "bytes": 66796,
+   "sha256": "f6f8a165e1980564c7d37a86cd3f52712aa62b2317f671c7da8d8741fc325aa5",
+   "characters": []
+  },
+  {
+   "id": "photo_frame",
+   "name": "卓上フォトフレーム",
+   "category": "photo_frame",
+   "shape": "photo_frame",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/photo_frame.glb",
+   "size": [
+    0.15,
+    0.2,
+    0.08
+   ],
+   "triangles": 476,
+   "color_material_keys": [
+    "tint",
+    "print"
+   ],
+   "bytes": 23060,
+   "sha256": "93e324df130d559b0b8de54517de24348ba10e9e8d34a1707ce066342a8f0638",
+   "characters": []
+  },
+  {
+   "id": "photo_garland",
+   "name": "フォトガーランド",
+   "category": "wall_art",
+   "shape": "photo_garland",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/photo_garland.glb",
+   "size": [
+    1.0,
+    0.3,
+    0.02
+   ],
+   "triangles": 2176,
+   "color_material_keys": [
+    "wood",
+    "print",
+    "paper",
+    "tint"
+   ],
+   "bytes": 112584,
+   "sha256": "54c9866528adb2a49443f46c858a6f1cc1def92d3c94515e67bc1203daa25b17",
+   "characters": []
+  },
+  {
+   "id": "photo_wall",
+   "name": "フォトフレーム3枚組",
+   "category": "wall_art",
+   "shape": "photo_wall",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/photo_wall.glb",
+   "size": [
+    0.9,
+    0.35,
+    0.02
+   ],
+   "triangles": 2024,
+   "color_material_keys": [
+    "wood",
+    "paper",
+    "tint",
+    "print"
+   ],
+   "bytes": 80408,
+   "sha256": "be9f9632767ec33af5523eba79a58fe31e590895854db448289feb7ed5412717",
+   "characters": []
+  },
+  {
+   "id": "pillow",
+   "name": "枕",
+   "category": "bedding",
+   "shape": "pillow",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/pillow.glb",
+   "size": [
+    0.6,
+    0.12,
+    0.4
+   ],
+   "triangles": 1196,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 37072,
+   "sha256": "9ada947865986963ef78becd5f02960bb0070ddc159fa96b07655a17a4defd3d",
+   "characters": []
+  },
+  {
+   "id": "plant_cactus",
+   "name": "サボテン",
+   "category": "small_plant",
+   "shape": "plant_cactus",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plant_cactus.glb",
+   "size": [
+    0.15,
+    0.3,
+    0.15
+   ],
+   "triangles": 1980,
+   "color_material_keys": [
+    "pot",
+    "soil",
+    "leaf",
+    "flower"
+   ],
+   "bytes": 89272,
+   "sha256": "72494c5ec9f22613de8785aa71bca68b681f726d9fc0459a6fce3617e894a928",
+   "characters": []
+  },
+  {
+   "id": "plant_dracaena",
+   "name": "ドラセナ",
+   "category": "plant",
+   "shape": "plant_dracaena",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plant_dracaena.glb",
+   "size": [
+    0.45,
+    1.3,
+    0.45
+   ],
+   "triangles": 6804,
+   "color_material_keys": [
+    "pot",
+    "soil",
+    "stem",
+    "leaf"
+   ],
+   "bytes": 309040,
+   "sha256": "273e3c4a7b917c562a240cd0f6f5a359be8e0562d77651c68634cf072334ed9c",
+   "characters": []
+  },
+  {
+   "id": "plant_eucalyptus",
+   "name": "ユーカリ",
+   "category": "plant",
+   "shape": "plant_eucalyptus",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plant_eucalyptus.glb",
+   "size": [
+    0.4,
+    0.9,
+    0.4
+   ],
+   "triangles": 4044,
+   "color_material_keys": [
+    "pot",
+    "soil",
+    "stem",
+    "leaf"
+   ],
+   "bytes": 220736,
+   "sha256": "c78854b502bc8208f4f3d25aa97de0b96b2d03b4074e66cd7e22126041f06c7c",
+   "characters": []
+  },
+  {
+   "id": "plant_fiddle",
+   "name": "ウンベラータ",
+   "category": "plant",
+   "shape": "plant_fiddle",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plant_fiddle.glb",
+   "size": [
+    0.6,
+    1.4,
+    0.6
+   ],
+   "triangles": 6852,
+   "color_material_keys": [
+    "pot",
+    "soil",
+    "stem",
+    "leaf"
+   ],
+   "bytes": 285768,
+   "sha256": "8f249f156dffcafb5df02bbdef7a8add983b93ea87889ee1895f3f16ebae4f11",
+   "characters": []
+  },
+  {
+   "id": "plant_monstera",
+   "name": "モンステラ",
+   "category": "plant",
+   "shape": "plant_monstera",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plant_monstera.glb",
+   "size": [
+    0.6,
+    1.2,
+    0.6
+   ],
+   "triangles": 4536,
+   "color_material_keys": [
+    "pot",
+    "soil",
+    "stem",
+    "leaf"
+   ],
+   "bytes": 223116,
+   "sha256": "93dfc27541f6638ecc260b4e0e68d181b9d673a4aa97db2d9ffca671d6a0f653",
+   "characters": []
+  },
+  {
+   "id": "plant_olive",
+   "name": "オリーブの木",
+   "category": "plant",
+   "shape": "plant_olive",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plant_olive.glb",
+   "size": [
+    0.5,
+    1.5,
+    0.5
+   ],
+   "triangles": 13908,
+   "color_material_keys": [
+    "pot",
+    "soil",
+    "stem",
+    "leaf"
+   ],
+   "bytes": 669384,
+   "sha256": "b4a0009ac6cbf958e0ecc94d9a5400da5f29457d91ad3da17f9549ea52824fd2",
+   "characters": []
+  },
+  {
+   "id": "plant_pachira",
+   "name": "パキラ",
+   "category": "plant",
+   "shape": "plant_pachira",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plant_pachira.glb",
+   "size": [
+    0.5,
+    1.2,
+    0.5
+   ],
+   "triangles": 7172,
+   "color_material_keys": [
+    "pot",
+    "soil",
+    "stem",
+    "leaf"
+   ],
+   "bytes": 337492,
+   "sha256": "217b18ad0d2fa64f7aba5a7b6a4c4bd919165b875992b1b905d36464df328c6d",
+   "characters": []
+  },
+  {
+   "id": "plant_pothos_hanging",
+   "name": "吊り下げポトス",
+   "category": "plant",
+   "shape": "plant_pothos_hanging",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plant_pothos_hanging.glb",
+   "size": [
+    0.4,
+    0.7,
+    0.4
+   ],
+   "triangles": 7384,
+   "color_material_keys": [
+    "pot",
+    "soil",
+    "cord",
+    "leaf"
+   ],
+   "bytes": 386452,
+   "sha256": "c5c379d142deb77d5a778bfa8ce1298f4b79306d5f36a8fc2bc76fe08b245543",
+   "characters": []
+  },
+  {
+   "id": "plant_snake",
+   "name": "サンセベリア",
+   "category": "plant",
+   "shape": "plant_snake",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plant_snake.glb",
+   "size": [
+    0.35,
+    0.7,
+    0.35
+   ],
+   "triangles": 2508,
+   "color_material_keys": [
+    "pot",
+    "soil",
+    "leaf_edge",
+    "leaf"
+   ],
+   "bytes": 100048,
+   "sha256": "f3df79c73b63c7cf47e6b955ba337596fc10e09260810f4f4a22c5c58deec28a",
+   "characters": []
+  },
+  {
+   "id": "plant_stand",
+   "name": "2段フラワースタンド",
+   "category": "plant_stand",
+   "shape": "plant_stand",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plant_stand.glb",
+   "size": [
+    0.4,
+    0.6,
+    0.4
+   ],
+   "triangles": 1060,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 45612,
+   "sha256": "9d4cac24d99f4ce4559d03b17419b985dab4ab31d593d9219cac826bd900e0ee",
+   "characters": []
+  },
+  {
+   "id": "plant_succulents",
+   "name": "多肉植物の寄せ植え",
+   "category": "small_plant",
+   "shape": "plant_succulents",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plant_succulents.glb",
+   "size": [
+    0.25,
+    0.12,
+    0.15
+   ],
+   "triangles": 5856,
+   "color_material_keys": [
+    "pot",
+    "soil",
+    "leaf",
+    "leaf2"
+   ],
+   "bytes": 278340,
+   "sha256": "d94d988d7ed3af6b4c872b2b7c8027cd22872c94b01ab38399f4fd78a73d323c",
+   "characters": []
+  },
+  {
+   "id": "plush_base_l",
+   "name": "ぬいぐるみ素体 L",
+   "category": "plush",
+   "shape": "plush_base_l",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plush_base_l.glb",
+   "size": [
+    0.4,
+    0.55,
+    0.25
+   ],
+   "triangles": 2664,
+   "color_material_keys": [
+    "tint",
+    "print"
+   ],
+   "bytes": 81960,
+   "sha256": "82ae6fb5c56b4e4ae86aabd454863685b6f1e165ce3a14ccf83a24ee7e4f928d",
+   "characters": []
+  },
+  {
+   "id": "plush_base_m",
+   "name": "ぬいぐるみ素体 M",
+   "category": "plush",
+   "shape": "plush_base_m",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plush_base_m.glb",
+   "size": [
+    0.25,
+    0.4,
+    0.2
+   ],
+   "triangles": 2664,
+   "color_material_keys": [
+    "tint",
+    "print"
+   ],
+   "bytes": 83240,
+   "sha256": "b1fec0f6c4985008317bedfc7c9b7951a9654e18760c5dd8dafce47e2735cd68",
+   "characters": []
+  },
+  {
+   "id": "plush_base_s",
+   "name": "ぬいぐるみ素体 S",
+   "category": "plush",
+   "shape": "plush_base_s",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plush_base_s.glb",
+   "size": [
+    0.13,
+    0.2,
+    0.11
+   ],
+   "triangles": 2664,
+   "color_material_keys": [
+    "tint",
+    "print"
+   ],
+   "bytes": 83248,
+   "sha256": "5bff44b429d95872b34ee6479515d2f4ca879e11507c569433c4930b03c2bad4",
+   "characters": []
+  },
+  {
+   "id": "plush_bear",
+   "name": "くまのぬいぐるみ",
+   "category": "plush",
+   "shape": "plush_bear",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plush_bear.glb",
+   "size": [
+    0.3,
+    0.35,
+    0.25
+   ],
+   "triangles": 3764,
+   "color_material_keys": [
+    "tint",
+    "muzzle",
+    "eye"
+   ],
+   "bytes": 135304,
+   "sha256": "f447975febf477ba04b4c6b159dc5a19d8527a94e4807008538f58b6925543a7",
+   "characters": []
+  },
+  {
+   "id": "plush_bunny",
+   "name": "うさぎのぬいぐるみ",
+   "category": "plush",
+   "shape": "plush_bunny",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/plush_bunny.glb",
+   "size": [
+    0.25,
+    0.4,
+    0.2
+   ],
+   "triangles": 3868,
+   "color_material_keys": [
+    "tint",
+    "inner",
+    "eye"
+   ],
+   "bytes": 140596,
+   "sha256": "58672f3337276f6351cbcbc48a4a224d1f00996c4e1d3808db7d41600660fc23",
+   "characters": []
+  },
+  {
+   "id": "poster",
+   "name": "ポスター（フレーム入り）",
+   "category": "poster",
+   "shape": "poster",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/poster.glb",
+   "size": [
+    0.5,
+    0.7,
+    0.02
+   ],
+   "triangles": 736,
+   "color_material_keys": [
+    "wood",
+    "tint",
+    "print2",
+    "print"
+   ],
+   "bytes": 32924,
+   "sha256": "1fe836e14f4062d1a85814b3688d098eedcd5a169961e9a5fe1c189e15813fe3",
+   "characters": []
+  },
+  {
+   "id": "pouf_square",
+   "name": "キューブ型スツール",
+   "category": "ottoman",
+   "shape": "pouf_square",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/pouf_square.glb",
+   "size": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "triangles": 2352,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 61004,
+   "sha256": "fd626422b9cae70e53dfa7f55d245d95b1296e2a8dc9f9a15213a79fa13f5cd8",
+   "characters": []
+  },
+  {
+   "id": "projector",
+   "name": "プロジェクター",
+   "category": "appliance",
+   "shape": "projector",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/projector.glb",
+   "size": [
+    0.25,
+    0.1,
+    0.2
+   ],
+   "triangles": 2872,
+   "color_material_keys": [
+    "plastic",
+    "tint",
+    "glass",
+    "light"
+   ],
+   "bytes": 127452,
+   "sha256": "f64b8067ecc161c4f5162b9d4bbd336787689d521804187508db3672c397b464",
+   "characters": []
+  },
+  {
+   "id": "radio",
+   "name": "レトロラジオ",
+   "category": "appliance",
+   "shape": "radio",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/radio.glb",
+   "size": [
+    0.25,
+    0.15,
+    0.1
+   ],
+   "triangles": 2268,
+   "color_material_keys": [
+    "tint",
+    "wood",
+    "face",
+    "ink"
+   ],
+   "bytes": 116752,
+   "sha256": "6e0ea1d612e4016c87d7b2becc639d4c1ddda3cd043c03310cd9fcfcc10e9993",
+   "characters": []
+  },
+  {
+   "id": "range_rack",
+   "name": "レンジ台",
+   "category": "storage",
+   "shape": "range_rack",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/range_rack.glb",
+   "size": [
+    0.6,
+    1.2,
+    0.4
+   ],
+   "triangles": 1764,
+   "color_material_keys": [
+    "tint",
+    "wood",
+    "metal"
+   ],
+   "bytes": 77428,
+   "sha256": "5b28083872f5d45f3a0a0a3ccc32c912205aefdd937b5093315c0da76c6d036b",
+   "characters": []
+  },
+  {
+   "id": "record_player",
+   "name": "レコードプレーヤー",
+   "category": "appliance",
+   "shape": "record_player",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/record_player.glb",
+   "size": [
+    0.42,
+    0.12,
+    0.35
+   ],
+   "triangles": 4124,
+   "color_material_keys": [
+    "arm",
+    "tint",
+    "record",
+    "label"
+   ],
+   "bytes": 155348,
+   "sha256": "2d5f019b44699e34e1bd0ee0e715cc343b88cdd0141c434a583e32f255cecfb2",
+   "characters": []
+  },
+  {
+   "id": "reed_diffuser",
+   "name": "リードディフューザー",
+   "category": "decor",
+   "shape": "reed_diffuser",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/reed_diffuser.glb",
+   "size": [
+    0.08,
+    0.25,
+    0.08
+   ],
+   "triangles": 748,
+   "color_material_keys": [
+    "tint",
+    "wood",
+    "reed"
+   ],
+   "bytes": 35932,
+   "sha256": "24d477c74f36b284c378350b1d4546744b52938324089ca047a0cbc44bd382ed",
+   "characters": []
+  },
+  {
+   "id": "rice_cooker",
+   "name": "炊飯器",
+   "category": "appliance",
+   "shape": "rice_cooker",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/rice_cooker.glb",
+   "size": [
+    0.25,
+    0.22,
+    0.33
+   ],
+   "triangles": 2024,
+   "color_material_keys": [
+    "plastic",
+    "tint",
+    "screen",
+    "light"
+   ],
+   "bytes": 96108,
+   "sha256": "de2e1e87ce1d24134b74f284954fa76d03a4cb2706508dd3e1146f99593964c9",
+   "characters": []
+  },
+  {
+   "id": "rocking_chair",
+   "name": "ロッキングチェア",
+   "category": "chair",
+   "shape": "rocking_chair",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/rocking_chair.glb",
+   "size": [
+    0.65,
+    0.95,
+    0.9
+   ],
+   "triangles": 3348,
+   "color_material_keys": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 134196,
+   "sha256": "dd5b98f5976e8f831ee94cff1f8c2fe86a74869a66510b362d6d9ce982a45d07",
+   "characters": []
+  },
+  {
+   "id": "room_divider",
+   "name": "3連パーテーション",
+   "category": "room_divider",
+   "shape": "room_divider",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/room_divider.glb",
+   "size": [
+    1.2,
+    1.6,
+    0.25
+   ],
+   "triangles": 1332,
+   "color_material_keys": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 58508,
+   "sha256": "699c0286868a3f1db9d94f1a259cef5504e5a93db67c73bd45a8aa681e85dabc",
+   "characters": []
+  },
+  {
+   "id": "rubber_mat",
+   "name": "ラバーマット",
+   "category": "rubber_mat",
+   "shape": "rubber_mat",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/rubber_mat.glb",
+   "size": [
+    0.6,
+    0.003,
+    0.3
+   ],
+   "triangles": 216,
+   "color_material_keys": [
+    "tint",
+    "print"
+   ],
+   "bytes": 10376,
+   "sha256": "3b81d864a986fef809f8c0189b6cdaf27c25ddca82ecae18cc02d668e20a7afe",
+   "characters": []
+  },
+  {
+   "id": "rug_checker",
+   "name": "チェック柄ラグ",
+   "category": "rug",
+   "shape": "rug_checker",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/rug_checker.glb",
+   "size": [
+    1.4,
+    0.02,
+    2.0
+   ],
+   "triangles": 3268,
+   "color_material_keys": [
+    "check",
+    "tint"
+   ],
+   "bytes": 172608,
+   "sha256": "774a79c4bef39b2d452a8032d28cf4512a593d3083b2cbf2fede0f4ac8deb7db",
+   "characters": []
+  },
+  {
+   "id": "rug_oval",
+   "name": "楕円ラグ",
+   "category": "rug",
+   "shape": "rug_oval",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/rug_oval.glb",
+   "size": [
+    1.2,
+    0.02,
+    1.8
+   ],
+   "triangles": 3056,
+   "color_material_keys": [
+    "trim",
+    "tint"
+   ],
+   "bytes": 107588,
+   "sha256": "817e902714f0fae4d42f6a44d55dd6fead5aa7b37c327f1937a47939453af909",
+   "characters": []
+  },
+  {
+   "id": "rug_rect",
+   "name": "長方形ラグ",
+   "category": "rug",
+   "shape": "rug_rect",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/rug_rect.glb",
+   "size": [
+    1.4,
+    0.03,
+    2.0
+   ],
+   "triangles": 472,
+   "color_material_keys": [
+    "trim",
+    "tint"
+   ],
+   "bytes": 19520,
+   "sha256": "04123c210ac57254e2111f28ea8c7301ed4c4e4748d0b6e9c975b30d5a24d844",
+   "characters": []
+  },
+  {
+   "id": "rug_rect__103",
+   "name": "長方形ラグ",
+   "category": "rug",
+   "shape": "rug_rect",
+   "variant": "103",
+   "format": "glb",
+   "object_key": "models/furniture/v1/rug_rect__103.glb",
+   "size": [
+    1.4,
+    0.03,
+    2.0
+   ],
+   "triangles": 472,
+   "color_material_keys": [
+    "trim",
+    "tint"
+   ],
+   "bytes": 19528,
+   "sha256": "7a044bdb7fefcfd7fc5d03ad9cfe650c5ca27aada729529858ef253e92b3ff3d",
+   "characters": []
+  },
+  {
+   "id": "rug_rect__203",
+   "name": "長方形ラグ",
+   "category": "rug",
+   "shape": "rug_rect",
+   "variant": "203",
+   "format": "glb",
+   "object_key": "models/furniture/v1/rug_rect__203.glb",
+   "size": [
+    1.3,
+    0.02,
+    1.9
+   ],
+   "triangles": 472,
+   "color_material_keys": [
+    "trim",
+    "tint"
+   ],
+   "bytes": 19664,
+   "sha256": "3e7a83b11b02b368891ee12c277a82be11f081ede488b730308c77795d036bf2",
+   "characters": []
+  },
+  {
+   "id": "rug_round",
+   "name": "円形ラグ",
+   "category": "rug",
+   "shape": "rug_round",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/rug_round.glb",
+   "size": [
+    1.0,
+    0.02,
+    1.0
+   ],
+   "triangles": 1528,
+   "color_material_keys": [
+    "trim",
+    "tint"
+   ],
+   "bytes": 47488,
+   "sha256": "04e238522ef8f1a9795b76fa3532c450e1712a8cf696e44cb12e63cfa68f1898",
+   "characters": []
+  },
+  {
+   "id": "rug_round__111",
+   "name": "円形ラグ",
+   "category": "rug",
+   "shape": "rug_round",
+   "variant": "111",
+   "format": "glb",
+   "object_key": "models/furniture/v1/rug_round__111.glb",
+   "size": [
+    1.0,
+    0.02,
+    1.0
+   ],
+   "triangles": 1528,
+   "color_material_keys": [
+    "trim",
+    "tint"
+   ],
+   "bytes": 47500,
+   "sha256": "78f9c5726101290e7b043b3f09121575347740cbd93da06f85062be80e469ba0",
+   "characters": []
+  },
+  {
+   "id": "rug_round__211",
+   "name": "円形ラグ",
+   "category": "rug",
+   "shape": "rug_round",
+   "variant": "211",
+   "format": "glb",
+   "object_key": "models/furniture/v1/rug_round__211.glb",
+   "size": [
+    1.2,
+    0.02,
+    1.2
+   ],
+   "triangles": 1528,
+   "color_material_keys": [
+    "trim",
+    "tint"
+   ],
+   "bytes": 47564,
+   "sha256": "a81c688a6b1c33ce33df07f786c9ef1e5f1970c7b18539df63c93550e0bbf5b2",
+   "characters": []
+  },
+  {
+   "id": "rug_round__311",
+   "name": "円形ラグ",
+   "category": "rug",
+   "shape": "rug_round",
+   "variant": "311",
+   "format": "glb",
+   "object_key": "models/furniture/v1/rug_round__311.glb",
+   "size": [
+    1.0,
+    0.03,
+    1.0
+   ],
+   "triangles": 1528,
+   "color_material_keys": [
+    "trim",
+    "tint"
+   ],
+   "bytes": 52216,
+   "sha256": "a0a78bf2658365ed8e38c7fdad6b3c35b0f762a2656e2aa8f8913d9fcda74185",
+   "characters": []
+  },
+  {
+   "id": "rug_runner",
+   "name": "ランナーラグ",
+   "category": "rug",
+   "shape": "rug_runner",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/rug_runner.glb",
+   "size": [
+    0.6,
+    0.02,
+    1.8
+   ],
+   "triangles": 1068,
+   "color_material_keys": [
+    "stripe",
+    "tint",
+    "fringe"
+   ],
+   "bytes": 71672,
+   "sha256": "6b6a7eed1673ce503afe0b29b76aacb9d9fa2661c7cf0dfb6e09a67f370b35a1",
+   "characters": []
+  },
+  {
+   "id": "rug_wave",
+   "name": "ウェーブラグ",
+   "category": "rug",
+   "shape": "rug_wave",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/rug_wave.glb",
+   "size": [
+    1.3,
+    0.02,
+    1.85
+   ],
+   "triangles": 2880,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 111484,
+   "sha256": "0860ad3a91ec5fe9a71354d85571bb5288017a13a36e68bc44bf7ffc7c44576f",
+   "characters": []
+  },
+  {
+   "id": "seat_cushion",
+   "name": "シートクッション（座布団）",
+   "category": "cushion",
+   "shape": "seat_cushion",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/seat_cushion.glb",
+   "size": [
+    0.55,
+    0.07,
+    0.59
+   ],
+   "triangles": 2556,
+   "color_material_keys": [
+    "tint",
+    "tuft"
+   ],
+   "bytes": 96104,
+   "sha256": "7dd273f570ee72b747da3382b551b02398d534667ced4238dbdae69bb0af8596",
+   "characters": []
+  },
+  {
+   "id": "shelf_corner",
+   "name": "コーナーラック",
+   "category": "shelf",
+   "shape": "shelf_corner",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/shelf_corner.glb",
+   "size": [
+    0.4,
+    1.2,
+    0.4
+   ],
+   "triangles": 1560,
+   "color_material_keys": [
+    "panel",
+    "tint"
+   ],
+   "bytes": 56924,
+   "sha256": "cb1438b45dafa9ef01eb18ad8ac74fa51b692c7205fb9bb18246846acd0ed44c",
+   "characters": []
+  },
+  {
+   "id": "shelf_cube",
+   "name": "キューブ収納",
+   "category": "shelf",
+   "shape": "shelf_cube",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/shelf_cube.glb",
+   "size": [
+    0.8,
+    0.8,
+    0.35
+   ],
+   "triangles": 660,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 24888,
+   "sha256": "3ad0908f876d2822d20a9e72369d4679d6d62997756482bd528c940c83e6d1f0",
+   "characters": []
+  },
+  {
+   "id": "shelf_cube_4x4",
+   "name": "キューブ収納4×4",
+   "category": "shelf",
+   "shape": "shelf_cube_4x4",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/shelf_cube_4x4.glb",
+   "size": [
+    1.47,
+    1.47,
+    0.39
+   ],
+   "triangles": 1092,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 40580,
+   "sha256": "fc8f71d254c670189ba0e7d646a1bcab5f421e35c75701f035f488f78c125489",
+   "characters": []
+  },
+  {
+   "id": "shelf_cube_boxes",
+   "name": "収納ボックス入りキューブ収納",
+   "category": "shelf",
+   "shape": "shelf_cube_boxes",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/shelf_cube_boxes.glb",
+   "size": [
+    0.8,
+    0.8,
+    0.35
+   ],
+   "triangles": 1260,
+   "color_material_keys": [
+    "tint",
+    "box",
+    "strap"
+   ],
+   "bytes": 59048,
+   "sha256": "f1e98c4afb7394607b6b3e6ead1ee5e49ec1e7d9d26bd322cddfd7517aed69aa",
+   "characters": []
+  },
+  {
+   "id": "shelf_floating",
+   "name": "ウォールシェルフ（1枚）",
+   "category": "wall_shelf",
+   "shape": "shelf_floating",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/shelf_floating.glb",
+   "size": [
+    0.8,
+    0.05,
+    0.2
+   ],
+   "triangles": 216,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 9612,
+   "sha256": "e2722f142fa0de074efdef3f5c8de1e0aecbe06bab44679b523fd5910127bed5",
+   "characters": []
+  },
+  {
+   "id": "shelf_gap",
+   "name": "すき間収納ワゴン",
+   "category": "storage",
+   "shape": "shelf_gap",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/shelf_gap.glb",
+   "size": [
+    0.2,
+    1.4,
+    0.4
+   ],
+   "triangles": 1872,
+   "color_material_keys": [
+    "tint",
+    "rail",
+    "wheel"
+   ],
+   "bytes": 89212,
+   "sha256": "4de99bf19122ce350900f6a3dfbff65c3fdde40ae0e07367da848be719b81bca",
+   "characters": []
+  },
+  {
+   "id": "shelf_low",
+   "name": "低いオープン棚",
+   "category": "shelf",
+   "shape": "shelf_low",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/shelf_low.glb",
+   "size": [
+    0.9,
+    0.9,
+    0.3
+   ],
+   "triangles": 672,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 25760,
+   "sha256": "6068c6ce784604687e524d6d4b748dbb4e53dfdb316b639104d89863fc997d32",
+   "characters": []
+  },
+  {
+   "id": "shelf_metal",
+   "name": "メタルラック",
+   "category": "shelf",
+   "shape": "shelf_metal",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/shelf_metal.glb",
+   "size": [
+    0.9,
+    1.8,
+    0.45
+   ],
+   "triangles": 3952,
+   "color_material_keys": [
+    "tint",
+    "foot"
+   ],
+   "bytes": 213304,
+   "sha256": "3488fcf980fcbdcea7ae66495488f33c36e30eedfda346cca308d5a7cb3543a2",
+   "characters": []
+  },
+  {
+   "id": "shoe_cabinet",
+   "name": "下駄箱",
+   "category": "storage",
+   "shape": "shoe_cabinet",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/shoe_cabinet.glb",
+   "size": [
+    0.8,
+    1.0,
+    0.35
+   ],
+   "triangles": 828,
+   "color_material_keys": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 38600,
+   "sha256": "1298f9accba68f8ea546c6bb47a6402e1bceeb92c28f5b51c2988c9d025dc4fa",
+   "characters": []
+  },
+  {
+   "id": "shoe_rack",
+   "name": "靴ラック",
+   "category": "storage",
+   "shape": "shoe_rack",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/shoe_rack.glb",
+   "size": [
+    0.8,
+    0.5,
+    0.3
+   ],
+   "triangles": 1980,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 79840,
+   "sha256": "af9d4465544e2190b8ec9da070736d727b6faf03ecb0d663cd0a3c3543c30496",
+   "characters": []
+  },
+  {
+   "id": "shoji_screen",
+   "name": "障子風パーテーション",
+   "category": "room_divider",
+   "shape": "shoji_screen",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/shoji_screen.glb",
+   "size": [
+    0.9,
+    1.7,
+    0.25
+   ],
+   "triangles": 3048,
+   "color_material_keys": [
+    "tint",
+    "wood",
+    "paper"
+   ],
+   "bytes": 134048,
+   "sha256": "fde2055f37ab3a0a54e9d0f3d3b61ce95a6f20dcb78c05a23156015abcc3ebfc",
+   "characters": []
+  },
+  {
+   "id": "side_table",
+   "name": "円形サイドテーブル",
+   "category": "side_table",
+   "shape": "side_table",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/side_table.glb",
+   "size": [
+    0.4,
+    0.5,
+    0.4
+   ],
+   "triangles": 1322,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 47892,
+   "sha256": "e806678f318c45ab12c5072291d51776add2bd8cfb9c84504682b53595a4094d",
+   "characters": []
+  },
+  {
+   "id": "side_table_c",
+   "name": "コの字サイドテーブル",
+   "category": "side_table",
+   "shape": "side_table_c",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/side_table_c.glb",
+   "size": [
+    0.45,
+    0.55,
+    0.3
+   ],
+   "triangles": 648,
+   "color_material_keys": [
+    "wood",
+    "metal"
+   ],
+   "bytes": 24472,
+   "sha256": "3d59bb5eecddb35b6d31620f21fe61f8135494c1a8fb8256acf60771e1e406be",
+   "characters": []
+  },
+  {
+   "id": "sideboard",
+   "name": "サイドボード",
+   "category": "storage",
+   "shape": "sideboard",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/sideboard.glb",
+   "size": [
+    1.6,
+    0.7,
+    0.45
+   ],
+   "triangles": 1344,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 59368,
+   "sha256": "23a9a4d7485ac633ac1267d976fd57f8c3641a04b2c8042069a5bf9a345cdd45",
+   "characters": []
+  },
+  {
+   "id": "slippers",
+   "name": "スリッパ",
+   "category": "goods",
+   "shape": "slippers",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/slippers.glb",
+   "size": [
+    0.25,
+    0.06,
+    0.28
+   ],
+   "triangles": 2720,
+   "color_material_keys": [
+    "sole",
+    "tint"
+   ],
+   "bytes": 102652,
+   "sha256": "b82958ffcc0dc076f37c329fe46f7a12d46c02c641c4eefa7663c56c1e94408c",
+   "characters": []
+  },
+  {
+   "id": "small_plant",
+   "name": "卓上ミニ植物",
+   "category": "small_plant",
+   "shape": "small_plant",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/small_plant.glb",
+   "size": [
+    0.15,
+    0.25,
+    0.15
+   ],
+   "triangles": 1216,
+   "color_material_keys": [
+    "pot",
+    "soil",
+    "stem",
+    "leaf"
+   ],
+   "bytes": 60572,
+   "sha256": "34af9fa953b5a8e52ec5cd817d858c1bcca72bd675df81c608f10212f8b29c2d",
+   "characters": []
+  },
+  {
+   "id": "sofa_1seat",
+   "name": "1人掛けソファ",
+   "category": "sofa",
+   "shape": "sofa_1seat",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_1seat.glb",
+   "size": [
+    0.85,
+    0.8,
+    0.85
+   ],
+   "triangles": 3168,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 116284,
+   "sha256": "07ec4f49f99696c8f9663efcecd5f4537407c40a33abdf89943ab3e2cba14bd3",
+   "characters": []
+  },
+  {
+   "id": "sofa_2seat",
+   "name": "2人掛けソファ",
+   "category": "sofa",
+   "shape": "sofa_2seat",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_2seat.glb",
+   "size": [
+    1.5,
+    0.8,
+    0.85
+   ],
+   "triangles": 4696,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 167088,
+   "sha256": "0791e83c7980240fceced228952fcf8f3f9b63339854ec74cbb082b61784874e",
+   "characters": []
+  },
+  {
+   "id": "sofa_2seat__w130",
+   "name": "2人掛けソファ",
+   "category": "sofa",
+   "shape": "sofa_2seat",
+   "variant": "w130",
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_2seat__w130.glb",
+   "size": [
+    1.3,
+    0.8,
+    0.85
+   ],
+   "triangles": 4696,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 167640,
+   "sha256": "0316c8d97e526f20dcd7129ae7d9f554e7f65a367f29a5f57a0681913576b69c",
+   "characters": []
+  },
+  {
+   "id": "sofa_2seat__w170",
+   "name": "2人掛けソファ",
+   "category": "sofa",
+   "shape": "sofa_2seat",
+   "variant": "w170",
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_2seat__w170.glb",
+   "size": [
+    1.7,
+    0.8,
+    0.85
+   ],
+   "triangles": 4696,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 167128,
+   "sha256": "e9312ece328fbfc743b75bec5d6c10745495680c7cb42a2de441fe26d7676de2",
+   "characters": []
+  },
+  {
+   "id": "sofa_3seat",
+   "name": "3人掛けソファ",
+   "category": "sofa",
+   "shape": "sofa_3seat",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_3seat.glb",
+   "size": [
+    2.1,
+    0.82,
+    0.9
+   ],
+   "triangles": 6268,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 218920,
+   "sha256": "9537f77bf4edaaef47d72751e9bbe6c18c6d2de93ecb0de13e6a3a0a58d9158a",
+   "characters": []
+  },
+  {
+   "id": "sofa_bed",
+   "name": "ソファベッド（ソファ状態）",
+   "category": "sofa",
+   "shape": "sofa_bed",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_bed.glb",
+   "size": [
+    1.4,
+    0.8,
+    0.85
+   ],
+   "triangles": 4824,
+   "color_material_keys": [
+    "wood",
+    "tint",
+    "tie"
+   ],
+   "bytes": 201776,
+   "sha256": "83541951ded7014f4f2753a01dc17fd1192abc17519a81ba63ef136e359f7472",
+   "characters": []
+  },
+  {
+   "id": "sofa_bed_open",
+   "name": "展開したソファベッド",
+   "category": "sofa",
+   "shape": "sofa_bed_open",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_bed_open.glb",
+   "size": [
+    1.4,
+    0.4,
+    1.9
+   ],
+   "triangles": 2664,
+   "color_material_keys": [
+    "fabric_base",
+    "tint",
+    "wood"
+   ],
+   "bytes": 99740,
+   "sha256": "8615804b25f907414304fef35fd8b531f7444faef818a7448c3a363f40bc4e92",
+   "characters": []
+  },
+  {
+   "id": "sofa_chesterfield",
+   "name": "チェスターフィールドソファ",
+   "category": "sofa",
+   "shape": "sofa_chesterfield",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_chesterfield.glb",
+   "size": [
+    1.8,
+    0.75,
+    0.85
+   ],
+   "triangles": 9304,
+   "color_material_keys": [
+    "wood",
+    "tint",
+    "button"
+   ],
+   "bytes": 335368,
+   "sha256": "81fa65a6b5d3fa06432dd1d596a15a8e64947fd52239604007cdc1b6f318520a",
+   "characters": []
+  },
+  {
+   "id": "sofa_cloud",
+   "name": "もこもこソファ（クラウドソファ）",
+   "category": "sofa",
+   "shape": "sofa_cloud",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_cloud.glb",
+   "size": [
+    2.0,
+    0.7,
+    0.95
+   ],
+   "triangles": 6928,
+   "color_material_keys": [
+    "fabric_base",
+    "tint"
+   ],
+   "bytes": 220216,
+   "sha256": "94dfe7dd894d4d49b6a7a6824999cb0f3338d11104c343e21c11537438a1a6ab",
+   "characters": []
+  },
+  {
+   "id": "sofa_l_left",
+   "name": "L字ソファ（正面から見て左カウチ）",
+   "category": "sofa",
+   "shape": "sofa_l_left",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_l_left.glb",
+   "size": [
+    2.4,
+    0.82,
+    1.55
+   ],
+   "triangles": 6420,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 225268,
+   "sha256": "f847d706f9531d1f5071ca68537f74e430c6cddc10a3497f878cd545b26d867b",
+   "characters": []
+  },
+  {
+   "id": "sofa_l_left__l",
+   "name": "L字ソファ（正面から見て左カウチ）",
+   "category": "sofa",
+   "shape": "sofa_l_left",
+   "variant": "l",
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_l_left__l.glb",
+   "size": [
+    2.8,
+    0.82,
+    1.8
+   ],
+   "triangles": 6420,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 226040,
+   "sha256": "39f6a642f7bd86e8c673065029e99fb85c132c2eea3514caa1b09632b085e154",
+   "characters": []
+  },
+  {
+   "id": "sofa_l_left__s",
+   "name": "L字ソファ（正面から見て左カウチ）",
+   "category": "sofa",
+   "shape": "sofa_l_left",
+   "variant": "s",
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_l_left__s.glb",
+   "size": [
+    2.1,
+    0.82,
+    1.4
+   ],
+   "triangles": 6420,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 226808,
+   "sha256": "55c90eb56a93e24a24a3e2f1165727acb7f01159c6f85e802980280ab0ded5cc",
+   "characters": []
+  },
+  {
+   "id": "sofa_l_right",
+   "name": "L字ソファ（正面から見て右カウチ）",
+   "category": "sofa",
+   "shape": "sofa_l_right",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_l_right.glb",
+   "size": [
+    2.4,
+    0.82,
+    1.55
+   ],
+   "triangles": 6420,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 225272,
+   "sha256": "4800b5790304006333c0c8ad02d6d060942a3ea5c5822c500170e7635d8bd5e6",
+   "characters": []
+  },
+  {
+   "id": "sofa_l_right__l",
+   "name": "L字ソファ（正面から見て右カウチ）",
+   "category": "sofa",
+   "shape": "sofa_l_right",
+   "variant": "l",
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_l_right__l.glb",
+   "size": [
+    2.8,
+    0.82,
+    1.8
+   ],
+   "triangles": 6420,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 226040,
+   "sha256": "e26642601375d42e5aae7591a72d6ae11d7604f04db687da418fd5130a4a761a",
+   "characters": []
+  },
+  {
+   "id": "sofa_l_right__s",
+   "name": "L字ソファ（正面から見て右カウチ）",
+   "category": "sofa",
+   "shape": "sofa_l_right",
+   "variant": "s",
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_l_right__s.glb",
+   "size": [
+    2.1,
+    0.82,
+    1.4
+   ],
+   "triangles": 6420,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 226812,
+   "sha256": "785294478a5044242ca2eae0b240f942976a10ff127dd026409c3ed7738b3691",
+   "characters": []
+  },
+  {
+   "id": "sofa_low",
+   "name": "ローソファ",
+   "category": "sofa",
+   "shape": "sofa_low",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_low.glb",
+   "size": [
+    1.6,
+    0.55,
+    0.85
+   ],
+   "triangles": 4628,
+   "color_material_keys": [
+    "tint",
+    "plinth"
+   ],
+   "bytes": 159728,
+   "sha256": "cf14f3bebcf2ef0bc3a9de7dc1d43879d149b85d3857b95e0df2273126164435",
+   "characters": []
+  },
+  {
+   "id": "sofa_modular",
+   "name": "モジュールソファ（コーナー）",
+   "category": "sofa",
+   "shape": "sofa_modular",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_modular.glb",
+   "size": [
+    2.1,
+    0.8,
+    2.1
+   ],
+   "triangles": 6656,
+   "color_material_keys": [
+    "plinth",
+    "tint"
+   ],
+   "bytes": 240208,
+   "sha256": "578b5716cfc0be095889f3ac218c076d007acc4fc506726bad4e1d13ab4c5bb8",
+   "characters": []
+  },
+  {
+   "id": "sofa_wood_frame",
+   "name": "木枠ソファ",
+   "category": "sofa",
+   "shape": "sofa_wood_frame",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/sofa_wood_frame.glb",
+   "size": [
+    1.4,
+    0.75,
+    0.75
+   ],
+   "triangles": 4992,
+   "color_material_keys": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 189020,
+   "sha256": "1c5bd793362d962c5e422378976116ccd72e19a8418e78c354f7ca3ac818c19e",
+   "characters": []
+  },
+  {
+   "id": "speaker",
+   "name": "スピーカー",
+   "category": "appliance",
+   "shape": "speaker",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/speaker.glb",
+   "size": [
+    0.12,
+    0.2,
+    0.12
+   ],
+   "triangles": 1948,
+   "color_material_keys": [
+    "plastic",
+    "tint",
+    "light"
+   ],
+   "bytes": 83392,
+   "sha256": "a83b8b3a5c6340c07fe0d8dde1fd3efa263dfbf63294ded4aa76871b1611adf5",
+   "characters": []
+  },
+  {
+   "id": "step_stool",
+   "name": "ステップスツール（踏み台）",
+   "category": "chair",
+   "shape": "step_stool",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/step_stool.glb",
+   "size": [
+    0.43,
+    0.45,
+    0.4
+   ],
+   "triangles": 1200,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 51732,
+   "sha256": "5b04195075682915b6cbb78a5ba21e94f47b7b75b8b83ff9bb23b6da64f4b46f",
+   "characters": []
+  },
+  {
+   "id": "stool_bar",
+   "name": "カウンタースツール",
+   "category": "chair",
+   "shape": "stool_bar",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/stool_bar.glb",
+   "size": [
+    0.4,
+    0.75,
+    0.4
+   ],
+   "triangles": 1896,
+   "color_material_keys": [
+    "tint",
+    "wood",
+    "metal"
+   ],
+   "bytes": 77304,
+   "sha256": "1d6453e550afb146de6a98cad898ef1c5d42e7a886c0eccae9ea549d0be7974d",
+   "characters": []
+  },
+  {
+   "id": "stool_round",
+   "name": "円形スツール",
+   "category": "chair",
+   "shape": "stool_round",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/stool_round.glb",
+   "size": [
+    0.35,
+    0.45,
+    0.35
+   ],
+   "triangles": 1016,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 44100,
+   "sha256": "54bb873ee02e86c940ba11f1556a71a7e66afeb0c4359e25c891357125c1f0db",
+   "characters": []
+  },
+  {
+   "id": "storage_basket",
+   "name": "ラタン調収納バスケット",
+   "category": "storage_box",
+   "shape": "storage_basket",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/storage_basket.glb",
+   "size": [
+    0.4,
+    0.3,
+    0.3
+   ],
+   "triangles": 3308,
+   "color_material_keys": [
+    "tint",
+    "weave"
+   ],
+   "bytes": 141092,
+   "sha256": "485096e4e5e48bab9e3c1239a37c3fb2eebf6ccc801567aa605357c770bffdad",
+   "characters": []
+  },
+  {
+   "id": "storage_bench",
+   "name": "収納ベンチ",
+   "category": "bench",
+   "shape": "storage_bench",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/storage_bench.glb",
+   "size": [
+    0.9,
+    0.45,
+    0.4
+   ],
+   "triangles": 3704,
+   "color_material_keys": [
+    "tint",
+    "fabric",
+    "basket",
+    "weave"
+   ],
+   "bytes": 138844,
+   "sha256": "ecc9aaeab11c66cb4f453894516fe409bfc62941ad25751f1a54ae533e31d661",
+   "characters": []
+  },
+  {
+   "id": "storage_box_fabric",
+   "name": "布製収納ボックス",
+   "category": "storage_box",
+   "shape": "storage_box_fabric",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/storage_box_fabric.glb",
+   "size": [
+    0.33,
+    0.33,
+    0.33
+   ],
+   "triangles": 1536,
+   "color_material_keys": [
+    "tint",
+    "trim"
+   ],
+   "bytes": 66688,
+   "sha256": "3c6290c3851d9bd9f70e9b454f16bfc9948d10f681638c3168bbbed9da9a191d",
+   "characters": []
+  },
+  {
+   "id": "suitcase",
+   "name": "スーツケース",
+   "category": "goods",
+   "shape": "suitcase",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/suitcase.glb",
+   "size": [
+    0.4,
+    0.65,
+    0.25
+   ],
+   "triangles": 4260,
+   "color_material_keys": [
+    "tint",
+    "trim"
+   ],
+   "bytes": 176732,
+   "sha256": "e373b9ede46d3c61571b7da7c1322d596711290dab9a1cff52086a9316aa9c9f",
+   "characters": []
+  },
+  {
+   "id": "table_bar",
+   "name": "カウンターテーブル",
+   "category": "table",
+   "shape": "table_bar",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_bar.glb",
+   "size": [
+    1.2,
+    0.9,
+    0.45
+   ],
+   "triangles": 1340,
+   "color_material_keys": [
+    "wood",
+    "metal"
+   ],
+   "bytes": 51208,
+   "sha256": "7c6109c830f12efc9840e47149f09587bce101d6b5b977b96707fd6aa9460fb4",
+   "characters": []
+  },
+  {
+   "id": "table_cafe",
+   "name": "カフェテーブル",
+   "category": "table",
+   "shape": "table_cafe",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_cafe.glb",
+   "size": [
+    0.6,
+    0.72,
+    0.6
+   ],
+   "triangles": 2120,
+   "color_material_keys": [
+    "tint",
+    "metal"
+   ],
+   "bytes": 81120,
+   "sha256": "ef2a28b227269f281dc03e216c2ce5fa624f0dd7f03ddef8079582fd7c44e1b9",
+   "characters": []
+  },
+  {
+   "id": "table_dining_6",
+   "name": "6人掛けダイニングテーブル",
+   "category": "table",
+   "shape": "table_dining_6",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_dining_6.glb",
+   "size": [
+    1.8,
+    0.72,
+    0.9
+   ],
+   "triangles": 920,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 36440,
+   "sha256": "5dce52514ea5ffe6073c3eca9ef1822de28e973946627429c1354fd4567a5df3",
+   "characters": []
+  },
+  {
+   "id": "table_dining_rect",
+   "name": "長方形ダイニングテーブル",
+   "category": "table",
+   "shape": "table_dining_rect",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_dining_rect.glb",
+   "size": [
+    1.2,
+    0.72,
+    0.75
+   ],
+   "triangles": 812,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 32856,
+   "sha256": "c088c3220d4aea184ecbc61e40bfd58819c7c3a77aa2205c88c785609f2b5cd8",
+   "characters": []
+  },
+  {
+   "id": "table_dining_round",
+   "name": "円形ダイニングテーブル",
+   "category": "table",
+   "shape": "table_dining_round",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_dining_round.glb",
+   "size": [
+    0.9,
+    0.72,
+    0.9
+   ],
+   "triangles": 1428,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 48880,
+   "sha256": "49a382ed2659d96aa833a274f38dfa96b8be528760889e8270a1cd1f91a5e1ec",
+   "characters": []
+  },
+  {
+   "id": "table_folding_low",
+   "name": "折り畳みローテーブル",
+   "category": "table",
+   "shape": "table_folding_low",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_folding_low.glb",
+   "size": [
+    0.75,
+    0.33,
+    0.5
+   ],
+   "triangles": 1956,
+   "color_material_keys": [
+    "tint",
+    "wood",
+    "metal"
+   ],
+   "bytes": 74224,
+   "sha256": "5694f47d5727609b16362f0d9e3d1aeaec9196305f08a5c5cb55d59601b3a6e5",
+   "characters": []
+  },
+  {
+   "id": "table_glass_low",
+   "name": "ガラスローテーブル",
+   "category": "table",
+   "shape": "table_glass_low",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_glass_low.glb",
+   "size": [
+    1.0,
+    0.4,
+    0.55
+   ],
+   "triangles": 1080,
+   "color_material_keys": [
+    "glass",
+    "tint"
+   ],
+   "bytes": 39388,
+   "sha256": "a732b78c294ed7e07b9364c0be97733e1dc9080b900884075fe8df0346e73076",
+   "characters": []
+  },
+  {
+   "id": "table_lamp",
+   "name": "マッシュルーム型テーブルランプ",
+   "category": "table_lamp",
+   "shape": "table_lamp",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_lamp.glb",
+   "size": [
+    0.25,
+    0.3,
+    0.25
+   ],
+   "triangles": 2164,
+   "color_material_keys": [
+    "tint",
+    "light"
+   ],
+   "bytes": 65452,
+   "sha256": "1fd1c9e5bb040c76b4889d138803cc1dc94ef3c0620ce3e59eacd3e533b96639",
+   "characters": []
+  },
+  {
+   "id": "table_low_oval",
+   "name": "楕円ローテーブル",
+   "category": "table",
+   "shape": "table_low_oval",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_low_oval.glb",
+   "size": [
+    1.0,
+    0.35,
+    0.55
+   ],
+   "triangles": 1640,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 66248,
+   "sha256": "b1aba02aad37fc81d55a31d5a49845e2cdd29cd010deddfc50b5d62966168f4a",
+   "characters": []
+  },
+  {
+   "id": "table_low_rect",
+   "name": "長方形ローテーブル",
+   "category": "table",
+   "shape": "table_low_rect",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_low_rect.glb",
+   "size": [
+    0.9,
+    0.38,
+    0.5
+   ],
+   "triangles": 972,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 40504,
+   "sha256": "86bf66290a8e3b5026794eb8d532c4f9d9f75b27d69154feba8969ee4cd09408",
+   "characters": []
+  },
+  {
+   "id": "table_low_rect__w075",
+   "name": "長方形ローテーブル",
+   "category": "table",
+   "shape": "table_low_rect",
+   "variant": "w075",
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_low_rect__w075.glb",
+   "size": [
+    0.75,
+    0.38,
+    0.5
+   ],
+   "triangles": 972,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 40488,
+   "sha256": "cd7fc70d7b78fdba135b941599f8ceec03f1ead3e5acdbefc5aa178198b0dbf4",
+   "characters": []
+  },
+  {
+   "id": "table_low_rect__w110",
+   "name": "長方形ローテーブル",
+   "category": "table",
+   "shape": "table_low_rect",
+   "variant": "w110",
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_low_rect__w110.glb",
+   "size": [
+    1.1,
+    0.38,
+    0.5
+   ],
+   "triangles": 972,
+   "color_material_keys": [
+    "wood"
+   ],
+   "bytes": 40576,
+   "sha256": "c018781a482b2d13dad821a73577fda5e4a4ac53e8fe82dcd0c42142ed8ed9f0",
+   "characters": []
+  },
+  {
+   "id": "table_low_round",
+   "name": "円形ローテーブル",
+   "category": "table",
+   "shape": "table_low_round",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_low_round.glb",
+   "size": [
+    0.7,
+    0.38,
+    0.7
+   ],
+   "triangles": 796,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 35484,
+   "sha256": "82f7adf4917fb13f968d52e9672ffced73ccd399c0d7262127b28690bfbb9227",
+   "characters": []
+  },
+  {
+   "id": "table_nesting",
+   "name": "ネストテーブル（2点）",
+   "category": "side_table",
+   "shape": "table_nesting",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/table_nesting.glb",
+   "size": [
+    0.5,
+    0.5,
+    0.4
+   ],
+   "triangles": 2176,
+   "color_material_keys": [
+    "tint",
+    "metal"
+   ],
+   "bytes": 77960,
+   "sha256": "9488c9c0274d6ab210a7fb81df9445cb77057594b3764f85518e0d1feea5e51c",
+   "characters": []
+  },
+  {
+   "id": "tableware_set",
+   "name": "マグとトレー",
+   "category": "tableware",
+   "shape": "tableware_set",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/tableware_set.glb",
+   "size": [
+    0.35,
+    0.1,
+    0.25
+   ],
+   "triangles": 2740,
+   "color_material_keys": [
+    "wood",
+    "tint",
+    "coffee",
+    "plate"
+   ],
+   "bytes": 120532,
+   "sha256": "43cb9d6c0e163bc6db49d17481cdfab3661dfc9bbefd77eae6da3b55bf671d71",
+   "characters": []
+  },
+  {
+   "id": "tapestry",
+   "name": "タペストリー",
+   "category": "tapestry",
+   "shape": "tapestry",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/tapestry.glb",
+   "size": [
+    0.6,
+    0.9,
+    0.01
+   ],
+   "triangles": 1520,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 42524,
+   "sha256": "f4b1e4e82d6d863aa72cab2d39a648055c7945021eb2989a25b46c3c1803ec2d",
+   "characters": []
+  },
+  {
+   "id": "tapestry_b1",
+   "name": "B1タペストリー",
+   "category": "tapestry",
+   "shape": "tapestry_b1",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/tapestry_b1.glb",
+   "size": [
+    0.728,
+    1.03,
+    0.015
+   ],
+   "triangles": 2396,
+   "color_material_keys": [
+    "print",
+    "tint",
+    "string"
+   ],
+   "bytes": 71372,
+   "sha256": "754e2b0586f9451664e864f16ec215f3c042f9d7a18b63014197d51fcd9f9e0f",
+   "characters": []
+  },
+  {
+   "id": "tapestry_b2",
+   "name": "B2タペストリー",
+   "category": "tapestry",
+   "shape": "tapestry_b2",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/tapestry_b2.glb",
+   "size": [
+    0.515,
+    0.728,
+    0.015
+   ],
+   "triangles": 2396,
+   "color_material_keys": [
+    "print",
+    "tint",
+    "string"
+   ],
+   "bytes": 71372,
+   "sha256": "562e99b46cc2e0747d8fd63cfdf93c3cdfcdc1472ee965cdad937fd9b423a93e",
+   "characters": []
+  },
+  {
+   "id": "terrarium",
+   "name": "テラリウム",
+   "category": "small_plant",
+   "shape": "terrarium",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/terrarium.glb",
+   "size": [
+    0.18,
+    0.22,
+    0.18
+   ],
+   "triangles": 3540,
+   "color_material_keys": [
+    "glass",
+    "sand",
+    "stone",
+    "leaf"
+   ],
+   "bytes": 139340,
+   "sha256": "a5529f559a6e248b8a52f4b25b0c92165b9707b74f5cf1ac267006b7b0b90941",
+   "characters": []
+  },
+  {
+   "id": "toaster",
+   "name": "オーブントースター",
+   "category": "appliance",
+   "shape": "toaster",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/toaster.glb",
+   "size": [
+    0.35,
+    0.22,
+    0.3
+   ],
+   "triangles": 1856,
+   "color_material_keys": [
+    "plastic",
+    "tint",
+    "glass",
+    "light"
+   ],
+   "bytes": 84096,
+   "sha256": "fa0e0984a4f63f7fe90625ad288ea8e441331a1239fd5061aea7636d3c570733",
+   "characters": []
+  },
+  {
+   "id": "toy_storage",
+   "name": "おもちゃ収納ラック",
+   "category": "storage",
+   "shape": "toy_storage",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/toy_storage.glb",
+   "size": [
+    0.8,
+    0.6,
+    0.35
+   ],
+   "triangles": 5292,
+   "color_material_keys": [
+    "tint",
+    "bin_pink",
+    "bin_mint",
+    "bin_yellow"
+   ],
+   "bytes": 198120,
+   "sha256": "b996fc0d24dce4868a655d77431699fc34b49a93e386c38b695aef56d8be2266",
+   "characters": []
+  },
+  {
+   "id": "trash_bin",
+   "name": "ゴミ箱",
+   "category": "trash_bin",
+   "shape": "trash_bin",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/trash_bin.glb",
+   "size": [
+    0.25,
+    0.35,
+    0.25
+   ],
+   "triangles": 560,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 20516,
+   "sha256": "53b503c0e5153c2426ea9a58840d96c98a2d500344f02ba30df52556dd71c505",
+   "characters": []
+  },
+  {
+   "id": "tv",
+   "name": "43型テレビ",
+   "category": "tv",
+   "shape": "tv",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/tv.glb",
+   "size": [
+    0.97,
+    0.62,
+    0.2
+   ],
+   "triangles": 660,
+   "color_material_keys": [
+    "tint",
+    "screen"
+   ],
+   "bytes": 25328,
+   "sha256": "b456b52dc8b2c9f9c19ac0be84f08f24013007e0588c6f16c0b87a8471a5c947",
+   "characters": []
+  },
+  {
+   "id": "tv_stand",
+   "name": "テレビ台",
+   "category": "storage",
+   "shape": "tv_stand",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/tv_stand.glb",
+   "size": [
+    1.2,
+    0.4,
+    0.35
+   ],
+   "triangles": 1376,
+   "color_material_keys": [
+    "wood",
+    "wood_dark"
+   ],
+   "bytes": 62640,
+   "sha256": "5aaaaacc8352f8506b319ebc293e196dcef9a8c6d796b4dd8f010cb65ed1cb02",
+   "characters": []
+  },
+  {
+   "id": "tv_stand_wide",
+   "name": "ロータイプテレビ台",
+   "category": "storage",
+   "shape": "tv_stand_wide",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/tv_stand_wide.glb",
+   "size": [
+    1.8,
+    0.35,
+    0.4
+   ],
+   "triangles": 1092,
+   "color_material_keys": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 47884,
+   "sha256": "96a48296cdddbe632a01f506d35872b49eec5fc9ee6e5669c6f68a13aee76ed5",
+   "characters": []
+  },
+  {
+   "id": "uchiwa_stand",
+   "name": "うちわ（スタンド付き）",
+   "category": "uchiwa",
+   "shape": "uchiwa_stand",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/uchiwa_stand.glb",
+   "size": [
+    0.25,
+    0.38,
+    0.1
+   ],
+   "triangles": 2328,
+   "color_material_keys": [
+    "tint",
+    "frame",
+    "print",
+    "wood"
+   ],
+   "bytes": 106204,
+   "sha256": "56312dd06b54e62bed954d4b0835a1d9796dcb7be343049b414be7afd6d940dc",
+   "characters": []
+  },
+  {
+   "id": "umbrella_stand",
+   "name": "傘立て",
+   "category": "storage",
+   "shape": "umbrella_stand",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/umbrella_stand.glb",
+   "size": [
+    0.25,
+    0.5,
+    0.25
+   ],
+   "triangles": 1236,
+   "color_material_keys": [
+    "tint",
+    "tray"
+   ],
+   "bytes": 47620,
+   "sha256": "1969e3c4a818e0cc49a8b5f92e2f7e673cbbbd64cce1ba705c2e67b3b88f2f78",
+   "characters": []
+  },
+  {
+   "id": "vacuum_stick",
+   "name": "スティック掃除機（スタンド付き）",
+   "category": "appliance",
+   "shape": "vacuum_stick",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/vacuum_stick.glb",
+   "size": [
+    0.25,
+    1.1,
+    0.25
+   ],
+   "triangles": 2224,
+   "color_material_keys": [
+    "stand",
+    "plastic",
+    "tint",
+    "metal"
+   ],
+   "bytes": 101584,
+   "sha256": "eaeac486f38a21929d2bfbd16063d299371a40ea02f9252ab27ce765f6de778f",
+   "characters": []
+  },
+  {
+   "id": "vanity_stool",
+   "name": "ドレッサースツール",
+   "category": "chair",
+   "shape": "vanity_stool",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/vanity_stool.glb",
+   "size": [
+    0.4,
+    0.45,
+    0.35
+   ],
+   "triangles": 1072,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 44684,
+   "sha256": "9cf7a98f91c6af46bbc45852a4100aea83d376c086b8e7bc64f78b30fa987aa2",
+   "characters": []
+  },
+  {
+   "id": "vase_tulip",
+   "name": "花瓶とチューリップ",
+   "category": "vase",
+   "shape": "vase_tulip",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/vase_tulip.glb",
+   "size": [
+    0.15,
+    0.4,
+    0.15
+   ],
+   "triangles": 1496,
+   "color_material_keys": [
+    "vase",
+    "stem",
+    "tint",
+    "leaf"
+   ],
+   "bytes": 71512,
+   "sha256": "ced4285d8ded10d230276c43834927ce0a40ca29285e7f426fea6eb28611f1bc",
+   "characters": []
+  },
+  {
+   "id": "wagon_cart",
+   "name": "3段ワゴン",
+   "category": "storage",
+   "shape": "wagon_cart",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/wagon_cart.glb",
+   "size": [
+    0.45,
+    0.78,
+    0.35
+   ],
+   "triangles": 2404,
+   "color_material_keys": [
+    "tint",
+    "wheel"
+   ],
+   "bytes": 108016,
+   "sha256": "9f0f75d49e8a9b7f372597f914c2923c871720e7dfd2346bfa6070f89d1f1bf0",
+   "characters": []
+  },
+  {
+   "id": "wall_art",
+   "name": "額入りアート",
+   "category": "wall_art",
+   "shape": "wall_art",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/wall_art.glb",
+   "size": [
+    0.5,
+    0.4,
+    0.02
+   ],
+   "triangles": 800,
+   "color_material_keys": [
+    "wood",
+    "tint",
+    "print"
+   ],
+   "bytes": 35916,
+   "sha256": "5a9aadcc9ae25be83cabf5fe9f32e6158339828632b16b79fca8043ed98ef180",
+   "characters": []
+  },
+  {
+   "id": "wall_clock",
+   "name": "壁掛け時計",
+   "category": "wall_clock",
+   "shape": "wall_clock",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/wall_clock.glb",
+   "size": [
+    0.3,
+    0.3,
+    0.04
+   ],
+   "triangles": 972,
+   "color_material_keys": [
+    "tint",
+    "face",
+    "ink"
+   ],
+   "bytes": 47592,
+   "sha256": "fcfb75ac9d883c9a3cb22be4287fbdb56b05e39fc1044471a021cd1a733f5bdd",
+   "characters": []
+  },
+  {
+   "id": "wall_hooks",
+   "name": "フックラック",
+   "category": "wall_hooks",
+   "shape": "wall_hooks",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/wall_hooks.glb",
+   "size": [
+    0.6,
+    0.15,
+    0.08
+   ],
+   "triangles": 1308,
+   "color_material_keys": [
+    "tint",
+    "wood"
+   ],
+   "bytes": 49904,
+   "sha256": "996ff9b6cbfe94ba6b2931ac49ed2b8738ec535d4f5f0673cbcf0d70f68a59fd",
+   "characters": []
+  },
+  {
+   "id": "wall_mirror",
+   "name": "ウェーブミラー",
+   "category": "wall_mirror",
+   "shape": "wall_mirror",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/wall_mirror.glb",
+   "size": [
+    0.4,
+    0.6,
+    0.03
+   ],
+   "triangles": 2304,
+   "color_material_keys": [
+    "tint",
+    "mirror"
+   ],
+   "bytes": 91392,
+   "sha256": "6fadaa1067ee8bd4dc0c65a568cb5b62fdb7a1818fc0266d89d9cadf64eecaee",
+   "characters": []
+  },
+  {
+   "id": "wall_planter",
+   "name": "壁掛けグリーン",
+   "category": "wall_planter",
+   "shape": "wall_planter",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/wall_planter.glb",
+   "size": [
+    0.5,
+    0.6,
+    0.15
+   ],
+   "triangles": 5588,
+   "color_material_keys": [
+    "pot",
+    "soil",
+    "stem",
+    "leaf"
+   ],
+   "bytes": 307084,
+   "sha256": "b94619f233747dd7fb71be7d605f7ee4a6101b7e5c626aaf2783233ba4a04b4f",
+   "characters": []
+  },
+  {
+   "id": "wall_shelf",
+   "name": "壁付け3段棚",
+   "category": "wall_shelf",
+   "shape": "wall_shelf",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/wall_shelf.glb",
+   "size": [
+    0.6,
+    0.5,
+    0.12
+   ],
+   "triangles": 1188,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 42192,
+   "sha256": "3832e644ce1d99d59f46fd7fb8e62b281e448d7590c8c0ead4340625a5499bf3",
+   "characters": []
+  },
+  {
+   "id": "wall_shelf_hex",
+   "name": "六角形ウォールシェルフ",
+   "category": "wall_shelf",
+   "shape": "wall_shelf_hex",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/wall_shelf_hex.glb",
+   "size": [
+    0.4,
+    0.35,
+    0.12
+   ],
+   "triangles": 776,
+   "color_material_keys": [
+    "wood",
+    "tint"
+   ],
+   "bytes": 34876,
+   "sha256": "e4cc691227a1e882a9095c01a893b38fb7d60dd956e9b5cb547cae93cdcd766d",
+   "characters": []
+  },
+  {
+   "id": "wardrobe",
+   "name": "ワードローブ",
+   "category": "storage",
+   "shape": "wardrobe",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/wardrobe.glb",
+   "size": [
+    0.8,
+    1.8,
+    0.55
+   ],
+   "triangles": 824,
+   "color_material_keys": [
+    "tint",
+    "metal",
+    "wood"
+   ],
+   "bytes": 40288,
+   "sha256": "9fe787f137e29a22129a92f806c73fd14a5f05517b41269cf3802b0ccdadec57",
+   "characters": []
+  },
+  {
+   "id": "wardrobe_open",
+   "name": "オープンクローゼット",
+   "category": "storage",
+   "shape": "wardrobe_open",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/wardrobe_open.glb",
+   "size": [
+    1.2,
+    1.8,
+    0.5
+   ],
+   "triangles": 1872,
+   "color_material_keys": [
+    "tint",
+    "wood",
+    "metal"
+   ],
+   "bytes": 71872,
+   "sha256": "aa1131a8075db280aeac358976541653ed7e7cb0bb60ce9fbef77cf88efbaa9d",
+   "characters": []
+  },
+  {
+   "id": "washing_machine",
+   "name": "縦型洗濯機",
+   "category": "appliance",
+   "shape": "washing_machine",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/washing_machine.glb",
+   "size": [
+    0.6,
+    1.0,
+    0.6
+   ],
+   "triangles": 1472,
+   "color_material_keys": [
+    "plastic",
+    "tint",
+    "lid",
+    "light"
+   ],
+   "bytes": 67820,
+   "sha256": "f22bd6a582526665a59e1e9031830d31d92e9a10983a593ce09c436d00367ec5",
+   "characters": []
+  },
+  {
+   "id": "watering_can",
+   "name": "じょうろ",
+   "category": "goods",
+   "shape": "watering_can",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/watering_can.glb",
+   "size": [
+    0.3,
+    0.22,
+    0.12
+   ],
+   "triangles": 1208,
+   "color_material_keys": [
+    "tint",
+    "accent"
+   ],
+   "bytes": 60304,
+   "sha256": "a0270d283956233a9796839ac108535dfe56cbbb872d90e7946bd91a232c5f2f",
+   "characters": []
+  },
+  {
+   "id": "yoga_mat",
+   "name": "ヨガマット（丸めた状態）",
+   "category": "goods",
+   "shape": "yoga_mat",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/yoga_mat.glb",
+   "size": [
+    0.6,
+    0.12,
+    0.12
+   ],
+   "triangles": 3208,
+   "color_material_keys": [
+    "tint",
+    "strap"
+   ],
+   "bytes": 130224,
+   "sha256": "40d4c5c16d4ef8c67a55551352001fbf1b3c1a14d87957af51ce1926c5ffc8be",
+   "characters": []
+  }
+ ]
+}

@@ -35,7 +35,7 @@ namespace :coordinations do
     picks = c.analysis.to_h.dig("response", "picks").to_a
     if picks.any?
       puts "Gemini が選んだ候補 (★ = 採用)"
-      catalog = InteriorLinks.client.search(theme: nil, slots: InteriorLinks::SLOTS, max_price: Float::INFINITY).values.flatten.index_by(&:id)
+      catalog = FurnitureCandidates.client.search(theme: nil, slots: FurnitureCandidates::SLOTS, max_price: Float::INFINITY).values.flatten.index_by(&:id)
       picks.each do |pick|
         names = pick["item_ids"].map { |id| "#{placed.include?(id) ? '★' : ''}#{catalog[id]&.name || "不明な id #{id}"}" }
         puts "  #{pick['slot'].ljust(10)} #{names.join(' / ')}"

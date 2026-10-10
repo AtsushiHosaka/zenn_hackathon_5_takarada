@@ -247,79 +247,64 @@ NAMES = {
     "char_hatsune_miku_uchiwa": "初音ミク うちわ（スタンド付き）",
     "char_hatsune_miku_led_light": "初音ミク LEDアクリルライト",
 }
-# 推し活グッズのモデル形状 → (goods_type, characters, search_terms)。
-# IDはbackend/config/characters.jsonのgoods_types[].id / characters[].id。未登録の形状は家具として扱う。
+# 推し活グッズのモデル形状 → (グッズ種別, キャラクター)。グッズ種別は家具の category になる。
+# キャラクターは backend/db/characters.json の characters[].key。未登録の形状は家具として扱う。
 GOODS = {
-    "acrylic_stand": ("acrylic_stand", [], []),
-    "tapestry": ("tapestry", [], []),
-    "uchiwa_stand": ("uchiwa", [], []),
-    "badge_display": ("can_badge", [], []),
-    "poster": ("poster", [], []),
-    "plush_bear": ("plush", [], []),
-    "plush_bunny": ("plush", [], []),
-    "cushion": ("cushion", [], []),
-    "cushion_round": ("cushion", [], []),
+    "acrylic_stand": ("acrylic_stand", []),
+    "tapestry": ("tapestry", []),
+    "uchiwa_stand": ("uchiwa", []),
+    "badge_display": ("can_badge", []),
+    "poster": ("poster", []),
+    "plush_bear": ("plush", []),
+    "plush_bunny": ("plush", []),
+    "cushion": ("cushion", []),
+    "cushion_round": ("cushion", []),
     # 2026-10-10 グッズのテンプレートと初音ミク
-    "acrylic_stand_s": ("acrylic_stand", [], ["アクスタ", "アクリルスタンド", "小", "acrylic stand"]),
-    "acrylic_stand_m": ("acrylic_stand", [], ["アクスタ", "アクリルスタンド", "acrylic stand"]),
-    "acrylic_stand_l": ("acrylic_stand", [], ["アクスタ", "アクリルスタンド", "大", "acrylic stand"]),
-    "acrylic_stand_big": ("acrylic_stand", [], ["BIGアクスタ", "ビッグアクスタ", "big acrylic stand"]),
-    "tapestry_b2": ("tapestry", [], ["タペストリー", "B2", "tapestry"]),
-    "tapestry_b1": ("tapestry", [], ["タペストリー", "B1", "特大", "tapestry"]),
-    "plush_base_s": ("plush", [], ["ぬい", "ぬいぐるみ", "ちびぬい", "plush"]),
-    "plush_base_m": ("plush", [], ["ぬいぐるみ", "plush", "doll"]),
-    "plush_base_l": ("plush", [], ["ぬいぐるみ", "BIGぬい", "大きいぬいぐるみ"]),
-    "cushion_diecut": ("cushion", [], ["ダイカットクッション", "クッション", "die-cut cushion"]),
-    "can_badge": ("can_badge", [], ["缶バッジ", "缶バ", "バッジ", "can badge"]),
-    "rubber_mat": ("rubber_mat", [], ["ラバーマット", "プレイマット", "rubber mat"]),
-    "blanket_print": ("blanket", [], ["ブランケット", "ひざ掛け", "blanket"]),
-    "acrylic_panel": ("acrylic_panel", [], ["アクリルパネル", "アクリルブロック", "acrylic panel"]),
-    "char_hatsune_miku_plush": ("plush", ["hatsune_miku"], ["初音ミク", "ミク", "ぬい", "ぬいぐるみ", "miku plush"]),
-    "char_hatsune_miku_plush_big": ("plush", ["hatsune_miku"], ["初音ミク", "ミク", "BIGぬい", "大きいぬいぐるみ"]),
-    "char_hatsune_miku_acrylic_stand": ("acrylic_stand", ["hatsune_miku"], ["初音ミク", "ミク", "アクスタ", "miku acrylic stand"]),
-    "char_hatsune_miku_tapestry_b2": ("tapestry", ["hatsune_miku"], ["初音ミク", "ミク", "タペストリー", "miku tapestry"]),
-    "char_hatsune_miku_cushion": ("cushion", ["hatsune_miku"], ["初音ミク", "ミク", "ダイカットクッション", "miku cushion"]),
-    "char_hatsune_miku_figure": ("figure", ["hatsune_miku"], ["初音ミク", "ミク", "フィギュア", "miku figure"]),
+    "acrylic_stand_s": ("acrylic_stand", []),
+    "acrylic_stand_m": ("acrylic_stand", []),
+    "acrylic_stand_l": ("acrylic_stand", []),
+    "acrylic_stand_big": ("acrylic_stand", []),
+    "tapestry_b2": ("tapestry", []),
+    "tapestry_b1": ("tapestry", []),
+    "plush_base_s": ("plush", []),
+    "plush_base_m": ("plush", []),
+    "plush_base_l": ("plush", []),
+    "cushion_diecut": ("cushion", []),
+    "can_badge": ("can_badge", []),
+    "rubber_mat": ("rubber_mat", []),
+    "blanket_print": ("blanket", []),
+    "acrylic_panel": ("acrylic_panel", []),
+    "char_hatsune_miku_plush": ("plush", ["hatsune_miku"]),
+    "char_hatsune_miku_plush_big": ("plush", ["hatsune_miku"]),
+    "char_hatsune_miku_acrylic_stand": ("acrylic_stand", ["hatsune_miku"]),
+    "char_hatsune_miku_tapestry_b2": ("tapestry", ["hatsune_miku"]),
+    "char_hatsune_miku_cushion": ("cushion", ["hatsune_miku"]),
+    "char_hatsune_miku_figure": ("figure", ["hatsune_miku"]),
     # 2026-10-10 初音ミクのグッズ追加分
-    "char_hatsune_miku_cushion_round": ("cushion", ["hatsune_miku"], ["初音ミク", "ミク", "丸クッション", "ラウンドクッション", "クッション"]),
-    "char_hatsune_miku_cushion_square": ("cushion", ["hatsune_miku"], ["初音ミク", "ミク", "スクエアクッション", "四角クッション", "クッション"]),
-    "char_hatsune_miku_cushion_body": ("cushion", ["hatsune_miku"], ["初音ミク", "ミク", "ダイカットクッション", "全身クッション"]),
-    "char_hatsune_miku_pc_cushion": ("cushion", ["hatsune_miku"], ["初音ミク", "ミク", "PCクッション", "アームレスト", "腕置きクッション"]),
-    "char_hatsune_miku_dakimakura": ("body_pillow", ["hatsune_miku"], ["初音ミク", "ミク", "抱き枕", "抱き枕カバー"]),
-    "char_hatsune_miku_blanket": ("blanket", ["hatsune_miku"], ["初音ミク", "ミク", "ブランケット", "ひざ掛け"]),
-    "char_hatsune_miku_plush_lying": ("plush", ["hatsune_miku"], ["初音ミク", "ミク", "寝そべり", "寝そべりぬいぐるみ", "ぬいぐるみ"]),
-    "char_hatsune_miku_plush_negi": ("plush", ["hatsune_miku"], ["初音ミク", "ミク", "ネギ", "ぬいぐるみ"]),
-    "char_hatsune_miku_bed_cover": ("bed_cover", ["hatsune_miku"], ["初音ミク", "ミク", "布団カバー", "掛け布団カバー"]),
-    "char_hatsune_miku_rug": ("rug", ["hatsune_miku"], ["初音ミク", "ミク", "ラグ", "カーペット"]),
-    "char_hatsune_miku_seat_cushion": ("cushion", ["hatsune_miku"], ["初音ミク", "ミク", "座布団", "シートクッション"]),
-    "char_hatsune_miku_poster_a3": ("poster", ["hatsune_miku"], ["初音ミク", "ミク", "ポスター", "A3", "額装"]),
-    "char_hatsune_miku_tapestry_life": ("tapestry", ["hatsune_miku"], ["初音ミク", "ミク", "等身大", "タペストリー"]),
-    "char_hatsune_miku_standee": ("standee", ["hatsune_miku"], ["初音ミク", "ミク", "等身大パネル", "スタンドパネル"]),
-    "char_hatsune_miku_wall_clock": ("wall_clock", ["hatsune_miku"], ["初音ミク", "ミク", "壁掛け時計", "掛け時計", "時計"]),
-    "char_hatsune_miku_mug": ("mug", ["hatsune_miku"], ["初音ミク", "ミク", "マグカップ"]),
-    "char_hatsune_miku_diorama": ("acrylic_diorama", ["hatsune_miku"], ["初音ミク", "ミク", "アクリルジオラマ", "アクスタ"]),
-    "char_hatsune_miku_desk_mat": ("rubber_mat", ["hatsune_miku"], ["初音ミク", "ミク", "デスクマット", "ラバーマット"]),
-    "char_hatsune_miku_penlight": ("penlight", ["hatsune_miku"], ["初音ミク", "ミク", "ペンライト", "ライブ"]),
-    "char_hatsune_miku_can_badge": ("can_badge", ["hatsune_miku"], ["初音ミク", "ミク", "缶バッジ", "バッジ"]),
-    "char_hatsune_miku_uchiwa": ("uchiwa", ["hatsune_miku"], ["初音ミク", "ミク", "うちわ", "団扇"]),
-    "char_hatsune_miku_led_light": ("room_light", ["hatsune_miku"], ["初音ミク", "ミク", "LEDアクリルライト", "アクリルライト", "ルームライト"]),
+    "char_hatsune_miku_cushion_round": ("cushion", ["hatsune_miku"]),
+    "char_hatsune_miku_cushion_square": ("cushion", ["hatsune_miku"]),
+    "char_hatsune_miku_cushion_body": ("cushion", ["hatsune_miku"]),
+    "char_hatsune_miku_pc_cushion": ("cushion", ["hatsune_miku"]),
+    "char_hatsune_miku_dakimakura": ("body_pillow", ["hatsune_miku"]),
+    "char_hatsune_miku_blanket": ("blanket", ["hatsune_miku"]),
+    "char_hatsune_miku_plush_lying": ("plush", ["hatsune_miku"]),
+    "char_hatsune_miku_plush_negi": ("plush", ["hatsune_miku"]),
+    "char_hatsune_miku_bed_cover": ("bed_cover", ["hatsune_miku"]),
+    "char_hatsune_miku_rug": ("rug", ["hatsune_miku"]),
+    "char_hatsune_miku_seat_cushion": ("cushion", ["hatsune_miku"]),
+    "char_hatsune_miku_poster_a3": ("poster", ["hatsune_miku"]),
+    "char_hatsune_miku_tapestry_life": ("tapestry", ["hatsune_miku"]),
+    "char_hatsune_miku_standee": ("standee", ["hatsune_miku"]),
+    "char_hatsune_miku_wall_clock": ("wall_clock", ["hatsune_miku"]),
+    "char_hatsune_miku_mug": ("mug", ["hatsune_miku"]),
+    "char_hatsune_miku_diorama": ("acrylic_diorama", ["hatsune_miku"]),
+    "char_hatsune_miku_desk_mat": ("rubber_mat", ["hatsune_miku"]),
+    "char_hatsune_miku_penlight": ("penlight", ["hatsune_miku"]),
+    "char_hatsune_miku_can_badge": ("can_badge", ["hatsune_miku"]),
+    "char_hatsune_miku_uchiwa": ("uchiwa", ["hatsune_miku"]),
+    "char_hatsune_miku_led_light": ("room_light", ["hatsune_miku"]),
 }
-NOT_GOODS = (None, [], [])
-# モックカタログの商品ID・既存家具ID → モデル
-PRODUCTS = {
-    "bed-1": "bed_single", "desk-1": "desk_wood", "shelf-1": "bookshelf",
-    "101": "bed_cover__101", "201": "bed_cover__201", "301": "bed_cover__301",
-    "102": "curtain_pair__102", "202": "curtain_pair__202",
-    "115": "curtain_sheer__115", "302": "curtain_sheer__302", "901": "curtain_sheer__901",
-    "103": "rug_rect__103", "203": "rug_rect__203", "303": "rug_wave",
-    "111": "rug_round__111", "211": "rug_round__211", "311": "rug_round__311",
-    "107": "cushion__107", "207": "cushion__207", "307": "cushion__307",
-    "104": "shelf_floating", "114": "tapestry", "105": "floor_lamp", "112": "floor_lamp_slim",
-    "205": "floor_lamp_rattan", "212": "floor_lamp_tripod", "305": "floor_lamp_ball", "312": "floor_lamp_pleated",
-    "106": "display_case", "113": "display_rack_open", "108": "acrylic_stand_case", "204": "wall_planter",
-    "214": "wall_art", "206": "plant_monstera", "213": "plant_eucalyptus", "208": "small_plant",
-    "304": "wall_mirror", "306": "side_table", "308": "candle", "902": "desk_lamp_clip",
-}
+NOT_GOODS = (None, [])
 
 
 def category(name):
@@ -330,8 +315,8 @@ def category(name):
 
 
 def goods(shape):
-    goods_type, characters, search_terms = GOODS.get(shape, NOT_GOODS)
-    return {"goods_type": goods_type, "characters": list(characters), "search_terms": list(search_terms)}
+    _, characters = GOODS.get(shape, NOT_GOODS)
+    return {"characters": list(characters)}
 
 
 IDENTITY = [[1 if row == col else 0 for col in range(4)] for row in range(4)]
@@ -431,7 +416,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--models-dir", type=Path, default=ROOT / "output/furniture_models/furniture")
     parser.add_argument("--report", type=Path, default=HERE / "build_report.json")
-    parser.add_argument("--output", type=Path, default=ROOT / "backend/db/furniture_models.json")
+    parser.add_argument("--output", type=Path, default=ROOT / "backend/db/furnitures.json")
     args = parser.parse_args()
     report = json.loads(args.report.read_text())
     models = []
@@ -455,18 +440,14 @@ def main():
             raise ValueError(f"Exported size differs from target: {filename}: {stats['size']} vs {target}")
         if stats["triangles"] != item["tris"] or stats["materials"] != item["materials"]:
             raise ValueError(f"Build report differs from exported geometry/materials: {filename}")
-        models.append({"id": model_id, "name": NAMES[base], "category": category(base), "shape": base,
-                       "variant": variant or None, "format": "glb", "object_key": f"models/furniture/v1/{filename}", **stats,
+        models.append({"id": model_id, "name": NAMES[base], "category": GOODS.get(base, NOT_GOODS)[0] or category(base), "shape": base,
+                       "variant": variant or None, "format": "glb", "object_key": f"models/furniture/v1/{filename}",
+                       **{("color_material_keys" if key == "materials" else key): value for key, value in stats.items()},
                        **goods(base)})
-    missing = [reference for reference, model_id in PRODUCTS.items() if model_id not in ids]
-    if missing:
-        raise ValueError(f"Missing models for bindings: {missing}")
-    bindings = [{"kind": "existing" if reference in ("bed-1", "desk-1", "shelf-1") else "product",
-                 "reference": reference, "model_id": model_id} for reference, model_id in sorted(PRODUCTS.items())]
-    catalog = {"unit": "meter", "axes": "+Y up, +Z front, origin bottom center", "models": models, "bindings": bindings}
+    catalog = {"unit": "meter", "axes": "+Y up, +Z front, origin bottom center", "models": models}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(catalog, ensure_ascii=False, indent=1) + "\n")
-    print(f"{len(models)} models, {len(bindings)} bindings -> {args.output}")
+    print(f"{len(models)} models -> {args.output}")
 
 
 if __name__ == "__main__":

@@ -1,9 +1,8 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRepositories } from '../../core/repositories';
-import { furnitureCategories, type ProductColorVariant, type RoomDesign, type RoomItem } from '../../domain/room';
-import type { FurnitureModel } from '../../domain/furnitureModel';
-import type { FurnitureSearchInterpretation } from '../../domain/roomRepository';
+import { furnitureCategories, type RoomDesign, type RoomItem } from '../../domain/room';
+import type { FurnitureDetailChoice, FurnitureSearchInterpretation, FurnitureSearchProduct, SearchModel } from '../../domain/roomRepository';
 import ErrorText from '../shared/ErrorText';
 import ModelCredits from './ModelCredits';
 import { furniturePositionInRoom } from './roomBounds';
@@ -33,7 +32,7 @@ export default function FurnitureSearchPanel({ design, disabled, onAddItem, repl
     return rooms.searchFurniture(input, controller.signal);
   } });
   const currentResults = search.variables?.query === query.trim() && search.variables?.color === (color || undefined) && search.variables?.category === (category || undefined);
-  const selected = search.data?.products.find(item => item.ecProductId === selectedId);
+  const selected = search.data?.products.find(product => product.item.furnitureDetailId === selectedId);
   return <div className="rc-furniture-search">
     <form className="rc-furniture-link-form" onSubmit={event => { event.preventDefault(); setSelectedId(undefined); if (!disabled && query.trim()) search.mutate({ query: query.trim(), color: color || undefined, category: category || undefined }); }}>
       <label htmlFor={`${formId}-query`}>家具を検索</label>
@@ -44,30 +43,27 @@ export default function FurnitureSearchPanel({ design, disabled, onAddItem, repl
       <select id={`${formId}-category`} value={category} onChange={event => setCategory(event.target.value)} disabled={disabled || search.isPending || Boolean(replacementTarget)}>{replacementTarget && !furnitureCategories.some(value => value === targetCategory) && <option value={targetCategory}>{replacementTarget.name}と同じカテゴリ</option>}<option value="">すべての種類</option>{furnitureCategories.map((value,index) => <option key={value} value={value}>{categories[index]}</option>)}</select>
       <button type="submit" disabled={disabled || search.isPending || !query.trim()}>{search.isPending ? '検索中…' : 'この条件で検索'}</button>
     </form>
-    {search.isPending && <p role="status" className="rc-planner-note">公式の商品ページで色・価格・寸法を確認しています。</p>}
     {search.isError && <ErrorText error={search.error}/>}
     {search.data && currentResults && !search.isPending && <>
       <SearchInterpretation interpretation={search.data.interpretation}/>
       {!!search.data.models.length && <SearchModels models={search.data.models} interpretation={search.data.interpretation}/>}
-      <p role="status" className="rc-planner-note">{search.data.products.length ? `${search.data.products.length}件の商品` : 'この条件の商品は見つかりませんでした。検索語や色を変えてお試しください。'}</p>
-      {!!search.data.failures && <p className="rc-planner-note">取得できなかった商品ページがあります。</p>}
-      <div className="rc-furniture-search-results">{search.data.products.map(item => <button key={item.ecProductId} type="button" className="rc-furniture-search-card" aria-pressed={selectedId === item.ecProductId} disabled={disabled} onClick={() => setSelectedId(item.ecProductId)}>
-        <ProductPhoto key={item.imageUrl} src={item.imageUrl} name={item.name}/><span>{item.name}</span><CharacterChips ids={item.productMetadata?.characters} interpretation={search.data!.interpretation}/><span>{item.productMetadata?.officialColor ?? '色の掲載なし'} · ¥{item.price?.toLocaleString('ja-JP')}</span>
+      <p role="status" className="rc-planner-note">{search.data.products.length ? `${search.data.products.length}件の商品` : search.data.models.length ? 'この条件で購入できる商品はまだ登録されていません。' : 'この条件の商品は見つかりませんでした。検索語や色を変えてお試しください。'}</p>
+      <div className="rc-furniture-search-results">{search.data.products.map(({ item, colorName, variants, characters }) => <button key={item.furnitureDetailId} type="button" className="rc-furniture-search-card" aria-pressed={selectedId === item.furnitureDetailId} disabled={disabled} onClick={() => setSelectedId(item.furnitureDetailId)}>
+        <ProductPhoto key={item.imageUrl} src={item.imageUrl} name={item.name}/><span>{item.name}</span><CharacterChips ids={characters} interpretation={search.data!.interpretation}/><span>{colorName ?? '色の掲載なし'} · ¥{item.price?.toLocaleString('ja-JP')}{variants.length > 1 ? ` · 他${variants.length - 1}件` : ''}</span>
       </button>)}</div>
-      {selected && <FurnitureSearchSelection key={selected.ecProductId} product={selected} design={design} disabled={disabled} onAddItem={onAddItem} replacementTarget={replacementTarget}/>}
-      {search.data.searchEntryPoints.map((html,index) => <iframe key={html} title={`家具検索のGoogle検索候補 ${index+1}`} srcDoc={`<base target="_blank">${html}`} sandbox="allow-popups allow-popups-to-escape-sandbox" referrerPolicy="no-referrer" className="rc-furniture-search-attribution"/>) }
+      {selected && <FurnitureSearchSelection key={selected.item.furnitureDetailId} product={selected} design={design} disabled={disabled} onAddItem={onAddItem} replacementTarget={replacementTarget}/>}
     </>}
   </div>;
 }
 
-function characterNames(ids: string[] | undefined, interpretation: FurnitureSearchInterpretation): string[] {
-  return (ids ?? []).flatMap(id => interpretation.characters.find(character => character.id === id)?.name ?? []);
+function characterNames(ids: string[], interpretation: FurnitureSearchInterpretation): string[] {
+  return ids.flatMap(id => interpretation.characters.find(character => character.id === id)?.name ?? []);
 }
 
 // 自然言語の検索語をどう解釈したかを示す。家具検索(source=none)では何も出さない。
 function SearchInterpretation({ interpretation }: { interpretation: FurnitureSearchInterpretation }) {
   const characterFranchises = new Set(interpretation.characters.map(character => character.franchise));
-  const labels = [...interpretation.characters.map(character => character.name), ...interpretation.franchises.filter(franchise => !characterFranchises.has(franchise.id)).map(franchise => franchise.name), ...interpretation.goodsTypes.map(goods => goods.name)];
+  const labels = [...interpretation.characters.map(character => character.name), ...interpretation.franchises.filter(franchise => !characterFranchises.has(franchise.id)).map(franchise => franchise.name), ...interpretation.categories.map(category => category.name)];
   if (interpretation.source === 'none' || !labels.length) return null;
   return <div className="rc-search-interpretation">
     <span className="rc-planner-note">{interpretation.source === 'llm' ? 'AIが読み取った条件' : '読み取った条件'}</span>
@@ -75,23 +71,23 @@ function SearchInterpretation({ interpretation }: { interpretation: FurnitureSea
   </div>;
 }
 
-function CharacterChips({ ids, interpretation }: { ids?: string[]; interpretation: FurnitureSearchInterpretation }) {
+function CharacterChips({ ids, interpretation }: { ids: string[]; interpretation: FurnitureSearchInterpretation }) {
   const names = characterNames(ids, interpretation);
   if (!names.length) return null;
-  return <span className="rc-search-chips rc-search-chips-compact" aria-label="商品名で確認したキャラクター">{names.map(name => <span key={name}>{name}</span>)}</span>;
+  return <span className="rc-search-chips rc-search-chips-compact" aria-label="キャラクター">{names.map(name => <span key={name}>{name}</span>)}</span>;
 }
 
-// 台帳の3Dモデル。ECに依存しないため、商品が見つからなくても表示する。
-function SearchModels({ models, interpretation }: { models: FurnitureModel[]; interpretation: FurnitureSearchInterpretation }) {
+// 推し活グッズの3Dモデル。購入できる商品が無くても表示する。
+function SearchModels({ models, interpretation }: { models: SearchModel[]; interpretation: FurnitureSearchInterpretation }) {
   const headingId = useId();
   return <section className="rc-search-models" aria-labelledby={headingId}>
     <h4 id={headingId}>3Dモデル</h4>
     <ul>{models.map(model => {
-      const goodsType = interpretation.goodsTypes.find(goods => goods.id === model.goodsType)?.name;
+      const category = interpretation.categories.find(value => value.id === model.category)?.name;
       const characters = characterNames(model.characters, interpretation);
       return <li key={model.id} className="rc-search-model">
         <span className="rc-search-model-name">{model.name}</span>
-        {(goodsType || !!characters.length) && <span className="rc-search-chips rc-search-chips-compact">{goodsType && <span>{goodsType}</span>}{characters.map(name => <span key={name}>{name}</span>)}</span>}
+        {(category || !!characters.length) && <span className="rc-search-chips rc-search-chips-compact">{category && <span>{category}</span>}{characters.map(name => <span key={name}>{name}</span>)}</span>}
         <span className="rc-planner-note">幅{Math.round(model.size.w*100)} × 高さ{Math.round(model.size.h*100)} × 奥行き{Math.round(model.size.d*100)}cm</span>
         <ModelCredits credits={model.credits}/>
       </li>;
@@ -99,39 +95,37 @@ function SearchModels({ models, interpretation }: { models: FurnitureModel[]; in
   </section>;
 }
 
-function FurnitureSearchSelection({ product, design, disabled, onAddItem, replacementTarget }: { product: RoomItem; design: RoomDesign; disabled: boolean; onAddItem: (item: RoomItem) => void; replacementTarget?: RoomItem }) {
-  const { rooms } = useRepositories();
-  const sku = (value?: string) => product.productMetadata?.provider === 'ikea' ? value?.replace(/\./g, '') : value;
-  const initial = { url: product.productUrl!, variantId: product.productMetadata?.colorVariants?.find(variant => variant.url === product.productUrl && sku(variant.variantId) === sku(product.productMetadata?.providerProductId))?.variantId };
-  const [choice, setChoice] = useState<{url: string; variantId?: string}>(initial);
-  const abort = useRef<AbortController | null>(null);
-  useEffect(() => () => abort.current?.abort(), []);
-  const imported = useMutation({ mutationFn: (variant: {url: string; variantId?: string}) => {
-    abort.current?.abort(); const controller = new AbortController(); abort.current = controller;
-    return rooms.importFurniture(variant.url, controller.signal, variant.variantId, replacementTarget ? "replacement" : undefined);
-  } });
-  const matching = imported.data && imported.variables?.url === choice.url && imported.variables?.variantId === choice.variantId;
-  const item = matching ? imported.data : undefined;
+const sizeLabel = (size: RoomItem['size']) => `幅${Math.round(size[0]*100)} × 高さ${Math.round(size[1]*100)} × 奥行き${Math.round(size[2]*100)}cm`;
+
+function variantLabel(variant: FurnitureDetailChoice, variants: FurnitureDetailChoice[]) {
+  const { item } = variant;
+  // 同じ家具 (3Dモデル) には別の商品も並ぶので、商品名を必ず出す。色名は商品名に無いときだけ足す
+  const parts = [item.name];
+  if (variant.colorName && !item.name.includes(variant.colorName)) parts.push(variant.colorName);
+  if (new Set(variants.map(value => sizeLabel(value.item.size))).size > 1) parts.push(`${Math.round(item.size[0]*100)}×${Math.round(item.size[1]*100)}×${Math.round(item.size[2]*100)}cm`);
+  if (new Set(variants.map(value => value.item.price)).size > 1) parts.push(`¥${item.price?.toLocaleString('ja-JP')}`);
+  if (new Set(variants.map(value => value.item.shop)).size > 1 && item.shop) parts.push(item.shop);
+  return parts.join(' · ');
+}
+
+function FurnitureSearchSelection({ product, design, disabled, onAddItem, replacementTarget }: { product: FurnitureSearchProduct; design: RoomDesign; disabled: boolean; onAddItem: (item: RoomItem) => void; replacementTarget?: RoomItem }) {
+  const [choiceId, setChoiceId] = useState(product.item.furnitureDetailId);
+  const variants = product.variants;
+  const chosen = variants.find(variant => variant.item.furnitureDetailId === choiceId) ?? product;
+  const item = chosen.item;
   const aliases: Record<string, string> = { lamp: "floor_lamp", artwork: "wall_art", cover: "bed_cover" };
-  const sameCategory = !replacementTarget || item?.category === (aliases[replacementTarget.category] ?? replacementTarget.category);
-  const fits = item && sameCategory && Boolean(replacementTarget ? productReplacementPosition(item, replacementTarget, design) : furniturePositionInRoom(item, item.position, design));
-  const variants = product.productMetadata?.colorVariants ?? [];
-  function selectVariant(variant: Pick<ProductColorVariant, 'url' | 'variantId'>) { setChoice(variant); imported.mutate(variant); }
+  const sameCategory = !replacementTarget || item.category === (aliases[replacementTarget.category] ?? replacementTarget.category);
+  const fits = sameCategory && Boolean(replacementTarget ? productReplacementPosition(item, replacementTarget, design) : furniturePositionInRoom(item, item.position, design));
   return <div className="rc-furniture-imported">
-    <h4>{product.name}</h4>
-    {!!variants.length && <fieldset className="rc-furniture-variants" disabled={disabled || imported.isPending}><legend>商品のカラーバリエーション</legend>{variants.map(variant => <button key={`${variant.url}:${variant.variantId ?? ''}`} type="button" aria-pressed={choice.url === variant.url && choice.variantId === variant.variantId} onClick={() => selectVariant(variant)}>{variant.colorName}</button>)}</fieldset>}
-    {variants.length === 0 && <p className="rc-planner-note">この商品には確認できた色違いの情報がありません。</p>}
-    {imported.isPending && <p role="status" className="rc-planner-note">選んだ商品の情報を確認しています。</p>}
-    {imported.isError && <ErrorText error={imported.error}/>}
-    {!item && !imported.isPending && <button type="button" className="rc-furniture-add" disabled={disabled} onClick={() => imported.mutate(choice)}>選んだ商品を確認</button>}
-    {item && !imported.isPending && <>
-      <ProductPhoto key={item.imageUrl} className="rc-furniture-variant-photo" src={item.imageUrl} name={item.name}/>
-      <p>{item.name} · {item.productMetadata?.officialColor ?? '色の掲載なし'} · ¥{item.price?.toLocaleString('ja-JP')}</p>
-      <p className="rc-planner-note">幅{Math.round(item.size[0]*100)} × 高さ{Math.round(item.size[1]*100)} × 奥行き{Math.round(item.size[2]*100)}cm</p>
-      <a className="rc-furniture-product-link" href={item.productUrl} target="_blank" rel="noopener noreferrer">選んだ商品のページを見る</a>
-      {!sameCategory && <p role="alert" className="rc-planner-input-error">選んだ商品のカテゴリが元の家具と一致しません。</p>}
-      {!fits && sameCategory && <p role="status" className="rc-planner-input-error">この家具は部屋の寸法に収まりません。</p>}
-      <button type="button" className="rc-furniture-add" disabled={disabled || !fits} onClick={() => onAddItem(item)}>{replacementTarget ? '選んだ商品で置き換える' : '＋ 選んだ色の商品を部屋に追加'}</button>
-    </>}
+    <h4>{product.item.name}</h4>
+    {variants.length > 1 && <fieldset className="rc-furniture-variants" disabled={disabled}><legend>色・サイズ・購入先を選ぶ</legend>{variants.map(variant => <button key={variant.item.furnitureDetailId} type="button" aria-pressed={choiceId === variant.item.furnitureDetailId} onClick={() => setChoiceId(variant.item.furnitureDetailId)}>{variantLabel(variant, variants)}</button>)}</fieldset>}
+    <ProductPhoto key={item.imageUrl} className="rc-furniture-variant-photo" src={item.imageUrl} name={item.name}/>
+    <p>{item.name} · {chosen.colorName ?? '色の掲載なし'} · ¥{item.price?.toLocaleString('ja-JP')}{item.shop ? ` · ${item.shop}` : ''}</p>
+    <p className="rc-planner-note">{sizeLabel(item.size)}</p>
+    <ModelCredits credits={chosen.credits}/>
+    {item.productUrl && <a className="rc-furniture-product-link" href={item.productUrl} target="_blank" rel="noopener noreferrer">選んだ商品のページを見る</a>}
+    {!sameCategory && <p role="alert" className="rc-planner-input-error">選んだ商品のカテゴリが元の家具と一致しません。</p>}
+    {!fits && sameCategory && <p role="status" className="rc-planner-input-error">この家具は部屋の寸法に収まりません。</p>}
+    <button type="button" className="rc-furniture-add" disabled={disabled || !fits} onClick={() => onAddItem(item)}>{replacementTarget ? '選んだ商品で置き換える' : '＋ 選んだ商品を部屋に追加'}</button>
   </div>;
 }

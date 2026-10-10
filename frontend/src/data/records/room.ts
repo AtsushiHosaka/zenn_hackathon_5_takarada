@@ -3,9 +3,7 @@ import { characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
 import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
 import { productCategories, furnitureCategories, isManualFurniture, isImageArtwork, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
-import type { FurnitureSearchInterpretation, FurnitureSearchResult, SavedRoom } from "../../domain/roomRepository";
-import type { FurnitureModel } from "../../domain/furnitureModel";
-import { toFurnitureModel } from "./furnitureModel";
+import type { FurnitureDetailChoice, FurnitureSearchInterpretation, FurnitureSearchResult, ModelCredit, SavedRoom, SearchModel } from "../../domain/roomRepository";
 import type { components } from "../generated/api";
 
 export type AnalysisRoomRecord = components["schemas"]["Room"];
@@ -20,45 +18,87 @@ export type UploadRecord = components["schemas"]["Upload"];
 
 export function toFurnitureSearch(value: unknown, baseUrl: string): FurnitureSearchResult {
   const record = object(value, "FurnitureSearch");
-  if (!Array.isArray(record.products) || record.products.length > 24 || !Array.isArray(record.search_entry_points)) invalid("FurnitureSearch");
-  if (record.models != null && !Array.isArray(record.models)) invalid("FurnitureSearch.models");
-  // 台帳モデルは描画の補助情報。壊れた行だけを除く。
-  const models = (record.models ?? []).map(toFurnitureModel).filter((model): model is FurnitureModel => Boolean(model));
-  return { products: record.products.map(product => toImportedFurniture(product, baseUrl)), failures: nonnegativeInteger(record.failures, "FurnitureSearch.failures"), searchEntryPoints: record.search_entry_points.map(entry => text(entry, "search_entry_point")), interpretation: searchInterpretation(record.interpretation), models };
+  if (!Array.isArray(record.products) || record.products.length > 24) invalid("FurnitureSearch.products");
+  return {
+    products: record.products.map(product => {
+      const variants = object(product, "FurnitureSearchProduct").variants;
+      if (!Array.isArray(variants) || variants.length === 0) invalid("FurnitureSearchProduct.variants");
+      return { ...toFurnitureDetail(product, baseUrl), variants: variants.map(variant => toFurnitureDetail(variant, baseUrl)) };
+    }),
+    color: record.color == null ? null : text(record.color, "FurnitureSearch.color"),
+    interpretation: searchInterpretation(record.interpretation),
+    models: list(record.models, "FurnitureSearch.models").map(model => searchModel(model, baseUrl)),
+  };
 }
 
-// 古いAPIは解釈を返さないため、家具検索(source=none)として扱う。
 function searchInterpretation(value: unknown): FurnitureSearchInterpretation {
-  if (value == null) return { characters: [], franchises: [], goodsTypes: [], source: "none" };
   const record = object(value, "FurnitureSearch.interpretation");
-  if (record.source !== "dictionary" && record.source !== "llm" && record.source !== "none") invalid("FurnitureSearch.interpretation.source");
-  const list = (entries: unknown, name: string) => {
-    if (!Array.isArray(entries)) invalid(`FurnitureSearch.interpretation.${name}`);
-    return entries.map(entry => object(entry, `FurnitureSearch.interpretation.${name}`));
+  const source = record.source;
+  if (source !== "dictionary" && source !== "llm" && source !== "none") invalid("SearchInterpretation.source");
+  const named = (entry: unknown, field: string) => {
+    const named = object(entry, field);
+    return { id: text(named.id, `${field}.id`), name: text(named.name, `${field}.name`) };
   };
   return {
-    characters: list(record.characters, "characters").map(entry => ({ id: text(entry.id, "interpretation.characters.id"), name: text(entry.name, "interpretation.characters.name"), franchise: text(entry.franchise, "interpretation.characters.franchise") })),
-    franchises: list(record.franchises, "franchises").map(entry => ({ id: text(entry.id, "interpretation.franchises.id"), name: text(entry.name, "interpretation.franchises.name") })),
-    goodsTypes: list(record.goods_types, "goods_types").map(entry => ({ id: text(entry.id, "interpretation.goods_types.id"), name: text(entry.name, "interpretation.goods_types.name") })),
-    source: record.source,
+    characters: list(record.characters, "SearchInterpretation.characters").map(entry => ({
+      ...named(entry, "SearchInterpretation.characters"),
+      franchise: text(object(entry, "SearchInterpretation.characters").franchise, "SearchInterpretation.characters.franchise"),
+    })),
+    franchises: list(record.franchises, "SearchInterpretation.franchises").map(entry => named(entry, "SearchInterpretation.franchises")),
+    categories: list(record.categories, "SearchInterpretation.categories").map(entry => named(entry, "SearchInterpretation.categories")),
+    source,
   };
 }
 
-export function toImportedFurniture(value: unknown, baseUrl: string): RoomItem {
-  const record = object(value, "FurnitureImport");
+function searchModel(value: unknown, baseUrl: string): SearchModel {
+  const record = object(value, "FurnitureModel");
+  return {
+    id: text(record.id, "FurnitureModel.id"),
+    name: text(record.name, "FurnitureModel.name"),
+    category: text(record.category, "FurnitureModel.category"),
+    size: sizeRecord(record.size),
+    modelUrl: url(record.model_url, baseUrl),
+    characters: characterKeys(record.characters, "FurnitureModel.characters"),
+    credits: credits(record.credits, "FurnitureModel.credits", baseUrl),
+  };
+}
+
+function characterKeys(value: unknown, field: string): string[] {
+  return list(value, field).map(key => text(key, field));
+}
+
+function credits(value: unknown, field: string, baseUrl: string): ModelCredit[] {
+  return list(value, field).map(entry => {
+    const record = object(entry, field);
+    return {
+      franchise: text(record.franchise, `${field}.franchise`),
+      credit: optionalText(record.credit, `${field}.credit`),
+      notice: optionalText(record.notice, `${field}.notice`),
+      licenseUrl: url(record.license_url, baseUrl),
+    };
+  });
+}
+
+function list(value: unknown, field: string): unknown[] {
+  if (!Array.isArray(value)) invalid(field);
+  return value;
+}
+
+function toFurnitureDetail(value: unknown, baseUrl: string): FurnitureDetailChoice {
+  const record = object(value, "FurnitureDetail");
   const category = productCategories.find(category => category === record.category);
-  if (!category) invalid("FurnitureImport.category");
+  if (!category) invalid("FurnitureDetail.category");
   const size = sizeRecord(record.size);
   const match = record.model_match == null ? undefined : modelMatchRecord(record.model_match);
   const item: RoomItem = {
     id: `manual-${crypto.randomUUID()}`, existing: true,
-    ecProductId: String(integer(record.ec_product_id, "ec_product_id")),
-    name: text(record.name, "FurnitureImport.name"), category,
-    color: hexColor(record.color, "FurnitureImport.color"),
+    furnitureDetailId: String(integer(record.furniture_detail_id, "FurnitureDetail.furniture_detail_id")),
+    name: text(record.name, "FurnitureDetail.name"), category,
+    color: hexColor(record.symbolic_color, "FurnitureDetail.symbolic_color"),
     size: [size.w, size.h, size.d], position: [0, size.h / 2, 0], rotation: 0,
-    price: nonnegativeInteger(record.price, "FurnitureImport.price"),
-    shop: text(record.shop, "FurnitureImport.shop"),
-    productUrl: url(text(record.url, "FurnitureImport.url"), baseUrl),
+    price: nonnegativeInteger(record.price, "FurnitureDetail.price"),
+    shop: text(record.shop, "FurnitureDetail.shop"),
+    productUrl: url(text(record.url, "FurnitureDetail.url"), baseUrl),
     imageUrl: url(record.image_url, baseUrl),
     productMetadata: productMetadata(record.product_metadata, baseUrl),
     modelUrl: url(record.model_url, baseUrl),
@@ -66,8 +106,12 @@ export function toImportedFurniture(value: unknown, baseUrl: string): RoomItem {
     modelSize: record.model_size == null ? undefined : sizeRecord(record.model_size),
     modelFit: record.model_fit == null ? undefined : containFit(record.model_fit),
   };
-  if (!isRoomItem(item)) invalid("FurnitureImport");
-  return item;
+  if (!isRoomItem(item)) invalid("FurnitureDetail");
+  return {
+    item, colorName: record.color_name == null ? undefined : text(record.color_name, "FurnitureDetail.color_name"),
+    characters: characterKeys(record.characters, "FurnitureDetail.characters"),
+    credits: credits(record.credits, "FurnitureDetail.credits", baseUrl),
+  };
 }
 
 export function toSavedRoom(value: unknown, baseUrl: string): SavedRoom {
@@ -284,9 +328,9 @@ function furnitureAdditions(value: unknown) {
   });
 }
 
-function productSource(value: unknown): "ec" | "mock" | null {
+function productSource(value: unknown): "db" | "ec" | "mock" | null {
   if (value == null) return null;
-  if (value !== "ec" && value !== "mock") invalid("product_source");
+  if (value !== "db" && value !== "ec" && value !== "mock") invalid("product_source");
   return value;
 }
 
@@ -335,9 +379,9 @@ function materialOverridesRecord(value: unknown) {
 }
 
 function sceneProductDetails(item: components["schemas"]["SceneObject"], baseUrl: string): Partial<RoomItem> {
-  // リンクから追加した家具は出典と近似モデルをBeforeにも引き継ぐ。
-  if (item.source === "existing") return item.ec_product_id == null ? {} : {
-    ecProductId: String(item.ec_product_id),
+  // 登録家具から選んだ所有家具は出典と近似モデルをBeforeにも引き継ぐ。
+  if (item.source === "existing") return item.furniture_detail_id == null ? {} : {
+    furnitureDetailId: String(item.furniture_detail_id),
     price: item.price ?? undefined, shop: item.shop ?? undefined,
     productUrl: url(item.url, baseUrl), productMetadata: productMetadata(item.product_metadata, baseUrl),
     imageUrl: url(item.image_url, baseUrl),
@@ -348,7 +392,7 @@ function sceneProductDetails(item: components["schemas"]["SceneObject"], baseUrl
     textureUrl: url(override.texture_url, baseUrl), tileSizeM: override.tile_size_m ?? undefined, color: override.color ?? undefined,
   }]));
   return {
-    ecProductId: item.ec_product_id == null ? undefined : String(item.ec_product_id),
+    furnitureDetailId: item.furniture_detail_id == null ? undefined : String(item.furniture_detail_id),
     materialOverrides,
     textureStatus: item.texture_status ?? undefined,
     textureSource: item.texture_source ?? undefined,
@@ -367,14 +411,6 @@ function productMetadata(value: unknown, baseUrl: string): ProductMetadata | und
   if (metadata.provider_product_id != null) result.providerProductId = text(metadata.provider_product_id, "provider_product_id");
   if (metadata.variant_id != null) result.variantId = text(metadata.variant_id, "variant_id");
   if (metadata.official_color != null) result.officialColor = text(metadata.official_color, "official_color");
-  if (metadata.color_variants != null) {
-    if (!Array.isArray(metadata.color_variants) || metadata.color_variants.length > 24) invalid("color_variants");
-    result.colorVariants = metadata.color_variants.map(value => {
-      const variant = object(value, "color_variant");
-      if (variant.source !== "official_color_picker" && variant.source !== "official_product_group") invalid("color_variant.source");
-      return { colorName: text(variant.color_name, "color_variant.color_name"), url: url(text(variant.url, "color_variant.url"), baseUrl)!, variantId: optionalText(variant.variant_id, "color_variant.variant_id"), source: variant.source };
-    });
-  }
   if (metadata.source_url != null) result.sourceUrl = url(metadata.source_url, baseUrl);
   if (metadata.price_checked_at != null) {
     const checkedAt = text(metadata.price_checked_at, "price_checked_at");
@@ -404,10 +440,6 @@ function productMetadata(value: unknown, baseUrl: string): ProductMetadata | und
   if (metadata.availability != null) result.availability = text(metadata.availability, "availability");
   if (metadata.image_usage != null) result.imageDisplayAllowed = object(metadata.image_usage, "image_usage").display === "allowed";
   if (metadata.search_entry_point_html != null) result.searchEntryPointHtml = text(metadata.search_entry_point_html, "search_entry_point_html");
-  if (metadata.characters != null) {
-    if (!Array.isArray(metadata.characters)) invalid("product_metadata.characters");
-    result.characters = metadata.characters.map(character => text(character, "product_metadata.characters"));
-  }
   return result;
 }
 
@@ -544,7 +576,7 @@ function analysisObject(value: unknown): components["schemas"]["SceneObject"] {
     model_size: record.model_size == null ? undefined : sizeRecord(record.model_size),
     model_fit: record.model_fit == null ? undefined : containFit(record.model_fit),
     replaces_object_id: record.replaces_object_id == null ? undefined : text(record.replaces_object_id, "SceneObject.replaces_object_id"),
-    ec_product_id: record.ec_product_id == null ? undefined : integer(record.ec_product_id, "SceneObject.ec_product_id"),
+    furniture_detail_id: record.furniture_detail_id == null ? undefined : integer(record.furniture_detail_id, "SceneObject.furniture_detail_id"),
     price: record.price == null ? undefined : nonnegativeInteger(record.price, "SceneObject.price"),
     shop: record.shop == null ? undefined : text(record.shop, "SceneObject.shop"),
     url: record.url == null ? undefined : text(record.url, "SceneObject.url"),

@@ -1,14 +1,15 @@
 # 検索語を推し活グッズの解釈 (キャラクター・フランチャイズ・グッズ種別) に変換する。
-# 辞書 (config/characters.json) の別名を最長一致で探し、曖昧な別名は手掛かりの語があるときだけ使う。
-# 辞書で何も見つからず、グッズを探していそうな検索語に限り Gemini で辞書 ID を選ばせる (specs/character-goods/spec.md)。
+# キャラクター・フランチャイズの別名 (DB) とグッズ種別の同義語 (config/goods_categories.json) を最長一致で探し、
+# 曖昧な別名は手掛かりの語があるときだけ使う。辞書で何も見つからず、グッズを探していそうな検索語に限り Gemini で ID を選ばせる。
+# ID はキャラクター・フランチャイズのキーと、グッズ種別 (= furnitures.category)。
 class CharacterQuery
-  Result = Data.define(:characters, :franchises, :goods_types, :source) do
+  Result = Data.define(:characters, :franchises, :categories, :source) do
     # キャラクター・フランチャイズ、または単独で使えるグッズ種別があればグッズ検索
     def goods_search?
-      characters.any? || franchises.any? || goods_types.any? { |id| CharacterCatalog.goods_type(id)["standalone"] }
+      characters.any? || franchises.any? || categories.any? { |id| GoodsCategories.find(id)["standalone"] }
     end
   end
-  EMPTY = Result.new(characters: [], franchises: [], goods_types: [], source: "none")
+  EMPTY = Result.new(characters: [], franchises: [], categories: [], source: "none")
 
   # 曖昧な別名の直後にあると「〜の形・色・柄」の意味になる語 (プリン型、シナモン色、マリン柄)
   DESCRIPTIVE_SUFFIX = /\A(?:型|形|柄|色|風|調|系|模様|味|っぽ|みたい|のよう)/
@@ -28,20 +29,18 @@ class CharacterQuery
   end
 
   def self.entries
-    @entries ||= begin
-      rows = CharacterCatalog::CHARACTERS.values.flat_map do |row|
-        row["aliases"].map { |item| [ item["text"], :character, row["id"], item["ambiguous"] ] } + [ [ row["name"], :character, row["id"], false ] ]
-      end
-      rows += CharacterCatalog::FRANCHISES.values.flat_map do |row|
-        row["aliases"].map { |item| [ item["text"], :franchise, row["id"], item["ambiguous"] ] } + [ [ row["name"], :franchise, row["id"], false ] ]
-      end
-      rows += CharacterCatalog::GOODS_TYPES.values.flat_map do |row|
-        (row["synonyms"] + [ row["name"] ]).map { |text| [ text, :goods, row["id"], false ] }
-      end
-      rows.map { |text, kind, id, ambiguous| [ fold(normalize(text)), normalize(text), kind, id, ambiguous ] }
-          .uniq { |folded, _, kind, id, _| [ folded, kind, id ] }
-          .sort_by { |folded, *| -folded.length }
+    rows = Character.find_each.flat_map do |row|
+      row.aliases.map { |item| [ item["text"], :character, row.character_key, item["ambiguous"] ] } + [ [ row.name, :character, row.character_key, false ] ]
     end
+    rows += Franchise.find_each.flat_map do |row|
+      row.aliases.map { |item| [ item["text"], :franchise, row.franchise_key, item["ambiguous"] ] } + [ [ row.name, :franchise, row.franchise_key, false ] ]
+    end
+    rows += GoodsCategories::ROWS.values.flat_map do |row|
+      (row["synonyms"] + [ row["name"] ]).map { |text| [ text, :goods, row["category"], false ] }
+    end
+    rows.map { |text, kind, id, ambiguous| [ fold(normalize(text)), normalize(text), kind, id, ambiguous ] }
+        .uniq { |folded, _, kind, id, _| [ folded, kind, id ] }
+        .sort_by { |folded, *| -folded.length }
   end
 
   def self.call(query, user_id: nil, llm: true)
@@ -72,16 +71,16 @@ class CharacterQuery
     characters = found.select { |match| match[:kind] == :character && (clues || !match[:ambiguous]) }.map { |match| match[:id] }.uniq
     franchises = found.select { |match| match[:kind] == :franchise }.map { |match| match[:id] }.uniq
     goods = found.select { |match| match[:kind] == :goods }.map { |match| match[:id] }.uniq
-    build(characters:, franchises:, goods_types: goods, source: "dictionary")
+    build(characters:, franchises:, categories: goods, source: "dictionary")
   end
 
   # 一般のインテリアと重なる種別 (クッションなど) は、キャラクターかフランチャイズがあるときだけ残す。
-  def self.build(characters:, franchises:, goods_types:, source:)
+  def self.build(characters:, franchises:, categories:, source:)
     branded = characters.any? || franchises.any?
-    goods_types = goods_types.select { |id| branded || CharacterCatalog.goods_type(id)["standalone"] }
-    return EMPTY if !branded && goods_types.empty?
+    categories = categories.select { |id| branded || GoodsCategories.find(id)["standalone"] }
+    return EMPTY if !branded && categories.empty?
 
-    Result.new(characters:, franchises:, goods_types:, source:)
+    Result.new(characters:, franchises:, categories:, source:)
   end
 
   # 英字は単語の境界で区切る。曖昧な別名は、同じ文字種の語の一部 (ミクロファイバー、船長室) や
@@ -106,10 +105,10 @@ class CharacterQuery
   def self.llm_candidate?(query, result)
     folded = fold(normalize(query))
     return true if folded.match?(FAN_WORDS)
-    return false if result.goods_types.empty?
+    return false if result.categories.empty?
 
     remainder = folded.dup
-    result.goods_types.flat_map { |id| [ CharacterCatalog.goods_type(id)["name"], *CharacterCatalog.goods_type(id)["synonyms"] ] }
+    result.categories.flat_map { |id| [ GoodsCategories.find(id)["name"], *GoodsCategories.find(id)["synonyms"] ] }
           .map { |text| fold(normalize(text)) }.sort_by { |text| -text.length }
           .each { |text| remainder = remainder.gsub(text, " ") }
     remainder.match?(/[\p{Katakana}ー]{2,}/)
@@ -119,10 +118,10 @@ class CharacterQuery
     return unless GeminiClient.configured?(user_id:)
 
     json = GeminiClient.new.generate_json(prompt: llm_prompt(query), schema: llm_schema).json
-    pick = ->(key, table) { Array(json[key]).map(&:to_s).select { |id| table.key?(id) }.uniq }
-    result = build(characters: pick.call("characters", CharacterCatalog::CHARACTERS),
-                   franchises: pick.call("franchises", CharacterCatalog::FRANCHISES),
-                   goods_types: pick.call("goods_types", CharacterCatalog::GOODS_TYPES), source: "llm")
+    pick = ->(key, ids) { Array(json[key]).map(&:to_s).select { |id| ids.include?(id) }.uniq }
+    result = build(characters: pick.call("characters", Character.pluck(:character_key)),
+                   franchises: pick.call("franchises", Franchise.pluck(:franchise_key)),
+                   categories: pick.call("categories", GoodsCategories.categories), source: "llm")
     result.goods_search? ? result : nil
   rescue GeminiClient::Error, ArgumentError => error
     Rails.logger.info("CharacterQuery LLM fallback skipped: #{error.message}")
@@ -130,14 +129,14 @@ class CharacterQuery
   end
 
   def self.llm_prompt(query)
-    characters = CharacterCatalog::CHARACTERS.values.map { |row| "#{row['id']}: #{row['name']} (#{row['name_en']})" }
-    goods = CharacterCatalog::GOODS_TYPES.values.map { |row| "#{row['id']}: #{row['synonyms'].join('、')}" }
+    characters = Character.order(:id).map { |row| "#{row.character_key}: #{row.name} (#{row.name_en})" }
+    goods = GoodsCategories::ROWS.values.map { |row| "#{row['category']}: #{row['synonyms'].join('、')}" }
     <<~PROMPT
       推し活グッズの検索語を、下の辞書のIDだけで解釈してください。
       辞書にないキャラクターや、確信のない対応は空の配列にしてください。家具や色・柄の説明はキャラクターではありません。
       検索語: #{query.to_s.first(200)}
       キャラクター: #{characters.join(' / ')}
-      フランチャイズ: #{CharacterCatalog::FRANCHISES.values.map { |row| "#{row['id']}: #{row['name']}" }.join(' / ')}
+      フランチャイズ: #{Franchise.order(:id).map { |row| "#{row.franchise_key}: #{row.name}" }.join(' / ')}
       グッズ種別: #{goods.join(' / ')}
     PROMPT
   end
@@ -145,9 +144,9 @@ class CharacterQuery
   def self.llm_schema
     list = ->(ids) { { type: "array", items: { type: "string", enum: ids } } }
     { type: "object",
-      properties: { characters: list.call(CharacterCatalog::CHARACTERS.keys), franchises: list.call(CharacterCatalog::FRANCHISES.keys),
-                    goods_types: list.call(CharacterCatalog::GOODS_TYPES.keys) },
-      required: %w[characters franchises goods_types] }
+      properties: { characters: list.call(Character.pluck(:character_key)), franchises: list.call(Franchise.pluck(:franchise_key)),
+                    categories: list.call(GoodsCategories.categories) },
+      required: %w[characters franchises categories] }
   end
   private_class_method :entries, :build, :boundary?, :llm_candidate?, :interpret_with_llm, :llm_prompt, :llm_schema
 end

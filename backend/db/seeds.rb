@@ -10,5 +10,14 @@ end
 
 puts "seeded #{User.count} users"
 
-catalog = FurnitureModelImporter.call
-puts "seeded #{catalog.fetch(:models)} furniture models and #{catalog.fetch(:bindings)} bindings"
+characters = CharacterImporter.call
+puts "seeded #{characters.fetch(:franchises)} franchises and #{characters.fetch(:characters)} characters"
+
+furnitures = FurnitureImporter.call
+puts "seeded #{furnitures.fetch(:models)} furnitures"
+
+textures = FurnitureTextureImporter.call
+puts "seeded #{textures.fetch(:textures)} furniture textures"
+
+details = FurnitureDetailImporter.call
+puts "seeded #{details.fetch(:details)} furniture details for #{details.fetch(:furnitures)} furnitures"

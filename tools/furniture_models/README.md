@@ -9,7 +9,7 @@
 /Applications/Blender.app/Contents/MacOS/Blender -b --python tools/furniture_models/build.py -- /tmp/out sofa_2seat.glb
 # 色・サイズのバリエーションを1件だけ生成する場合
 /Applications/Blender.app/Contents/MacOS/Blender -b --python tools/furniture_models/build.py -- /tmp/out bed_cover__201.glb
-# GLBを実測し、DB用の backend/db/furniture_models.json を更新
+# GLBを実測し、DB用の backend/db/furnitures.json を更新
 python3 tools/furniture_models/manifest.py
 # 確認用の一覧画像。view=front|back|top|side、engine=eevee でアプリに近い光、checker でUV確認
 /Applications/Blender.app/Contents/MacOS/Blender -b --python tools/furniture_models/preview.py -- output/furniture_models/furniture /tmp/sheet.png view=back engine=eevee
