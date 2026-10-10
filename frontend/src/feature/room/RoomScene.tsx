@@ -3,7 +3,6 @@ import type { RoomDesign, RoomItem } from '../../domain/room';
 import ReferenceSvg from './ReferenceSvg';
 import { categoryOf } from './itemCategory';
 import { useMotionPresence } from '../shared/useMotionPresence';
-import { useFurnitureModelsForDesign } from './furnitureModels';
 const RoomViewer = lazy(() => import('./RoomViewer'));
 const points = [[38.45,13.9],[24.38,40.73],[39.54,67.71],[40.62,22.44],[46.39,59.02],[73.09,40.49],[51.08,68.05],[41.34,43.17]];
 const money = (value: number) => `¥${value.toLocaleString('ja-JP')}`;
@@ -25,7 +24,6 @@ type Props = {
   referenceLayout:boolean; editing:boolean; view:'perspective'|'top'|'front'; dimensions:boolean;
 };
 export default function RoomScene({design, panel, before, filter, selectedId, onSelect, onBefore, onOpenPanel, onMoveItem, placementItem, onPlaceItem, children, referenceLayout, editing, view, dimensions}:Props) {
-  const viewerDesign = useFurnitureModelsForDesign(design);
   const [readiness,setReadiness] = useState<'loading'|'ready'|'degraded'>('loading');
   const [moved,setMoved] = useState(false);
   const [command,setCommand] = useState<{sequence:number;action:'left'|'right'|'in'|'out'}>();
@@ -44,7 +42,7 @@ export default function RoomScene({design, panel, before, filter, selectedId, on
   return <section className="rc-stage" aria-label="3Dプレビュー">
     <div className={`rc-scene-stage${panel?' has-panel':''}`}>
       <div className="rc-scene" onPointerDown={event=>{start.current={x:event.clientX,y:event.clientY};}} onPointerMove={event=>{if(start.current&&Math.hypot(event.clientX-start.current.x,event.clientY-start.current.y)>8){setMoved(true);start.current=null;}}} onPointerUp={()=>{start.current=null;}} onPointerCancel={()=>{start.current=null;}} onWheel={()=>setMoved(true)}>
-        <div className={`rc-viewer-reveal${readiness==='ready'?' motion-fade':''}`} data-readiness={readiness} inert={readiness==='loading'} aria-hidden={readiness==='loading'||undefined}><ViewerBoundary onFailure={()=>setReadiness('degraded')}><Suspense fallback={<div className="viewer-fallback">3Dを読み込んでいます…</div>}><RoomViewer design={viewerDesign} selectedItemId={selectedId} onSelectItem={onSelect} onMoveItem={onMoveItem} placementItem={placementItem} onPlaceItem={onPlaceItem} editing={editing} view={view} resetKey={resetKey} before={before} command={command} dimensions={dimensions} onReady={ready=>setReadiness(previous=>previous==='loading'?(ready?'ready':'degraded'):previous)}/></Suspense></ViewerBoundary></div>{readiness==='loading'&&<div className="viewer-fallback" role="status">3Dを読み込んでいます…</div>}{readiness==='degraded'&&<p className="rc-viewer-readiness-note" role="status">3Dの一部を読み込めませんでした。表示できる内容を確認してください。</p>}
+        <div className={`rc-viewer-reveal${readiness==='ready'?' motion-fade':''}`} data-readiness={readiness} inert={readiness==='loading'} aria-hidden={readiness==='loading'||undefined}><ViewerBoundary onFailure={()=>setReadiness('degraded')}><Suspense fallback={<div className="viewer-fallback">3Dを読み込んでいます…</div>}><RoomViewer design={design} selectedItemId={selectedId} onSelectItem={onSelect} onMoveItem={onMoveItem} placementItem={placementItem} onPlaceItem={onPlaceItem} editing={editing} view={view} resetKey={resetKey} before={before} command={command} dimensions={dimensions} onReady={ready=>setReadiness(previous=>previous==='loading'?(ready?'ready':'degraded'):previous)}/></Suspense></ViewerBoundary></div>{readiness==='loading'&&<div className="viewer-fallback" role="status">3Dを読み込んでいます…</div>}{readiness==='degraded'&&<p className="rc-viewer-readiness-note" role="status">3Dの一部を読み込めませんでした。表示できる内容を確認してください。</p>}
         {pins && additions.map(item=>{const p=points[Number(item.id)-1];if(!p)return null;return <Fragment key={item.id}><button type="button" aria-label={`${item.id}. ${item.name}`} aria-pressed={selectedId===item.id} className="rc-pin motion-control" style={{left:`${p[0]}%`,top:`${p[1]}%`,opacity:filter==='all'||categoryOf(item)===filter?1:.3}} onClick={()=>onSelect(item.id)}><span>{item.id}</span></button><PinTooltip item={item} point={p} active={selectedId===item.id}/></Fragment>;})}
       </div>
     </div>

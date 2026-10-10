@@ -1,6 +1,5 @@
 import { Component, lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { RoomDesign } from '../../domain/room';
-import { useRoomFurnitureModels } from './furnitureModels';
 
 const RoomViewer = lazy(() => import('./RoomViewer'));
 const ignoreSelection = () => {};
@@ -13,14 +12,13 @@ function PreviewPlaceholder({ failed = false }: { failed?: boolean }) {
   return <span className={`room-list-preview-placeholder${failed ? ' is-unavailable' : ''}`} role="status" aria-label={failed ? '3Dモデルを表示できませんでした' : '3Dモデルを読み込み中'}>{failed ? '◇' : ''}</span>;
 }
 function SavedRoomViewer({ design }: { design: RoomDesign }) {
-  const models = useRoomFurnitureModels(design);
   const [ready, setReady] = useState<boolean | null>(null);
-  if (models.error || ready === false) return <PreviewPlaceholder failed/>;
+  if (ready === false) return <PreviewPlaceholder failed/>;
   return <>
-    {(models.loading || ready === null) && <PreviewPlaceholder/>}
-    {!models.loading && <div className={`room-list-live-model${ready ? ' is-ready motion-fade' : ''}`}><Suspense fallback={null}>
-      <RoomViewer design={models.design} selectedItemId={null} onSelectItem={ignoreSelection} view="perspective" resetKey={0} preview onReady={setReady}/>
-    </Suspense></div>}
+    {ready === null && <PreviewPlaceholder/>}
+    <div className={`room-list-live-model${ready ? ' is-ready motion-fade' : ''}`}><Suspense fallback={null}>
+      <RoomViewer design={design} selectedItemId={null} onSelectItem={ignoreSelection} view="perspective" resetKey={0} preview onReady={setReady}/>
+    </Suspense></div>
   </>;
 }
 // 画面内の部屋だけを描画し、一覧を離れたらモデルとWebGLを破棄する。

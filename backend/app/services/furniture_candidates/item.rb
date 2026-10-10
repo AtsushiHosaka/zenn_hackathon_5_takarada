@@ -1,5 +1,5 @@
-module InteriorLinks
-  # 商品1件。実ECの未掲載寸法はProductParserが推定し、取得値とは別に記録する。
+module FurnitureCandidates
+  # 商品1件 (furniture_details の 1 行)。寸法が無ければカテゴリの標準寸法を使う。
   Item = Data.define(:id, :slot, :category, :name, :price, :shop, :url, :image_url, :color, :size, :metadata) do
     def self.build(size: nil, metadata: {}, **attrs)
       size = size&.to_h&.transform_keys(&:to_s)&.transform_values(&:to_f)

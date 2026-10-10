@@ -21,9 +21,9 @@ Google DocsのURLは`docs/project.md`に未設定のため、Docsは未確認。
 
 ## DBと配信の判断
 
-`backend/db/Schemafile`に`furniture_models`と`furniture_model_bindings`を定義する。モデルIDと、対応の種類・参照IDには一意制約を置く。バリエーションはGLBごとに一行とする。`object_key`は`models/furniture/v1/<file>.glb`とする。
+`backend/db/Schemafile`に`furnitures`と`furniture_3d_models`（家具1：1）を定義する（2026-10-10に旧`furniture_models`・`furniture_model_bindings`から移行）。モデルID（`model_key`）には一意制約を置く。バリエーションはGLBごとに一行とする。GLBのパス（`object_key`）はカラムに持たず、`models/furniture/v1/<model_key>.glb`として計算する。
 
-公開APIと`ModelResolver`は`FURNITURE_MODEL_BASE_URL`を優先し、未設定なら`MODELS_BUCKET`から`https://storage.googleapis.com/<bucket>`を組み立てる。この配信元へ`object_key`を連結する。両方未設定ならURLを返さない。
+公開APIと`Furniture.asset_base_url`は`FURNITURE_MODEL_BASE_URL`を優先し、未設定なら`MODELS_BUCKET`から`https://storage.googleapis.com/<bucket>`を組み立てる。この配信元へ`object_key`を連結する。両方未設定ならURLを返さない。
 
 GLBの座標は`+Y`が上、`+Z`が正面、底面中心を原点とする。制作時の寸法は書き出し工程で適用する。モデルの寸法と、部屋に置いたときの寸法は別に扱い、GLBを取り込んでもレイアウトは変更しない。
 
@@ -31,11 +31,11 @@ GLBの座標は`+Y`が上、`+Z`が正面、底面中心を原点とする。制
 
 2026年10月5日の追加要求では、日本向けECの実商品を用途・形状・寸法から照合し、採用したモデルを商品バリエーションの明示対応として保存する。表示時にカテゴリだけから推測する処理は追加しない。生成するのはテクスチャだけで、元のGLBを共用する。詳細は[EC家具Spec](../ec-furniture/spec.md)を参照する。照合・生成処理は実装済み。`managed_by`で台帳とEC照合の管理元を分け、台帳取り込みはEC照合の対応を維持する。
 
-取り込みの正本は`backend/db/furniture_models.json`。生成ツールはGLBを照合し、メタデータと対応表を出力する。入力から外した対応関係はDBから削除する。入力にないDBのモデルは削除せず、無効化したモデルも再有効化しない。
+取り込みの正本は`backend/db/furnitures.json`（`furnitures`テーブル。旧`furniture_models`から置き換え）。生成ツールはGLBを照合し、メタデータと対応表を出力する。入力から外した対応関係はDBから削除する。入力にないDBのモデルは削除せず、無効化したモデルも再有効化しない。
 
 公開モデル用バケットは`infra/gcp/storage.tf`で`${project_id}-models`として定義済み。`allUsers`の読み取り権限と、すべてのオリジンからの`GET`・`HEAD`を許可するCORSを利用する。部屋写真の非公開バケットとは分ける。署名付きURLやWeb向けのGCP認証情報は発行しない。
 
-`make infra-models-publish`は、`output/furniture_models/furniture/`から台帳に載ったGLBだけを一時ディレクトリへ複製し、検証したファイルを`gs://<bucket>/models/furniture/v1/`へアップロードする。`MODELS_BUCKET`を指定でき、未指定時はTerraformの`models_bucket`出力を使う。デプロイCIと`make infra-release`は、Cloud Runジョブで`db:apply`と`furniture_models:import`を順に実行してからサービスを更新する。
+`make infra-models-publish`は、`output/furniture_models/furniture/`から台帳に載ったGLBだけを一時ディレクトリへ複製し、検証したファイルを`gs://<bucket>/models/furniture/v1/`へアップロードする。`MODELS_BUCKET`を指定でき、未指定時はTerraformの`models_bucket`出力を使う。デプロイCIと`make infra-release`は、Cloud Runジョブで`db:apply`・`furniture:import`・`furniture_detail:import`を順に実行してからサービスを更新する。
 
 GCS上のファイル一覧を自動収集する処理と管理画面は含めない。運用手順は`docs/furniture-models.md`に記す。
 

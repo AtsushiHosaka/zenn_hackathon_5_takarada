@@ -14,13 +14,11 @@ export type FurnitureOperation = { objectId: string; action: "keep" | "replace" 
 export type FurnitureAddition = { category: FurnitureCategory; uiId?: string };
 export type TextureStatus = "disabled" | "ready" | "failed" | "skipped" | "unmatched";
 export type MaterialOverrides = Record<string, { textureUrl?: string; tileSizeM?: number; color?: string }>;
-export type ProductColorVariant = { colorName: string; url: string; variantId?: string; source: "official_color_picker" | "official_product_group" };
 export type ProductMetadata = {
   provider?: string;
   providerProductId?: string;
   variantId?: string;
   officialColor?: string;
-  colorVariants?: ProductColorVariant[];
   sourceUrl?: string;
   priceCheckedAt?: string;
   sizeSource?: string | { url?: string; evidence?: string | string[]; kind?: string };
@@ -103,8 +101,8 @@ export type RoomItem = {
   modelUrl?: string;
   // APIのitem_id。画面内のidやmarkerから商品IDを推定しない。
   productId?: string;
-  // 商品リンクから取得したEC商品のID。再提案時も取得元を引き継ぐ。
-  ecProductId?: string;
+  // 登録された家具から選んだFurnitureDetailのID。再提案時も選んだ商品を引き継ぐ。
+  furnitureDetailId?: string;
   marker?: number;
   materialOverrides?: MaterialOverrides;
   textureStatus?: TextureStatus;
@@ -153,7 +151,7 @@ export type RoomDesign = {
   keptObjectIds?: string[];
   furnitureOperations?: FurnitureOperation[];
   furnitureAdditions?: FurnitureAddition[];
-  productSource?: "ec" | "mock";
+  productSource?: "db" | "ec" | "mock";
   searchEntryPoints?: string[];
   // 手動で編集した家具。選択から外した既存家具の変更も次の提案まで保持する。
   editedItems?: RoomItem[];
@@ -186,7 +184,7 @@ export function isRoomDesign(value: unknown): value is RoomDesign {
   if (value.keptObjectIds !== undefined && (!Array.isArray(value.keptObjectIds) || !value.keptObjectIds.every(nonemptyString) || new Set(value.keptObjectIds).size !== value.keptObjectIds.length)) return false;
   if (value.furnitureOperations !== undefined && !isFurnitureOperations(value.furnitureOperations)) return false;
   if (value.furnitureAdditions !== undefined && !isFurnitureAdditions(value.furnitureAdditions)) return false;
-  if (value.productSource !== undefined && value.productSource !== "ec" && value.productSource !== "mock") return false;
+  if (value.productSource !== undefined && value.productSource !== "db" && value.productSource !== "ec" && value.productSource !== "mock") return false;
   if (value.searchEntryPoints !== undefined && (!Array.isArray(value.searchEntryPoints) || !value.searchEntryPoints.every(nonemptyString))) return false;
   if (!optionalHttpUrl(value.modelUrl) || !Array.isArray(value.items) || !value.items.every(isRoomItem)) return false;
   const currentItems = value.items as RoomItem[];
@@ -255,7 +253,7 @@ export function isRoomItem(value: unknown): value is RoomItem {
   if (value.marker !== undefined && (typeof value.marker !== "number" || !Number.isSafeInteger(value.marker) || value.marker <= 0)) return false;
   if (value.shop !== undefined && !nonemptyString(value.shop)) return false;
   if (value.productId !== undefined && (typeof value.productId !== "string" || !/^[1-9]\d*$/.test(value.productId))) return false;
-  if (value.ecProductId !== undefined && (typeof value.ecProductId !== "string" || !/^[1-9]\d*$/.test(value.ecProductId))) return false;
+  if (value.furnitureDetailId !== undefined && (typeof value.furnitureDetailId !== "string" || !/^[1-9]\d*$/.test(value.furnitureDetailId))) return false;
   if (value.referenceImage !== undefined && (!(isManualFurniture(value as RoomItem) || isTemplateFurniture(value as RoomItem)) || !furnitureCategories.some(category => category === value.category) || !isImageArtwork(value.referenceImage))) return false;
   if (value.artwork !== undefined && (!(isManualFurniture(value as RoomItem) || isTemplateFurniture(value as RoomItem)) || !imageGoodsCategories.some(category => category === value.category) || !isImageArtwork(value.artwork))) return false;
   if (value.materialOverrides !== undefined && !isMaterialOverrides(value.materialOverrides)) return false;
@@ -290,7 +288,6 @@ function isProductMetadata(value: unknown): value is ProductMetadata {
   if (!isRecord(value) || !optionalHttpUrl(value.sourceUrl)) return false;
   if (value.priceCheckedAt !== undefined && (typeof value.priceCheckedAt !== "string" || !Number.isFinite(Date.parse(value.priceCheckedAt)))) return false;
   if (![value.material, value.shape, value.availability, value.provider, value.providerProductId, value.variantId, value.officialColor].every(field => field === undefined || nonemptyString(field))) return false;
-  if (value.colorVariants !== undefined && (!Array.isArray(value.colorVariants) || value.colorVariants.length > 24 || !value.colorVariants.every(variant => isRecord(variant) && nonemptyString(variant.colorName) && nonemptyString(variant.url) && optionalHttpUrl(variant.url) && (variant.variantId === undefined || nonemptyString(variant.variantId)) && (variant.source === "official_color_picker" || variant.source === "official_product_group")))) return false;
   if (value.estimatedAxes !== undefined && (!Array.isArray(value.estimatedAxes) || !value.estimatedAxes.every(axis => axis === "w" || axis === "h" || axis === "d"))) return false;
   if (value.size !== undefined && (!isRecord(value.size) || ![value.size.w, value.size.h, value.size.d].every(axis => axis === null || positiveNumber(axis)))) return false;
   if (value.imageDisplayAllowed !== undefined && typeof value.imageDisplayAllowed !== "boolean") return false;

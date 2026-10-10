@@ -1,10 +1,10 @@
-require "timeout"
-
-# Reuse verified EC discovery; search results are candidates, selection is imported afresh.
+# 登録済みの furniture_details を検索する。外部の EC は検索しない。
+# 家具 (モデル) ごとに 1 件を返し、同じ家具の他の色・寸法・購入先は variants に入れる。
 class FurnitureSearch
-  DEADLINE_SECONDS = 130
-  Result = Data.define(:products, :color, :failures, :search_entry_points)
-  CATEGORIES = (InteriorLinks::ProductParser::CATEGORY_RULES.map(&:first) + [ "small_plant" ]).uniq.freeze
+  MAX_RESULTS = 24
+  Result = Data.define(:products, :color)
+  Product = Data.define(:detail, :variants)
+  CATEGORIES = (FurnitureCandidates::Categories::RULES.map(&:first) + [ "small_plant" ]).uniq.freeze
   QUERY_CATEGORY_NAMES = {
     "sofa" => /\b(?:sofas?|couch(?:es)?)\b/i, "bed" => /\bbeds?\b/i,
     "desk" => /\bdesks?\b/i, "chair" => /\b(?:chairs?|stools?)\b/i,
@@ -13,36 +13,37 @@ class FurnitureSearch
   }.freeze
   class Error < StandardError; end
 
-  def self.call(query:, color:, category:, user_id:)
+  def self.call(query:, color:, category:, **)
     raise Error, "検索語を1〜200文字で入力してください" unless query.is_a?(String) && query.strip.length.between?(1, 200)
-    raise Error, "検索する色を確認してください" unless color.blank? || InteriorLinks::ProductColors::PATTERNS.key?(color)
+    raise Error, "検索する色を確認してください" unless color.blank? || FurnitureCandidates::Colors::PATTERNS.key?(color)
     raise Error, "家具の種類を確認してください" unless category.blank? || CATEGORIES.include?(category)
-    raise Error, "実商品検索の接続が設定されていません" unless GeminiClient.configured?(user_id:)
 
     categories = requested_categories(query, category)
-    client = InteriorLinks::RealClient.new(user_id:, preferred_categories: categories.presence || Coordination::FLOOR_CATEGORIES)
-    search_query = color.present? ? "#{query.strip}。希望する商品の色: #{color}" : query.strip
-    candidates = Timeout.timeout(DEADLINE_SECONDS) do
-      client.search(prompt: search_query, theme: nil, slots: categories.present? ? categories.map { |value| slot_for(value) }.uniq : [ "floor" ], categories:, max_price: 10_000_000).values.flatten
-    end
-    products = candidates.select { |item| (categories.empty? || categories.include?(item.category)) && InteriorLinks::ProductColors.matches?(item.metadata["official_color"], color) }.first(24)
-    Result.new(products:, color: color.presence, failures: Array(client.diagnostics["failures"]).size, search_entry_points: client.search_entry_points)
-  rescue InteriorLinks::RealClient::Error => error
-    raise Error, error.message
-  rescue Timeout::Error
-    raise Error, "家具の検索に時間がかかっています。条件を変えて再度お試しください"
+    scope = FurnitureDetail.joins(:furniture).merge(Furniture.available).includes(:furniture).order(:position, :id)
+    details = (categories.any? ? scope.where(category: categories) : scope.where(slot: "floor")).to_a
+    tokens = query.unicode_normalize(:nfkc).downcase.split(/[\s、,]+/).reject(&:blank?)
+    scored = details.map { |detail| [ detail, tokens.count { |token| detail.name.unicode_normalize(:nfkc).downcase.include?(token) } ] }
+    # No name contains the words (e.g. "白い椅子"): the category alone narrows the results.
+    scored = scored.select { |_, score| score.positive? } if scored.any? { |_, score| score.positive? }
+    matches = scored.sort_by.with_index { |(_, score), index| [ -score, index ] }.map(&:first)
+      .select { |detail| FurnitureCandidates::Colors.matches?(detail.metadata["official_color"].presence || detail.color_name.presence || detail.name, color) }
+    siblings = details.group_by { |detail| [ detail.furniture_id, detail.category ] }
+    products = matches.uniq { |detail| [ detail.furniture_id, detail.category ] }.first(MAX_RESULTS)
+      .map { |detail| Product.new(detail:, variants: siblings.fetch([ detail.furniture_id, detail.category ])) }
+    Result.new(products:, color: color.presence)
   end
+
   def self.slot_for(category)
     return "desk_top" if category == "small_plant"
 
-    InteriorLinks::ProductParser::CATEGORY_RULES.find { |rule| rule.first == category }&.fetch(1) || "floor"
+    FurnitureCandidates::Categories::RULES.find { |rule| rule.first == category }&.fetch(1) || "floor"
   end
 
   def self.requested_categories(query, category)
     return [ category ] if category.present?
 
     text = query.unicode_normalize(:nfkc).strip
-    rules = InteriorLinks::ProductParser::CATEGORY_RULES.map { |value, _, pattern| [ value, pattern ] } + QUERY_CATEGORY_NAMES.to_a
+    rules = FurnitureCandidates::Categories::RULES.map { |value, _, pattern| [ value, pattern ] } + QUERY_CATEGORY_NAMES.to_a
     matches = rules.filter_map do |value, pattern|
       [ value, pattern ] if pattern.match?(text)
     end

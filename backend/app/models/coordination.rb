@@ -50,20 +50,24 @@ class Coordination < ApplicationRecord
 
   private
 
+  def find_furniture_detail(id)
+    FurnitureDetail.includes(:furniture).find_by(id:) if id.is_a?(Integer) && id.positive?
+  end
+
   def manual_objects
     return [] unless edited_objects.is_a?(Array) && edited_objects.size <= 100
 
     edited_objects.filter_map do |edit|
       next unless edit.is_a?(Hash) && edit["id"].is_a?(String) && edit["id"].match?(MANUAL_OBJECT_ID)
-      product_id = edit["ec_product_id"]
-      product = EcProduct.find_by(id: product_id) if product_id.is_a?(Integer) && product_id.positive?
-      next if product_id && (!product || !FLOOR_CATEGORIES.include?(product.data["category"]))
+      product_id = edit["furniture_detail_id"]
+      product = find_furniture_detail(product_id)
+      next if product_id && (!product || !FLOOR_CATEGORIES.include?(product.category))
       next unless product || (MANUAL_CATEGORIES.include?(edit["category"]) && edit["label"].is_a?(String) && edit["label"].strip.present? && edit["label"].length <= 100)
 
       next if IMAGE_GOODS_CATEGORIES.include?(edit["category"]) && !ImageArtwork.valid?(edit["artwork"])
       next if edit["artwork"] && !IMAGE_GOODS_CATEGORIES.include?(edit["category"])
 
-      trusted = product ? FurnitureImport.scene_attributes(product).compact.merge(edit.slice("position", "size", "rotation_y", "color")) : edit.slice("label", "category", "position", "size", "rotation_y", "color", "artwork")
+      trusted = product ? product.scene_attributes.compact.merge(edit.slice("position", "size", "rotation_y", "color")) : edit.slice("label", "category", "position", "size", "rotation_y", "color", "artwork")
       trusted.merge(
         "id" => edit["id"],
         "source" => "existing", "slot" => nil, "attach_to" => nil, "item_id" => nil, "marker" => nil, "model_url" => trusted["model_url"]
@@ -137,18 +141,18 @@ class Coordination < ApplicationRecord
     objects_by_id = (existing + suggested_objects).index_by { |object| object["id"] }
     ids = edited_objects.pluck("id")
     linked_ids_valid = edited_objects.all? do |edit|
-      next true if edit["ec_product_id"].nil? && edit["replacement_ec_product_id"].nil?
+      next true if edit["furniture_detail_id"].nil? && edit["replacement_furniture_detail_id"].nil?
       next false unless edit["id"].is_a?(String)
 
       original = objects_by_id[edit["id"]]
       if edit["id"].match?(MANUAL_OBJECT_ID)
-        owned_valid = original&.fetch("ec_product_id", nil) == edit["ec_product_id"]
-        replacement_id = edit["replacement_ec_product_id"]
-        replacement = EcProduct.find_by(id: replacement_id) if replacement_id.is_a?(Integer) && replacement_id.positive?
-        owned_valid && (replacement_id.nil? || (replacement && original && replacement.data["category"] == original["category"]))
+        owned_valid = original&.fetch("furniture_detail_id", nil) == edit["furniture_detail_id"]
+        replacement_id = edit["replacement_furniture_detail_id"]
+        replacement = find_furniture_detail(replacement_id)
+        owned_valid && (replacement_id.nil? || (replacement && original && replacement.category == original["category"]))
       else
-        product = EcProduct.find_by(id: edit["ec_product_id"]) if edit["ec_product_id"].is_a?(Integer) && edit["ec_product_id"].positive?
-        edit["replacement_ec_product_id"].nil? && original && product && product.data["category"] == original["category"]
+        product = find_furniture_detail(edit["furniture_detail_id"])
+        edit["replacement_furniture_detail_id"].nil? && original && product && product.category == original["category"]
       end
     end
     unless ids.uniq == ids && linked_ids_valid && (ids - existing_ids - suggested_ids).empty? && edited_objects.all? { |edit| valid_edit?(edit, objects_by_id.fetch(edit["id"])) }

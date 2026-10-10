@@ -1,4 +1,4 @@
-# ridgepole のスキーマ定義。**DB の唯一の正はこのファイル**。
+# ridgepole のスキーマ定義。**DB の唯一の正はこのファイル**。ここに無いテーブルは db:apply で削除される (--drop-table)。
 # 変更したら `make db-apply` (中身は ridgepole --apply) で DB に反映する。
 # マイグレーションファイルは作らない。
 
@@ -64,70 +64,90 @@ create_table "coordinations", force: :cascade do |t|
   t.datetime "updated_at", null: false
 end
 
-# 公式ECで確認した商品・バリエーションの安定した内部IDと取得情報を保存する
-create_table "ec_products", force: :cascade do |t|
-  t.string "provider", null: false
-  t.string "provider_product_id", null: false
-  t.string "variant_id", null: false
-  t.string "source_url", null: false
-  t.jsonb "data", null: false, default: {}
-  t.datetime "fetched_at", null: false
+# 家具。detail (色・寸法・購入リンク) が指す。3D モデルは furniture_3d_models (1 : 1)。
+# db/furnitures.json から rails furniture:import で入れる
+create_table "furnitures", force: :cascade do |t|
+  t.string "name", null: false # 表示名 (例: 2人掛けソファ)
+  t.string "category", null: false # 家具の種類 (sofa, chair, rug など)。写真の家具にモデルを付けるときにも使う
+  t.boolean "enabled", null: false, default: true # false なら使わない (API・提案から外す)
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+end
+
+# 家具の 3D モデル (GLB)。GLB 本体は GCS の models/furniture/v1/<model_key>.glb
+create_table "furniture_3d_models", force: :cascade do |t|
+  t.references "furniture", null: false, foreign_key: true, index: { unique: true }
+  t.string "model_key", null: false # モデルの安定 ID。GLB のファイル名 (例: sofa_2seat__w130)。家具を指すキーにも使う
+  t.string "shape", null: false # 形の種類 (sofa_2seat, rug_round など)。同じ形の寸法違いで共通
+  t.string "variant" # 同じ形の中の違い (w130 など)。無ければ null
+  t.string "format", null: false, default: "glb" # ファイル形式。glb のみ
+  t.decimal "width", precision: 10, scale: 6, null: false # モデルの幅 (m)
+  t.decimal "height", precision: 10, scale: 6, null: false # モデルの高さ (m)
+  t.decimal "depth", precision: 10, scale: 6, null: false # モデルの奥行き (m)
+  t.integer "triangle_count", null: false # ポリゴン数
+  t.bigint "byte_size", null: false # GLB のバイト数
+  t.string "sha256", null: false # GLB のハッシュ。ファイルとの照合用
+  t.jsonb "color_material_keys", null: false, default: [] # 色が分かれている部位の名前 (GLB の素材名。例: ["tint", "wood"])
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
 
-  t.index [ "provider", "provider_product_id", "variant_id" ], unique: true, name: "index_ec_products_on_identity"
+  t.index [ "model_key" ], unique: true
+  t.check_constraint "width > 0::numeric AND width < 10000::numeric AND height > 0::numeric AND height < 10000::numeric AND depth > 0::numeric AND depth < 10000::numeric", name: "furniture_3d_models_positive_dimensions"
+  t.check_constraint "triangle_count >= 0 AND byte_size > 0", name: "furniture_3d_models_valid_counts"
+  t.check_constraint "format::text = 'glb'::text", name: "furniture_3d_models_glb_format"
 end
 
-# GLB 本体は GCS に置き、DB には検索・描画に必要なメタデータを持つ
-create_table "furniture_models", force: :cascade do |t|
+# 家具の色・寸法・購入リンク 1 つ (家具 1 : 多)。3D は家具のモデルを部位ごとに color_materials で塗る。価格はリンク先の参考価格 (税込)。
+# db/furniture_details.json から rails furniture_detail:import で入れる
+create_table "furniture_details", force: :cascade do |t|
   t.string "key", null: false
+  t.references "furniture", null: false, foreign_key: true
   t.string "name", null: false
   t.string "category", null: false
-  t.string "shape", null: false
-  t.string "variant"
-  t.string "format", null: false, default: "glb"
-  t.string "object_key", null: false
+  t.string "slot", null: false
+  t.string "symbolic_color", null: false # 代表色 (#rrggbb)。モデルが無いときの表示・色での検索・AI への商品情報に使う
+  t.jsonb "color_materials", null: false, default: {} # 部位ごとの色 (例: {"tint": "#123682", "wood": "#714248"})。キーは家具の color_material_keys。無い部位はモデルの色のまま
+  t.string "color_name" # 公式の色名
   t.decimal "width", precision: 10, scale: 6, null: false
   t.decimal "height", precision: 10, scale: 6, null: false
   t.decimal "depth", precision: 10, scale: 6, null: false
-  t.integer "triangle_count", null: false
-  t.bigint "byte_size", null: false
-  t.string "sha256", null: false
-  t.jsonb "materials", null: false, default: []
-  t.boolean "enabled", null: false, default: true
+  t.integer "price", null: false
+  t.string "shop", null: false
+  t.string "url", null: false
+  t.string "image_url"
+  t.jsonb "themes", null: false, default: []
+  t.jsonb "metadata", null: false, default: {} # 出典・推定した寸法の軸など
+  t.integer "position", null: false, default: 0 # 候補の並び順 (小さいほど先)。AI は枠ごとに先頭から一定数だけ見る
+  t.datetime "checked_at"
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
 
   t.index [ "key" ], unique: true
-  t.check_constraint "width > 0::numeric AND width < 10000::numeric AND height > 0::numeric AND height < 10000::numeric AND depth > 0::numeric AND depth < 10000::numeric", name: "furniture_models_positive_dimensions"
-  t.check_constraint "triangle_count >= 0 AND byte_size > 0", name: "furniture_models_valid_counts"
-  t.check_constraint "format::text = 'glb'::text", name: "furniture_models_glb_format"
+  t.index [ "slot", "position" ]
+  t.check_constraint "price > 0", name: "furniture_details_positive_price"
+  t.check_constraint "width > 0::numeric AND height > 0::numeric AND depth > 0::numeric", name: "furniture_details_positive_dimensions"
 end
 
-# 認識済み家具 ID / 商品 ID とモデルを明示的に対応させる
-create_table "furniture_model_bindings", force: :cascade do |t|
-  t.references "furniture_model", null: false, foreign_key: true
-  t.string "kind", null: false
-  t.string "reference", null: false
-  t.string "managed_by", null: false, default: "manifest"
-  t.jsonb "match_metadata", null: false, default: {}
-  t.datetime "created_at", null: false
-  t.datetime "updated_at", null: false
-
-  t.index [ "kind", "reference" ], unique: true
-  t.check_constraint "kind::text = ANY (ARRAY['existing'::character varying::text, 'product'::character varying::text])", name: "furniture_model_bindings_valid_kind"
-end
-
-# Description-derived images are immutable and shared by their complete generation key.
+# 模様 (質感の画像)。静的に用意し、db/furniture_textures.json から rails furniture_texture:import で入れる
 create_table "furniture_textures", force: :cascade do |t|
-  t.string "generation_key", null: false
-  t.string "bucket", null: false
-  t.string "object_key", null: false
-  t.string "generator_model", null: false
-  t.string "material_name", null: false
-  t.text "source_description", null: false
-  t.decimal "tile_size_m", precision: 6, scale: 3, null: false
+  t.string "texture_key", null: false # 安定 ID (例: linen)。画像は textures/v1/<texture_key>.png
+  t.string "name", null: false # 表示名 (例: リネン)
+  t.decimal "tile_size_m", precision: 6, scale: 3, null: false # 画像 1 枚が何 m 四方か
+  t.boolean "tinted", null: false, default: true # true: 部位の色を掛ける (色の無い質感画像) / false: 柄物なので画像の色のまま
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
-  t.index [ "generation_key" ], unique: true
+
+  t.index [ "texture_key" ], unique: true
+  t.check_constraint "tile_size_m > 0::numeric", name: "furniture_textures_positive_tile_size"
+end
+
+# detail の部位に貼る模様 (detail 1 : 0〜n)
+create_table "furniture_detail_textures", force: :cascade do |t|
+  t.references "furniture_detail", null: false, foreign_key: true
+  t.references "furniture_texture", null: false, foreign_key: true
+  t.string "material_key", null: false # 貼る部位 (家具の color_material_keys のどれか)
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+
+  t.index [ "furniture_detail_id", "material_key" ], unique: true
 end

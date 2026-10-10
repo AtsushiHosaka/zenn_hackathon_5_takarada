@@ -1,14 +1,17 @@
 class FurnitureSearchSerializer
   include Alba::Resource
 
-  attributes :color, :failures, :search_entry_points
+  attributes :color
   attribute :products do |result|
-    result.products.map do |item|
-      { "ec_product_id" => item.id - EcProduct::PUBLIC_ID_OFFSET, "name" => item.name,
-        "category" => item.category, "color" => item.color, "size" => item.size,
-        "price" => item.price, "shop" => item.shop, "url" => item.url,
-        "image_url" => item.image_url, "product_metadata" => item.metadata,
-        "model_url" => nil, "model_match" => nil, "model_size" => nil, "model_fit" => nil }
+    result.products.map do |product|
+      FurnitureSearchSerializer.detail_attributes(product.detail).merge(
+        "variants" => product.variants.map { |detail| FurnitureSearchSerializer.detail_attributes(detail) }
+      )
     end
+  end
+
+  def self.detail_attributes(detail)
+    detail.scene_attributes.except("label", "texture_status", "color")
+      .merge("name" => detail.name, "furniture_id" => detail.furniture_id, "symbolic_color" => detail.symbolic_color, "color_name" => detail.color_name)
   end
 end

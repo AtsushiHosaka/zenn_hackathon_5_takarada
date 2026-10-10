@@ -46,7 +46,7 @@ export function createTemplateSnapshot(design: RoomDesign, title: string): RoomD
     items: copyFurniture(design.items, 'template-object', design.room ? [0, 0, 0] : center).map(item => {
       return {...item, existing: true,
         name: item.name.slice(0,100),
-        marker: undefined, productId: undefined, ecProductId: undefined,
+        marker: undefined, productId: undefined, furnitureDetailId: undefined,
         replacesObjectId: undefined, materialOverrides: undefined};
     }),
   };

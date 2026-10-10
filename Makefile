@@ -1,5 +1,5 @@
 .PHONY: up down setup logs worker-logs sh test docs console reset db-apply db-dry-run db-export \
-	front-sh front-logs front-lint front-build front-types furniture-models-import infra-models-publish \
+	front-sh front-logs front-lint front-build front-types furniture-import infra-models-publish \
 	ios-setup ios-open ios-build \
 	infra-bootstrap infra-apply infra-plan infra-release infra-up infra-destroy \
 	infra-url infra-logs infra-db-apply infra-seed infra-task infra-psql infra-secrets
@@ -29,7 +29,7 @@ docs:          ## specs から OpenAPI(swagger.yaml) を再生成
 	docker compose exec api bundle exec rails rswag
 
 db-apply:      ## db/Schemafile を DB に適用
-	docker compose exec api bin/rails db:apply
+	docker compose exec api bin/rails furniture_texture:clear_legacy db:apply
 
 db-dry-run:    ## db/Schemafile と DB の差分を表示 (適用しない)
 	docker compose exec api bin/rails db:dry_run
@@ -126,8 +126,8 @@ infra-psql:    ## Cloud SQL に psql で繋ぐ (自分の IP を一時的に許�
 		--database=$$($(GTF) output -raw db_database) \
 		--project $$($(GTF) output -raw project_id)
 
-furniture-models-import: ## 家具モデルの台帳JSONをDBへ取り込む
-	docker compose exec api bin/rails furniture_models:import
+furniture-import: ## 家具・模様・色と購入リンク (db/furnitures.json, furniture_textures.json, furniture_details.json) をDBへ取り込む
+	docker compose exec api bin/rails furniture:import furniture_texture:import furniture_detail:import
 
 infra-models-publish: ## 生成済み家具GLBをMODELS_BUCKETまたはTerraformのバケットへ配置
 	$(GBIN)/models-publish.sh

@@ -30,7 +30,7 @@ module Api
       def coordination_params
         params.require(:coordination).permit(:prompt, :budget, :base_coordination_id, :room_palette_id, :character_theme_id, kept_object_ids: [],
                                                     furniture_operations: [ :object_id, :action ], additions: [ :category ],
-                                                    edited_objects: [ :id, :label, :category, :ec_product_id, :replacement_ec_product_id, :rotation_y, :color, artwork: [ :data_url ], position: [ :x, :y, :z ], size: [ :w, :h, :d ] ])
+                                                    edited_objects: [ :id, :label, :category, :furniture_detail_id, :replacement_furniture_detail_id, :rotation_y, :color, artwork: [ :data_url ], position: [ :x, :y, :z ], size: [ :w, :h, :d ] ])
       end
     end
   end

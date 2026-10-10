@@ -161,21 +161,6 @@ NAMES = {
     "wall_shelf_hex": "六角形ウォールシェルフ", "record_player": "レコードプレーヤー", "guitar": "ギター（スタンド付き）",
     "suitcase": "スーツケース", "yoga_mat": "ヨガマット（丸めた状態）",
 }
-# モックカタログの商品ID・既存家具ID → モデル
-PRODUCTS = {
-    "bed-1": "bed_single", "desk-1": "desk_wood", "shelf-1": "bookshelf",
-    "101": "bed_cover__101", "201": "bed_cover__201", "301": "bed_cover__301",
-    "102": "curtain_pair__102", "202": "curtain_pair__202",
-    "115": "curtain_sheer__115", "302": "curtain_sheer__302", "901": "curtain_sheer__901",
-    "103": "rug_rect__103", "203": "rug_rect__203", "303": "rug_wave",
-    "111": "rug_round__111", "211": "rug_round__211", "311": "rug_round__311",
-    "107": "cushion__107", "207": "cushion__207", "307": "cushion__307",
-    "104": "shelf_floating", "114": "tapestry", "105": "floor_lamp", "112": "floor_lamp_slim",
-    "205": "floor_lamp_rattan", "212": "floor_lamp_tripod", "305": "floor_lamp_ball", "312": "floor_lamp_pleated",
-    "106": "display_case", "113": "display_rack_open", "108": "acrylic_stand_case", "204": "wall_planter",
-    "214": "wall_art", "206": "plant_monstera", "213": "plant_eucalyptus", "208": "small_plant",
-    "304": "wall_mirror", "306": "side_table", "308": "candle", "902": "desk_lamp_clip",
-}
 
 
 def category(name):
@@ -282,7 +267,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--models-dir", type=Path, default=ROOT / "output/furniture_models/furniture")
     parser.add_argument("--report", type=Path, default=HERE / "build_report.json")
-    parser.add_argument("--output", type=Path, default=ROOT / "backend/db/furniture_models.json")
+    parser.add_argument("--output", type=Path, default=ROOT / "backend/db/furnitures.json")
     args = parser.parse_args()
     report = json.loads(args.report.read_text())
     models = []
@@ -307,16 +292,12 @@ def main():
         if stats["triangles"] != item["tris"] or stats["materials"] != item["materials"]:
             raise ValueError(f"Build report differs from exported geometry/materials: {filename}")
         models.append({"id": model_id, "name": NAMES[base], "category": category(base), "shape": base,
-                       "variant": variant or None, "format": "glb", "object_key": f"models/furniture/v1/{filename}", **stats})
-    missing = [reference for reference, model_id in PRODUCTS.items() if model_id not in ids]
-    if missing:
-        raise ValueError(f"Missing models for bindings: {missing}")
-    bindings = [{"kind": "existing" if reference in ("bed-1", "desk-1", "shelf-1") else "product",
-                 "reference": reference, "model_id": model_id} for reference, model_id in sorted(PRODUCTS.items())]
-    catalog = {"unit": "meter", "axes": "+Y up, +Z front, origin bottom center", "models": models, "bindings": bindings}
+                       "variant": variant or None, "format": "glb", "object_key": f"models/furniture/v1/{filename}",
+                       **{("color_material_keys" if key == "materials" else key): value for key, value in stats.items()}})
+    catalog = {"unit": "meter", "axes": "+Y up, +Z front, origin bottom center", "models": models}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(catalog, ensure_ascii=False, indent=1) + "\n")
-    print(f"{len(models)} models, {len(bindings)} bindings -> {args.output}")
+    print(f"{len(models)} models -> {args.output}")
 
 
 if __name__ == "__main__":

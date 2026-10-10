@@ -14,7 +14,7 @@ export type GenerateRoomInput = {
   shape?: RoomShape;
   roomId?: string;
   keptObjectIds?: string[];
-  editedItems?: (RoomItem & { replacementEcProductId?: number })[];
+  editedItems?: (RoomItem & { replacementFurnitureDetailId?: number })[];
   furnitureOperations?: FurnitureOperation[];
   furnitureAdditions?: FurnitureAddition[];
   // 追加の指示 (チャット) で作り直すときの前回のコーデ (backend の ID)。指示に関係ない商品は前回のものが残る
@@ -35,7 +35,11 @@ export type SavedRoom = {
 };
 
 export type FurnitureSearchInput = { query: string; color?: string; category?: string };
-export type FurnitureSearchResult = { products: RoomItem[]; failures: number; searchEntryPoints: string[] };
+// 登録された家具の色・寸法・購入リンク1つ。itemはそのまま部屋へ置ける形 (furnitureDetailId付き)。
+export type FurnitureDetailChoice = { item: RoomItem; colorName?: string };
+// 家具ごとに1件。variantsは同じ家具の全detail (自身を含む)。
+export type FurnitureSearchProduct = FurnitureDetailChoice & { variants: FurnitureDetailChoice[] };
+export type FurnitureSearchResult = { products: FurnitureSearchProduct[]; color: string | null };
 
 export type RoomRepository = {
   demo(style?: Style): RoomDesign;
@@ -47,7 +51,6 @@ export type RoomRepository = {
   createFromTemplate(template: RoomDesign, signal?: AbortSignal): Promise<RoomDesign>;
   analyze(input: GenerateRoomInput, signal?: AbortSignal): Promise<RoomDesign>;
   generate(input: GenerateRoomInput, signal?: AbortSignal): Promise<RoomDesign>;
-  importFurniture(url: string, signal?: AbortSignal, variantId?: string, purpose?: "replacement"): Promise<RoomItem>;
   searchFurniture(input: FurnitureSearchInput, signal?: AbortSignal): Promise<FurnitureSearchResult>;
   capabilities(): Promise<RoomCapabilities>;
 };
