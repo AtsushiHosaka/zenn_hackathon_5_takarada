@@ -1,0 +1,1189 @@
+{
+ "version": 1,
+ "note": "推し活グッズ検索用のキャラクター辞書。aliasのambiguous=trueは単独では一致させず、グッズ種別・作品名などの語が同時にある場合だけ使う。colorはcolor_sourceがofficialのものだけを公式値として扱う。",
+ "franchises": [
+  {
+   "id": "piapro",
+   "name": "ピアプロキャラクターズ",
+   "aliases": [
+    {
+     "text": "ピアプロ",
+     "ambiguous": false
+    },
+    {
+     "text": "ボカロ",
+     "ambiguous": false
+    },
+    {
+     "text": "ボーカロイド",
+     "ambiguous": false
+    },
+    {
+     "text": "vocaloid",
+     "ambiguous": false
+    },
+    {
+     "text": "piapro",
+     "ambiguous": false
+    }
+   ],
+   "license": "piapro",
+   "likeness_allowed": true,
+   "credit": "© Crypton Future Media, INC. www.piapro.net",
+   "notice": "非公式の二次創作です。利用時はピアプロ・キャラクター・ライセンスとキャラクター利用のガイドラインに従ってください。",
+   "license_url": "https://piapro.jp/license/character_guideline"
+  },
+  {
+   "id": "hololive",
+   "name": "ホロライブ",
+   "aliases": [
+    {
+     "text": "ホロライブ",
+     "ambiguous": false
+    },
+    {
+     "text": "hololive",
+     "ambiguous": false
+    },
+    {
+     "text": "ホロメン",
+     "ambiguous": false
+    }
+   ],
+   "license": "cover",
+   "likeness_allowed": true,
+   "credit": null,
+   "notice": "非公式の二次創作です。カバー株式会社の二次創作ガイドラインに従っています。",
+   "license_url": "https://hololivepro.com/terms/"
+  },
+  {
+   "id": "nijisanji",
+   "name": "にじさんじ",
+   "aliases": [
+    {
+     "text": "にじさんじ",
+     "ambiguous": false
+    },
+    {
+     "text": "nijisanji",
+     "ambiguous": false
+    }
+   ],
+   "license": "anycolor",
+   "likeness_allowed": true,
+   "credit": null,
+   "notice": "非公式の二次創作です。ANYCOLOR株式会社の二次創作ガイドラインに従っています。",
+   "license_url": "https://www.anycolor.co.jp/guidelines"
+  },
+  {
+   "id": "sanrio",
+   "name": "サンリオ",
+   "aliases": [
+    {
+     "text": "サンリオ",
+     "ambiguous": false
+    },
+    {
+     "text": "sanrio",
+     "ambiguous": false
+    }
+   ],
+   "license": "sanrio",
+   "likeness_allowed": false,
+   "credit": null,
+   "notice": "キャラクターの造形は作成しません。検索と商品情報の表示のみに使います。",
+   "license_url": "https://www.sanrio.co.jp/legal_notices/"
+  }
+ ],
+ "characters": [
+  {
+   "id": "hatsune_miku",
+   "franchise": "piapro",
+   "name": "初音ミク",
+   "name_en": "Hatsune Miku",
+   "group": null,
+   "status": "active",
+   "color": "#39C5BB",
+   "color_source": "community",
+   "theme_id": "hatsune-miku",
+   "aliases": [
+    {
+     "text": "初音ミク",
+     "ambiguous": false
+    },
+    {
+     "text": "初音",
+     "ambiguous": false
+    },
+    {
+     "text": "はつねみく",
+     "ambiguous": false
+    },
+    {
+     "text": "hatsune miku",
+     "ambiguous": false
+    },
+    {
+     "text": "hatsune",
+     "ambiguous": false
+    },
+    {
+     "text": "ミク",
+     "ambiguous": true
+    },
+    {
+     "text": "miku",
+     "ambiguous": true
+    },
+    {
+     "text": "ミクさん",
+     "ambiguous": false
+    },
+    {
+     "text": "はちゅねミク",
+     "ambiguous": false
+    }
+   ]
+  },
+  {
+   "id": "kagamine_rin",
+   "franchise": "piapro",
+   "name": "鏡音リン",
+   "name_en": "Kagamine Rin",
+   "group": null,
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "鏡音リン",
+     "ambiguous": false
+    },
+    {
+     "text": "kagamine rin",
+     "ambiguous": false
+    },
+    {
+     "text": "リン",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "kagamine_len",
+   "franchise": "piapro",
+   "name": "鏡音レン",
+   "name_en": "Kagamine Len",
+   "group": null,
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "鏡音レン",
+     "ambiguous": false
+    },
+    {
+     "text": "kagamine len",
+     "ambiguous": false
+    },
+    {
+     "text": "レン",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "megurine_luka",
+   "franchise": "piapro",
+   "name": "巡音ルカ",
+   "name_en": "Megurine Luka",
+   "group": null,
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "巡音ルカ",
+     "ambiguous": false
+    },
+    {
+     "text": "megurine luka",
+     "ambiguous": false
+    },
+    {
+     "text": "ルカ",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "kaito",
+   "franchise": "piapro",
+   "name": "KAITO",
+   "name_en": "KAITO",
+   "group": null,
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "kaito",
+     "ambiguous": true
+    },
+    {
+     "text": "カイト",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "meiko",
+   "franchise": "piapro",
+   "name": "MEIKO",
+   "name_en": "MEIKO",
+   "group": null,
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "meiko",
+     "ambiguous": true
+    },
+    {
+     "text": "メイコ",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "usada_pekora",
+   "franchise": "hololive",
+   "name": "兎田ぺこら",
+   "name_en": "Usada Pekora",
+   "group": "3期生",
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "兎田ぺこら",
+     "ambiguous": false
+    },
+    {
+     "text": "usada pekora",
+     "ambiguous": false
+    },
+    {
+     "text": "ぺこら",
+     "ambiguous": false
+    },
+    {
+     "text": "ぺこーら",
+     "ambiguous": false
+    },
+    {
+     "text": "ぺこちゃん",
+     "ambiguous": false
+    },
+    {
+     "text": "pekora",
+     "ambiguous": false
+    }
+   ]
+  },
+  {
+   "id": "houshou_marine",
+   "franchise": "hololive",
+   "name": "宝鐘マリン",
+   "name_en": "Houshou Marine",
+   "group": "3期生",
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "宝鐘マリン",
+     "ambiguous": false
+    },
+    {
+     "text": "houshou marine",
+     "ambiguous": false
+    },
+    {
+     "text": "マリン船長",
+     "ambiguous": false
+    },
+    {
+     "text": "船長",
+     "ambiguous": true
+    },
+    {
+     "text": "マリン",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "hoshimachi_suisei",
+   "franchise": "hololive",
+   "name": "星街すいせい",
+   "name_en": "Hoshimachi Suisei",
+   "group": "0期生",
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "星街すいせい",
+     "ambiguous": false
+    },
+    {
+     "text": "hoshimachi suisei",
+     "ambiguous": false
+    },
+    {
+     "text": "すいちゃん",
+     "ambiguous": false
+    },
+    {
+     "text": "すいせい",
+     "ambiguous": true
+    },
+    {
+     "text": "suisei",
+     "ambiguous": false
+    }
+   ]
+  },
+  {
+   "id": "sakura_miko",
+   "franchise": "hololive",
+   "name": "さくらみこ",
+   "name_en": "Sakura Miko",
+   "group": "0期生",
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "さくらみこ",
+     "ambiguous": false
+    },
+    {
+     "text": "sakura miko",
+     "ambiguous": false
+    },
+    {
+     "text": "みこち",
+     "ambiguous": false
+    },
+    {
+     "text": "みこ",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "shirakami_fubuki",
+   "franchise": "hololive",
+   "name": "白上フブキ",
+   "name_en": "Shirakami Fubuki",
+   "group": "1期生",
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "白上フブキ",
+     "ambiguous": false
+    },
+    {
+     "text": "shirakami fubuki",
+     "ambiguous": false
+    },
+    {
+     "text": "フブちゃん",
+     "ambiguous": false
+    },
+    {
+     "text": "白上",
+     "ambiguous": false
+    },
+    {
+     "text": "フブキ",
+     "ambiguous": true
+    },
+    {
+     "text": "fubuki",
+     "ambiguous": false
+    }
+   ]
+  },
+  {
+   "id": "inugami_korone",
+   "franchise": "hololive",
+   "name": "戌神ころね",
+   "name_en": "Inugami Korone",
+   "group": "ゲーマーズ",
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "戌神ころね",
+     "ambiguous": false
+    },
+    {
+     "text": "inugami korone",
+     "ambiguous": false
+    },
+    {
+     "text": "ころね",
+     "ambiguous": false
+    },
+    {
+     "text": "ころさん",
+     "ambiguous": false
+    },
+    {
+     "text": "korone",
+     "ambiguous": false
+    }
+   ]
+  },
+  {
+   "id": "tokoyami_towa",
+   "franchise": "hololive",
+   "name": "常闇トワ",
+   "name_en": "Tokoyami Towa",
+   "group": "4期生",
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "常闇トワ",
+     "ambiguous": false
+    },
+    {
+     "text": "tokoyami towa",
+     "ambiguous": false
+    },
+    {
+     "text": "トワ様",
+     "ambiguous": false
+    },
+    {
+     "text": "トワ",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "minato_aqua",
+   "franchise": "hololive",
+   "name": "湊あくあ",
+   "name_en": "Minato Aqua",
+   "group": "2期生",
+   "status": "graduated",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "湊あくあ",
+     "ambiguous": false
+    },
+    {
+     "text": "minato aqua",
+     "ambiguous": false
+    },
+    {
+     "text": "あくたん",
+     "ambiguous": false
+    },
+    {
+     "text": "あくあ",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "murasaki_shion",
+   "franchise": "hololive",
+   "name": "紫咲シオン",
+   "name_en": "Murasaki Shion",
+   "group": "2期生",
+   "status": "graduated",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "紫咲シオン",
+     "ambiguous": false
+    },
+    {
+     "text": "murasaki shion",
+     "ambiguous": false
+    },
+    {
+     "text": "シオンちゃん",
+     "ambiguous": false
+    },
+    {
+     "text": "シオン",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "amane_kanata",
+   "franchise": "hololive",
+   "name": "天音かなた",
+   "name_en": "Amane Kanata",
+   "group": "4期生",
+   "status": "graduated",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "天音かなた",
+     "ambiguous": false
+    },
+    {
+     "text": "amane kanata",
+     "ambiguous": false
+    },
+    {
+     "text": "かなたん",
+     "ambiguous": false
+    },
+    {
+     "text": "かなた",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "tsukino_mito",
+   "franchise": "nijisanji",
+   "name": "月ノ美兎",
+   "name_en": "Tsukino Mito",
+   "group": null,
+   "status": "active",
+   "color": "#E43F3B",
+   "color_source": "official",
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "月ノ美兎",
+     "ambiguous": false
+    },
+    {
+     "text": "tsukino mito",
+     "ambiguous": false
+    },
+    {
+     "text": "委員長",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "kuzuha",
+   "franchise": "nijisanji",
+   "name": "葛葉",
+   "name_en": "Kuzuha",
+   "group": null,
+   "status": "active",
+   "color": "#ACA7BB",
+   "color_source": "official",
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "葛葉",
+     "ambiguous": false
+    },
+    {
+     "text": "kuzuha",
+     "ambiguous": false
+    },
+    {
+     "text": "くずは",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "kanae",
+   "franchise": "nijisanji",
+   "name": "叶",
+   "name_en": "Kanae",
+   "group": null,
+   "status": "active",
+   "color": "#ABD3D8",
+   "color_source": "official",
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "叶",
+     "ambiguous": true
+    },
+    {
+     "text": "kanae",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "hyakumantenbara_salome",
+   "franchise": "nijisanji",
+   "name": "壱百満天原サロメ",
+   "name_en": "Hyakumantenbara Salome",
+   "group": null,
+   "status": "active",
+   "color": "#CD3796",
+   "color_source": "official",
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "壱百満天原サロメ",
+     "ambiguous": false
+    },
+    {
+     "text": "hyakumantenbara salome",
+     "ambiguous": false
+    },
+    {
+     "text": "サロメ嬢",
+     "ambiguous": false
+    },
+    {
+     "text": "サロメ",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "kenmochi_toya",
+   "franchise": "nijisanji",
+   "name": "剣持刀也",
+   "name_en": "Kenmochi Toya",
+   "group": null,
+   "status": "active",
+   "color": "#A590AE",
+   "color_source": "official",
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "剣持刀也",
+     "ambiguous": false
+    },
+    {
+     "text": "kenmochi toya",
+     "ambiguous": false
+    },
+    {
+     "text": "もちさん",
+     "ambiguous": false
+    },
+    {
+     "text": "剣持",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "lize_helesta",
+   "franchise": "nijisanji",
+   "name": "リゼ・ヘルエスタ",
+   "name_en": "Lize Helesta",
+   "group": null,
+   "status": "active",
+   "color": "#42FFFF",
+   "color_source": "official",
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "リゼ・ヘルエスタ",
+     "ambiguous": false
+    },
+    {
+     "text": "リゼヘルエスタ",
+     "ambiguous": false
+    },
+    {
+     "text": "lize helesta",
+     "ambiguous": false
+    },
+    {
+     "text": "リゼ",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "higuchi_kaede",
+   "franchise": "nijisanji",
+   "name": "樋口楓",
+   "name_en": "Higuchi Kaede",
+   "group": null,
+   "status": "active",
+   "color": "#FBAF71",
+   "color_source": "official",
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "樋口楓",
+     "ambiguous": false
+    },
+    {
+     "text": "higuchi kaede",
+     "ambiguous": false
+    },
+    {
+     "text": "でろーん",
+     "ambiguous": false
+    },
+    {
+     "text": "楓",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "fuwa_minato",
+   "franchise": "nijisanji",
+   "name": "不破湊",
+   "name_en": "Fuwa Minato",
+   "group": null,
+   "status": "active",
+   "color": "#BF69F4",
+   "color_source": "official",
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "不破湊",
+     "ambiguous": false
+    },
+    {
+     "text": "fuwa minato",
+     "ambiguous": false
+    },
+    {
+     "text": "ふわっち",
+     "ambiguous": false
+    }
+   ]
+  },
+  {
+   "id": "honma_himawari",
+   "franchise": "nijisanji",
+   "name": "本間ひまわり",
+   "name_en": "Honma Himawari",
+   "group": null,
+   "status": "active",
+   "color": "#FBE340",
+   "color_source": "official",
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "本間ひまわり",
+     "ambiguous": false
+    },
+    {
+     "text": "honma himawari",
+     "ambiguous": false
+    },
+    {
+     "text": "ひまわり",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "shiina_yuika",
+   "franchise": "nijisanji",
+   "name": "椎名唯華",
+   "name_en": "Shiina Yuika",
+   "group": null,
+   "status": "active",
+   "color": "#F1C8DE",
+   "color_source": "official",
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "椎名唯華",
+     "ambiguous": false
+    },
+    {
+     "text": "shiina yuika",
+     "ambiguous": false
+    },
+    {
+     "text": "しいな",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "hello_kitty",
+   "franchise": "sanrio",
+   "name": "ハローキティ",
+   "name_en": "Hello Kitty",
+   "group": null,
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": "hello-kitty",
+   "aliases": [
+    {
+     "text": "ハローキティ",
+     "ambiguous": false
+    },
+    {
+     "text": "hello kitty",
+     "ambiguous": false
+    },
+    {
+     "text": "キティちゃん",
+     "ambiguous": false
+    },
+    {
+     "text": "キティ",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "my_melody",
+   "franchise": "sanrio",
+   "name": "マイメロディ",
+   "name_en": "My Melody",
+   "group": null,
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": "my-melody",
+   "aliases": [
+    {
+     "text": "マイメロディ",
+     "ambiguous": false
+    },
+    {
+     "text": "my melody",
+     "ambiguous": false
+    },
+    {
+     "text": "マイメロ",
+     "ambiguous": false
+    }
+   ]
+  },
+  {
+   "id": "kuromi",
+   "franchise": "sanrio",
+   "name": "クロミ",
+   "name_en": "Kuromi",
+   "group": null,
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": "kuromi",
+   "aliases": [
+    {
+     "text": "クロミ",
+     "ambiguous": false
+    },
+    {
+     "text": "kuromi",
+     "ambiguous": false
+    }
+   ]
+  },
+  {
+   "id": "cinnamoroll",
+   "franchise": "sanrio",
+   "name": "シナモロール",
+   "name_en": "Cinnamoroll",
+   "group": null,
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": "cinnamoroll",
+   "aliases": [
+    {
+     "text": "シナモロール",
+     "ambiguous": false
+    },
+    {
+     "text": "cinnamoroll",
+     "ambiguous": false
+    },
+    {
+     "text": "シナモン",
+     "ambiguous": true
+    },
+    {
+     "text": "シナモ",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "pompompurin",
+   "franchise": "sanrio",
+   "name": "ポムポムプリン",
+   "name_en": "Pompompurin",
+   "group": null,
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": "pompompurin",
+   "aliases": [
+    {
+     "text": "ポムポムプリン",
+     "ambiguous": false
+    },
+    {
+     "text": "pompompurin",
+     "ambiguous": false
+    },
+    {
+     "text": "プリン",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "pochacco",
+   "franchise": "sanrio",
+   "name": "ポチャッコ",
+   "name_en": "Pochacco",
+   "group": null,
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": "pochacco",
+   "aliases": [
+    {
+     "text": "ポチャッコ",
+     "ambiguous": false
+    },
+    {
+     "text": "pochacco",
+     "ambiguous": false
+    }
+   ]
+  },
+  {
+   "id": "keroppi",
+   "franchise": "sanrio",
+   "name": "けろけろけろっぴ",
+   "name_en": "Keroppi",
+   "group": null,
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "けろけろけろっぴ",
+     "ambiguous": false
+    },
+    {
+     "text": "けろっぴ",
+     "ambiguous": false
+    },
+    {
+     "text": "keroppi",
+     "ambiguous": false
+    }
+   ]
+  },
+  {
+   "id": "little_twin_stars",
+   "franchise": "sanrio",
+   "name": "リトルツインスターズ",
+   "name_en": "Little Twin Stars",
+   "group": null,
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "リトルツインスターズ",
+     "ambiguous": false
+    },
+    {
+     "text": "little twin stars",
+     "ambiguous": false
+    },
+    {
+     "text": "キキララ",
+     "ambiguous": false
+    },
+    {
+     "text": "キキ",
+     "ambiguous": true
+    },
+    {
+     "text": "ララ",
+     "ambiguous": true
+    }
+   ]
+  },
+  {
+   "id": "hangyodon",
+   "franchise": "sanrio",
+   "name": "ハンギョドン",
+   "name_en": "Hangyodon",
+   "group": null,
+   "status": "active",
+   "color": null,
+   "color_source": null,
+   "theme_id": null,
+   "aliases": [
+    {
+     "text": "ハンギョドン",
+     "ambiguous": false
+    },
+    {
+     "text": "hangyodon",
+     "ambiguous": false
+    }
+   ]
+  }
+ ],
+ "goods_types": [
+  {
+   "id": "acrylic_stand",
+   "name": "アクリルスタンド",
+   "synonyms": [
+    "アクリルスタンド",
+    "アクスタ",
+    "アクリルフィギュア",
+    "bigアクスタ",
+    "acrylic stand",
+    "acryl stand"
+   ]
+  },
+  {
+   "id": "tapestry",
+   "name": "タペストリー",
+   "synonyms": [
+    "タペストリー",
+    "タペ",
+    "b2タペストリー",
+    "b1タペストリー",
+    "tapestry"
+   ]
+  },
+  {
+   "id": "plush",
+   "name": "ぬいぐるみ",
+   "synonyms": [
+    "ぬいぐるみ",
+    "ぬい",
+    "マスコット",
+    "寝そべり",
+    "ふわぷち",
+    "plush",
+    "plushie",
+    "plushy",
+    "stuffed toy"
+   ]
+  },
+  {
+   "id": "cushion",
+   "name": "クッション",
+   "synonyms": [
+    "ダイカットクッション",
+    "クッション",
+    "cushion"
+   ]
+  },
+  {
+   "id": "can_badge",
+   "name": "缶バッジ",
+   "synonyms": [
+    "缶バッジ",
+    "缶バ",
+    "badge",
+    "button badge"
+   ]
+  },
+  {
+   "id": "poster",
+   "name": "ポスター",
+   "synonyms": [
+    "ポスター",
+    "poster"
+   ]
+  },
+  {
+   "id": "uchiwa",
+   "name": "うちわ",
+   "synonyms": [
+    "うちわ",
+    "団扇",
+    "uchiwa"
+   ]
+  },
+  {
+   "id": "rubber_mat",
+   "name": "ラバーマット",
+   "synonyms": [
+    "ラバーマット",
+    "プレイマット",
+    "rubber mat",
+    "playmat"
+   ]
+  },
+  {
+   "id": "blanket",
+   "name": "ブランケット",
+   "synonyms": [
+    "ブランケット",
+    "blanket"
+   ]
+  },
+  {
+   "id": "acrylic_panel",
+   "name": "アクリルパネル",
+   "synonyms": [
+    "アクリルパネル",
+    "アクリルブロック",
+    "acrylic panel",
+    "acrylic block"
+   ]
+  },
+  {
+   "id": "figure",
+   "name": "フィギュア",
+   "synonyms": [
+    "フィギュア",
+    "プライズフィギュア",
+    "figure",
+    "figurine"
+   ]
+  }
+ ]
+}
