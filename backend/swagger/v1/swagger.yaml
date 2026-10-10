@@ -749,6 +749,49 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/FurnitureModelBinding"
+        goods_type:
+          type: string
+          nullable: true
+          description: config/characters.json の goods_types[].id。家具は null
+          example:
+        characters:
+          type: array
+          items:
+            type: string
+          description: config/characters.json の characters[].id
+          example: []
+        search_terms:
+          type: array
+          items:
+            type: string
+          description: 検索で一致させる追加の語
+          example: []
+        credits:
+          type: array
+          description: キャラクターのフランチャイズごとのクレジットと注意書き
+          items:
+            type: object
+            properties:
+              franchise:
+                type: string
+                example: piapro
+              credit:
+                type: string
+                nullable: true
+                example: "© Crypton Future Media, INC. www.piapro.net"
+              notice:
+                type: string
+                nullable: true
+              license_url:
+                type: string
+                nullable: true
+                example: https://piapro.jp/license/character_guideline
+            required:
+            - franchise
+            - credit
+            - notice
+            - license_url
+          example: []
       required:
       - id
       - name
@@ -766,6 +809,10 @@ components:
       - materials
       - model_url
       - bindings
+      - goods_type
+      - characters
+      - search_terms
+      - credits
     Position:
       type: object
       description: 物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き
@@ -1346,6 +1393,8 @@ components:
           - oshi_goods
           - acrylic_stand_case
           - display_case
+          - plush
+          - blanket
           - tapestry
           - neon
           - wall_shelf
@@ -1395,11 +1444,83 @@ components:
           items:
             type: string
           example: []
+        interpretation:
+          type: object
+          description: 推し活グッズとしての解釈。キャラクター・フランチャイズ・単独で使えるグッズ種別があればグッズ検索になり、products[].product_metadata.charactersに商品名で確認したキャラクターIDを入れる。家具検索ではsource=none
+          properties:
+            characters:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: hatsune_miku
+                  name:
+                    type: string
+                    example: 初音ミク
+                  franchise:
+                    type: string
+                    example: piapro
+                required:
+                - id
+                - name
+                - franchise
+              example: []
+            franchises:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: nijisanji
+                  name:
+                    type: string
+                    example: にじさんじ
+                required:
+                - id
+                - name
+              example: []
+            goods_types:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: acrylic_stand
+                  name:
+                    type: string
+                    example: アクリルスタンド
+                required:
+                - id
+                - name
+              example: []
+            source:
+              type: string
+              enum:
+              - dictionary
+              - llm
+              - none
+              example: none
+          required:
+          - characters
+          - franchises
+          - goods_types
+          - source
+        models:
+          type: array
+          description: 解釈に合う台帳モデル。キャラクターとグッズ種別が一致、キャラクターだけ一致、グッズ種別のテンプレートの順
+          items:
+            "$ref": "#/components/schemas/FurnitureModel"
       required:
       - products
       - color
       - failures
       - search_entry_points
+      - interpretation
+      - models
     ProductColorVariant:
       type: object
       properties:
@@ -1441,6 +1562,8 @@ components:
           - oshi_goods
           - acrylic_stand_case
           - display_case
+          - plush
+          - blanket
           - tapestry
           - neon
           - wall_shelf

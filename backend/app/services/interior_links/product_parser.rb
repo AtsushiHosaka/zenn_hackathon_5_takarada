@@ -13,6 +13,9 @@ module InteriorLinks
       [ "oshi_goods", "desk_top", /缶バッジ\s?(?:ディスプレイ|ホルダー|ボード|スタンド)|バッジディスプレイ/ ],
       [ "acrylic_stand_case", "desk_top", /アクスタ(?:ケース|ボックス)|アクリルスタンド(?:用)?ケース|アクリル(?:コレクション|ディスプレイ)(?:ケース|スタンド)/ ],
       [ "display_case", "display", /(?:コレクション|ディスプレイ|フィギュア)(?:ケース|ラック|キャビネット)|ガラス(?:キャビネット|ケース)/ ],
+      # Character goods themselves (specs/character-goods/spec.md); stands and cases for them match above.
+      [ "oshi_goods", "desk_top", /アクリル(?:スタンド|フィギュア|パネル|ブロック)|アクスタ|缶バッジ|ラバーマット|プレイマット|うちわ|団扇|フィギュア/ ],
+      [ "plush", "display", /ぬいぐるみ|ヌイグルミ|寝そべり|ふわぷち/ ], [ "blanket", "cushion", /ブランケット|ひざ掛け|膝掛け/ ],
       [ "tapestry", "wall_decor", /タペストリー/ ], [ "neon", "wall_decor", /ネオン(?:サイン|ライト|管)/ ],
       [ "wall_shelf", "wall_decor", /ウォール\s?(?:シェルフ|ラック)|壁(?:掛け|付け)(?:棚|ラック|シェルフ)/ ],
       [ "bed_cover", "bed_cover", /掛け?布団カバー|掛ふとんカバー|ベッドカバー|掛けふとんカバー/ ],
@@ -35,7 +38,10 @@ module InteriorLinks
     ].freeze
     # Carried or worn "アクスタケース" (pouches, binders, phone cases) are not room display items.
     PORTABLE_GOODS = /ポーチ|持ち運び|バインダー|リフィル|スマホケース|iPhone|ペンケース|筆箱|筆入れ|バッグ|痛バ/
+    # Worn or carried character goods (keychains, apparel, stationery) are not placed in a room either.
+    WORN_GOODS = /キーホルダー|キーチェーン|キーリング|ストラップ|ボールチェーン|チャーム|スマホ|Tシャツ|パーカー|靴下|ソックス|帽子|キャップ|ネックレス|ピアス|イヤリング|ヘア(?:ゴム|クリップ|ピン)|ステッカー|シール|クリアファイル|ボールペン/i
     DISPLAY_GOODS = %w[oshi_goods acrylic_stand_case display_case].freeze
+    CARRIED_CHECK_CATEGORIES = (DISPLAY_GOODS + %w[plush blanket]).freeze
     THIN_AXES = { "rug" => [ "h", 0.02 ], "bed_cover" => [ "h", 0.04 ],
                   "curtain" => [ "d", 0.04 ], "cushion" => [ "h", 0.15 ], "wall_art" => [ "d", 0.02 ],
                   "tapestry" => [ "d", 0.01 ], "neon" => [ "d", 0.03 ] }.freeze
@@ -55,7 +61,8 @@ module InteriorLinks
       "acrylic_stand_case" => { "w" => 0.3, "h" => 0.15, "d" => 0.15 }, "display_case" => { "w" => 0.4, "h" => 1.2, "d" => 0.3 },
       "oshi_goods" => { "w" => 0.25, "h" => 0.38, "d" => 0.1 }, "tapestry" => { "w" => 0.6, "h" => 0.9, "d" => 0.01 },
       "neon" => { "w" => 0.4, "h" => 0.35, "d" => 0.03 }, "wall_shelf" => { "w" => 0.6, "h" => 0.15, "d" => 0.15 },
-      "vase" => { "w" => 0.15, "h" => 0.4, "d" => 0.15 }, "candle" => { "w" => 0.1, "h" => 0.12, "d" => 0.1 }
+      "vase" => { "w" => 0.15, "h" => 0.4, "d" => 0.15 }, "candle" => { "w" => 0.1, "h" => 0.12, "d" => 0.1 },
+      "plush" => { "w" => 0.25, "h" => 0.3, "d" => 0.2 }, "blanket" => { "w" => 0.45, "h" => 0.12, "d" => 0.35 }
     ).freeze
 
     class Unverified < StandardError; end
@@ -289,10 +296,9 @@ module InteriorLinks
     end
 
     def category_for(name, product)
-      return if PORTABLE_GOODS.match?(name) && DISPLAY_GOODS.include?(CATEGORY_RULES.find { |_, _, pattern| pattern.match?(name) }&.first)
-
       rule = CATEGORY_RULES.find { |_, _, pattern| pattern.match?(name) } ||
         CATEGORY_RULES.find { |_, _, pattern| pattern.match?(product["category"].to_s) }
+      return if rule && CARRIED_CHECK_CATEGORIES.include?(rule.first) && (PORTABLE_GOODS.match?(name) || (rule.first != "display_case" && WORN_GOODS.match?(name)))
       return rule.first(2) if rule
 
       category = product["category"].to_s

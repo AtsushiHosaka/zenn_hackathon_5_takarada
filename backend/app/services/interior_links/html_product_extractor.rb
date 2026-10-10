@@ -8,7 +8,7 @@ module InteriorLinks
     MAX_HTML_BYTES = 120_000
     DEADLINE_SECONDS = 25
     CATEGORIES = %w[bed_cover curtain rug cushion floor_lamp desk_lamp wall_mirror wall_art wall_planter plant small_plant sofa bed desk chair shelf table storage tv_stand wardrobe
-                    acrylic_stand_case oshi_goods display_case tapestry neon wall_shelf vase candle].freeze
+                    acrylic_stand_case oshi_goods display_case tapestry neon wall_shelf vase candle plush blanket].freeze
     SHAPES = %w[round oval rectangular corner_left corner_right corner tripod unknown].freeze
     class Error < StandardError; end
 

@@ -35,9 +35,11 @@
 
 家具検索API（`POST /api/v1/furniture_searches`）の応答に次を足す。
 
-- `interpretation`: `{ characters: [{id, name, franchise}], goods_types: [{id, name}], source: "dictionary" | "llm" | "none" }`
+- `interpretation`: `{ characters: [{id, name, franchise}], franchises: [{id, name}], goods_types: [{id, name}], source: "dictionary" | "llm" | "none" }`
 - `models`: 解釈に合う台帳モデル。家具モデルAPIと同じ形
 - `products[].product_metadata.characters`: 商品名で確認できたキャラクターID
+
+グッズ検索では、台帳のモデルはECに依存しないため、Gemini未設定やEC検索の失敗時も`models`を返す（`products`は空、失敗時は`failures`=1）。家具検索の挙動は変えない。
 
 ## 検索の手順
 
@@ -51,5 +53,10 @@
 
 ## 未確認・制約
 
-- 主要なグッズ店（ホロライブ公式ショップ、にじさんじオフィシャルストア、アニメイトなど）のページを取得・解析できるかは実装時に確認する。
+- 主要なグッズ店は取得先に加えていない（2026-10-10確認）。ECはYahoo!ショッピングなど既存の店舗だけで探す。
+  - ホロライブ公式ショップ（Shopify）: 商品ページにJSON-LDのProductがなく、HTMLは約1.2MBで、税込の表記もない。複数キャラクターを1商品のバリエーションにまとめるため、商品名でキャラクターを確認できない。
+  - にじさんじオフィシャルストア: JSON-LDはないが、HTMLは約90KBで、商品名と税込価格が本文にある。GeminiによるHTML抽出なら解析できる見込みだが、未検証のため加えていない。
+  - アニメイト通販: robots.txtの`Crawl-delay: 1180`を守ると、検索時間内に取得できない。
+- グッズ検索で、正式名と曖昧でない別名が商品名にないEC商品は除く。フランチャイズだけの検索では、フランチャイズ名を含む商品も残す。
+- 辞書にない名前のGemini解釈は、「グッズ」「推し」などの語があるか、単独で使えるグッズ種別と辞書にないカタカナ語が並ぶ場合だけ行う。
 - ピアプロ以外のキャラクターの色は公式値がない。ホロライブの色は空とする。

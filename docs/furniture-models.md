@@ -15,6 +15,7 @@
 | `format`、`byte_size`、`sha256` | ファイル形式、バイト数、内容の照合に使うハッシュ |
 | `triangle_count`、`materials` | 三角形の数と素材名 |
 | `enabled` | 配信対象かどうか。無効ならURLを返さない |
+| `goods_type`、`characters`、`search_terms` | 推し活グッズの種別とキャラクター（`backend/config/characters.json`のID）、検索用の追加語。家具はnullと`[]`。APIはキャラクターから導いた`credits`も返す |
 
 座標は`+Y`が上、`+Z`が正面、原点は底面中心で統一する。モデルの寸法と、部屋のシーンに保存した配置寸法は別に扱う。ローダーは配置寸法の範囲に収まるようモデル全体を拡縮する。
 

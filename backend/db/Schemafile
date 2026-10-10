@@ -95,10 +95,16 @@ create_table "furniture_models", force: :cascade do |t|
   t.string "sha256", null: false
   t.jsonb "materials", null: false, default: []
   t.boolean "enabled", null: false, default: true
+  # 推し活グッズ: config/characters.json の goods_types[].id / characters[].id と検索用の追加語
+  t.string "goods_type"
+  t.jsonb "characters", null: false, default: []
+  t.jsonb "search_terms", null: false, default: []
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
 
   t.index [ "key" ], unique: true
+  t.index [ "goods_type" ]
+  t.index [ "characters" ], using: :gin
   t.check_constraint "width > 0::numeric AND width < 10000::numeric AND height > 0::numeric AND height < 10000::numeric AND depth > 0::numeric AND depth < 10000::numeric", name: "furniture_models_positive_dimensions"
   t.check_constraint "triangle_count >= 0 AND byte_size > 0", name: "furniture_models_valid_counts"
   t.check_constraint "format::text = 'glb'::text", name: "furniture_models_glb_format"

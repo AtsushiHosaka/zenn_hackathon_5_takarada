@@ -70,14 +70,37 @@ class FurnitureModelImporter
     check(model["triangles"].is_a?(Integer) && model["triangles"].between?(0, 2_147_483_647), "#{label}.triangles must be a nonnegative 32-bit integer")
     check(model["bytes"].is_a?(Integer) && model["bytes"].between?(1, 9_223_372_036_854_775_807), "#{label}.bytes must be a positive 64-bit integer")
     check(model["materials"].is_a?(Array) && model["materials"].all? { |material| material.is_a?(String) }, "#{label}.materials must be an array of strings")
+    goods_type, characters, search_terms = validate_goods(model, label)
 
     {
       key: model.fetch("id"), name: model.fetch("name"), category: model.fetch("category"),
       shape: model.fetch("shape"), variant: model["variant"], format: model.fetch("format"),
       object_key: model.fetch("object_key"), width: size[0], height: size[1], depth: size[2],
       triangle_count: model.fetch("triangles"), byte_size: model.fetch("bytes"),
-      sha256: model.fetch("sha256"), materials: model.fetch("materials")
+      sha256: model.fetch("sha256"), materials: model.fetch("materials"),
+      goods_type: goods_type, characters: characters, search_terms: search_terms
     }
+  end
+
+  # 推し活グッズの任意フィールド。省略時は null / [] として扱う。
+  def validate_goods(model, label)
+    goods_type = model["goods_type"]
+    characters = model.fetch("characters", [])
+    search_terms = model.fetch("search_terms", [])
+    check(goods_type.nil? || CharacterCatalog.goods_type(goods_type), "#{label}.goods_type must be null or a goods_types id in config/characters.json")
+    check(string_array?(characters), "#{label}.characters must be an array of strings")
+    check(string_array?(search_terms), "#{label}.search_terms must be an array of strings")
+    check(characters.uniq.length == characters.length, "#{label}.characters must not contain duplicates")
+    characters.each do |id|
+      check(CharacterCatalog.character(id), "#{label}.characters contains unknown character #{id}")
+      check(CharacterCatalog.likeness_allowed?(id), "#{label}.characters contains #{id}, whose franchise does not allow character likenesses")
+    end
+    check(characters.empty? || goods_type, "#{label}.characters requires a goods_type")
+    [ goods_type, characters, search_terms ]
+  end
+
+  def string_array?(value)
+    value.is_a?(Array) && value.all? { |item| item.is_a?(String) && item.present? }
   end
 
   def validate_binding(binding, model_keys, index)

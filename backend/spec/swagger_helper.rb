@@ -144,9 +144,27 @@ RSpec.configure do |config|
               sha256: { type: :string, pattern: "^[0-9a-f]{64}$", example: "a" * 64 },
               materials: { type: :array, items: { type: :string }, example: [ "wood", "fabric" ] },
               model_url: { type: :string, nullable: true, description: "GCS の公開 GLB URL。ベース URL が未設定なら null", example: nil },
-              bindings: { type: :array, items: { "$ref" => "#/components/schemas/FurnitureModelBinding" } }
+              bindings: { type: :array, items: { "$ref" => "#/components/schemas/FurnitureModelBinding" } },
+              goods_type: { type: :string, nullable: true, description: "config/characters.json の goods_types[].id。家具は null", example: nil },
+              characters: { type: :array, items: { type: :string }, description: "config/characters.json の characters[].id", example: [] },
+              search_terms: { type: :array, items: { type: :string }, description: "検索で一致させる追加の語", example: [] },
+              credits: {
+                type: :array,
+                description: "キャラクターのフランチャイズごとのクレジットと注意書き",
+                items: {
+                  type: :object,
+                  properties: {
+                    franchise: { type: :string, example: "piapro" },
+                    credit: { type: :string, nullable: true, example: "© Crypton Future Media, INC. www.piapro.net" },
+                    notice: { type: :string, nullable: true },
+                    license_url: { type: :string, nullable: true, example: "https://piapro.jp/license/character_guideline" }
+                  },
+                  required: %w[franchise credit notice license_url]
+                },
+                example: []
+              }
             },
-            required: %w[id name category shape variant format object_key size unit axes triangle_count byte_size sha256 materials model_url bindings]
+            required: %w[id name category shape variant format object_key size unit axes triangle_count byte_size sha256 materials model_url bindings goods_type characters search_terms credits]
           },
           Position: {
             type: :object,
@@ -357,9 +375,49 @@ RSpec.configure do |config|
               products: { type: :array, maxItems: 24, items: { "$ref" => "#/components/schemas/ImportedFurniture" } },
               color: { type: :string, nullable: true, example: "blue" },
               failures: { type: :integer, minimum: 0, example: 0 },
-              search_entry_points: { type: :array, items: { type: :string }, example: [] }
+              search_entry_points: { type: :array, items: { type: :string }, example: [] },
+              interpretation: {
+                type: :object,
+                description: "推し活グッズとしての解釈。キャラクター・フランチャイズ・単独で使えるグッズ種別があればグッズ検索になり、products[].product_metadata.charactersに商品名で確認したキャラクターIDを入れる。家具検索ではsource=none",
+                properties: {
+                  characters: {
+                    type: :array,
+                    items: {
+                      type: :object,
+                      properties: {
+                        id: { type: :string, example: "hatsune_miku" },
+                        name: { type: :string, example: "初音ミク" },
+                        franchise: { type: :string, example: "piapro" }
+                      },
+                      required: %w[id name franchise]
+                    },
+                    example: []
+                  },
+                  franchises: {
+                    type: :array,
+                    items: {
+                      type: :object,
+                      properties: { id: { type: :string, example: "nijisanji" }, name: { type: :string, example: "にじさんじ" } },
+                      required: %w[id name]
+                    },
+                    example: []
+                  },
+                  goods_types: {
+                    type: :array,
+                    items: {
+                      type: :object,
+                      properties: { id: { type: :string, example: "acrylic_stand" }, name: { type: :string, example: "アクリルスタンド" } },
+                      required: %w[id name]
+                    },
+                    example: []
+                  },
+                  source: { type: :string, enum: %w[dictionary llm none], example: "none" }
+                },
+                required: %w[characters franchises goods_types source]
+              },
+              models: { type: :array, description: "解釈に合う台帳モデル。キャラクターとグッズ種別が一致、キャラクターだけ一致、グッズ種別のテンプレートの順", items: { "$ref" => "#/components/schemas/FurnitureModel" } }
             },
-            required: %w[products color failures search_entry_points]
+            required: %w[products color failures search_entry_points interpretation models]
           },
           ProductColorVariant: {
             type: :object,

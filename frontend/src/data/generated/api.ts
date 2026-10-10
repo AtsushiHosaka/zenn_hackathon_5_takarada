@@ -1106,6 +1106,34 @@ export interface components {
              */
             model_url: string | null;
             bindings: components["schemas"]["FurnitureModelBinding"][];
+            /**
+             * @description config/characters.json の goods_types[].id。家具は null
+             * @example null
+             */
+            goods_type: string | null;
+            /**
+             * @description config/characters.json の characters[].id
+             * @example []
+             */
+            characters: string[];
+            /**
+             * @description 検索で一致させる追加の語
+             * @example []
+             */
+            search_terms: string[];
+            /**
+             * @description キャラクターのフランチャイズごとのクレジットと注意書き
+             * @example []
+             */
+            credits: {
+                /** @example piapro */
+                franchise: string;
+                /** @example © Crypton Future Media, INC. www.piapro.net */
+                credit: string | null;
+                notice: string | null;
+                /** @example https://piapro.jp/license/character_guideline */
+                license_url: string | null;
+            }[];
         };
         /** @description 物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き */
         Position: {
@@ -1453,7 +1481,7 @@ export interface components {
              * @example table
              * @enum {string}
              */
-            category?: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
+            category?: "oshi_goods" | "acrylic_stand_case" | "display_case" | "plush" | "blanket" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
         };
         FurnitureSearchResult: {
             products: components["schemas"]["ImportedFurniture"][];
@@ -1463,6 +1491,39 @@ export interface components {
             failures: number;
             /** @example [] */
             search_entry_points: string[];
+            /** @description 推し活グッズとしての解釈。キャラクター・フランチャイズ・単独で使えるグッズ種別があればグッズ検索になり、products[].product_metadata.charactersに商品名で確認したキャラクターIDを入れる。家具検索ではsource=none */
+            interpretation: {
+                /** @example [] */
+                characters: {
+                    /** @example hatsune_miku */
+                    id: string;
+                    /** @example 初音ミク */
+                    name: string;
+                    /** @example piapro */
+                    franchise: string;
+                }[];
+                /** @example [] */
+                franchises: {
+                    /** @example nijisanji */
+                    id: string;
+                    /** @example にじさんじ */
+                    name: string;
+                }[];
+                /** @example [] */
+                goods_types: {
+                    /** @example acrylic_stand */
+                    id: string;
+                    /** @example アクリルスタンド */
+                    name: string;
+                }[];
+                /**
+                 * @example none
+                 * @enum {string}
+                 */
+                source: "dictionary" | "llm" | "none";
+            };
+            /** @description 解釈に合う台帳モデル。キャラクターとグッズ種別が一致、キャラクターだけ一致、グッズ種別のテンプレートの順 */
+            models: components["schemas"]["FurnitureModel"][];
         };
         ProductColorVariant: {
             /** @example ホワイト */
@@ -1487,7 +1548,7 @@ export interface components {
              * @example chair
              * @enum {string}
              */
-            category: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
+            category: "oshi_goods" | "acrylic_stand_case" | "display_case" | "plush" | "blanket" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
             /** @example #f2efe8 */
             color: string;
             size: components["schemas"]["Size"];
