@@ -142,11 +142,11 @@ RSpec.configure do |config|
               triangle_count: { type: :integer, minimum: 0, example: 1200 },
               byte_size: { type: :integer, minimum: 1, example: 48000 },
               sha256: { type: :string, pattern: "^[0-9a-f]{64}$", example: "a" * 64 },
-              materials: { type: :array, items: { type: :string }, example: [ "wood", "fabric" ] },
+              color_material_keys: { type: :array, items: { type: :string }, description: "色が分かれている部位の名前 (GLB の素材名)", example: [ "tint", "wood" ] },
               model_url: { type: :string, nullable: true, description: "GCS の公開 GLB URL。ベース URL が未設定なら null", example: nil },
               bindings: { type: :array, items: { "$ref" => "#/components/schemas/FurnitureModelBinding" } }
             },
-            required: %w[id name category shape variant format object_key size unit axes triangle_count byte_size sha256 materials model_url bindings]
+            required: %w[id name category shape variant format object_key size unit axes triangle_count byte_size sha256 color_material_keys model_url bindings]
           },
           Position: {
             type: :object,
@@ -372,7 +372,8 @@ RSpec.configure do |config|
               furniture_id: { type: :integer, minimum: 1, example: 1 },
               name: { type: :string, example: "SANDSBERG サンドスベリ チェア - ホワイト" },
               category: { type: :string, enum: FurnitureSearch::CATEGORIES, example: "chair" },
-              color: { type: :string, example: "#f2efe8" },
+              symbolic_color: { type: :string, description: "代表色", example: "#f2efe8" },
+              color_materials: { type: :object, additionalProperties: { type: :string, pattern: "^#[0-9a-fA-F]{6}$" }, description: "部位ごとの色。キーは家具の color_material_keys。無い部位はモデルの色のまま", example: { "tint" => "#f2efe8", "wood" => "#b08960" } },
               color_name: { type: :string, nullable: true, example: "ホワイト" },
               size: { "$ref" => "#/components/schemas/Size" },
               price: { type: :integer, minimum: 1, description: "リンク先の参考価格 (税込)", example: 2000 },
@@ -385,7 +386,7 @@ RSpec.configure do |config|
               model_size: { allOf: [ { "$ref" => "#/components/schemas/Size" } ], nullable: true, example: nil },
               model_fit: { type: :string, enum: [ "contain", nil ], nullable: true, example: nil }
             },
-            required: %w[furniture_detail_id furniture_id name category color color_name size price shop url image_url product_metadata model_url model_match model_size model_fit]
+            required: %w[furniture_detail_id furniture_id name category symbolic_color color_materials color_name size price shop url image_url product_metadata model_url model_match model_size model_fit]
           },
           FurnitureSearchProduct: {
             allOf: [

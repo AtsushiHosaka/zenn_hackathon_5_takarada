@@ -11,7 +11,7 @@ class FurnitureSearchSerializer
   end
 
   def self.detail_attributes(detail)
-    detail.scene_attributes.except("label", "texture_status")
-      .merge("name" => detail.name, "furniture_id" => detail.furniture_id, "color_name" => detail.color_name)
+    detail.scene_attributes.except("label", "texture_status", "color")
+      .merge("name" => detail.name, "furniture_id" => detail.furniture_id, "symbolic_color" => detail.symbolic_color, "color_name" => detail.color_name)
   end
 end

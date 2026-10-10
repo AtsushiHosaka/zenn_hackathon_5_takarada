@@ -13,7 +13,7 @@ class FurnitureTextureGenerator
     @attempts = 0
   end
 
-  def call(item:, model:, max_images:, deadline:)
+  def call(item:, model:, materials:, max_images:, deadline:)
     metadata = item.fetch("product_metadata", {}).to_h
     description = {
       color: metadata["official_color"].presence || metadata["color_name"].presence || item["color"],
@@ -25,7 +25,7 @@ class FurnitureTextureGenerator
     overrides = {}
     location = ENV["GEMINI_IMAGE_LOCATION"].presence || (@client.model.start_with?("imagen-") ? "us-central1" : "global")
     storage_scope = [ ENV["MODELS_BUCKET"], @storage.class.name, Rails.env.local? ]
-    model.materials.select { |material| MATERIALS.include?(material) }.each do |material|
+    materials.select { |material| MATERIALS.include?(material) }.each do |material|
       prompt = texture_prompt(description, material)
       key = Digest::SHA256.hexdigest([ VERSION, @client.model, GeminiClient.provider, location, storage_scope, item["item_id"], metadata["variant_id"], model.sha256, material, prompt, TILE_SIZE_M ].to_json)
       texture = FurnitureTexture.find_by(generation_key: key)

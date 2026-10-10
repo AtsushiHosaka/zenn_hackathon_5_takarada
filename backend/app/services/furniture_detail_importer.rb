@@ -27,7 +27,7 @@ class FurnitureDetailImporter
         detail = FurnitureDetail.find_or_initialize_by(key: row["key"])
         detail.update!(
           furniture:, position: index,
-          **row.slice("name", "category", "slot", "color", "color_name", "price", "shop", "url", "image_url", "themes", "metadata", "checked_at").symbolize_keys,
+          **row.slice("name", "category", "slot", "symbolic_color", "color_materials", "color_name", "price", "shop", "url", "image_url", "themes", "metadata", "checked_at").symbolize_keys,
           width: size["w"], height: size["h"], depth: size["d"]
         )
         detail.key

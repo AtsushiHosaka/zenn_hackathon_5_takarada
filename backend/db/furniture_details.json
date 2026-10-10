@@ -6,7 +6,10 @@
       "category": "bed_cover",
       "slot": "bed_cover",
       "model_key": "bed_cover__101",
-      "color": "#b9a3e3",
+      "symbolic_color": "#b9a3e3",
+      "color_materials": {
+        "tint": "#b9a3e3"
+      },
       "color_name": null,
       "size": {
         "w": 1.5,
@@ -34,7 +37,10 @@
       "category": "curtain",
       "slot": "curtain",
       "model_key": "curtain_pair__102",
-      "color": "#f5f3ee",
+      "symbolic_color": "#f5f3ee",
+      "color_materials": {
+        "tint": "#f5f3ee"
+      },
       "color_name": null,
       "size": {
         "w": 1.45,
@@ -62,7 +68,10 @@
       "category": "curtain",
       "slot": "curtain",
       "model_key": "curtain_sheer__115",
-      "color": "#d9cdf0",
+      "symbolic_color": "#d9cdf0",
+      "color_materials": {
+        "tint": "#d9cdf0"
+      },
       "color_name": null,
       "size": {
         "w": 1.0,
@@ -91,7 +100,10 @@
       "category": "rug",
       "slot": "rug",
       "model_key": "rug_rect__103",
-      "color": "#ccbaa9",
+      "symbolic_color": "#ccbaa9",
+      "color_materials": {
+        "tint": "#ccbaa9"
+      },
       "color_name": "ベージュ, ホワイト",
       "size": {
         "d": 1.95,
@@ -175,7 +187,10 @@
       "category": "wall_shelf",
       "slot": "wall_decor",
       "model_key": "shelf_floating",
-      "color": "#ffffff",
+      "symbolic_color": "#ffffff",
+      "color_materials": {
+        "tint": "#ffffff"
+      },
       "color_name": null,
       "size": {
         "w": 1.1,
@@ -203,7 +218,10 @@
       "category": "tapestry",
       "slot": "wall_decor",
       "model_key": "tapestry",
-      "color": "#c3aee8",
+      "symbolic_color": "#c3aee8",
+      "color_materials": {
+        "tint": "#c3aee8"
+      },
       "color_name": null,
       "size": {
         "w": 0.6,
@@ -232,7 +250,10 @@
       "category": "floor_lamp",
       "slot": "light",
       "model_key": "floor_lamp",
-      "color": "#222222",
+      "symbolic_color": "#222222",
+      "color_materials": {
+        "tint": "#222222"
+      },
       "color_name": null,
       "size": {
         "w": 0.255,
@@ -260,7 +281,10 @@
       "category": "floor_lamp",
       "slot": "light",
       "model_key": "floor_lamp_slim",
-      "color": "#222222",
+      "symbolic_color": "#222222",
+      "color_materials": {
+        "light": "#222222"
+      },
       "color_name": null,
       "size": {
         "w": 0.12,
@@ -288,7 +312,10 @@
       "category": "display_case",
       "slot": "display",
       "model_key": "display_case",
-      "color": "#d6d8d0",
+      "symbolic_color": "#d6d8d0",
+      "color_materials": {
+        "tint": "#d6d8d0"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.3,
@@ -372,7 +399,10 @@
       "category": "display_case",
       "slot": "display",
       "model_key": "display_rack_open",
-      "color": "#efefef",
+      "symbolic_color": "#efefef",
+      "color_materials": {
+        "tint": "#efefef"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.32,
@@ -456,7 +486,10 @@
       "category": "cushion",
       "slot": "cushion",
       "model_key": "cushion__107",
-      "color": "#cbb8e6",
+      "symbolic_color": "#cbb8e6",
+      "color_materials": {
+        "tint": "#cbb8e6"
+      },
       "color_name": null,
       "size": {
         "w": 0.6,
@@ -484,7 +517,10 @@
       "category": "acrylic_stand_case",
       "slot": "desk_top",
       "model_key": "acrylic_stand_case",
-      "color": "#eeeeee",
+      "symbolic_color": "#eeeeee",
+      "color_materials": {
+        "tint": "#eeeeee"
+      },
       "color_name": null,
       "size": {
         "w": 0.252,
@@ -512,7 +548,10 @@
       "category": "bed_cover",
       "slot": "bed_cover",
       "model_key": "bed_cover__201",
-      "color": "#9cae8c",
+      "symbolic_color": "#9cae8c",
+      "color_materials": {
+        "tint": "#9cae8c"
+      },
       "color_name": null,
       "size": {
         "w": 1.5,
@@ -540,7 +579,10 @@
       "category": "curtain",
       "slot": "curtain",
       "model_key": "curtain_pair__202",
-      "color": "#c8d6b4",
+      "symbolic_color": "#c8d6b4",
+      "color_materials": {
+        "tint": "#c8d6b4"
+      },
       "color_name": null,
       "size": {
         "w": 1.0,
@@ -568,7 +610,10 @@
       "category": "rug",
       "slot": "rug",
       "model_key": "rug_rect__203",
-      "color": "#cdb58a",
+      "symbolic_color": "#cdb58a",
+      "color_materials": {
+        "tint": "#cdb58a"
+      },
       "color_name": null,
       "size": {
         "w": 1.33,
@@ -596,7 +641,10 @@
       "category": "rug",
       "slot": "rug",
       "model_key": "rug_round__211",
-      "color": "#aaaaa6",
+      "symbolic_color": "#aaaaa6",
+      "color_materials": {
+        "tint": "#aaaaa6"
+      },
       "color_name": null,
       "size": {
         "w": 1.3,
@@ -624,7 +672,10 @@
       "category": "wall_planter",
       "slot": "wall_decor",
       "model_key": "wall_planter",
-      "color": "#5f8a4f",
+      "symbolic_color": "#5f8a4f",
+      "color_materials": {
+        "leaf": "#5f8a4f"
+      },
       "color_name": null,
       "size": {
         "w": 0.5,
@@ -652,7 +703,10 @@
       "category": "wall_art",
       "slot": "wall_decor",
       "model_key": "wall_art",
-      "color": "#e8eadc",
+      "symbolic_color": "#e8eadc",
+      "color_materials": {
+        "tint": "#e8eadc"
+      },
       "color_name": null,
       "size": {
         "w": 0.4,
@@ -680,7 +734,10 @@
       "category": "floor_lamp",
       "slot": "light",
       "model_key": "floor_lamp_rattan",
-      "color": "#c49a5e",
+      "symbolic_color": "#c49a5e",
+      "color_materials": {
+        "tint": "#c49a5e"
+      },
       "color_name": null,
       "size": {
         "w": 0.2,
@@ -708,7 +765,10 @@
       "category": "floor_lamp",
       "slot": "light",
       "model_key": "floor_lamp_tripod",
-      "color": "#b08960",
+      "symbolic_color": "#b08960",
+      "color_materials": {
+        "tint": "#b08960"
+      },
       "color_name": null,
       "size": {
         "w": 0.62,
@@ -736,7 +796,10 @@
       "category": "plant",
       "slot": "display",
       "model_key": "plant_monstera",
-      "color": "#3f7a3a",
+      "symbolic_color": "#3f7a3a",
+      "color_materials": {
+        "leaf": "#3f7a3a"
+      },
       "color_name": null,
       "size": {
         "w": 0.6,
@@ -764,7 +827,10 @@
       "category": "plant",
       "slot": "display",
       "model_key": "plant_eucalyptus",
-      "color": "#7d9c7a",
+      "symbolic_color": "#7d9c7a",
+      "color_materials": {
+        "leaf": "#7d9c7a"
+      },
       "color_name": null,
       "size": {
         "w": 0.4,
@@ -792,7 +858,10 @@
       "category": "cushion",
       "slot": "cushion",
       "model_key": "cushion__207",
-      "color": "#7c9a6a",
+      "symbolic_color": "#7c9a6a",
+      "color_materials": {
+        "tint": "#7c9a6a"
+      },
       "color_name": null,
       "size": {
         "w": 0.48,
@@ -820,7 +889,10 @@
       "category": "small_plant",
       "slot": "desk_top",
       "model_key": "small_plant",
-      "color": "#4f8a45",
+      "symbolic_color": "#4f8a45",
+      "color_materials": {
+        "leaf": "#4f8a45"
+      },
       "color_name": null,
       "size": {
         "w": 0.15,
@@ -848,7 +920,10 @@
       "category": "bed_cover",
       "slot": "bed_cover",
       "model_key": "bed_cover__301",
-      "color": "#efe6d8",
+      "symbolic_color": "#efe6d8",
+      "color_materials": {
+        "tint": "#efe6d8"
+      },
       "color_name": null,
       "size": {
         "w": 1.5,
@@ -876,7 +951,10 @@
       "category": "curtain",
       "slot": "curtain",
       "model_key": "curtain_sheer__302",
-      "color": "#e6d9c4",
+      "symbolic_color": "#e6d9c4",
+      "color_materials": {
+        "tint": "#e6d9c4"
+      },
       "color_name": null,
       "size": {
         "w": 1.45,
@@ -904,7 +982,10 @@
       "category": "rug",
       "slot": "rug",
       "model_key": "rug_wave",
-      "color": "#d8c3a5",
+      "symbolic_color": "#d8c3a5",
+      "color_materials": {
+        "tint": "#d8c3a5"
+      },
       "color_name": null,
       "size": {
         "w": 1.3,
@@ -933,7 +1014,10 @@
       "category": "rug",
       "slot": "rug",
       "model_key": "rug_round__311",
-      "color": "#ceb9a6",
+      "symbolic_color": "#ceb9a6",
+      "color_materials": {
+        "tint": "#ceb9a6"
+      },
       "color_name": "ベージュ, ホワイト",
       "size": {
         "d": 1.3,
@@ -1016,7 +1100,10 @@
       "category": "wall_mirror",
       "slot": "wall_decor",
       "model_key": "wall_mirror",
-      "color": "#bba894",
+      "symbolic_color": "#bba894",
+      "color_materials": {
+        "tint": "#bba894"
+      },
       "color_name": null,
       "size": {
         "w": 0.285,
@@ -1044,7 +1131,10 @@
       "category": "floor_lamp",
       "slot": "light",
       "model_key": "floor_lamp_ball",
-      "color": "#f5f2ec",
+      "symbolic_color": "#f5f2ec",
+      "color_materials": {
+        "tint": "#f5f2ec"
+      },
       "color_name": null,
       "size": {
         "w": 0.38,
@@ -1072,7 +1162,10 @@
       "category": "floor_lamp",
       "slot": "light",
       "model_key": "floor_lamp_pleated",
-      "color": "#f4f0e9",
+      "symbolic_color": "#f4f0e9",
+      "color_materials": {
+        "tint": "#f4f0e9"
+      },
       "color_name": null,
       "size": {
         "w": 0.36,
@@ -1100,7 +1193,10 @@
       "category": "side_table",
       "slot": "display",
       "model_key": "side_table",
-      "color": "#f3f3ef",
+      "symbolic_color": "#f3f3ef",
+      "color_materials": {
+        "tint": "#f3f3ef"
+      },
       "color_name": null,
       "size": {
         "w": 0.45,
@@ -1128,7 +1224,10 @@
       "category": "cushion",
       "slot": "cushion",
       "model_key": "cushion__307",
-      "color": "#e7dcc8",
+      "symbolic_color": "#e7dcc8",
+      "color_materials": {
+        "tint": "#e7dcc8"
+      },
       "color_name": null,
       "size": {
         "w": 0.5,
@@ -1156,7 +1255,10 @@
       "category": "candle",
       "slot": "desk_top",
       "model_key": "candle",
-      "color": "#f2e8d5",
+      "symbolic_color": "#f2e8d5",
+      "color_materials": {
+        "tint": "#f2e8d5"
+      },
       "color_name": null,
       "size": {
         "w": 0.057,
@@ -1184,7 +1286,10 @@
       "category": "curtain",
       "slot": "curtain",
       "model_key": "curtain_sheer__901",
-      "color": "#f5f3ee",
+      "symbolic_color": "#f5f3ee",
+      "color_materials": {
+        "tint": "#f5f3ee"
+      },
       "color_name": null,
       "size": {
         "w": 2.8,
@@ -1213,7 +1318,10 @@
       "category": "desk_lamp",
       "slot": "desk_top",
       "model_key": "desk_lamp_clip",
-      "color": "#f0f0f0",
+      "symbolic_color": "#f0f0f0",
+      "color_materials": {
+        "tint": "#f0f0f0"
+      },
       "color_name": null,
       "size": {
         "w": 0.15,
@@ -1243,7 +1351,10 @@
       "category": "cushion",
       "slot": "cushion",
       "model_key": "cushion",
-      "color": "#d5c8b8",
+      "symbolic_color": "#d5c8b8",
+      "color_materials": {
+        "tint": "#d5c8b8"
+      },
       "color_name": "ベージュ",
       "size": {
         "d": 0.5,
@@ -1329,7 +1440,10 @@
       "category": "desk_lamp",
       "slot": "desk_top",
       "model_key": "desk_lamp_arm",
-      "color": "#4e4e4e",
+      "symbolic_color": "#4e4e4e",
+      "color_materials": {
+        "tint": "#4e4e4e"
+      },
       "color_name": "グレー, ホワイト",
       "size": {
         "d": 0.16,
@@ -1409,7 +1523,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "stool_round",
-      "color": "#505156",
+      "symbolic_color": "#505156",
+      "color_materials": {
+        "tint": "#505156"
+      },
       "color_name": "ブラック",
       "size": {
         "d": 0.5,
@@ -1501,7 +1618,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "stool_round",
-      "color": "#eae9e5",
+      "symbolic_color": "#eae9e5",
+      "color_materials": {
+        "tint": "#eae9e5"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.5,
@@ -1589,7 +1709,10 @@
       "category": "cushion",
       "slot": "cushion",
       "model_key": "cushion",
-      "color": "#d3cfce",
+      "symbolic_color": "#d3cfce",
+      "color_materials": {
+        "tint": "#d3cfce"
+      },
       "color_name": "ライラック",
       "size": {
         "d": 0.5,
@@ -1675,7 +1798,10 @@
       "category": "cushion",
       "slot": "cushion",
       "model_key": "cushion",
-      "color": "#d3c9b4",
+      "symbolic_color": "#d3c9b4",
+      "color_materials": {
+        "tint": "#d3c9b4"
+      },
       "color_name": "ベージュ",
       "size": {
         "d": 0.5,
@@ -1761,7 +1887,10 @@
       "category": "cushion",
       "slot": "cushion",
       "model_key": "cushion",
-      "color": "#a77634",
+      "symbolic_color": "#a77634",
+      "color_materials": {
+        "tint": "#a77634"
+      },
       "color_name": "ブラウン, イエロー",
       "size": {
         "d": 0.5,
@@ -1847,7 +1976,10 @@
       "category": "cushion",
       "slot": "cushion",
       "model_key": "cushion",
-      "color": "#cec4ba",
+      "symbolic_color": "#cec4ba",
+      "color_materials": {
+        "tint": "#cec4ba"
+      },
       "color_name": "ベージュ",
       "size": {
         "d": 0.65,
@@ -1933,7 +2065,10 @@
       "category": "desk_lamp",
       "slot": "desk_top",
       "model_key": "desk_lamp_arm",
-      "color": "#d0cfcd",
+      "symbolic_color": "#d0cfcd",
+      "color_materials": {
+        "tint": "#d0cfcd"
+      },
       "color_name": "ダークグレー/ホワイト",
       "size": {
         "d": 0.25,
@@ -2026,7 +2161,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "stool_round",
-      "color": "#fdfdfd",
+      "symbolic_color": "#fdfdfd",
+      "color_materials": {
+        "tint": "#fdfdfd"
+      },
       "color_name": "ブラック",
       "size": {
         "d": 0.32,
@@ -2108,7 +2246,10 @@
       "category": "cushion",
       "slot": "cushion",
       "model_key": "cushion",
-      "color": "#54473a",
+      "symbolic_color": "#54473a",
+      "color_materials": {
+        "tint": "#54473a"
+      },
       "color_name": "グレーブラウン",
       "size": {
         "d": 0.5,
@@ -2194,7 +2335,10 @@
       "category": "cushion",
       "slot": "cushion",
       "model_key": "cushion",
-      "color": "#d6c9b6",
+      "symbolic_color": "#d6c9b6",
+      "color_materials": {
+        "tint": "#d6c9b6"
+      },
       "color_name": "ベージュ",
       "size": {
         "d": 0.4,
@@ -2280,7 +2424,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "stool_round",
-      "color": "#f9f9f8",
+      "symbolic_color": "#f9f9f8",
+      "color_materials": {
+        "tint": "#f9f9f8"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.315,
@@ -2366,7 +2513,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_folding",
-      "color": "#f7f6f4",
+      "symbolic_color": "#f7f6f4",
+      "color_materials": {
+        "tint": "#f7f6f4"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.42,
@@ -2448,7 +2598,10 @@
       "category": "wall_shelf",
       "slot": "wall_decor",
       "model_key": "wall_shelf_hex",
-      "color": "#fdfdfd",
+      "symbolic_color": "#fdfdfd",
+      "color_materials": {
+        "tint": "#fdfdfd"
+      },
       "color_name": "オーク調",
       "size": {
         "d": 0.12,
@@ -2541,7 +2694,10 @@
       "category": "bed_cover",
       "slot": "bed_cover",
       "model_key": "bed_cover",
-      "color": "#d4cfd2",
+      "symbolic_color": "#d4cfd2",
+      "color_materials": {
+        "tint": "#d4cfd2"
+      },
       "color_name": "レッドパープル",
       "size": {
         "d": 2.1,
@@ -2632,7 +2788,10 @@
       "category": "wall_shelf",
       "slot": "wall_decor",
       "model_key": "wall_shelf_hex",
-      "color": "#e8e3dd",
+      "symbolic_color": "#e8e3dd",
+      "color_materials": {
+        "tint": "#e8e3dd"
+      },
       "color_name": "ライトブラウン",
       "size": {
         "d": 0.12,
@@ -2718,7 +2877,10 @@
       "category": "rug",
       "slot": "rug",
       "model_key": "rug_rect",
-      "color": "#d1c6bb",
+      "symbolic_color": "#d1c6bb",
+      "color_materials": {
+        "tint": "#d1c6bb"
+      },
       "color_name": "ベージュ, ホワイト",
       "size": {
         "d": 1.8,
@@ -2800,7 +2962,10 @@
       "category": "acrylic_stand_case",
       "slot": "desk_top",
       "model_key": "acrylic_stand_case",
-      "color": "#d4d2cd",
+      "symbolic_color": "#d4d2cd",
+      "color_materials": {
+        "tint": "#d4d2cd"
+      },
       "color_name": "イエロー, ホワイト",
       "size": {
         "d": 0.15,
@@ -2892,7 +3057,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_dining",
-      "color": "#ecebe7",
+      "symbolic_color": "#ecebe7",
+      "color_materials": {
+        "tint": "#ecebe7"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.47,
@@ -2974,7 +3142,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_dining",
-      "color": "#fdfdfd",
+      "symbolic_color": "#fdfdfd",
+      "color_materials": {
+        "tint": "#fdfdfd"
+      },
       "color_name": "ブラック",
       "size": {
         "d": 0.47,
@@ -3056,7 +3227,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_folding",
-      "color": "#fefefe",
+      "symbolic_color": "#fefefe",
+      "color_materials": {
+        "tint": "#fefefe"
+      },
       "color_name": "ブラック",
       "size": {
         "d": 0.45,
@@ -3138,7 +3312,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "stool_bar",
-      "color": "#fefefe",
+      "symbolic_color": "#fefefe",
+      "color_materials": {
+        "tint": "#fefefe"
+      },
       "color_name": "ブラック",
       "size": {
         "d": 0.42,
@@ -3220,7 +3397,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "stool_round",
-      "color": "#e8cdb1",
+      "symbolic_color": "#e8cdb1",
+      "color_materials": {
+        "tint": "#e8cdb1"
+      },
       "color_name": "ベージュ, ブラウン",
       "size": {
         "d": 0.48,
@@ -3302,7 +3482,10 @@
       "category": "bed_cover",
       "slot": "bed_cover",
       "model_key": "bed_cover",
-      "color": "#af8a72",
+      "symbolic_color": "#af8a72",
+      "color_materials": {
+        "tint": "#af8a72"
+      },
       "color_name": "ブラウン",
       "size": {
         "d": 2.0,
@@ -3395,7 +3578,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_dining",
-      "color": "#edece6",
+      "symbolic_color": "#edece6",
+      "color_materials": {
+        "tint": "#edece6"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.47,
@@ -3477,7 +3663,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_dining",
-      "color": "#d2d2d1",
+      "symbolic_color": "#d2d2d1",
+      "color_materials": {
+        "tint": "#d2d2d1"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.47,
@@ -3567,7 +3756,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "step_stool",
-      "color": "#f9f7f5",
+      "symbolic_color": "#f9f7f5",
+      "color_materials": {
+        "tint": "#f9f7f5"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.39,
@@ -3649,7 +3841,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "vanity_stool",
-      "color": "#e8cdad",
+      "symbolic_color": "#e8cdad",
+      "color_materials": {
+        "tint": "#e8cdad"
+      },
       "color_name": "ベージュ",
       "size": {
         "d": 0.28,
@@ -3731,7 +3926,10 @@
       "category": "shelf",
       "slot": "floor",
       "model_key": "shelf_metal",
-      "color": "#f0f1ec",
+      "symbolic_color": "#f0f1ec",
+      "color_materials": {
+        "tint": "#f0f1ec"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.3,
@@ -3813,7 +4011,10 @@
       "category": "desk_lamp",
       "slot": "desk_top",
       "model_key": "table_lamp",
-      "color": "#d4d4d5",
+      "symbolic_color": "#d4d4d5",
+      "color_materials": {
+        "tint": "#d4d4d5"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.18,
@@ -3900,7 +4101,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_folding",
-      "color": "#f2f3f1",
+      "symbolic_color": "#f2f3f1",
+      "color_materials": {
+        "tint": "#f2f3f1"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.51,
@@ -3982,7 +4186,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_dining",
-      "color": "#f2f2f1",
+      "symbolic_color": "#f2f2f1",
+      "color_materials": {
+        "tint": "#f2f2f1"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.49,
@@ -4064,7 +4271,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_office",
-      "color": "#efefec",
+      "symbolic_color": "#efefec",
+      "color_materials": {
+        "tint": "#efefec"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.67,
@@ -4146,7 +4356,10 @@
       "category": "desk_lamp",
       "slot": "desk_top",
       "model_key": "table_lamp",
-      "color": "#d8d5d3",
+      "symbolic_color": "#d8d5d3",
+      "color_materials": {
+        "tint": "#d8d5d3"
+      },
       "color_name": "ベージュ, ホワイト",
       "size": {
         "d": 0.25,
@@ -4238,7 +4451,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_shell",
-      "color": "#e7e7e7",
+      "symbolic_color": "#e7e7e7",
+      "color_materials": {
+        "tint": "#e7e7e7"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.54,
@@ -4320,7 +4536,10 @@
       "category": "rug",
       "slot": "rug",
       "model_key": "rug_rect__203",
-      "color": "#eee7d5",
+      "symbolic_color": "#eee7d5",
+      "color_materials": {
+        "tint": "#eee7d5"
+      },
       "color_name": "アイボリー",
       "size": {
         "d": 2.4,
@@ -4406,7 +4625,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_dining",
-      "color": "#fafafa",
+      "symbolic_color": "#fafafa",
+      "color_materials": {
+        "tint": "#fafafa"
+      },
       "color_name": "ホワイトステイン/パイン材",
       "size": {
         "d": 0.49,
@@ -4496,7 +4718,10 @@
       "category": "rug",
       "slot": "rug",
       "model_key": "rug_rect",
-      "color": "#cdb7a6",
+      "symbolic_color": "#cdb7a6",
+      "color_materials": {
+        "tint": "#cdb7a6"
+      },
       "color_name": "ベージュ, ホワイト",
       "size": {
         "d": 1.5,
@@ -4578,7 +4803,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "stool_round",
-      "color": "#c6b8aa",
+      "symbolic_color": "#c6b8aa",
+      "color_materials": {
+        "tint": "#c6b8aa"
+      },
       "color_name": "ジェム スツール ホワイト",
       "size": {
         "d": 0.35,
@@ -4656,7 +4884,10 @@
       "category": "desk_lamp",
       "slot": "desk_top",
       "model_key": "desk_lamp_arm",
-      "color": "#d4d2d3",
+      "symbolic_color": "#d4d2d3",
+      "color_materials": {
+        "tint": "#d4d2d3"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.21,
@@ -4736,7 +4967,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_wishbone",
-      "color": "#b2b0b0",
+      "symbolic_color": "#b2b0b0",
+      "color_materials": {
+        "tint": "#b2b0b0"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.55,
@@ -4822,7 +5056,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_folding",
-      "color": "#fefefe",
+      "symbolic_color": "#fefefe",
+      "color_materials": {
+        "tint": "#fefefe"
+      },
       "color_name": "ベージュ, ブルー, レッド, ブラック",
       "size": {
         "d": 0.51,
@@ -4904,7 +5141,10 @@
       "category": "display_case",
       "slot": "display",
       "model_key": "display_case",
-      "color": "#d3cfcb",
+      "symbolic_color": "#d3cfcb",
+      "color_materials": {
+        "tint": "#d3cfcb"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.3,
@@ -4990,7 +5230,10 @@
       "category": "display_case",
       "slot": "display",
       "model_key": "display_case",
-      "color": "#292a29",
+      "symbolic_color": "#292a29",
+      "color_materials": {
+        "tint": "#292a29"
+      },
       "color_name": "グレー",
       "size": {
         "d": 0.37,
@@ -5072,7 +5315,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_office",
-      "color": "#e6e7ea",
+      "symbolic_color": "#e6e7ea",
+      "color_materials": {
+        "tint": "#e6e7ea"
+      },
       "color_name": "ホワイト",
       "size": {
         "d": 0.63,
@@ -5158,7 +5404,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_shell",
-      "color": "#0b4c93",
+      "symbolic_color": "#0b4c93",
+      "color_materials": {
+        "tint": "#0b4c93"
+      },
       "color_name": "ブルー",
       "size": {
         "d": 0.55,
@@ -5240,7 +5489,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_dining",
-      "color": "#4d4d4d",
+      "symbolic_color": "#4d4d4d",
+      "color_materials": {
+        "tint": "#4d4d4d"
+      },
       "color_name": "グレー",
       "size": {
         "d": 0.51,
@@ -5322,7 +5574,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_lounge",
-      "color": "#fcfcfc",
+      "symbolic_color": "#fcfcfc",
+      "color_materials": {
+        "tint": "#fcfcfc"
+      },
       "color_name": "バーチ材突き板/クニーサ ライトベージュ",
       "size": {
         "d": 0.82,
@@ -5412,7 +5667,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_shell",
-      "color": "#f9f9f9",
+      "symbolic_color": "#f9f9f9",
+      "color_materials": {
+        "tint": "#f9f9f9"
+      },
       "color_name": "グレー, ホワイト",
       "size": {
         "d": 0.56,
@@ -5494,7 +5752,10 @@
       "category": "table",
       "slot": "floor",
       "model_key": "table_dining_rect",
-      "color": "#d0d3d5",
+      "symbolic_color": "#d0d3d5",
+      "color_materials": {
+        "wood": "#d0d3d5"
+      },
       "color_name": "ブラウン, ホワイト",
       "size": {
         "d": 1.25,
@@ -5576,7 +5837,10 @@
       "category": "rug",
       "slot": "rug",
       "model_key": "rug_rect__203",
-      "color": "#cab6a6",
+      "symbolic_color": "#cab6a6",
+      "color_materials": {
+        "tint": "#cab6a6"
+      },
       "color_name": "ベージュ, ホワイト",
       "size": {
         "d": 2.4,
@@ -5658,7 +5922,10 @@
       "category": "display_case",
       "slot": "display",
       "model_key": "cabinet_glass",
-      "color": "#1b1c17",
+      "symbolic_color": "#1b1c17",
+      "color_materials": {
+        "tint": "#1b1c17"
+      },
       "color_name": "グレー",
       "size": {
         "d": 0.37,
@@ -5740,7 +6007,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "armchair_wing",
-      "color": "#6d6d71",
+      "symbolic_color": "#6d6d71",
+      "color_materials": {
+        "tint": "#6d6d71"
+      },
       "color_name": "グレー",
       "size": {
         "d": 0.96,
@@ -5822,7 +6092,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_lounge",
-      "color": "#d4c8b6",
+      "symbolic_color": "#d4c8b6",
+      "color_materials": {
+        "tint": "#d4c8b6"
+      },
       "color_name": "キランダ ライトベージュ",
       "size": {
         "d": 0.5,
@@ -5913,7 +6186,10 @@
       "category": "chair",
       "slot": "floor",
       "model_key": "chair_gaming",
-      "color": "#d2d5d0",
+      "symbolic_color": "#d2d5d0",
+      "color_materials": {
+        "tint": "#d2d5d0"
+      },
       "color_name": "ホワイト/ホワイト",
       "size": {
         "d": 0.66,

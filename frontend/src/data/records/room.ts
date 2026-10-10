@@ -39,7 +39,7 @@ function toFurnitureDetail(value: unknown, baseUrl: string): FurnitureDetailChoi
     id: `manual-${crypto.randomUUID()}`, existing: true,
     furnitureDetailId: String(integer(record.furniture_detail_id, "FurnitureDetail.furniture_detail_id")),
     name: text(record.name, "FurnitureDetail.name"), category,
-    color: hexColor(record.color, "FurnitureDetail.color"),
+    color: hexColor(record.symbolic_color, "FurnitureDetail.symbolic_color"),
     size: [size.w, size.h, size.d], position: [0, size.h / 2, 0], rotation: 0,
     price: nonnegativeInteger(record.price, "FurnitureDetail.price"),
     shop: text(record.shop, "FurnitureDetail.shop"),

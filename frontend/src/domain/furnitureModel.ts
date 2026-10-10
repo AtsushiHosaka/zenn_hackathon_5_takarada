@@ -18,7 +18,7 @@ export type FurnitureModel = {
   triangleCount: number;
   byteSize: number;
   sha256: string;
-  materials: string[];
+  colorMaterialKeys: string[];
   modelUrl: string | null;
   bindings: FurnitureModelBinding[];
 };

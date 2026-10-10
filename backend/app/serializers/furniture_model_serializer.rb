@@ -2,7 +2,7 @@ class FurnitureModelSerializer
   include Alba::Resource
 
   attributes :name, :category, :shape, :variant, :format, :object_key,
-             :triangle_count, :byte_size, :sha256, :materials
+             :triangle_count, :byte_size, :sha256, :color_material_keys
   attribute(:id) { |model| model.model_key }
   attribute(:size) { |model| { w: model.width.to_f, h: model.height.to_f, d: model.depth.to_f } }
   attribute(:unit) { Furniture::UNIT }

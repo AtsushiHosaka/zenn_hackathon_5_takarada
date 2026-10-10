@@ -1033,12 +1033,13 @@ export interface components {
             /** @example aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa */
             sha256: string;
             /**
+             * @description 色が分かれている部位の名前 (GLB の素材名)
              * @example [
-             *       "wood",
-             *       "fabric"
+             *       "tint",
+             *       "wood"
              *     ]
              */
-            materials: string[];
+            color_material_keys: string[];
             /**
              * @description GCS の公開 GLB URL。ベース URL が未設定なら null
              * @example null
@@ -1408,8 +1409,21 @@ export interface components {
              * @enum {string}
              */
             category: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
-            /** @example #f2efe8 */
-            color: string;
+            /**
+             * @description 代表色
+             * @example #f2efe8
+             */
+            symbolic_color: string;
+            /**
+             * @description 部位ごとの色。キーは家具の color_material_keys。無い部位はモデルの色のまま
+             * @example {
+             *       "tint": "#f2efe8",
+             *       "wood": "#b08960"
+             *     }
+             */
+            color_materials: {
+                [key: string]: string;
+            };
             /** @example ホワイト */
             color_name: string | null;
             size: components["schemas"]["Size"];

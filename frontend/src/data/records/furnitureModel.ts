@@ -21,7 +21,7 @@ export function toFurnitureModel(value: unknown): FurnitureModel | undefined {
     triangleCount: record.triangle_count,
     byteSize: record.byte_size,
     sha256: record.sha256,
-    materials: record.materials,
+    colorMaterialKeys: record.color_material_keys,
     modelUrl: record.model_url,
     bindings: record.bindings,
   };
@@ -35,7 +35,7 @@ function isFurnitureModelRecord(value: unknown): value is FurnitureModelRecord {
   if (!isRecord(value.size) || ![value.size.w, value.size.h, value.size.d].every(positiveNumber)) return false;
   if (!nonnegativeInteger(value.triangle_count) || !nonnegativeInteger(value.byte_size) || value.byte_size === 0) return false;
   if (typeof value.sha256 !== "string" || !/^[0-9a-f]{64}$/.test(value.sha256)) return false;
-  if (!Array.isArray(value.materials) || !value.materials.every(material => typeof material === "string")) return false;
+  if (!Array.isArray(value.color_material_keys) || !value.color_material_keys.every(key => typeof key === "string")) return false;
   if (value.model_url !== null && !isHttpUrl(value.model_url)) return false;
   return Array.isArray(value.bindings) && value.bindings.every(binding => {
     if (!isRecord(binding) || !nonemptyString(binding.reference)) return false;

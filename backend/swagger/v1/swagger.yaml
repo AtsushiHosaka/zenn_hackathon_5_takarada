@@ -701,13 +701,14 @@ components:
           type: string
           pattern: "^[0-9a-f]{64}$"
           example: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        materials:
+        color_material_keys:
           type: array
           items:
             type: string
+          description: 色が分かれている部位の名前 (GLB の素材名)
           example:
+          - tint
           - wood
-          - fabric
         model_url:
           type: string
           nullable: true
@@ -731,7 +732,7 @@ components:
       - triangle_count
       - byte_size
       - sha256
-      - materials
+      - color_material_keys
       - model_url
       - bindings
     Position:
@@ -1408,9 +1409,19 @@ components:
           - table
           - small_plant
           example: chair
-        color:
+        symbolic_color:
           type: string
+          description: 代表色
           example: "#f2efe8"
+        color_materials:
+          type: object
+          additionalProperties:
+            type: string
+            pattern: "^#[0-9a-fA-F]{6}$"
+          description: 部位ごとの色。キーは家具の color_material_keys。無い部位はモデルの色のまま
+          example:
+            tint: "#f2efe8"
+            wood: "#b08960"
         color_name:
           type: string
           nullable: true
@@ -1460,7 +1471,8 @@ components:
       - furniture_id
       - name
       - category
-      - color
+      - symbolic_color
+      - color_materials
       - color_name
       - size
       - price

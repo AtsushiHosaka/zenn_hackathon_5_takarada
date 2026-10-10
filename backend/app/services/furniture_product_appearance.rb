@@ -2,12 +2,6 @@ class FurnitureProductAppearance
   MAX_IMAGES = 3
   DEADLINE_SECONDS = 90
   IMAGE_COLOR_SOURCE = "product_image_dominant_color_v1".freeze
-  PRIMARY_MATERIALS = %w[tint wood fabric fabric_base rattan weave leaf pot metal].freeze
-  # These templates name their color-changing region differently from tint.
-  SHAPE_MATERIALS = { "hanger_rack" => "metal", "floor_lamp_slim" => "light",
-                      "led_strip_segment" => "light", "fairy_lights" => "light", "neon_sign" => "light" }.freeze
-  PAINTED_WOOD = /(?:無垢材|合板|突き板|木材|天然木|ラバーウッド|バーチ材|パイン材)[^:。\n]{0,100}(?:塗装|ペイント)/
-  CLEAR_FINISH = /透明|クリア|無色|clear|transparent/i
 
   def self.call(scene:, items:, user_id:)
     new(scene: scene, items: items, user_id: user_id).call
@@ -43,15 +37,15 @@ class FurnitureProductAppearance
         object["model_fit"] = "contain"
         object["color"] ||= item["color"]
         edited_color = object["color"] != item["color"]
-        overrides = color_overrides(item, model, color: object["color"])
+        overrides = color_overrides(item, model, edited_color: edited_color ? object["color"] : nil)
         # Apply the product color even without image generation or its dependencies.
         object["material_overrides"] = overrides if overrides.present?
         status = overrides.present? ? "ready" : "disabled"
-        # Hand-entered details have no verified product page to describe materials from.
-        if !edited_color && !image_color?(item) && item.dig("product_metadata", "provider").present? && object["model_url"].present? && ENV["MODELS_BUCKET"].present? && GeminiImageClient.configured?(user_id: @user_id)
+        # 商品ページの説明は 1 色分なので、色が 1 部位だけの商品にだけテクスチャを作る
+        if !edited_color && !image_color?(item) && overrides.one? && item.dig("product_metadata", "provider").present? && object["model_url"].present? && ENV["MODELS_BUCKET"].present? && GeminiImageClient.configured?(user_id: @user_id)
           object["texture_source"] = item["texture_source"] = "description"
           @generator ||= FurnitureTextureGenerator.new
-          generated = @generator.call(item: item, model: model, max_images: MAX_IMAGES - @generator.attempts, deadline: deadline)
+          generated = @generator.call(item: item, model: model, materials: overrides.keys, max_images: MAX_IMAGES - @generator.attempts, deadline: deadline)
           overrides = overrides.merge(generated.overrides)
           status = overrides.present? ? "ready" : "skipped"
           object["material_overrides"] = overrides if overrides.present?
@@ -72,22 +66,10 @@ class FurnitureProductAppearance
     item.dig("product_metadata", "color_source") == IMAGE_COLOR_SOURCE
   end
 
-  def color_overrides(item, model, color:)
-    return {} unless color.is_a?(String) && color.match?(/\A#[0-9a-f]{6}\z/i)
-
-    material = SHAPE_MATERIALS[model.shape] || PRIMARY_MATERIALS.find { |name| model.materials.include?(name) }
-    return {} unless material && model.materials.include?(material)
-
-    overrides = { material => { "color" => color } }
-    metadata = item.fetch("product_metadata", {})
-    colors = InteriorLinks::ProductColors::NAMES.keys.count { |pattern| pattern.match?(metadata["color_name"].to_s) }
-    # Upholstered templates may also represent a painted wooden frame. Recolor
-    # that region only with published coating evidence and a single color name.
-    material_description = metadata["material"].to_s
-    if image_color?(item) && colors == 1 && model.materials.include?("wood") &&
-       PAINTED_WOOD.match?(material_description) && !CLEAR_FINISH.match?(material_description)
-      overrides["wood"] = { "color" => color }
-    end
-    overrides
+  # detail の部位ごとの色で塗る。画面で色を変えた家具は主な部位をその色にする
+  def color_overrides(item, model, edited_color:)
+    colors = item.dig("product_metadata", "color_materials").to_h.slice(*model.color_material_keys)
+    colors = colors.merge(model.primary_color_key => edited_color) if edited_color&.match?(/\A#[0-9a-f]{6}\z/i) && model.primary_color_key
+    colors.transform_values { |color| { "color" => color } }
   end
 end

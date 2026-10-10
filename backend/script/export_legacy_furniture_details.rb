@@ -46,7 +46,7 @@ SQL
 
 current = JSON.parse(File.read(PATH)).fetch("details")
 by_key = current.index_by { |detail| detail["key"] }
-furniture_keys = Furniture.pluck(:model_key).to_set
+furnitures = Furniture.all.index_by(&:model_key)
 report = { "excluded" => [], "unassigned" => [], "added" => [], "updated" => [] }
 seen = []
 
@@ -61,7 +61,7 @@ products.each do |row|
 
   existing = by_key[key]
   furniture = existing&.fetch("model_key") || FURNITURE_OVERRIDES[id] || row["bound_furniture"]
-  unless furniture && furniture_keys.include?(furniture)
+  unless furniture && furnitures.key?(furniture)
     report["unassigned"] << "#{id} #{data['name']} (#{data['category']})"
     next
   end
@@ -69,7 +69,8 @@ products.each do |row|
   metadata = data.fetch("metadata").except(*DROP_METADATA)
   detail = {
     "key" => key, "name" => data["name"], "category" => data["category"], "slot" => data["slot"], "model_key" => furniture,
-    "color" => data["color"].downcase, "color_name" => metadata["color_name"].presence, "size" => data["size"],
+    "symbolic_color" => data["color"].downcase,
+    "color_materials" => { furnitures.fetch(furniture).primary_color_key => data["color"].downcase }, "color_name" => metadata["color_name"].presence, "size" => data["size"],
     "price" => data["price"], "shop" => data["shop"], "url" => row["source_url"], "image_url" => data["image_url"],
     "themes" => existing&.fetch("themes") || [], "metadata" => metadata,
     "checked_at" => metadata["price_checked_at"] || Time.zone.parse(row["fetched_at"].to_s).iso8601

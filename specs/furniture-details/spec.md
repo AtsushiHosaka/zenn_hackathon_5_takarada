@@ -22,7 +22,9 @@ furnitures          1件 = 3Dモデル1つ (GLBのキー・寸法・素材)。db
 
 - 両JSONを正とする。`furniture_detail:import`はJSONにないdetailを消す。先に`furniture:import`が必要。
 - デプロイ・`compose`・`make furniture-import`・seedは両タスクを順に流す。
-- 3Dは家具のモデルの形を使い、detailの`color`を主素材に上書きして塗る。商品からモデルを寸法比で推定する照合（`FurnitureProductMatcher`）は削除した。
+- 色はdetailに2つ持つ。`symbolic_color`は代表色（モデルがないときの表示・色での検索・AIへの商品情報）、`color_materials`は部位ごとの色（`{"tint": "#123682", "wood": "#714248"}`）。キーは家具の`color_material_keys`（GLBの素材名）に限り、書いていない部位はモデルの色のまま。
+- 3Dは`color_materials`のとおりに部位を塗る。画面で色を変えた家具は、主な部位（`Furniture#primary_color_key`）をその色にする。説明文によるテクスチャ生成は、色が1部位だけのdetailに限り、その部位に行う。
+- 商品からモデルを寸法比で推定する照合（`FurnitureProductMatcher`）は削除した。
 - 写真の家具の照合（`FurnitureModelCatalog.fill_by_category`・`existing`の対応）は`furnitures`を引くだけで、ロジックは変えていない。
 - 旧`furniture_models`・`furniture_model_bindings`・`ec_products`はSchemafileから削除した。`db:apply`・`db:dry_run`は`--drop-table`付きになり、Schemafileにないテーブルを削除する。
 - 削除前の2026-10-10に、Cloud SQLのオンデマンドバックアップ（ID `1791628305175`）を取得した。旧3テーブルの`pg_dump`も作業者のローカル（`backend/tmp/backups/`、git管理外）に保存した。

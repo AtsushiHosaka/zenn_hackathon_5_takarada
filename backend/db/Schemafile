@@ -92,7 +92,7 @@ create_table "furnitures", force: :cascade do |t|
   t.integer "triangle_count", null: false # ポリゴン数
   t.bigint "byte_size", null: false # GLB のバイト数
   t.string "sha256", null: false # GLB のハッシュ。ファイルとの照合用
-  t.jsonb "materials", null: false, default: [] # GLB の素材名 (tint, wood など)。tint などの主素材を商品の色で塗る
+  t.jsonb "color_material_keys", null: false, default: [] # 色が分かれている部位の名前 (GLB の素材名。例: ["tint", "wood"])
   t.boolean "enabled", null: false, default: true # false なら使わない (API・提案から外す)
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
@@ -117,7 +117,7 @@ create_table "furniture_bindings", force: :cascade do |t|
   t.check_constraint "kind::text = ANY (ARRAY['existing'::character varying::text, 'product'::character varying::text])", name: "furniture_bindings_valid_kind"
 end
 
-# 家具の色・寸法・購入リンク 1 つ (家具 1 : 多)。3D は家具のモデルを color で塗る。価格はリンク先の参考価格 (税込)。
+# 家具の色・寸法・購入リンク 1 つ (家具 1 : 多)。3D は家具のモデルを部位ごとに color_materials で塗る。価格はリンク先の参考価格 (税込)。
 # db/furniture_details.json から rails furniture_detail:import で入れる
 create_table "furniture_details", force: :cascade do |t|
   t.string "key", null: false
@@ -125,8 +125,9 @@ create_table "furniture_details", force: :cascade do |t|
   t.string "name", null: false
   t.string "category", null: false
   t.string "slot", null: false
-  t.string "color", null: false
-  t.string "color_name"
+  t.string "symbolic_color", null: false # 代表色 (#rrggbb)。モデルが無いときの表示・色での検索・AI への商品情報に使う
+  t.jsonb "color_materials", null: false, default: {} # 部位ごとの色 (例: {"tint": "#123682", "wood": "#714248"})。キーは家具の color_material_keys。無い部位はモデルの色のまま
+  t.string "color_name" # 公式の色名
   t.decimal "width", precision: 10, scale: 6, null: false
   t.decimal "height", precision: 10, scale: 6, null: false
   t.decimal "depth", precision: 10, scale: 6, null: false

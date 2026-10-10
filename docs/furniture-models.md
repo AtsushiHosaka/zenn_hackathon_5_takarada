@@ -12,7 +12,7 @@
 | `category`、`shape`、`variant` | 家具の分類、形状、色やサイズのバリエーション |
 | `width`、`height`、`depth` | GLBの幅・高さ・奥行き。単位はメートル |
 | `format`、`byte_size`、`sha256` | ファイル形式、バイト数、内容の照合に使うハッシュ |
-| `triangle_count`、`materials` | 三角形の数と素材名 |
+| `triangle_count`、`color_material_keys` | 三角形の数と、色が分かれている部位の名前（GLBの素材名） |
 | `enabled` | 配信対象かどうか。無効ならURLを返さない |
 
 座標は`+Y`が上、`+Z`が正面、原点は底面中心で統一する。モデルの寸法と、部屋のシーンに保存した配置寸法は別に扱う。ローダーは配置寸法の範囲に収まるようモデル全体を拡縮する。

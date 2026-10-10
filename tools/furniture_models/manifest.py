@@ -307,7 +307,8 @@ def main():
         if stats["triangles"] != item["tris"] or stats["materials"] != item["materials"]:
             raise ValueError(f"Build report differs from exported geometry/materials: {filename}")
         models.append({"id": model_id, "name": NAMES[base], "category": category(base), "shape": base,
-                       "variant": variant or None, "format": "glb", "object_key": f"models/furniture/v1/{filename}", **stats})
+                       "variant": variant or None, "format": "glb", "object_key": f"models/furniture/v1/{filename}",
+                       **{("color_material_keys" if key == "materials" else key): value for key, value in stats.items()}})
     missing = [reference for reference, model_id in PRODUCTS.items() if model_id not in ids]
     if missing:
         raise ValueError(f"Missing models for bindings: {missing}")

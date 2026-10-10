@@ -4,10 +4,11 @@ class FurnitureDetail < ApplicationRecord
   validates :key, presence: true, uniqueness: true
   validates :name, :category, :shop, :url, presence: true
   validates :slot, inclusion: { in: InteriorLinks::SLOTS }
-  validates :color, format: { with: /\A#[0-9a-f]{6}\z/i }
+  validates :symbolic_color, format: { with: /\A#[0-9a-f]{6}\z/i }
   validates :price, numericality: { only_integer: true, greater_than: 0 }
   validates :width, :height, :depth, numericality: { greater_than: 0 }
   validate :valid_themes
+  validate :valid_color_materials
 
   def size
     { "w" => width.to_f, "h" => height.to_f, "d" => depth.to_f }
@@ -18,7 +19,7 @@ class FurnitureDetail < ApplicationRecord
     model = furniture if furniture.enabled?
     model_url = model && FurnitureModelCatalog.model_url(model)
     {
-      "furniture_detail_id" => id, "label" => name, "category" => category, "color" => color, "size" => size,
+      "furniture_detail_id" => id, "label" => name, "category" => category, "color" => symbolic_color, "color_materials" => color_materials, "size" => size,
       "price" => price, "shop" => shop, "url" => url, "image_url" => image_url, "product_metadata" => metadata,
       "model_url" => model_url,
       "model_match" => model && { "model_id" => model.id, "reason" => "furniture_detail", "approximate" => true },
@@ -29,6 +30,15 @@ class FurnitureDetail < ApplicationRecord
   end
 
   private
+
+  def valid_color_materials
+    unless color_materials.is_a?(Hash) && color_materials.present? && color_materials.values.all? { |value| value.is_a?(String) && value.match?(/\A#[0-9a-f]{6}\z/i) }
+      return errors.add(:color_materials, "must map part names to #rrggbb colors")
+    end
+
+    unknown = color_materials.keys - Array(furniture&.color_material_keys)
+    errors.add(:color_materials, "has parts the furniture does not have: #{unknown.join(', ')}") if unknown.any?
+  end
 
   def valid_themes
     errors.add(:themes, "must be an array of strings") unless themes.is_a?(Array) && themes.all? { |theme| theme.is_a?(String) }

@@ -69,14 +69,14 @@ class FurnitureImporter
     check(size.all? { |value| value.is_a?(Numeric) && value.to_f.finite? && value >= 0.000001 && value <= 9999.999999 }, "#{label}.size values must be positive meters within database precision")
     check(model["triangles"].is_a?(Integer) && model["triangles"].between?(0, 2_147_483_647), "#{label}.triangles must be a nonnegative 32-bit integer")
     check(model["bytes"].is_a?(Integer) && model["bytes"].between?(1, 9_223_372_036_854_775_807), "#{label}.bytes must be a positive 64-bit integer")
-    check(model["materials"].is_a?(Array) && model["materials"].all? { |material| material.is_a?(String) }, "#{label}.materials must be an array of strings")
+    check(model["color_material_keys"].is_a?(Array) && model["color_material_keys"].all? { |key| key.is_a?(String) }, "#{label}.color_material_keys must be an array of strings")
 
     {
       model_key: model.fetch("id"), name: model.fetch("name"), category: model.fetch("category"),
       shape: model.fetch("shape"), variant: model["variant"], format: model.fetch("format"),
       width: size[0], height: size[1], depth: size[2],
       triangle_count: model.fetch("triangles"), byte_size: model.fetch("bytes"),
-      sha256: model.fetch("sha256"), materials: model.fetch("materials")
+      sha256: model.fetch("sha256"), color_material_keys: model.fetch("color_material_keys")
     }
   end
 
