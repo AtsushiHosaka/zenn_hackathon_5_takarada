@@ -23,12 +23,7 @@
       "themes": [
         "oshi_purple"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -54,12 +49,7 @@
       "themes": [
         "oshi_purple"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -85,13 +75,7 @@
       "themes": [
         "oshi_purple"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "category_default"
-        },
-        "reference_only": true
-      },
+      "metadata": {},
       "checked_at": null
     },
     {
@@ -124,60 +108,11 @@
           "w": 1.33
         },
         "shape": "rectangular",
-        "currency": "JPY",
         "material": "表面:ポリプロピレン 100%裏面:合成ゴム100%",
         "provider": "ikea",
         "color_name": "ベージュ, ホワイト",
-        "fetched_at": "2026-10-09T04:03:00Z",
-        "variant_id": "904.255.27",
-        "image_color": {
-          "color": "#ccbaa9",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/stoense-rug-low-pile-off-white__0624373_pe691791_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 4244
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-90425527/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-90425527/",
-          "kind": "official_page",
-          "evidence": [
-            "長さ: 195 cm",
-            "幅: 133 cm",
-            "厚さ: 18 mm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-90425527/",
-          "kind": "category_and_official_text",
-          "name": "STOENSE ストエンセ ラグ パイル短 - オフホワイト 133x195 cm",
-          "measurements": [
-            "長さ: 195 cm",
-            "幅: 133 cm",
-            "厚さ: 18 mm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ベージュ, ホワイト",
-        "price_checked_at": "2026-10-09T04:03:00Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "904.255.27"
+        "official_color": "ベージュ, ホワイト"
       },
       "checked_at": "2026-10-09T04:03:00Z"
     },
@@ -204,12 +139,7 @@
       "themes": [
         "oshi_purple"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -235,13 +165,7 @@
       "themes": [
         "oshi_purple"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        },
-        "reference_only": true
-      },
+      "metadata": {},
       "checked_at": null
     },
     {
@@ -267,12 +191,7 @@
       "themes": [
         "oshi_purple"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -298,12 +217,7 @@
       "themes": [
         "oshi_purple"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -336,60 +250,11 @@
           "w": 0.34
         },
         "shape": null,
-        "currency": "JPY",
         "material": "チューブ/ トップパネル/ 底板/ サイドパネル/ バックパネル:スチール, エポキシ/ポリエステル粉体塗装棚板:強化ガラスガラス扉:スチール, 強化ガラス, エポキシ/ポリエステル粉体塗装",
         "provider": "ikea",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T04:03:01Z",
-        "variant_id": "105.029.92",
-        "image_color": {
-          "color": "#d6d8d0",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/baggebo-glass-door-cabinet-metal-white__0981557_pe815393_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1394
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/baggebo-glass-door-cabinet-metal-white-10502992/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/baggebo-glass-door-cabinet-metal-white-10502992/",
-          "kind": "official_page",
-          "evidence": [
-            "奥行き: 30 cm",
-            "高さ: 116 cm",
-            "幅: 34 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/baggebo-glass-door-cabinet-metal-white-10502992/",
-          "kind": "category_and_official_text",
-          "name": "BAGGEBO バッゲボー コレクションケース - メタル/ホワイト 34x30x116 cm",
-          "measurements": [
-            "奥行き: 30 cm",
-            "高さ: 116 cm",
-            "幅: 34 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "price_checked_at": "2026-10-09T04:03:01Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "105.029.92"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T04:03:01Z"
     },
@@ -423,60 +288,11 @@
           "w": 0.35
         },
         "shape": null,
-        "currency": "JPY",
         "material": "上部パネル/ 上部フレーム/ 底板/ 底部レール/ 側部フレーム/ 固定プレート/ 扉枠/ 固定プレート:スチール, エポキシ/ポリエステル粉体塗装リベット/ 差し込み式ネジ/ ヒンジ/ ポール:スチール保護層:EVA樹脂, ポリプロピレン ., EVA樹脂サイドパネル/ バックパネル/ ドアパネル/ 棚板:強化ガラス",
         "provider": "ikea",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T04:02:43Z",
-        "variant_id": "405.012.60",
-        "image_color": {
-          "color": "#efefef",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/blaliden-glass-door-cabinet-white__1186284_pe898752_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1264
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/blaliden-glass-door-cabinet-white-40501260/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/blaliden-glass-door-cabinet-white-40501260/",
-          "kind": "official_page",
-          "evidence": [
-            "奥行き: 32 cm",
-            "高さ: 151 cm",
-            "幅: 35 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/blaliden-glass-door-cabinet-white-40501260/",
-          "kind": "category_and_official_text",
-          "name": "BLÅLIDEN ブローリーデン コレクションケース - ホワイト 35x32x151 cm",
-          "measurements": [
-            "奥行き: 32 cm",
-            "高さ: 151 cm",
-            "幅: 35 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "price_checked_at": "2026-10-09T04:02:43Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "405.012.60"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T04:02:43Z"
     },
@@ -503,12 +319,7 @@
       "themes": [
         "oshi_purple"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -534,12 +345,7 @@
       "themes": [
         "oshi_purple"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -565,12 +371,7 @@
       "themes": [
         "botanical"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -596,12 +397,7 @@
       "themes": [
         "botanical"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -627,12 +423,7 @@
       "themes": [
         "botanical"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -658,12 +449,7 @@
       "themes": [
         "botanical"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -689,12 +475,7 @@
       "themes": [
         "botanical"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -720,12 +501,7 @@
       "themes": [
         "botanical"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -751,12 +527,7 @@
       "themes": [
         "botanical"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -782,12 +553,7 @@
       "themes": [
         "botanical"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -813,12 +579,7 @@
       "themes": [
         "botanical"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -844,12 +605,7 @@
       "themes": [
         "botanical"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -875,12 +631,7 @@
       "themes": [
         "botanical"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -906,12 +657,7 @@
       "themes": [
         "botanical"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -937,12 +683,7 @@
       "themes": [
         "korean"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -968,12 +709,7 @@
       "themes": [
         "korean"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -999,13 +735,7 @@
       "themes": [
         "korean"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        },
-        "reference_only": true
-      },
+      "metadata": {},
       "checked_at": null
     },
     {
@@ -1039,58 +769,11 @@
           "w": 1.3
         },
         "shape": "round",
-        "currency": "JPY",
         "material": "表面:ポリプロピレン 100%裏面:合成ゴム100%",
         "provider": "ikea",
         "color_name": "ベージュ, ホワイト",
-        "fetched_at": "2026-10-09T04:02:59Z",
-        "variant_id": "804.268.05",
-        "image_color": {
-          "color": "#ceb9a6",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/stoense-rug-low-pile-off-white__0622593_pe690629_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 3681
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-80426805/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-80426805/",
-          "kind": "official_page",
-          "evidence": [
-            "直径: 130 cm",
-            "厚さ: 18 mm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-80426805/",
-          "kind": "category_and_official_text",
-          "name": "STOENSE ストエンセ ラグ パイル短 - オフホワイト 130 cm",
-          "measurements": [
-            "直径: 130 cm",
-            "厚さ: 18 mm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ベージュ, ホワイト",
-        "price_checked_at": "2026-10-09T04:02:59Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "804.268.05"
+        "official_color": "ベージュ, ホワイト"
       },
       "checked_at": "2026-10-09T04:02:59Z"
     },
@@ -1117,12 +800,7 @@
       "themes": [
         "korean"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -1148,12 +826,7 @@
       "themes": [
         "korean"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -1179,12 +852,7 @@
       "themes": [
         "korean"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -1210,12 +878,7 @@
       "themes": [
         "korean"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -1241,12 +904,7 @@
       "themes": [
         "korean"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -1272,12 +930,7 @@
       "themes": [
         "korean"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -1304,12 +957,7 @@
         "botanical",
         "korean"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -1337,12 +985,7 @@
         "botanical",
         "korean"
       ],
-      "metadata": {
-        "source": "hand_entered",
-        "size_source": {
-          "kind": "hand_entered"
-        }
-      },
+      "metadata": {},
       "checked_at": "2026-10-05"
     },
     {
@@ -1373,64 +1016,13 @@
           "w": 0.5
         },
         "shape": null,
-        "currency": "JPY",
         "material": "綿 100%",
         "provider": "ikea",
         "color_name": "ベージュ",
-        "fetched_at": "2026-10-10T08:10:55Z",
-        "variant_id": "005.987.30",
-        "image_color": {
-          "color": "#d5c8b8",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/gurli-cushion-cover-unbleached__1409327_pe972205_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 2396
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-00598730/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-00598730/",
-          "kind": "official_page",
-          "evidence": [
-            "長さ: 50 cm",
-            "幅: 50 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "h"
-          ],
-          "estimated_values_m": {
-            "h": 0.15
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-00598730/",
-          "kind": "category_and_official_text",
-          "name": "GURLI グルリ クッションカバー - 生成り 50x50 cm",
-          "measurements": [
-            "長さ: 50 cm",
-            "幅: 50 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "h"
         ],
-        "official_color": "ベージュ",
-        "price_checked_at": "2026-10-10T08:10:55Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "005.987.30"
+        "official_color": "ベージュ"
       },
       "checked_at": "2026-10-10T08:10:55Z"
     },
@@ -1462,58 +1054,11 @@
           "w": 0.16
         },
         "shape": null,
-        "currency": "JPY",
         "material": "ポリプロピレン ...",
         "provider": "ikea",
         "color_name": "グレー, ホワイト",
-        "fetched_at": "2026-10-10T08:17:19Z",
-        "variant_id": "303.584.94",
-        "image_color": {
-          "color": "#4e4e4e",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/svallet-work-lamp-dark-grey-white__0703502_pe724751_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 383
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/svallet-work-lamp-dark-grey-white-30358494/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/svallet-work-lamp-dark-grey-white-30358494/",
-          "kind": "official_page",
-          "evidence": [
-            "高さ: 35 cm",
-            "ベースの直径: 16 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/svallet-work-lamp-dark-grey-white-30358494/",
-          "kind": "category_and_official_text",
-          "name": "SVALLET スヴァレット ワークランプ - ダークグレー/ホワイト",
-          "measurements": [
-            "高さ: 35 cm",
-            "ベースの直径: 16 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "グレー, ホワイト",
-        "price_checked_at": "2026-10-10T08:17:19Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "303.584.94"
+        "official_color": "グレー, ホワイト"
       },
       "checked_at": "2026-10-10T08:17:19Z"
     },
@@ -1545,70 +1090,13 @@
           "w": 0.4
         },
         "shape": null,
-        "currency": "JPY",
         "material": "シート/ バンパー/ 足:ポリプロピレン. ....脚:スチール, エポキシ/ポリエステル粉体塗装",
         "provider": "ikea",
         "color_name": "ブラック",
-        "fetched_at": "2026-10-09T01:51:28Z",
-        "variant_id": "001.623.80",
-        "image_color": {
-          "color": "#505156",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/marius-stool-black__0727386_pe735638_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 466
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/marius-stool-black-00162380/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/marius-stool-black-00162380/",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "シートの高さ45 cm",
-            "幅: 40 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "d"
-          ],
-          "estimated_values_m": {
-            "d": 0.5
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/marius-stool-black-00162380/",
-          "kind": "category_and_official_text",
-          "name": "MARIUS マリウス スツール - ブラック 45 cm",
-          "measurements": [
-            "シートの高さ45 cm",
-            "幅: 40 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "d"
         ],
-        "official_color": "ブラック",
-        "html_extraction": {
-          "h": "シートの高さ45 cm",
-          "kind": "gemini_official_html",
-          "shape": "unknown",
-          "name_evidence": "MARIUS マリウス"
-        },
-        "price_checked_at": "2026-10-09T01:51:28Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "001.623.80"
+        "official_color": "ブラック"
       },
       "checked_at": "2026-10-09T01:51:28Z"
     },
@@ -1640,66 +1128,14 @@
           "w": 0.4
         },
         "shape": null,
-        "currency": "JPY",
         "material": "シート/ バンパー/ 足:ポリプロピレン. ....脚:スチール, エポキシ/ポリエステル粉体塗装",
         "provider": "ikea",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T01:31:07Z",
-        "variant_id": "301.840.50",
-        "image_color": {
-          "color": "#eae9e5",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/marius-stool-white__0727398_pe735650_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 462
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/marius-stool-white-30184050/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/marius-stool-white-30184050/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 40 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "h",
-            "d"
-          ],
-          "estimated_values_m": {
-            "d": 0.5,
-            "h": 0.85
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/marius-stool-white-30184050/",
-          "kind": "category_and_official_text",
-          "name": "MARIUS マリウス スツール - ホワイト 45 cm",
-          "measurements": [
-            "幅: 40 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "h",
           "d"
         ],
-        "official_color": "ホワイト",
-        "price_checked_at": "2026-10-09T01:31:07Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "301.840.50",
-        "html_extraction_failure": "公式HTMLの商品抽出に失敗しました (Timeout::Error)"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T01:31:07Z"
     },
@@ -1731,64 +1167,13 @@
           "w": 0.5
         },
         "shape": null,
-        "currency": "JPY",
         "material": "ポリエステル 100%..",
         "provider": "ikea",
         "color_name": "ライラック",
-        "fetched_at": "2026-10-09T15:56:38Z",
-        "variant_id": "205.695.19",
-        "image_color": {
-          "color": "#d3cfce",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/blaskata-cushion-cover-purple-patterned__1198277_pe903999_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1582
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/blaskata-cushion-cover-purple-patterned-20569519/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/blaskata-cushion-cover-purple-patterned-20569519/",
-          "kind": "official_page",
-          "evidence": [
-            "長さ: 50 cm",
-            "幅: 50 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "h"
-          ],
-          "estimated_values_m": {
-            "h": 0.15
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/blaskata-cushion-cover-purple-patterned-20569519/",
-          "kind": "category_and_official_text",
-          "name": "BLÅSKATA ブロースカータ クッションカバー - パープル/模様入り 50x50 cm",
-          "measurements": [
-            "長さ: 50 cm",
-            "幅: 50 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "h"
         ],
-        "official_color": "ライラック",
-        "price_checked_at": "2026-10-09T15:56:38Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "205.695.19"
+        "official_color": "ライラック"
       },
       "checked_at": "2026-10-09T15:56:38Z"
     },
@@ -1820,64 +1205,13 @@
           "w": 0.5
         },
         "shape": null,
-        "currency": "JPY",
         "material": "綿 100%",
         "provider": "ikea",
         "color_name": "ベージュ",
-        "fetched_at": "2026-10-10T08:10:41Z",
-        "variant_id": "305.908.98",
-        "image_color": {
-          "color": "#d3c9b4",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/sanela-cushion-cover-light-beige__1284678_pe933086_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 3070
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
-          "kind": "official_page",
-          "evidence": [
-            "長さ: 50 cm",
-            "幅: 50 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "h"
-          ],
-          "estimated_values_m": {
-            "h": 0.15
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
-          "kind": "category_and_official_text",
-          "name": "SANELA サネーラ クッションカバー - ライトベージュ 50x50 cm",
-          "measurements": [
-            "長さ: 50 cm",
-            "幅: 50 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "h"
         ],
-        "official_color": "ベージュ",
-        "price_checked_at": "2026-10-10T08:10:41Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "305.908.98"
+        "official_color": "ベージュ"
       },
       "checked_at": "2026-10-10T08:10:41Z"
     },
@@ -1909,64 +1243,13 @@
           "w": 0.5
         },
         "shape": null,
-        "currency": "JPY",
         "material": "綿 100%",
         "provider": "ikea",
         "color_name": "ブラウン, イエロー",
-        "fetched_at": "2026-10-10T08:10:55Z",
-        "variant_id": "706.359.89",
-        "image_color": {
-          "color": "#a77634",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/sanela-cushion-cover-yellow-brown__1502327_pe1007597_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 2477
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
-          "kind": "official_page",
-          "evidence": [
-            "長さ: 50 cm",
-            "幅: 50 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "h"
-          ],
-          "estimated_values_m": {
-            "h": 0.15
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
-          "kind": "category_and_official_text",
-          "name": "SANELA サネーラ クッションカバー - イエローブラウン 50x50 cm",
-          "measurements": [
-            "長さ: 50 cm",
-            "幅: 50 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "h"
         ],
-        "official_color": "ブラウン, イエロー",
-        "price_checked_at": "2026-10-10T08:10:55Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "706.359.89"
+        "official_color": "ブラウン, イエロー"
       },
       "checked_at": "2026-10-10T08:10:55Z"
     },
@@ -1998,64 +1281,13 @@
           "w": 0.65
         },
         "shape": null,
-        "currency": "JPY",
         "material": "綿 100%",
         "provider": "ikea",
         "color_name": "ベージュ",
-        "fetched_at": "2026-10-09T04:03:02Z",
-        "variant_id": "905.987.78",
-        "image_color": {
-          "color": "#cec4ba",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/gurli-cushion-cover-unbleached__1373591_pe960019_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1713
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-90598778/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-90598778/",
-          "kind": "official_page",
-          "evidence": [
-            "長さ: 65 cm",
-            "幅: 65 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "h"
-          ],
-          "estimated_values_m": {
-            "h": 0.15
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-90598778/",
-          "kind": "category_and_official_text",
-          "name": "GURLI グルリ クッションカバー - 生成り 65x65 cm",
-          "measurements": [
-            "長さ: 65 cm",
-            "幅: 65 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "h"
         ],
-        "official_color": "ベージュ",
-        "price_checked_at": "2026-10-09T04:03:02Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "905.987.78"
+        "official_color": "ベージュ"
       },
       "checked_at": "2026-10-09T04:03:02Z"
     },
@@ -2087,71 +1319,14 @@
           "w": null
         },
         "shape": null,
-        "currency": "JPY",
         "material": "ポリプロピレンプラスチック",
         "provider": "yahoo_shopping",
         "color_name": "ダークグレー/ホワイト",
-        "fetched_at": "2026-10-10T08:17:19Z",
-        "variant_id": "shop-brain/30358494",
-        "image_color": {
-          "color": "#d0cfcd",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://item-shopping.c.yimg.jp/i/n/shop-brain_30358494",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 623
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://store.shopping.yahoo.co.jp/shop-brain/30358494.html",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://store.shopping.yahoo.co.jp/shop-brain/30358494.html",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "高さ: 35 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "w",
-            "d"
-          ],
-          "estimated_values_m": {
-            "d": 0.25,
-            "w": 0.25
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY, Yahoo!ショッピングの税込総額表示)",
-        "shape_source": {
-          "url": "https://store.shopping.yahoo.co.jp/shop-brain/30358494.html",
-          "kind": "category_and_official_text",
-          "name": "ＩＫＥＡ/イケア　SVALLET　ワークランプ　ダークグレー/ホワイト(303.584.94)",
-          "measurements": [
-            "高さ: 35 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "w",
           "d"
         ],
-        "official_color": "ダークグレー/ホワイト",
-        "html_extraction": {
-          "h": "高さ: 35 cm",
-          "kind": "gemini_official_html",
-          "shape": "unknown",
-          "name_evidence": "ＩＫＥＡ/イケア　SVALLET　ワークランプ　ダークグレー/ホワイト(303.584.94)"
-        },
-        "price_checked_at": "2026-10-10T08:17:19Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "shop-brain/30358494"
+        "official_color": "ダークグレー/ホワイト"
       },
       "checked_at": "2026-10-10T08:17:19Z"
     },
@@ -2183,60 +1358,11 @@
           "w": 0.34
         },
         "shape": null,
-        "currency": "JPY",
         "material": "フレーム:スチール, エポキシ/ポリエステル粉体塗装シート/ 足:ポリプロピレン .",
         "provider": "ikea",
         "color_name": "ブラック",
-        "fetched_at": "2026-10-09T01:30:46Z",
-        "variant_id": "705.704.07",
-        "image_color": {
-          "color": "#fdfdfd",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/gunde-folding-stool-black__1321494_pe941625_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 2512
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/gunde-folding-stool-black-70570407/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/gunde-folding-stool-black-70570407/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 34 cm",
-            "奥行き: 32 cm",
-            "高さ: 45 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/gunde-folding-stool-black-70570407/",
-          "kind": "category_and_official_text",
-          "name": "GUNDE グンデ 折りたたみスツール - ブラック",
-          "measurements": [
-            "幅: 34 cm",
-            "奥行き: 32 cm",
-            "高さ: 45 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ブラック",
-        "price_checked_at": "2026-10-09T01:30:46Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "705.704.07"
+        "official_color": "ブラック"
       },
       "checked_at": "2026-10-09T01:30:46Z"
     },
@@ -2268,64 +1394,13 @@
           "w": 0.5
         },
         "shape": null,
-        "currency": "JPY",
         "material": "綿 100%",
         "provider": "ikea",
         "color_name": "グレーブラウン",
-        "fetched_at": "2026-10-10T08:10:56Z",
-        "variant_id": "606.264.19",
-        "image_color": {
-          "color": "#54473a",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/asveig-cushion-cover-grey-brown__1478230_pe999460_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 2353
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-grey-brown-60626419/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-grey-brown-60626419/",
-          "kind": "official_page",
-          "evidence": [
-            "長さ: 50 cm",
-            "幅: 50 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "h"
-          ],
-          "estimated_values_m": {
-            "h": 0.15
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-grey-brown-60626419/",
-          "kind": "category_and_official_text",
-          "name": "ÅSVEIG オースヴェイグ クッションカバー - グレーブラウン 50x50 cm",
-          "measurements": [
-            "長さ: 50 cm",
-            "幅: 50 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "h"
         ],
-        "official_color": "グレーブラウン",
-        "price_checked_at": "2026-10-10T08:10:56Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "606.264.19"
+        "official_color": "グレーブラウン"
       },
       "checked_at": "2026-10-10T08:10:56Z"
     },
@@ -2357,64 +1432,13 @@
           "w": 0.58
         },
         "shape": null,
-        "currency": "JPY",
         "material": "綿 100%",
         "provider": "ikea",
         "color_name": "ベージュ",
-        "fetched_at": "2026-10-09T04:02:58Z",
-        "variant_id": "805.724.20",
-        "image_color": {
-          "color": "#d6c9b6",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/asveig-cushion-cover-light-beige__1207685_pe908134_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 2042
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-light-beige-80572420/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-light-beige-80572420/",
-          "kind": "official_page",
-          "evidence": [
-            "長さ: 40 cm",
-            "幅: 58 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "h"
-          ],
-          "estimated_values_m": {
-            "h": 0.15
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-light-beige-80572420/",
-          "kind": "category_and_official_text",
-          "name": "ÅSVEIG オースヴェイグ クッションカバー - ライトベージュ 40x58 cm",
-          "measurements": [
-            "長さ: 40 cm",
-            "幅: 58 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "h"
         ],
-        "official_color": "ベージュ",
-        "price_checked_at": "2026-10-09T04:02:58Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "805.724.20"
+        "official_color": "ベージュ"
       },
       "checked_at": "2026-10-09T04:02:58Z"
     },
@@ -2446,64 +1470,11 @@
           "w": 0.3
         },
         "shape": "round",
-        "currency": "JPY",
         "material": "スチール、PVC",
         "provider": "yahoo_shopping",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T01:33:16Z",
-        "variant_id": "nitori-net/8700458",
-        "image_color": {
-          "color": "#f9f9f8",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_8700458",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1110
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://store.shopping.yahoo.co.jp/nitori-net/8700458.html",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/8700458.html",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "幅30×奥行31.5×高さ49.5cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY, Yahoo!ショッピングの税込総額表示)",
-        "shape_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/8700458.html",
-          "kind": "category_and_official_text",
-          "name": "折りたたみスツール ボンベイ(WH) ニトリ",
-          "measurements": [
-            "幅30×奥行31.5×高さ49.5cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "html_extraction": {
-          "d": "幅30×奥行31.5×高さ49.5cm",
-          "h": "幅30×奥行31.5×高さ49.5cm",
-          "w": "幅30×奥行31.5×高さ49.5cm",
-          "kind": "gemini_official_html",
-          "shape": "round",
-          "name_evidence": "折りたたみスツール ボンベイ(WH) ニトリ"
-        },
-        "price_checked_at": "2026-10-09T01:33:16Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "nitori-net/8700458"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T01:33:16Z"
     },
@@ -2535,60 +1506,11 @@
           "w": 0.44
         },
         "shape": null,
-        "currency": "JPY",
         "material": "フレーム:スチール、亜鉛メッキ, ポリエステル粉体塗装シート及び背もたれ/ 脚:ポリプロピレン .リベット:スチールワッシャー:ポリアミド .",
         "provider": "ikea",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T01:33:06Z",
-        "variant_id": "902.553.08",
-        "image_color": {
-          "color": "#f7f6f4",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/fejan-chair-outdoor-foldable-white__0728344_pe736190_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 2130
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/fejan-chair-outdoor-foldable-white-90255308/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/fejan-chair-outdoor-foldable-white-90255308/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 44 cm",
-            "奥行き: 42 cm",
-            "高さ: 89 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/fejan-chair-outdoor-foldable-white-90255308/",
-          "kind": "category_and_official_text",
-          "name": "FEJAN フェヤン チェア 屋外用 - 折りたたみ式 ホワイト",
-          "measurements": [
-            "幅: 44 cm",
-            "奥行き: 42 cm",
-            "高さ: 89 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "price_checked_at": "2026-10-09T01:33:06Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "902.553.08"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T01:33:06Z"
     },
@@ -2620,71 +1542,13 @@
           "w": 0.55
         },
         "shape": "rectangular",
-        "currency": "JPY",
         "material": "繊維板, ペーパーフォイル",
         "provider": "yahoo_shopping",
         "color_name": "オーク調",
-        "fetched_at": "2026-10-10T08:17:17Z",
-        "variant_id": "shop-brain/90586940",
-        "image_color": {
-          "color": "#fdfdfd",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://item-shopping.c.yimg.jp/i/n/shop-brain_90586940",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 7384
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://store.shopping.yahoo.co.jp/shop-brain/90586940.html",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://store.shopping.yahoo.co.jp/shop-brain/90586940.html",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "長さ: 55 cm",
-            "奥行き: 12 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "h"
-          ],
-          "estimated_values_m": {
-            "h": 0.15
-          }
-        },
-        "availability": "unknown",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY, Yahoo!ショッピングの税込総額表示)",
-        "shape_source": {
-          "url": "https://store.shopping.yahoo.co.jp/shop-brain/90586940.html",
-          "kind": "category_and_official_text",
-          "name": "ＩＫＥＡ/イケア　MOSSLANDA/モッスランダ　アート用飾り棚55cm　オーク調(905.869.40/90586940)80",
-          "measurements": [
-            "長さ: 55 cm",
-            "奥行き: 12 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "h"
         ],
-        "official_color": "オーク調",
-        "html_extraction": {
-          "d": "奥行き: 12 cm",
-          "w": "長さ: 55 cm",
-          "kind": "gemini_official_html",
-          "shape": "rectangular",
-          "name_evidence": "ＩＫＥＡ/イケア　MOSSLANDA/モッスランダ　アート用飾り棚55cm　オーク調(905.869.40/90586940)80"
-        },
-        "price_checked_at": "2026-10-10T08:17:17Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "shop-brain/90586940"
+        "official_color": "オーク調"
       },
       "checked_at": "2026-10-10T08:17:17Z"
     },
@@ -2716,69 +1580,13 @@
           "w": 1.5
         },
         "shape": "rectangular",
-        "currency": "JPY",
         "material": "ポリエステル100％",
         "provider": "yahoo_shopping",
         "color_name": "レッドパープル",
-        "fetched_at": "2026-10-09T15:56:53Z",
-        "variant_id": "nitori-net/2115100099156",
-        "image_color": {
-          "color": "#d4cfd2",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_2115100099156",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1530
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://store.shopping.yahoo.co.jp/nitori-net/2115100099156.html",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/2115100099156.html",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "幅150×奥行210cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "h"
-          ],
-          "estimated_values_m": {
-            "h": 0.04
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY, Yahoo!ショッピングの税込総額表示)",
-        "shape_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/2115100099156.html",
-          "kind": "category_and_official_text",
-          "name": "掛布団カバー シングル(PT112 Pステッチハナ パープル S) ニトリ",
-          "measurements": [
-            "幅150×奥行210cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "h"
         ],
-        "official_color": "レッドパープル",
-        "html_extraction": {
-          "d": "幅150×奥行210cm",
-          "w": "幅150×奥行210cm",
-          "kind": "gemini_official_html",
-          "shape": "rectangular",
-          "name_evidence": "掛布団カバー シングル(PT112 Pステッチハナ パープル S) ニトリ"
-        },
-        "price_checked_at": "2026-10-09T15:56:53Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "nitori-net/2115100099156"
+        "official_color": "レッドパープル"
       },
       "checked_at": "2026-10-09T15:56:53Z"
     },
@@ -2810,64 +1618,11 @@
           "w": 0.45
         },
         "shape": "rectangular",
-        "currency": "JPY",
         "material": "合成樹脂化粧繊維版(メラミン樹脂)",
         "provider": "yahoo_shopping",
         "color_name": "ライトブラウン",
-        "fetched_at": "2026-10-09T04:02:48Z",
-        "variant_id": "nitori-net/2117100002310",
-        "image_color": {
-          "color": "#e8e3dd",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_2117100002310",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1362
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://store.shopping.yahoo.co.jp/nitori-net/2117100002310.html",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/2117100002310.html",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "幅45×奥行12×高さ12cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY, Yahoo!ショッピングの税込総額表示)",
-        "shape_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/2117100002310.html",
-          "kind": "category_and_official_text",
-          "name": "ウォールシェルフ 幅45cm (ライトブラウン HS) ニトリ",
-          "measurements": [
-            "幅45×奥行12×高さ12cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ライトブラウン",
-        "html_extraction": {
-          "d": "幅45×奥行12×高さ12cm",
-          "h": "幅45×奥行12×高さ12cm",
-          "w": "幅45×奥行12×高さ12cm",
-          "kind": "gemini_official_html",
-          "shape": "rectangular",
-          "name_evidence": "ウォールシェルフ 幅45cm (ライトブラウン HS) ニトリ"
-        },
-        "price_checked_at": "2026-10-09T04:02:48Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "nitori-net/2117100002310"
+        "official_color": "ライトブラウン"
       },
       "checked_at": "2026-10-09T04:02:48Z"
     },
@@ -2899,60 +1654,11 @@
           "w": 1.2
         },
         "shape": "rectangular",
-        "currency": "JPY",
         "material": "綿 100%",
         "provider": "ikea",
         "color_name": "ベージュ, ホワイト",
-        "fetched_at": "2026-10-10T08:10:41Z",
-        "variant_id": "004.567.59",
-        "image_color": {
-          "color": "#d1c6bb",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/tiphede-rug-flatwoven-natural-black__0772066_pe755879_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 3282
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/tiphede-rug-flatwoven-natural-black-00456759/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/tiphede-rug-flatwoven-natural-black-00456759/",
-          "kind": "official_page",
-          "evidence": [
-            "長さ: 180 cm",
-            "幅: 120 cm",
-            "厚さ: 2 mm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/tiphede-rug-flatwoven-natural-black-00456759/",
-          "kind": "category_and_official_text",
-          "name": "TIPHEDE ティプヘデ ラグ 平織り - ナチュラル/ブラック 120x180 cm",
-          "measurements": [
-            "長さ: 180 cm",
-            "幅: 120 cm",
-            "厚さ: 2 mm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ベージュ, ホワイト",
-        "price_checked_at": "2026-10-10T08:10:41Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "004.567.59"
+        "official_color": "ベージュ, ホワイト"
       },
       "checked_at": "2026-10-10T08:10:41Z"
     },
@@ -2984,70 +1690,14 @@
           "w": null
         },
         "shape": "round",
-        "currency": "JPY",
         "material": "本体:ステンレススチール, スチール, ポリプロピレン ., 金属膜コーティング, エポキシ/ポリエステル粉体塗装基本素材:ガラス",
         "provider": "ikea",
         "color_name": "イエロー, ホワイト",
-        "fetched_at": "2026-10-09T15:56:43Z",
-        "variant_id": "203.501.39",
-        "image_color": {
-          "color": "#d4d2cd",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/begavning-glass-dome-with-base__0904079_pe644670_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 5990
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/begavning-glass-dome-with-base-20350139/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/begavning-glass-dome-with-base-20350139/",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "高さ: 26 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "w",
-            "d"
-          ],
-          "estimated_values_m": {
-            "d": 0.15,
-            "w": 0.3
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/begavning-glass-dome-with-base-20350139/",
-          "kind": "category_and_official_text",
-          "name": "BEGÅVNING ベゴーヴニング ガラスドーム ベース付き 26 cm",
-          "measurements": [
-            "高さ: 26 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "w",
           "d"
         ],
-        "official_color": "イエロー, ホワイト",
-        "html_extraction": {
-          "kind": "gemini_official_html",
-          "shape": "round",
-          "name_evidence": "BEGÅVNING ベゴーヴニング ガラスドーム ベース付き, 26 cm"
-        },
-        "price_checked_at": "2026-10-09T15:56:43Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "203.501.39"
+        "official_color": "イエロー, ホワイト"
       },
       "checked_at": "2026-10-09T15:56:43Z"
     },
@@ -3079,60 +1729,11 @@
           "w": 0.39
         },
         "shape": null,
-        "currency": "JPY",
         "material": "脚フレーム/ クロスレール:スチール, エポキシ/ポリエステル粉体塗装シート/ 背もたれ:ポリプロピレン. ....バンパー:熱可塑性エラストマー",
         "provider": "ikea",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T01:33:05Z",
-        "variant_id": "206.054.28",
-        "image_color": {
-          "color": "#ecebe7",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/sandsberg-chair-white__1390727_pe965548_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 296
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-20605428/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-20605428/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 39 cm",
-            "奥行き: 47 cm",
-            "高さ: 77 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-20605428/",
-          "kind": "category_and_official_text",
-          "name": "SANDSBERG サンドスベリ チェア - ホワイト",
-          "measurements": [
-            "幅: 39 cm",
-            "奥行き: 47 cm",
-            "高さ: 77 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "price_checked_at": "2026-10-09T01:33:05Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "206.054.28"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T01:33:05Z"
     },
@@ -3164,60 +1765,11 @@
           "w": 0.39
         },
         "shape": null,
-        "currency": "JPY",
         "material": "脚フレーム/ クロスレール:スチール, エポキシ/ポリエステル粉体塗装シート/ 背もたれ:ポリプロピレン. ....バンパー:熱可塑性エラストマー",
         "provider": "ikea",
         "color_name": "ブラック",
-        "fetched_at": "2026-10-09T01:30:47Z",
-        "variant_id": "806.054.30",
-        "image_color": {
-          "color": "#fdfdfd",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/sandsberg-chair-black__1390732_pe965553_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 607
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-black-80605430/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-black-80605430/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 39 cm",
-            "奥行き: 47 cm",
-            "高さ: 77 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-black-80605430/",
-          "kind": "category_and_official_text",
-          "name": "SANDSBERG サンドスベリ チェア - ブラック",
-          "measurements": [
-            "幅: 39 cm",
-            "奥行き: 47 cm",
-            "高さ: 77 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ブラック",
-        "price_checked_at": "2026-10-09T01:30:47Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "806.054.30"
+        "official_color": "ブラック"
       },
       "checked_at": "2026-10-09T01:30:47Z"
     },
@@ -3249,60 +1801,11 @@
           "w": 0.41
         },
         "shape": null,
-        "currency": "JPY",
         "material": "フレーム:スチール、亜鉛メッキシート及び背もたれ:ポリプロピレン .",
         "provider": "ikea",
         "color_name": "ブラック",
-        "fetched_at": "2026-10-09T01:30:43Z",
-        "variant_id": "802.177.98",
-        "image_color": {
-          "color": "#fefefe",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/gunde-folding-chair-black__0728313_pe736184_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 2005
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/gunde-folding-chair-black-80217798/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/gunde-folding-chair-black-80217798/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 41 cm",
-            "奥行き: 45 cm",
-            "高さ: 78 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/gunde-folding-chair-black-80217798/",
-          "kind": "category_and_official_text",
-          "name": "GUNDE グンデ 折りたたみチェア - ブラック",
-          "measurements": [
-            "幅: 41 cm",
-            "奥行き: 45 cm",
-            "高さ: 78 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ブラック",
-        "price_checked_at": "2026-10-09T01:30:43Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "802.177.98"
+        "official_color": "ブラック"
       },
       "checked_at": "2026-10-09T01:30:43Z"
     },
@@ -3334,60 +1837,11 @@
           "w": 0.4
         },
         "shape": null,
-        "currency": "JPY",
         "material": "フレーム:スチール, エポキシ/ポリエステル粉体塗装シート/ 背もたれ:ポリプロピレン...., ポリプロピレン. ....",
         "provider": "ikea",
         "color_name": "ブラック",
-        "fetched_at": "2026-10-09T01:30:51Z",
-        "variant_id": "104.984.19",
-        "image_color": {
-          "color": "#fefefe",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/stig-bar-stool-with-backrest-counter-height-black-black__0948110_pe798867_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1647
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/stig-bar-stool-with-backrest-counter-height-black-black-10498419/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/stig-bar-stool-with-backrest-counter-height-black-black-10498419/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 40 cm",
-            "奥行き: 42 cm",
-            "高さ: 90 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/stig-bar-stool-with-backrest-counter-height-black-black-10498419/",
-          "kind": "category_and_official_text",
-          "name": "STIG スティグ カウンターチェア 背もたれ付き - カウンターの高さ ブラック/ブラック 63 cm",
-          "measurements": [
-            "幅: 40 cm",
-            "奥行き: 42 cm",
-            "高さ: 90 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ブラック",
-        "price_checked_at": "2026-10-09T01:30:51Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "104.984.19"
+        "official_color": "ブラック"
       },
       "checked_at": "2026-10-09T01:30:51Z"
     },
@@ -3419,60 +1873,11 @@
           "w": 0.42
         },
         "shape": null,
-        "currency": "JPY",
         "material": "シート:合板, バーチ材突き板, 着色クリアラッカー脚:積層合板, バーチ材突き板, 着色クリアラッカー",
         "provider": "ikea",
         "color_name": "ベージュ, ブラウン",
-        "fetched_at": "2026-10-09T01:51:29Z",
-        "variant_id": "804.200.40",
-        "image_color": {
-          "color": "#e8cdb1",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/kyrre-stool-birch__1488024_pe1003293_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 921
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/kyrre-stool-birch-80420040/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/kyrre-stool-birch-80420040/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 42 cm",
-            "奥行き: 48 cm",
-            "高さ: 45 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/kyrre-stool-birch-80420040/",
-          "kind": "category_and_official_text",
-          "name": "KYRRE シルレ スツール - バーチ",
-          "measurements": [
-            "幅: 42 cm",
-            "奥行き: 48 cm",
-            "高さ: 45 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ベージュ, ブラウン",
-        "price_checked_at": "2026-10-09T01:51:29Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "804.200.40"
+        "official_color": "ベージュ, ブラウン"
       },
       "checked_at": "2026-10-09T01:51:29Z"
     },
@@ -3504,71 +1909,13 @@
           "w": 1.5
         },
         "shape": "rectangular",
-        "currency": "JPY",
         "material": "綿 100%",
         "provider": "ikea",
         "color_name": "ブラウン",
-        "fetched_at": "2026-10-09T04:03:04Z",
-        "variant_id": "706.324.91",
-        "image_color": {
-          "color": "#af8a72",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/aengslilja-duvet-cover-and-pillowcase-light-brown__1599615_pe1042448_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 569
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "掛け布団カバーの幅\n150 cm",
-            "掛け布団カバーの長さ\n200 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "d"
-          ],
-          "estimated_values_m": {
-            "d": 2.0
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
-          "kind": "category_and_official_text",
-          "name": "ÄNGSLILJA エングスリリア 掛け布団カバー＆枕カバー - ライトブラウン 150x200/50x60 cm",
-          "measurements": [
-            "掛け布団カバーの幅\n150 cm",
-            "掛け布団カバーの長さ\n200 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "d"
         ],
-        "official_color": "ブラウン",
-        "html_extraction": {
-          "h": "掛け布団カバーの長さ\n200 cm",
-          "w": "掛け布団カバーの幅\n150 cm",
-          "kind": "gemini_official_html",
-          "shape": "rectangular",
-          "name_evidence": "ÄNGSLILJA エングスリリア"
-        },
-        "price_checked_at": "2026-10-09T04:03:04Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "706.324.91"
+        "official_color": "ブラウン"
       },
       "checked_at": "2026-10-09T04:03:04Z"
     },
@@ -3600,60 +1947,11 @@
           "w": 0.45
         },
         "shape": null,
-        "currency": "JPY",
         "material": "脚フレーム/ ピン/ クロスレール:スチール, エポキシ/ポリエステル粉体塗装シート/ 背もたれ:ポリプロピレン....",
         "provider": "ikea",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T01:29:15Z",
-        "variant_id": "805.927.34",
-        "image_color": {
-          "color": "#edece6",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/vihals-chair-white__1370478_pe958751_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 188
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/vihals-chair-white-80592734/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/vihals-chair-white-80592734/",
-          "kind": "official_page",
-          "evidence": [
-            "奥行き: 47 cm",
-            "高さ: 79 cm",
-            "幅: 45 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/vihals-chair-white-80592734/",
-          "kind": "category_and_official_text",
-          "name": "VIHALS ヴィーハルス チェア - ホワイト",
-          "measurements": [
-            "奥行き: 47 cm",
-            "高さ: 79 cm",
-            "幅: 45 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "price_checked_at": "2026-10-09T01:29:15Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "805.927.34"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T01:29:15Z"
     },
@@ -3685,68 +1983,11 @@
           "w": 0.39
         },
         "shape": null,
-        "currency": "JPY",
         "material": "スチール, エポキシ/ポリエステル粉体塗装, ポリプロピレン, 熱可塑性エラストマー",
         "provider": "yahoo_shopping",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T01:33:15Z",
-        "variant_id": "shop-brain/20605428",
-        "image_color": {
-          "color": "#d2d2d1",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://item-shopping.c.yimg.jp/i/n/shop-brain_20605428",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 611
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://store.shopping.yahoo.co.jp/shop-brain/20605428.html",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://store.shopping.yahoo.co.jp/shop-brain/20605428.html",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "幅: 39 cm",
-            "高さ: 77 cm",
-            "奥行き: 47 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY, Yahoo!ショッピングの税込総額表示)",
-        "shape_source": {
-          "url": "https://store.shopping.yahoo.co.jp/shop-brain/20605428.html",
-          "kind": "category_and_official_text",
-          "name": "ＩＫＥＡ/イケア　SANDSBERG/サンドスベリ　チェア　ホワイト（206.054.28/20605428）",
-          "measurements": [
-            "幅: 39 cm",
-            "高さ: 77 cm",
-            "奥行き: 47 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "html_extraction": {
-          "d": "奥行き: 47 cm",
-          "h": "高さ: 77 cm",
-          "w": "幅: 39 cm",
-          "kind": "gemini_official_html",
-          "shape": "unknown",
-          "name_evidence": "ＩＫＥＡ/イケア　SANDSBERG/サンドスベリ　チェア　ホワイト（206.054.28/20605428）"
-        },
-        "price_checked_at": "2026-10-09T01:33:15Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "shop-brain/20605428"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T01:33:15Z"
     },
@@ -3778,60 +2019,11 @@
           "w": 0.43
         },
         "shape": null,
-        "currency": "JPY",
         "material": "アスペン無垢材, 粘着性, ステイン, 透明アクリルラッカー",
         "provider": "ikea",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T01:32:53Z",
-        "variant_id": "701.788.96",
-        "image_color": {
-          "color": "#f9f7f5",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/bekvaem-step-stool-white__0122140_pe278505_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1496
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/bekvaem-step-stool-white-70178896/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/bekvaem-step-stool-white-70178896/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 43 cm",
-            "奥行き: 39 cm",
-            "高さ: 50 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/bekvaem-step-stool-white-70178896/",
-          "kind": "category_and_official_text",
-          "name": "BEKVÄM ベクヴェーム ステップスツール - ホワイト 50 cm",
-          "measurements": [
-            "幅: 43 cm",
-            "奥行き: 39 cm",
-            "高さ: 50 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "price_checked_at": "2026-10-09T01:32:53Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "701.788.96"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T01:32:53Z"
     },
@@ -3863,60 +2055,11 @@
           "w": 0.49
         },
         "shape": null,
-        "currency": "JPY",
         "material": "パイン無垢材",
         "provider": "ikea",
         "color_name": "ベージュ",
-        "fetched_at": "2026-10-09T01:30:49Z",
-        "variant_id": "405.013.21",
-        "image_color": {
-          "color": "#e8cdad",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/perjohan-stool-with-storage-pine__1018243_pe831131_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1452
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/perjohan-stool-with-storage-pine-40501321/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/perjohan-stool-with-storage-pine-40501321/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 49 cm",
-            "奥行き: 28 cm",
-            "高さ: 45 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/perjohan-stool-with-storage-pine-40501321/",
-          "kind": "category_and_official_text",
-          "name": "PERJOHAN ペルヨハン スツール 収納付き - パイン材",
-          "measurements": [
-            "幅: 49 cm",
-            "奥行き: 28 cm",
-            "高さ: 45 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ベージュ",
-        "price_checked_at": "2026-10-09T01:30:49Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "405.013.21"
+        "official_color": "ベージュ"
       },
       "checked_at": "2026-10-09T01:30:49Z"
     },
@@ -3948,60 +2091,11 @@
           "w": 0.5
         },
         "shape": null,
-        "currency": "JPY",
         "material": "トップパネル/ 棚板/ 底板:パーティクルボード, ペーパーフォイル, ペーパーフォイルサイドパネル:パーティクルボード, ペーパーフォイル, ペーパーフォイル, プラスチックエッジバックパネル:繊維板, プリント・アクリル塗装仕上げパーティション/ 扉:パーティクルボード, ペーパーフォイル, プラスチックエッジ",
         "provider": "ikea",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T04:02:56Z",
-        "variant_id": "704.838.82",
-        "image_color": {
-          "color": "#f0f1ec",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/baggebo-cabinet-with-door-white__1016757_pe830615_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 2210
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/baggebo-cabinet-with-door-white-70483882/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/baggebo-cabinet-with-door-white-70483882/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 50 cm",
-            "奥行き: 30 cm",
-            "高さ: 80 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/baggebo-cabinet-with-door-white-70483882/",
-          "kind": "category_and_official_text",
-          "name": "BAGGEBO バッゲボー キャビネット 扉付 - ホワイト 50x30x80 cm",
-          "measurements": [
-            "幅: 50 cm",
-            "奥行き: 30 cm",
-            "高さ: 80 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "price_checked_at": "2026-10-09T04:02:56Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "704.838.82"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T04:02:56Z"
     },
@@ -4033,65 +2127,13 @@
           "w": 0.18
         },
         "shape": null,
-        "currency": "JPY",
         "material": "カバー/ チューブ:スチール, 粉体塗装重り:コンクリートシェード:ガラス, 塗料",
         "provider": "ikea",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-10T08:17:18Z",
-        "variant_id": "305.943.25",
-        "image_color": {
-          "color": "#d4d4d5",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/nymane-table-lamp-white__1377229_pe960816_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 4919
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/nymane-table-lamp-white-30594325/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/nymane-table-lamp-white-30594325/",
-          "kind": "official_page",
-          "evidence": [
-            "ベースの直径: 18 cm",
-            "直径: 24 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "h"
-          ],
-          "estimated_values_m": {
-            "h": 0.4
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/nymane-table-lamp-white-30594325/",
-          "kind": "category_and_official_text",
-          "name": "NYMÅNE ニーモーネ テーブルランプ - ホワイト 33 cm",
-          "measurements": [
-            "ベースの直径: 18 cm",
-            "直径: 24 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "h"
         ],
-        "official_color": "ホワイト",
-        "price_checked_at": "2026-10-10T08:17:18Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "305.943.25",
-        "html_extraction_failure": "主商品名と抽出対象を照合できません"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-10T08:17:18Z"
     },
@@ -4123,60 +2165,11 @@
           "w": 0.44
         },
         "shape": null,
-        "currency": "JPY",
         "material": "ビーチ無垢材, 粘着性, ステイン, 透明アクリルラッカー",
         "provider": "ikea",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T01:29:27Z",
-        "variant_id": "605.343.30",
-        "image_color": {
-          "color": "#f2f3f1",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/froesvi-folding-chair-white__1284073_pe932746_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1521
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/froesvi-folding-chair-white-60534330/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/froesvi-folding-chair-white-60534330/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 44 cm",
-            "奥行き: 51 cm",
-            "高さ: 77 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/froesvi-folding-chair-white-60534330/",
-          "kind": "category_and_official_text",
-          "name": "FRÖSVI フロースヴィ 折りたたみチェア - ホワイト",
-          "measurements": [
-            "幅: 44 cm",
-            "奥行き: 51 cm",
-            "高さ: 77 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "price_checked_at": "2026-10-09T01:29:27Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "605.343.30"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T01:29:27Z"
     },
@@ -4208,60 +2201,11 @@
           "w": 0.42
         },
         "shape": null,
-        "currency": "JPY",
         "material": "パイン無垢材, ステイン, クリアラッカー",
         "provider": "ikea",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T01:29:26Z",
-        "variant_id": "706.351.78",
-        "image_color": {
-          "color": "#f2f2f1",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/pinntorp-chair-white-stained-pine__1508780_pe1009581_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1665
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/pinntorp-chair-white-stained-pine-70635178/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/pinntorp-chair-white-stained-pine-70635178/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 42 cm",
-            "奥行き: 49 cm",
-            "高さ: 90 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/pinntorp-chair-white-stained-pine-70635178/",
-          "kind": "category_and_official_text",
-          "name": "PINNTORP ピントルプ チェア - ホワイトステイン/パイン材",
-          "measurements": [
-            "幅: 42 cm",
-            "奥行き: 49 cm",
-            "高さ: 90 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "price_checked_at": "2026-10-09T01:29:26Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "706.351.78"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T01:29:26Z"
     },
@@ -4293,60 +2237,11 @@
           "w": 0.67
         },
         "shape": null,
-        "currency": "JPY",
         "material": "シートシェルシート:ポリプロピレン .ナット:スチール, 亜鉛メッキ",
         "provider": "ikea",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T01:32:52Z",
-        "variant_id": "594.454.67",
-        "image_color": {
-          "color": "#efefec",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/loberget-malskaer-swivel-chair-white__1078458_pe857202_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1130
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/loberget-malskaer-swivel-chair-white-s59445467/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/loberget-malskaer-swivel-chair-white-s59445467/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 67 cm",
-            "奥行き: 67 cm",
-            "高さ: 90 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/loberget-malskaer-swivel-chair-white-s59445467/",
-          "kind": "category_and_official_text",
-          "name": "LOBERGET ローベルゲット / MALSKÄR マルシェール 回転チェア - ホワイト",
-          "measurements": [
-            "幅: 67 cm",
-            "奥行き: 67 cm",
-            "高さ: 90 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "price_checked_at": "2026-10-09T01:32:52Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "594.454.67"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T01:32:52Z"
     },
@@ -4378,70 +2273,13 @@
           "w": 0.26
         },
         "shape": "round",
-        "currency": "JPY",
         "material": "ベース/ シェード:ガラス装飾:スチール, ニッケルメッキ",
         "provider": "ikea",
         "color_name": "ベージュ, ホワイト",
-        "fetched_at": "2026-10-09T04:02:58Z",
-        "variant_id": "404.049.90",
-        "image_color": {
-          "color": "#d8d5d3",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/dejsa-table-lamp-beige-opal-white-glass__0967540_pe810183_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1159
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/dejsa-table-lamp-beige-opal-white-glass-40404990/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/dejsa-table-lamp-beige-opal-white-glass-40404990/",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "シェードの幅26 cm",
-            "高さ: 28 cm"
-          ],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "d"
-          ],
-          "estimated_values_m": {
-            "d": 0.25
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/dejsa-table-lamp-beige-opal-white-glass-40404990/",
-          "kind": "category_and_official_text",
-          "name": "DEJSA デイサ テーブルランプ - ベージュ/オパールホワイト ガラス 28 cm",
-          "measurements": [
-            "シェードの幅26 cm",
-            "高さ: 28 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [
           "d"
         ],
-        "official_color": "ベージュ, ホワイト",
-        "html_extraction": {
-          "w": "シェードの幅26 cm",
-          "kind": "gemini_official_html",
-          "shape": "round",
-          "name_evidence": "DEJSA デイサ テーブルランプ"
-        },
-        "price_checked_at": "2026-10-09T04:02:58Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "404.049.90"
+        "official_color": "ベージュ, ホワイト"
       },
       "checked_at": "2026-10-09T04:02:58Z"
     },
@@ -4473,60 +2311,11 @@
           "w": 0.46
         },
         "shape": null,
-        "currency": "JPY",
         "material": "脚フレーム/ クロスレール/ ラウンド バー:スチール, エポキシ/ポリエステル粉体塗装シート/ 背もたれ:ポリプロピレン .",
         "provider": "ikea",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T01:33:07Z",
-        "variant_id": "703.509.38",
-        "image_color": {
-          "color": "#e7e7e7",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/teodores-chair-white__0727344_pe735616_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 266
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/teodores-chair-white-70350938/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/teodores-chair-white-70350938/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 46 cm",
-            "奥行き: 54 cm",
-            "高さ: 80 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/teodores-chair-white-70350938/",
-          "kind": "category_and_official_text",
-          "name": "TEODORES テオドレス チェア - ホワイト",
-          "measurements": [
-            "幅: 46 cm",
-            "奥行き: 54 cm",
-            "高さ: 80 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "price_checked_at": "2026-10-09T01:33:07Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "703.509.38"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T01:33:07Z"
     },
@@ -4558,64 +2347,11 @@
           "w": 2.0
         },
         "shape": "rectangular",
-        "currency": "JPY",
         "material": "ポリエステル",
         "provider": "yahoo_shopping",
         "color_name": "アイボリー",
-        "fetched_at": "2026-10-09T04:02:59Z",
-        "variant_id": "nitori-net/2113100020583",
-        "image_color": {
-          "color": "#eee7d5",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_2113100020583",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 3026
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://store.shopping.yahoo.co.jp/nitori-net/2113100020583.html",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/2113100020583.html",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "幅200X奥行240X高さ2cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY, Yahoo!ショッピングの税込総額表示)",
-        "shape_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/2113100020583.html",
-          "kind": "category_and_official_text",
-          "name": "ラグ ラグマット カーペット なめらかでやわらかい肌ざわりの洗えるラグ  200X240 約3帖 アイボリー FR02 ニトリ オールシーズン 洗える 洗えるラグ",
-          "measurements": [
-            "幅200X奥行240X高さ2cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "アイボリー",
-        "html_extraction": {
-          "d": "幅200X奥行240X高さ2cm",
-          "h": "幅200X奥行240X高さ2cm",
-          "w": "幅200X奥行240X高さ2cm",
-          "kind": "gemini_official_html",
-          "shape": "rectangular",
-          "name_evidence": "ラグ ラグマット カーペット なめらかでやわらかい肌ざわりの洗えるラグ  200X240 約3帖 アイボリー FR02 ニトリ オールシーズン 洗える 洗えるラグ"
-        },
-        "price_checked_at": "2026-10-09T04:02:59Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "nitori-net/2113100020583"
+        "official_color": "アイボリー"
       },
       "checked_at": "2026-10-09T04:02:59Z"
     },
@@ -4647,68 +2383,11 @@
           "w": 0.42
         },
         "shape": null,
-        "currency": "JPY",
         "material": "パイン無垢材, ステイン, クリアラッカー",
         "provider": "yahoo_shopping",
         "color_name": "ホワイトステイン/パイン材",
-        "fetched_at": "2026-10-09T01:29:23Z",
-        "variant_id": "shop-brain/70635178",
-        "image_color": {
-          "color": "#fafafa",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://item-shopping.c.yimg.jp/i/n/shop-brain_70635178",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 8280
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://store.shopping.yahoo.co.jp/shop-brain/70635178.html",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://store.shopping.yahoo.co.jp/shop-brain/70635178.html",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "幅: 42 cm",
-            "高さ: 90 cm",
-            "奥行き: 49 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY, Yahoo!ショッピングの税込総額表示)",
-        "shape_source": {
-          "url": "https://store.shopping.yahoo.co.jp/shop-brain/70635178.html",
-          "kind": "category_and_official_text",
-          "name": "ＩＫＥＡ/イケア　PINNTORP/ピントルプ　チェア　ホワイトステイン/パイン材（706.351.78/70635178）",
-          "measurements": [
-            "幅: 42 cm",
-            "高さ: 90 cm",
-            "奥行き: 49 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイトステイン/パイン材",
-        "html_extraction": {
-          "d": "奥行き: 49 cm",
-          "h": "高さ: 90 cm",
-          "w": "幅: 42 cm",
-          "kind": "gemini_official_html",
-          "shape": "unknown",
-          "name_evidence": "ＩＫＥＡ/イケア　PINNTORP/ピントルプ　チェア　ホワイトステイン/パイン材（706.351.78/70635178）"
-        },
-        "price_checked_at": "2026-10-09T01:29:23Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "shop-brain/70635178"
+        "official_color": "ホワイトステイン/パイン材"
       },
       "checked_at": "2026-10-09T01:29:23Z"
     },
@@ -4740,60 +2419,11 @@
           "w": 0.8
         },
         "shape": "rectangular",
-        "currency": "JPY",
         "material": "表面:ポリプロピレン 100%裏面:合成ゴム100%",
         "provider": "ikea",
         "color_name": "ベージュ, ホワイト",
-        "fetched_at": "2026-10-09T04:02:57Z",
-        "variant_id": "604.268.06",
-        "image_color": {
-          "color": "#cdb7a6",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/stoense-rug-low-pile-off-white__0624419_pe691827_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 2866
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-60426806/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-60426806/",
-          "kind": "official_page",
-          "evidence": [
-            "長さ: 150 cm",
-            "幅: 80 cm",
-            "厚さ: 18 mm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-60426806/",
-          "kind": "category_and_official_text",
-          "name": "STOENSE ストエンセ ラグ パイル短 - オフホワイト 80x150 cm",
-          "measurements": [
-            "長さ: 150 cm",
-            "幅: 80 cm",
-            "厚さ: 18 mm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ベージュ, ホワイト",
-        "price_checked_at": "2026-10-09T04:02:57Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "604.268.06"
+        "official_color": "ベージュ, ホワイト"
       },
       "checked_at": "2026-10-09T04:02:57Z"
     },
@@ -4825,56 +2455,11 @@
           "w": 0.35
         },
         "shape": null,
-        "currency": "JPY",
         "material": "張地：ポリエステル100％、装飾：ステンレス チタンメッキ仕上げ",
         "provider": "francfranc",
         "color_name": "ジェム スツール ホワイト",
-        "fetched_at": "2026-10-09T01:29:25Z",
-        "variant_id": "1108010008418",
-        "image_color": {
-          "color": "#c6b8aa",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://francfranc.com/cdn/shop/products/1108010008418_d1_2000x.jpg?v=1612407231",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 608
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://francfranc.com/products/1108010008418",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://francfranc.com/products/1108010008418",
-          "kind": "official_page",
-          "evidence": [
-            "W350×D350×H410mm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://francfranc.com/products/1108010008418",
-          "kind": "category_and_official_text",
-          "name": "ジェム スツール ホワイト",
-          "measurements": [
-            "W350×D350×H410mm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": null,
-        "price_checked_at": "2026-10-09T01:29:25Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "1108010008418"
+        "official_color": null
       },
       "checked_at": "2026-10-09T01:29:25Z"
     },
@@ -4906,58 +2491,11 @@
           "w": 0.21
         },
         "shape": null,
-        "currency": "JPY",
         "material": "ベースカバー/ アーム:スチール, 粉体塗装重り:EVA樹脂..シェード:アルミニウム, 粉体塗装",
         "provider": "ikea",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-10T08:17:18Z",
-        "variant_id": "804.486.09",
-        "image_color": {
-          "color": "#d4d2d3",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/nymane-work-lamp-with-wireless-charging-white__0991755_pe819570_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 514
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/nymane-work-lamp-with-wireless-charging-white-80448609/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/nymane-work-lamp-with-wireless-charging-white-80448609/",
-          "kind": "official_page",
-          "evidence": [
-            "高さ: 67 cm",
-            "ベースの直径: 21 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/nymane-work-lamp-with-wireless-charging-white-80448609/",
-          "kind": "category_and_official_text",
-          "name": "NYMÅNE ニーモーネ ワークランプ ワイヤレス充電機能付き - ホワイト",
-          "measurements": [
-            "高さ: 67 cm",
-            "ベースの直径: 21 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "price_checked_at": "2026-10-10T08:17:18Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "804.486.09"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-10T08:17:18Z"
     },
@@ -4989,64 +2527,11 @@
           "w": 0.55
         },
         "shape": null,
-        "currency": "JPY",
         "material": "スチール",
         "provider": "yahoo_shopping",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T01:33:02Z",
-        "variant_id": "nitori-net/5692727",
-        "image_color": {
-          "color": "#b2b0b0",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_5692727",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1230
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://store.shopping.yahoo.co.jp/nitori-net/5692727.html",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/5692727.html",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "サイズ(約)：幅55×奥行55×高さ73〜81.5cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY, Yahoo!ショッピングの税込総額表示)",
-        "shape_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/5692727.html",
-          "kind": "category_and_official_text",
-          "name": "大人かわいいチェア (Elance エランセ WH） ニトリ",
-          "measurements": [
-            "サイズ(約)：幅55×奥行55×高さ73〜81.5cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "html_extraction": {
-          "d": "サイズ(約)：幅55×奥行55×高さ73〜81.5cm",
-          "h": "サイズ(約)：幅55×奥行55×高さ73〜81.5cm",
-          "w": "サイズ(約)：幅55×奥行55×高さ73〜81.5cm",
-          "kind": "gemini_official_html",
-          "shape": "unknown",
-          "name_evidence": "大人かわいいチェア (Elance エランセ WH） ニトリ"
-        },
-        "price_checked_at": "2026-10-09T01:33:02Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "nitori-net/5692727"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T01:33:02Z"
     },
@@ -5078,60 +2563,11 @@
           "w": 0.45
         },
         "shape": null,
-        "currency": "JPY",
         "material": "背もたれ:バーチ無垢材, ステイン, 着色アクリルクリアラッカーシート:バーチ無垢材, バーチ材合板, 粘着性, バーチ材突き板, アクリル塗装後脚:バーチ無垢材, アクリル塗装前脚:バーチ無垢材, 着色アクリルクリアラッカー",
         "provider": "ikea",
         "color_name": "ベージュ, ブルー, レッド, ブラック",
-        "fetched_at": "2026-10-09T01:51:25Z",
-        "variant_id": "206.179.59",
-        "image_color": {
-          "color": "#fefefe",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/ikea-ps-2026-folding-chair-birch-blue-black-red__1481300_pe1000485_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1521
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/ikea-ps-2026-folding-chair-birch-blue-black-red-20617959/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/ikea-ps-2026-folding-chair-birch-blue-black-red-20617959/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 45 cm",
-            "奥行き: 51 cm",
-            "高さ: 76 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/ikea-ps-2026-folding-chair-birch-blue-black-red-20617959/",
-          "kind": "category_and_official_text",
-          "name": "IKEA PS 2026 折りたたみチェア - バーチ ブルー/ブラック レッド",
-          "measurements": [
-            "幅: 45 cm",
-            "奥行き: 51 cm",
-            "高さ: 76 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ベージュ, ブルー, レッド, ブラック",
-        "price_checked_at": "2026-10-09T01:51:25Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "206.179.59"
+        "official_color": "ベージュ, ブルー, レッド, ブラック"
       },
       "checked_at": "2026-10-09T01:51:25Z"
     },
@@ -5163,64 +2599,11 @@
           "w": 0.34
         },
         "shape": "rectangular",
-        "currency": "JPY",
         "material": "ガラス",
         "provider": "yahoo_shopping",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T04:02:47Z",
-        "variant_id": "nitori-net/2110700057643",
-        "image_color": {
-          "color": "#d3cfcb",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_2110700057643",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 3925
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://store.shopping.yahoo.co.jp/nitori-net/2110700057643.html",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/2110700057643.html",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "幅34×奥行30×高さ116cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY, Yahoo!ショッピングの税込総額表示)",
-        "shape_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/2110700057643.html",
-          "kind": "category_and_official_text",
-          "name": "ガラスコレクションケース(AN001 WH) ニトリ",
-          "measurements": [
-            "幅34×奥行30×高さ116cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "html_extraction": {
-          "d": "幅34×奥行30×高さ116cm",
-          "h": "幅34×奥行30×高さ116cm",
-          "w": "幅34×奥行30×高さ116cm",
-          "kind": "gemini_official_html",
-          "shape": "rectangular",
-          "name_evidence": "ガラスコレクションケース(AN001 WH) ニトリ"
-        },
-        "price_checked_at": "2026-10-09T04:02:47Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "nitori-net/2110700057643"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T04:02:47Z"
     },
@@ -5252,60 +2635,11 @@
           "w": 0.42
         },
         "shape": null,
-        "currency": "JPY",
         "material": "フレーム/ 上部パネル/ バックパネル/ 固定棚:スチール, エポキシ/ポリエステル粉体塗装ブラケット/ 差し込み式ネジ/ 取っ手:スチールサイドパネル/ 扉:アルミニウム, エポキシ/ポリエステル粉体塗装, 強化ガラスコネクター:スチール、亜鉛メッキ, スチール、亜鉛メッキ保護層:合成ゴム棚板:強化ガラスカバーキャップ:ポリプロピレン .",
         "provider": "ikea",
         "color_name": "グレー",
-        "fetched_at": "2026-10-09T04:02:59Z",
-        "variant_id": "804.501.31",
-        "image_color": {
-          "color": "#292a29",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/rudsta-glass-door-cabinet-anthracite__0938997_pe794381_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 827
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/rudsta-glass-door-cabinet-anthracite-80450131/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/rudsta-glass-door-cabinet-anthracite-80450131/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 42 cm",
-            "奥行き: 37 cm",
-            "高さ: 155 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/rudsta-glass-door-cabinet-anthracite-80450131/",
-          "kind": "category_and_official_text",
-          "name": "RUDSTA ルードスタ コレクションケース - チャコール 42x37x155 cm",
-          "measurements": [
-            "幅: 42 cm",
-            "奥行き: 37 cm",
-            "高さ: 155 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "グレー",
-        "price_checked_at": "2026-10-09T04:02:59Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "804.501.31"
+        "official_color": "グレー"
       },
       "checked_at": "2026-10-09T04:02:59Z"
     },
@@ -5337,64 +2671,11 @@
           "w": 0.62
         },
         "shape": null,
-        "currency": "JPY",
         "material": "ポリエステル",
         "provider": "yahoo_shopping",
         "color_name": "ホワイト",
-        "fetched_at": "2026-10-09T01:33:04Z",
-        "variant_id": "nitori-net/6620805",
-        "image_color": {
-          "color": "#e6e7ea",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_6620805",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 3473
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://store.shopping.yahoo.co.jp/nitori-net/6620805.html",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/6620805.html",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "幅62×奥行63×高さ72〜78cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY, Yahoo!ショッピングの税込総額表示)",
-        "shape_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/6620805.html",
-          "kind": "category_and_official_text",
-          "name": "オフィスチェア(OC106 WH) ニトリ",
-          "measurements": [
-            "幅62×奥行63×高さ72〜78cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト",
-        "html_extraction": {
-          "d": "幅62×奥行63×高さ72〜78cm",
-          "h": "幅62×奥行63×高さ72〜78cm",
-          "w": "幅62×奥行63×高さ72〜78cm",
-          "kind": "gemini_official_html",
-          "shape": "unknown",
-          "name_evidence": "オフィスチェア(OC106 WH) ニトリ"
-        },
-        "price_checked_at": "2026-10-09T01:33:04Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "nitori-net/6620805"
+        "official_color": "ホワイト"
       },
       "checked_at": "2026-10-09T01:33:04Z"
     },
@@ -5426,60 +2707,11 @@
           "w": 0.44
         },
         "shape": null,
-        "currency": "JPY",
         "material": "布地:綿 76%, ポリエステル 24%..後脚/ 前脚/ レール:無垢材, アクリル塗装シート:バーチ材合板, ポリウレタンフォーム 35kg/立方メートル背もたれ:スチール, ポリウレタンフォーム 35kg/立方メートル裏地/ 裏面:ポリプロピレン 100%耐くすぶり性に優れた裏地:ポリエステル...",
         "provider": "ikea",
         "color_name": "ブルー",
-        "fetched_at": "2026-10-09T01:51:28Z",
-        "variant_id": "206.179.64",
-        "image_color": {
-          "color": "#0b4c93",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/ikea-ps-2026-chair-bright-blue-knaebaeck-bright-blue__1481301_pe1000486_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 907
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/ikea-ps-2026-chair-bright-blue-knaebaeck-bright-blue-20617964/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/ikea-ps-2026-chair-bright-blue-knaebaeck-bright-blue-20617964/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 44 cm",
-            "奥行き: 55 cm",
-            "高さ: 76 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/ikea-ps-2026-chair-bright-blue-knaebaeck-bright-blue-20617964/",
-          "kind": "category_and_official_text",
-          "name": "IKEA PS 2026 チェア - ブライトブルー/クネーベック ブライトブルー",
-          "measurements": [
-            "幅: 44 cm",
-            "奥行き: 55 cm",
-            "高さ: 76 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ブルー",
-        "price_checked_at": "2026-10-09T01:51:28Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "206.179.64"
+        "official_color": "ブルー"
       },
       "checked_at": "2026-10-09T01:51:28Z"
     },
@@ -5511,60 +2743,11 @@
           "w": 0.45
         },
         "shape": null,
-        "currency": "JPY",
         "material": "シート/ 脚フレーム:木材・プラスチック複合材（WPC）ハンドル:ポリプロピレン .脚:熱可塑性エラストマー",
         "provider": "ikea",
         "color_name": "グレー",
-        "fetched_at": "2026-10-09T01:51:25Z",
-        "variant_id": "304.573.14",
-        "image_color": {
-          "color": "#4d4d4d",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/odger-chair-anthracite__0739669_pe741828_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1313
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/odger-chair-anthracite-30457314/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/odger-chair-anthracite-30457314/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 45 cm",
-            "奥行き: 51 cm",
-            "高さ: 81 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/odger-chair-anthracite-30457314/",
-          "kind": "category_and_official_text",
-          "name": "ODGER オドゲル チェア - チャコール",
-          "measurements": [
-            "幅: 45 cm",
-            "奥行き: 51 cm",
-            "高さ: 81 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "グレー",
-        "price_checked_at": "2026-10-09T01:51:25Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "304.573.14"
+        "official_color": "グレー"
       },
       "checked_at": "2026-10-09T01:51:25Z"
     },
@@ -5596,68 +2779,11 @@
           "w": 0.68
         },
         "shape": null,
-        "currency": "JPY",
         "material": "積層合板, バーチ材突き板, クリアラッカー",
         "provider": "yahoo_shopping",
         "color_name": "バーチ材突き板/クニーサ ライトベージュ",
-        "fetched_at": "2026-10-09T01:51:31Z",
-        "variant_id": "shop-brain/19240788",
-        "image_color": {
-          "color": "#fcfcfc",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://item-shopping.c.yimg.jp/i/n/shop-brain_19240788",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 5852
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://store.shopping.yahoo.co.jp/shop-brain/19240788.html",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://store.shopping.yahoo.co.jp/shop-brain/19240788.html",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "幅: 68 cm",
-            "高さ: 100 cm",
-            "奥行き: 82 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY, Yahoo!ショッピングの税込総額表示)",
-        "shape_source": {
-          "url": "https://store.shopping.yahoo.co.jp/shop-brain/19240788.html",
-          "kind": "category_and_official_text",
-          "name": "ＩＫＥＡ/イケア　POANG/ポエング　パーソナルチェア　バーチ材突き板/クニーサ ライトベージュ（192.407.88/19240788）",
-          "measurements": [
-            "幅: 68 cm",
-            "高さ: 100 cm",
-            "奥行き: 82 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "バーチ材突き板/クニーサ ライトベージュ",
-        "html_extraction": {
-          "d": "奥行き: 82 cm",
-          "h": "高さ: 100 cm",
-          "w": "幅: 68 cm",
-          "kind": "gemini_official_html",
-          "shape": "unknown",
-          "name_evidence": "ＩＫＥＡ/イケア　POANG/ポエング　パーソナルチェア　バーチ材突き板/クニーサ ライトベージュ"
-        },
-        "price_checked_at": "2026-10-09T01:51:31Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "shop-brain/19240788"
+        "official_color": "バーチ材突き板/クニーサ ライトベージュ"
       },
       "checked_at": "2026-10-09T01:51:31Z"
     },
@@ -5689,60 +2815,11 @@
           "w": 0.55
         },
         "shape": null,
-        "currency": "JPY",
         "material": "脚フレーム:スチール, クロムメッキシート:ポリカーボネート .足:ポリプロピレン .ナット:亜鉛, クロムメッキバンパー/ ワッシャー:合成ゴム",
         "provider": "ikea",
         "color_name": "グレー, ホワイト",
-        "fetched_at": "2026-10-09T01:30:53Z",
-        "variant_id": "603.496.72",
-        "image_color": {
-          "color": "#f9f9f9",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/tobias-chair-transparent-chrome-plated__0727342_pe735614_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1285
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/tobias-chair-transparent-chrome-plated-60349672/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/tobias-chair-transparent-chrome-plated-60349672/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 55 cm",
-            "奥行き: 56 cm",
-            "高さ: 82 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/tobias-chair-transparent-chrome-plated-60349672/",
-          "kind": "category_and_official_text",
-          "name": "TOBIAS トービアス チェア - 透明/クロムメッキ",
-          "measurements": [
-            "幅: 55 cm",
-            "奥行き: 56 cm",
-            "高さ: 82 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "グレー, ホワイト",
-        "price_checked_at": "2026-10-09T01:30:53Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "603.496.72"
+        "official_color": "グレー, ホワイト"
       },
       "checked_at": "2026-10-09T01:30:53Z"
     },
@@ -5774,60 +2851,11 @@
           "w": 0.75
         },
         "shape": null,
-        "currency": "JPY",
         "material": "テーブルトップ:パイン無垢材, 粘着性, ステイン, 透明アクリルラッカー, クリアラッカー下部フレーム:パイン無垢材, 粘着性, ステイン, 透明アクリルラッカー",
         "provider": "ikea",
         "color_name": "ブラウン, ホワイト",
-        "fetched_at": "2026-10-09T01:33:03Z",
-        "variant_id": "105.294.68",
-        "image_color": {
-          "color": "#d0d3d5",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/pinntorp-table-light-brown-stained-white-stained-pine__1118109_pe872932_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 660
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/pinntorp-table-light-brown-stained-white-stained-pine-10529468/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/pinntorp-table-light-brown-stained-white-stained-pine-10529468/",
-          "kind": "official_page",
-          "evidence": [
-            "長さ: 125 cm",
-            "幅: 75 cm",
-            "高さ: 75 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/pinntorp-table-light-brown-stained-white-stained-pine-10529468/",
-          "kind": "category_and_official_text",
-          "name": "PINNTORP ピントルプ テーブル - ライトブラウンステイン/ホワイトステイン パイン材 125x75 cm",
-          "measurements": [
-            "長さ: 125 cm",
-            "幅: 75 cm",
-            "高さ: 75 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ブラウン, ホワイト",
-        "price_checked_at": "2026-10-09T01:33:03Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "105.294.68"
+        "official_color": "ブラウン, ホワイト"
       },
       "checked_at": "2026-10-09T01:33:03Z"
     },
@@ -5859,60 +2887,11 @@
           "w": 1.7
         },
         "shape": "rectangular",
-        "currency": "JPY",
         "material": "表面:ポリプロピレン 100%裏面:合成ゴム100%",
         "provider": "ikea",
         "color_name": "ベージュ, ホワイト",
-        "fetched_at": "2026-10-09T04:03:01Z",
-        "variant_id": "004.255.36",
-        "image_color": {
-          "color": "#cab6a6",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/stoense-rug-low-pile-off-white__0624386_pe691799_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 4453
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-00425536/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-00425536/",
-          "kind": "official_page",
-          "evidence": [
-            "長さ: 240 cm",
-            "幅: 170 cm",
-            "厚さ: 18 mm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-00425536/",
-          "kind": "category_and_official_text",
-          "name": "STOENSE ストエンセ ラグ パイル短 - オフホワイト 170x240 cm",
-          "measurements": [
-            "長さ: 240 cm",
-            "幅: 170 cm",
-            "厚さ: 18 mm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ベージュ, ホワイト",
-        "price_checked_at": "2026-10-09T04:03:01Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "004.255.36"
+        "official_color": "ベージュ, ホワイト"
       },
       "checked_at": "2026-10-09T04:03:01Z"
     },
@@ -5944,60 +2923,11 @@
           "w": 0.8
         },
         "shape": null,
-        "currency": "JPY",
         "material": "フレーム/ 上部パネル/ バックパネル/ 固定棚:スチール, エポキシ/ポリエステル粉体塗装ブラケット/ 差し込み式ネジ/ 取っ手:スチールサイドパネル/ 扉:アルミニウム, エポキシ/ポリエステル粉体塗装, 強化ガラスコネクター:スチール、亜鉛メッキ, スチール、亜鉛メッキ保護層:合成ゴム棚板:強化ガラスカバーキャップ:ポリプロピレン .",
         "provider": "ikea",
         "color_name": "グレー",
-        "fetched_at": "2026-10-09T04:02:59Z",
-        "variant_id": "304.501.38",
-        "image_color": {
-          "color": "#1b1c17",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/rudsta-glass-door-cabinet-anthracite__0939002_pe794384_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1254
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/rudsta-glass-door-cabinet-anthracite-30450138/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/rudsta-glass-door-cabinet-anthracite-30450138/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 80 cm",
-            "奥行き: 37 cm",
-            "高さ: 120 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/rudsta-glass-door-cabinet-anthracite-30450138/",
-          "kind": "category_and_official_text",
-          "name": "RUDSTA ルードスタ コレクションケース - チャコール 80x37x120 cm",
-          "measurements": [
-            "幅: 80 cm",
-            "奥行き: 37 cm",
-            "高さ: 120 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "グレー",
-        "price_checked_at": "2026-10-09T04:02:59Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "304.501.38"
+        "official_color": "グレー"
       },
       "checked_at": "2026-10-09T04:02:59Z"
     },
@@ -6029,60 +2959,11 @@
           "w": 0.82
         },
         "shape": null,
-        "currency": "JPY",
         "material": "布地:ポリエステル 100%... .フレーム:合板, パーティクルボード, 無垢材シートクッション:ポリウレタンフォーム 35kg/立方メートル脚:無垢材, 着色クリアラッカー",
         "provider": "ikea",
         "color_name": "グレー",
-        "fetched_at": "2026-10-09T01:30:44Z",
-        "variant_id": "303.598.27",
-        "image_color": {
-          "color": "#6d6d71",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/strandmon-wing-chair-nordvalla-dark-grey__0325432_pe517964_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1429
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/strandmon-wing-chair-nordvalla-dark-grey-30359827/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/strandmon-wing-chair-nordvalla-dark-grey-30359827/",
-          "kind": "official_page",
-          "evidence": [
-            "幅: 82 cm",
-            "奥行き: 96 cm",
-            "高さ: 101 cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/strandmon-wing-chair-nordvalla-dark-grey-30359827/",
-          "kind": "category_and_official_text",
-          "name": "STRANDMON ストランドモン ウィングチェア - ノールドヴァッラ ダークグレー",
-          "measurements": [
-            "幅: 82 cm",
-            "奥行き: 96 cm",
-            "高さ: 101 cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "グレー",
-        "price_checked_at": "2026-10-09T01:30:44Z",
-        "extraction_method": "structured_html",
-        "provider_product_id": "303.598.27"
+        "official_color": "グレー"
       },
       "checked_at": "2026-10-09T01:30:44Z"
     },
@@ -6114,69 +2995,15 @@
           "w": null
         },
         "shape": null,
-        "currency": "JPY",
         "material": "パーソナルチェア フレーム背もたれ及び座面フレーム:合板, ポリウレタンフォーム 20kg/立方メートル, 単板積層材, パーティクルボード, 繊維板アームレスト:ポリウレタンフォーム 20kg/立方メートル, ポリウレタンフォーム 25kg/立方メートル, 単板積層材, パーティクルボード, 繊維板シートクッション:ポリウレタン 30%/ ポリエステル 70%, 高反発ポリウレタンフォーム（コールドフォーム） 35kg/立方メートル, ポリエステル ..背もたれクッション:ポリエステル ..裏地:ポリプロピレン 100%固定具:ポリプロピレン .",
         "provider": "ikea",
         "color_name": "キランダ ライトベージュ",
-        "fetched_at": "2026-10-09T01:51:32Z",
-        "variant_id": "995.521.20",
-        "image_color": {
-          "color": "#d4c8b6",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://www.ikea.com/jp/ja/images/products/ektorp-armchair-kilanda-light-beige__1242736_pe920364_s5.jpg",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1113
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://www.ikea.com/jp/ja/p/ektorp-armchair-kilanda-light-beige-s99552120/",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://www.ikea.com/jp/ja/p/ektorp-armchair-kilanda-light-beige-s99552120/",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [],
-          "estimate_basis": "category_standard_dimensions",
-          "estimated_axes": [
-            "w",
-            "h",
-            "d"
-          ],
-          "estimated_values_m": {
-            "d": 0.5,
-            "h": 0.85,
-            "w": 0.5
-          }
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY)",
-        "shape_source": {
-          "url": "https://www.ikea.com/jp/ja/p/ektorp-armchair-kilanda-light-beige-s99552120/",
-          "kind": "category_and_official_text",
-          "name": "EKTORP エークトルプ パーソナルチェア - キランダ ライトベージュ",
-          "measurements": []
-        },
-        "tax_included": true,
         "estimated_axes": [
           "w",
           "h",
           "d"
         ],
-        "official_color": "キランダ ライトベージュ",
-        "html_extraction": {
-          "kind": "gemini_official_html",
-          "shape": "unknown",
-          "name_evidence": "EKTORP エークトルプ パーソナルチェア, キランダ ライトベージュ"
-        },
-        "price_checked_at": "2026-10-09T01:51:32Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "995.521.20"
+        "official_color": "キランダ ライトベージュ"
       },
       "checked_at": "2026-10-09T01:51:32Z"
     },
@@ -6208,64 +3035,11 @@
           "w": 0.69
         },
         "shape": null,
-        "currency": "JPY",
         "material": "合成皮革",
         "provider": "yahoo_shopping",
         "color_name": "ホワイト/ホワイト",
-        "fetched_at": "2026-10-09T01:29:35Z",
-        "variant_id": "nitori-net/6620996",
-        "image_color": {
-          "color": "#d2d5d0",
-          "source": "product_image_dominant_color_v1",
-          "status": "ready",
-          "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_6620996",
-          "sample_size": {
-            "h": 96,
-            "w": 96
-          },
-          "dominant_pixels": 1734
-        },
-        "image_usage": {
-          "display": "unconfirmed",
-          "storage": "unconfirmed",
-          "source_url": "https://store.shopping.yahoo.co.jp/nitori-net/6620996.html",
-          "generation_input": "unconfirmed"
-        },
-        "size_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/6620996.html",
-          "kind": "official_html_with_gemini_extraction",
-          "evidence": [
-            "幅69×奥行66×高さ125cm"
-          ],
-          "estimate_basis": null,
-          "estimated_axes": [],
-          "estimated_values_m": {}
-        },
-        "availability": "in_stock",
-        "color_source": "product_image_dominant_color_v1",
-        "price_source": "JSON-LD Offer.price (JPY, Yahoo!ショッピングの税込総額表示)",
-        "shape_source": {
-          "url": "https://store.shopping.yahoo.co.jp/nitori-net/6620996.html",
-          "kind": "category_and_official_text",
-          "name": "ゲーミングチェア(GM709 フットレスト付き WH/WH) ニトリ",
-          "measurements": [
-            "幅69×奥行66×高さ125cm"
-          ]
-        },
-        "tax_included": true,
         "estimated_axes": [],
-        "official_color": "ホワイト/ホワイト",
-        "html_extraction": {
-          "d": "幅69×奥行66×高さ125cm",
-          "h": "幅69×奥行66×高さ125cm",
-          "w": "幅69×奥行66×高さ125cm",
-          "kind": "gemini_official_html",
-          "shape": "unknown",
-          "name_evidence": "ゲーミングチェア(GM709 フットレスト付き WH/WH) ニトリ"
-        },
-        "price_checked_at": "2026-10-09T01:29:35Z",
-        "extraction_method": "gemini_html",
-        "provider_product_id": "nitori-net/6620996"
+        "official_color": "ホワイト/ホワイト"
       },
       "checked_at": "2026-10-09T01:29:35Z"
     }
