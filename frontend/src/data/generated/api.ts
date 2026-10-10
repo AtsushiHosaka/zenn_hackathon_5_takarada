@@ -13,7 +13,7 @@ export interface paths {
         };
         /**
          * 商品 (家具の色・寸法・購入リンク) を非表示のものも含めて一覧で取得する
-         * @description ADMIN_EMAILS に入っている人だけが使える。
+         * @description 管理者 (users.admin) だけが使える。
          */
         get: {
             parameters: {
@@ -212,7 +212,7 @@ export interface paths {
         };
         /**
          * 3D モデルを無効なものも含めて一覧で取得する
-         * @description ADMIN_EMAILS に入っている人だけが使える。
+         * @description 管理者 (users.admin) だけが使える。
          */
         get: {
             parameters: {
@@ -1151,7 +1151,7 @@ export interface components {
              */
             email: string;
             /**
-             * @description 家具・商品の管理画面を使えるか (ADMIN_EMAILS に入っている人)
+             * @description 家具・商品の管理画面を使えるか。API からは変えられない
              * @example false
              */
             admin: boolean;

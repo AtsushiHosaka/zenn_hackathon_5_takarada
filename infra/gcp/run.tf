@@ -40,9 +40,6 @@ locals {
 
     # 署名付き URL の発行者。秘密鍵が無いので signBlob で署名する (storage.tf 参照)
     STORAGE_SIGNER_EMAIL = google_service_account.api.email
-
-    # 家具・商品の管理画面 (/admin) を使える人。空なら誰も使えない
-    ADMIN_EMAILS = var.admin_emails
   }
 
   # 空なら Web フロントの Cloud Run URL だけを許可する

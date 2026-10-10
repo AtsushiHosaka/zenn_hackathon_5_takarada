@@ -1,7 +1,7 @@
 require "swagger_helper"
 
 RSpec.describe "Api::V1::Admin::FurnitureModels", type: :request do
-  let(:current) { create(:user) }
+  let(:current) { create(:user, admin: true) }
   let(:Authorization) { bearer_token_for(current) }
 
   before do
@@ -9,18 +9,10 @@ RSpec.describe "Api::V1::Admin::FurnitureModels", type: :request do
     FurnitureImporter.call
   end
 
-  around do |example|
-    previous = ENV["ADMIN_EMAILS"]
-    ENV["ADMIN_EMAILS"] = current.email
-    example.run
-  ensure
-    ENV["ADMIN_EMAILS"] = previous
-  end
-
   path "/api/v1/admin/furniture_models" do
     get "3D モデルを無効なものも含めて一覧で取得する" do
       tags "Admin"
-      description "ADMIN_EMAILS に入っている人だけが使える。"
+      description "管理者 (users.admin) だけが使える。"
       security [ { bearerAuth: [] } ]
       produces "application/json"
 

@@ -25,7 +25,7 @@ function revealPanel(panel: RefObject<HTMLElement | null>) {
   });
 }
 
-// 家具・商品の管理画面。ADMIN_EMAILS に入っている人だけが使える (API 側でも 403 にしている)
+// 家具・商品の管理画面。管理者 (User.admin) だけが使える (API 側でも 403 にしている)
 export default function AdminPage() {
   const session = useSession();
   const [tab, setTab] = useState<"details" | "models">("details");

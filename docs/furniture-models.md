@@ -97,7 +97,17 @@ Webが取得した台帳はブラウザのセッション中にキャッシュ�
 
 Webの`/admin`で、商品（`furniture_details`）のリンク・画像・価格・寸法・置き場所の枠・並び順・色を編集し、3Dで見た目を確かめられる。3Dモデルは有効・無効だけを切り替えられる。GLBと寸法は従来どおり`backend/db/furnitures.json`で管理する。
 
-使えるのは環境変数`ADMIN_EMAILS`（カンマ区切りのメールアドレス）に入っている人だけで、APIも`/api/v1/admin/*`を403で守る。ローカルの既定は`user1@example.com`。本番はTerraformの`admin_emails`で渡す（未設定なら誰も使えない）。
+使えるのは管理者（`users.admin`が`true`の人）だけで、APIも`/api/v1/admin/*`を403で守る。APIからは管理者を変えられず、メールアドレスを指定してタスクで付け外しする。ローカルではseedが`user1@example.com`を管理者にする。
+
+```bash
+# ローカル
+docker compose exec api bin/rails 'admin:grant[you@example.com]'
+docker compose exec api bin/rails admin:list
+
+# 本番 (Cloud Run ジョブ)
+make infra-task T='admin:grant[you@example.com]'
+make infra-task T='admin:revoke[you@example.com]'
+```
 
 商品はDBが正で、管理画面での追加・編集・削除がそのまま提案と家具検索に使われる。`backend/db/furniture_details.json`は空のDBへ入れる初期データで、`furniture_detail:import`は`furniture_details`に1件でもあれば何もしない。デプロイのたびに実行しても、本番の編集は消えない。JSONを直してマージしても本番の商品は変わらないので、本番の商品は管理画面で直す。
 

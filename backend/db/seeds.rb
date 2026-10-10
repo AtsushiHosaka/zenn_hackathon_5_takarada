@@ -8,6 +8,11 @@
   )
 end
 
+# 手元では user1 を管理者にして、管理画面 (/admin) をすぐ使えるようにする。本番は rails admin:grant で付ける
+if Rails.env.development?
+  User.joins(:identity).where(identities: { email: "user1@example.com" }).update_all(admin: true)
+end
+
 puts "seeded #{User.count} users"
 
 characters = CharacterImporter.call

@@ -36,7 +36,7 @@ RSpec.configure do |config|
               id: { type: :integer, example: 1 },
               name: { type: :string, example: "Taro Yamada" },
               email: { type: :string, format: :email, example: "taro@example.com" },
-              admin: { type: :boolean, description: "家具・商品の管理画面を使えるか (ADMIN_EMAILS に入っている人)", example: false },
+              admin: { type: :boolean, description: "家具・商品の管理画面を使えるか。API からは変えられない", example: false },
               created_at: { type: :string, format: "date-time" },
               updated_at: { type: :string, format: "date-time" }
             },

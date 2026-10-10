@@ -10,7 +10,7 @@ paths:
       summary: 商品 (家具の色・寸法・購入リンク) を非表示のものも含めて一覧で取得する
       tags:
       - Admin
-      description: ADMIN_EMAILS に入っている人だけが使える。
+      description: 管理者 (users.admin) だけが使える。
       security:
       - bearerAuth: []
       responses:
@@ -114,7 +114,7 @@ paths:
       summary: 3D モデルを無効なものも含めて一覧で取得する
       tags:
       - Admin
-      description: ADMIN_EMAILS に入っている人だけが使える。
+      description: 管理者 (users.admin) だけが使える。
       security:
       - bearerAuth: []
       responses:
@@ -640,7 +640,7 @@ components:
           example: taro@example.com
         admin:
           type: boolean
-          description: 家具・商品の管理画面を使えるか (ADMIN_EMAILS に入っている人)
+          description: 家具・商品の管理画面を使えるか。API からは変えられない
           example: false
         created_at:
           type: string

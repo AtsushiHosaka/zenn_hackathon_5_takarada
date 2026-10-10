@@ -5,8 +5,7 @@
 class UserSerializer
   include Alba::Resource
 
-  attributes :id, :name, :email
-  attribute(:admin) { |user| user.admin? }
+  attributes :id, :name, :email, :admin
 
   attribute(:created_at) { |user| user.created_at.iso8601 }
   attribute(:updated_at) { |user| user.updated_at.iso8601 }

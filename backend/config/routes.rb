@@ -33,7 +33,7 @@ Rails.application.routes.draw do
       end
       resources :coordinations, only: :show
 
-      # 家具・商品の管理画面用。ADMIN_EMAILS の人だけ (Admin::BaseController)
+      # 家具・商品の管理画面用。管理者 (users.admin) だけ (Admin::BaseController)
       namespace :admin do
         get "furniture_details/export", to: "furniture_details#export"
         resources :furniture_details, only: %i[index create update destroy]

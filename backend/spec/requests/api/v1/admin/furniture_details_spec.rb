@@ -1,7 +1,7 @@
 require "swagger_helper"
 
 RSpec.describe "Api::V1::Admin::FurnitureDetails", type: :request do
-  let(:current) { create(:user) }
+  let(:current) { create(:user, admin: true) }
   let(:Authorization) { bearer_token_for(current) }
 
   before do
@@ -11,19 +11,10 @@ RSpec.describe "Api::V1::Admin::FurnitureDetails", type: :request do
     FurnitureDetailImporter.call
   end
 
-  around do |example|
-    previous = ENV["ADMIN_EMAILS"]
-    ENV["ADMIN_EMAILS"] = admin_emails
-    example.run
-  ensure
-    ENV["ADMIN_EMAILS"] = previous
-  end
-  let(:admin_emails) { current.email }
-
   path "/api/v1/admin/furniture_details" do
     get "商品 (家具の色・寸法・購入リンク) を非表示のものも含めて一覧で取得する" do
       tags "Admin"
-      description "ADMIN_EMAILS に入っている人だけが使える。"
+      description "管理者 (users.admin) だけが使える。"
       security [ { bearerAuth: [] } ]
       produces "application/json"
 
@@ -35,7 +26,7 @@ RSpec.describe "Api::V1::Admin::FurnitureDetails", type: :request do
 
       response "403", "管理者ではない" do
         schema "$ref" => "#/components/schemas/Forbidden"
-        let(:admin_emails) { "" }
+        let(:current) { create(:user) }
 
         run_test!
       end

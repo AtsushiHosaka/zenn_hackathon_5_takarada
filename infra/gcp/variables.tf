@@ -65,12 +65,6 @@ variable "cors_origins" {
   default     = ""
 }
 
-variable "admin_emails" {
-  description = "家具・商品の管理画面 (/admin) を使える人のメールアドレス。カンマ区切り。空なら誰も使えない。"
-  type        = string
-  default     = ""
-}
-
 variable "gemini_provider" {
   description = "Gemini の接続先。vertex はこのプロジェクトの ADC 認証、developer は既存 Secret の API キー認証。Vertex からキーへフォールバックしない。"
   type        = string

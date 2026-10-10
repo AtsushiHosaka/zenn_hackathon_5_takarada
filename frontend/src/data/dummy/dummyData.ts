@@ -1,6 +1,6 @@
 // ダミー接続の初期データ。**増やしたければここを書き換える**。
 // backend/db/seeds.rb と同じ顔ぶれにしてあるので、接続先を切り替えても見た目が変わらない。
-// admin は compose.yaml の ADMIN_EMAILS の既定 (user1@example.com) に合わせてある。
+// admin は backend/db/seeds.rb (手元では user1 が管理者) に合わせてある。
 import type { User } from "../../domain/user";
 
 const at = (iso: string) => new Date(iso);
