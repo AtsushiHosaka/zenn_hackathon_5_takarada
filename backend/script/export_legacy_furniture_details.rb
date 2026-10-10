@@ -4,7 +4,7 @@
 #   LEGACY_DATABASE_URL=postgres://app:<password>@<host>:5432/app_production \
 #     bin/rails runner script/export_legacy_furniture_details.rb
 #
-# 既に JSON にある detail は、手で決めた家具 (furniture)・テーマ・並び順を保ち、他の項目を旧DBの値で更新する。
+# 既に JSON にある detail は、手で決めた家具 (model_key)・テーマ・並び順を保ち、他の項目を旧DBの値で更新する。
 # 新しい商品の家具は FURNITURE_OVERRIDES、なければ旧DBの照合結果 (furniture_model_bindings) を使い、どちらも無ければ報告して入れない。
 # 手入力の detail (key が static:) はそのまま残す。旧DBで見つからない EC の detail は消さずに残し、件数を報告する。
 require "json"
@@ -18,7 +18,7 @@ EXCLUDED = {
   74 => "奥行きが幅と同じ値で取得されている", 79 => "奥行きが幅と同じ値で取得されている",
   85 => "奥行きが幅と同じ値で取得されている"
 }.freeze
-# 寸法比の自動照合が外れた・似ていないモデルを選んだ商品は、商品名から家具を決める (ec_products.id => furnitures.key)
+# 寸法比の自動照合が外れた・似ていないモデルを選んだ商品は、商品名から家具を決める (ec_products.id => furnitures.model_key)
 FURNITURE_OVERRIDES = {
   1 => "cushion", 62 => "cushion", 66 => "cushion", 80 => "cushion", 89 => "cushion", 90 => "cushion", 91 => "cushion",
   7 => "rug_rect", 70 => "bed_cover", 42 => "table_dining_rect", 60 => "table_lamp", 93 => "table_lamp", 95 => "desk_lamp_arm",
@@ -46,7 +46,7 @@ SQL
 
 current = JSON.parse(File.read(PATH)).fetch("details")
 by_key = current.index_by { |detail| detail["key"] }
-furniture_keys = Furniture.pluck(:key).to_set
+furniture_keys = Furniture.pluck(:model_key).to_set
 report = { "excluded" => [], "unassigned" => [], "added" => [], "updated" => [] }
 seen = []
 
@@ -60,7 +60,7 @@ products.each do |row|
   end
 
   existing = by_key[key]
-  furniture = existing&.fetch("furniture") || FURNITURE_OVERRIDES[id] || row["bound_furniture"]
+  furniture = existing&.fetch("model_key") || FURNITURE_OVERRIDES[id] || row["bound_furniture"]
   unless furniture && furniture_keys.include?(furniture)
     report["unassigned"] << "#{id} #{data['name']} (#{data['category']})"
     next
@@ -68,7 +68,7 @@ products.each do |row|
 
   metadata = data.fetch("metadata").except(*DROP_METADATA)
   detail = {
-    "key" => key, "name" => data["name"], "category" => data["category"], "slot" => data["slot"], "furniture" => furniture,
+    "key" => key, "name" => data["name"], "category" => data["category"], "slot" => data["slot"], "model_key" => furniture,
     "color" => data["color"].downcase, "color_name" => metadata["color_name"].presence, "size" => data["size"],
     "price" => data["price"], "shop" => data["shop"], "url" => row["source_url"], "image_url" => data["image_url"],
     "themes" => existing&.fetch("themes") || [], "metadata" => metadata,

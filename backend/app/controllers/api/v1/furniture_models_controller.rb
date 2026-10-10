@@ -4,11 +4,11 @@ module Api
       skip_before_action :authenticate_identity!
 
       def index
-        render json: FurnitureModelSerializer.new(Furniture.available.includes(:bindings).order(:key))
+        render json: FurnitureModelSerializer.new(Furniture.available.includes(:bindings).order(:model_key))
       end
 
       def show
-        render json: FurnitureModelSerializer.new(Furniture.available.includes(:bindings).find_by!(key: params[:id]))
+        render json: FurnitureModelSerializer.new(Furniture.available.includes(:bindings).find_by!(model_key: params[:id]))
       end
     end
   end

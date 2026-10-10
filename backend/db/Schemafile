@@ -80,13 +80,12 @@ end
 
 # 家具。1 件 = 3D モデル (GLB) 1 つ。GLB 本体は GCS。db/furnitures.json から rails furniture:import で入れる
 create_table "furnitures", force: :cascade do |t|
-  t.string "key", null: false # 安定 ID。GLB のファイル名 (例: sofa_2seat__w130)。API の id
+  t.string "model_key", null: false # モデルの安定 ID。GLB のファイル名 (例: sofa_2seat__w130)。API の id。GLB のパスもここから決まる
   t.string "name", null: false # 表示名 (例: 2人掛けソファ)
   t.string "category", null: false # 家具の種類 (sofa, chair, rug など)。写真の家具の照合に使う
   t.string "shape", null: false # 形の種類 (sofa_2seat, rug_round など)。同じ形の寸法・色違いで共通
   t.string "variant" # 同じ形の中の違い (w130 など)。無ければ null
   t.string "format", null: false, default: "glb" # ファイル形式。glb のみ
-  t.string "object_key", null: false # バケット内の GLB のパス (models/furniture/v1/<key>.glb)
   t.decimal "width", precision: 10, scale: 6, null: false # モデルの幅 (m)
   t.decimal "height", precision: 10, scale: 6, null: false # モデルの高さ (m)
   t.decimal "depth", precision: 10, scale: 6, null: false # モデルの奥行き (m)
@@ -98,7 +97,7 @@ create_table "furnitures", force: :cascade do |t|
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
 
-  t.index [ "key" ], unique: true
+  t.index [ "model_key" ], unique: true
   t.check_constraint "width > 0::numeric AND width < 10000::numeric AND height > 0::numeric AND height < 10000::numeric AND depth > 0::numeric AND depth < 10000::numeric", name: "furnitures_positive_dimensions"
   t.check_constraint "triangle_count >= 0 AND byte_size > 0", name: "furnitures_valid_counts"
   t.check_constraint "format::text = 'glb'::text", name: "furnitures_glb_format"

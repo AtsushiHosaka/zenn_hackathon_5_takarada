@@ -8,9 +8,8 @@
 
 | 項目 | 意味 |
 | --- | --- |
-| `key`、`name` | 安定したモデルIDと表示名 |
+| `model_key`、`name` | 安定したモデルIDと表示名 |
 | `category`、`shape`、`variant` | 家具の分類、形状、色やサイズのバリエーション |
-| `object_key` | バケット内の相対パス。例：`models/furniture/v1/bed_single.glb` |
 | `width`、`height`、`depth` | GLBの幅・高さ・奥行き。単位はメートル |
 | `format`、`byte_size`、`sha256` | ファイル形式、バイト数、内容の照合に使うハッシュ |
 | `triangle_count`、`materials` | 三角形の数と素材名 |
@@ -63,7 +62,7 @@ FURNITURE_MODEL_BASE_URL=https://storage.googleapis.com/BUCKET_NAME
 MODELS_BUCKET=BUCKET_NAME
 ```
 
-配信元URLには`object_key`を連結するため、末尾に`models/furniture/v1/`を付けない。URLはHTTPSに限り、認証情報・クエリ・フラグメントは付けない。`gs://`やGoogle CloudコンソールのURLは設定しない。どちらも未設定なら`model_url`は`null`になり、Webは簡易形状を表示する。GCPの秘密鍵をWebへ渡す必要はない。
+配信元URLにはGLBのパス（`models/furniture/v1/<model_key>.glb`。`model_key`から計算する）を連結するため、末尾に`models/furniture/v1/`を付けない。URLはHTTPSに限り、認証情報・クエリ・フラグメントは付けない。`gs://`やGoogle CloudコンソールのURLは設定しない。どちらも未設定なら`model_url`は`null`になり、Webは簡易形状を表示する。GCPの秘密鍵をWebへ渡す必要はない。
 
 ローカルで環境変数を変更した後は、既存のAPIとworkerへ反映する。
 
@@ -97,7 +96,7 @@ Webが取得した台帳はブラウザのセッション中にキャッシュ�
 
 ## 更新時はファイルと台帳をそろえる
 
-GLBを生成して台帳JSONを更新し、GCSへアップロードしてからDBへ取り込む。同じパスのファイルを置き換えると最大1時間キャッシュされる設定なので、即時に切り替えたい更新では新しいファイル名と`object_key`を使う。旧オブジェクトを参照する保存シーンがある場合は、旧ファイルも残す。
+GLBを生成して台帳JSONを更新し、GCSへアップロードしてからDBへ取り込む。同じパスのファイルを置き換えると最大1時間キャッシュされる設定なので、即時に切り替えたい更新では新しいモデルIDを使う。旧オブジェクトを参照する保存シーンがある場合は、旧ファイルも残す。
 
 アップロード済みファイルを自動で列挙したり、用途を推定したりする仕組みは含めない。外部制作モデルを追加する場合も、用途・寸法・保存先をJSONへ記入して取り込む。ブラウザで読めない場合は、公開権限、CORS、`object_key`、APIの`model_url`を確認する。
 

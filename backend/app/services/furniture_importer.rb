@@ -19,9 +19,9 @@ class FurnitureImporter
 
     Furniture.transaction do
       imported = models.to_h do |attributes|
-        model = Furniture.find_or_initialize_by(key: attributes.fetch(:key))
+        model = Furniture.find_or_initialize_by(model_key: attributes.fetch(:model_key))
         model.update!(attributes)
-        [ model.key, model ]
+        [ model.model_key, model ]
       end
       retained_binding_ids = bindings.map do |attributes|
         binding = FurnitureBinding.find_or_initialize_by(kind: attributes.fetch("kind"), reference: attributes.fetch("reference"))
@@ -45,7 +45,7 @@ class FurnitureImporter
     check(@manifest["bindings"].is_a?(Array), "bindings must be an array")
 
     models = @manifest.fetch("models").map.with_index { |model, index| validate_model(model, index) }
-    keys = models.map { |model| model.fetch(:key) }
+    keys = models.map { |model| model.fetch(:model_key) }
     check(keys.uniq.length == keys.length, "model IDs must be unique")
     bindings = @manifest.fetch("bindings").map.with_index { |binding, index| validate_binding(binding, keys, index) }
     references = bindings.map { |binding| binding.values_at("kind", "reference") }
@@ -61,7 +61,7 @@ class FurnitureImporter
     end
     check(model["id"].match?(Furniture::KEY_PATTERN), "#{label}.id must be a stable filename key")
     check(model["format"] == "glb", "#{label}.format must be glb")
-    check(Furniture.valid_object_key?(model["object_key"]), "#{label}.object_key must be a safe relative GLB path")
+    check(model["object_key"] == Furniture.object_key_for(model["id"]), "#{label}.object_key must be #{Furniture.object_key_for(model['id'])}")
     check(model["sha256"].match?(/\A[0-9a-f]{64}\z/), "#{label}.sha256 must be 64 lowercase hex characters")
     check(model["variant"].nil? || model["variant"].is_a?(String), "#{label}.variant must be a string or null")
     size = model["size"]
@@ -72,9 +72,9 @@ class FurnitureImporter
     check(model["materials"].is_a?(Array) && model["materials"].all? { |material| material.is_a?(String) }, "#{label}.materials must be an array of strings")
 
     {
-      key: model.fetch("id"), name: model.fetch("name"), category: model.fetch("category"),
+      model_key: model.fetch("id"), name: model.fetch("name"), category: model.fetch("category"),
       shape: model.fetch("shape"), variant: model["variant"], format: model.fetch("format"),
-      object_key: model.fetch("object_key"), width: size[0], height: size[1], depth: size[2],
+      width: size[0], height: size[1], depth: size[2],
       triangle_count: model.fetch("triangles"), byte_size: model.fetch("bytes"),
       sha256: model.fetch("sha256"), materials: model.fetch("materials")
     }

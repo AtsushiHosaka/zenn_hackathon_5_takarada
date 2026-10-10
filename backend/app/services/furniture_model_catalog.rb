@@ -29,10 +29,6 @@ class FurnitureModelCatalog
   def self.model_url(model, base: base_url)
     return nil if base.nil? || !model.enabled?
 
-    unless Furniture.valid_object_key?(model.object_key)
-      raise ConfigurationError, "Furniture model #{model.key} has an invalid object_key"
-    end
-
     "#{base}/#{model.object_key.split('/').map { |segment| URI.encode_www_form_component(segment) }.join('/')}"
   end
 

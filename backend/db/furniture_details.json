@@ -5,7 +5,7 @@
       "name": "フリルチェック 掛け布団カバー シングル オレンジ×パープル",
       "category": "bed_cover",
       "slot": "bed_cover",
-      "furniture": "bed_cover__101",
+      "model_key": "bed_cover__101",
       "color": "#b9a3e3",
       "color_name": null,
       "size": {
@@ -33,7 +33,7 @@
       "name": "MERETE メレーテ ドレープカーテン 1組 ホワイト/ヘディングテープ付き 145×250cm",
       "category": "curtain",
       "slot": "curtain",
-      "furniture": "curtain_pair__102",
+      "model_key": "curtain_pair__102",
       "color": "#f5f3ee",
       "color_name": null,
       "size": {
@@ -61,7 +61,7 @@
       "name": "ラベンダー レースカーテン（参考モック）",
       "category": "curtain",
       "slot": "curtain",
-      "furniture": "curtain_sheer__115",
+      "model_key": "curtain_sheer__115",
       "color": "#d9cdf0",
       "color_name": null,
       "size": {
@@ -90,7 +90,7 @@
       "name": "STOENSE ストエンセ ラグ パイル短 - オフホワイト 133x195 cm",
       "category": "rug",
       "slot": "rug",
-      "furniture": "rug_rect__103",
+      "model_key": "rug_rect__103",
       "color": "#ccbaa9",
       "color_name": "ベージュ, ホワイト",
       "size": {
@@ -174,7 +174,7 @@
       "name": "LACK ラック ウォールシェルフ ホワイト 110×26cm",
       "category": "wall_shelf",
       "slot": "wall_decor",
-      "furniture": "shelf_floating",
+      "model_key": "shelf_floating",
       "color": "#ffffff",
       "color_name": null,
       "size": {
@@ -202,7 +202,7 @@
       "name": "推し色 タペストリー (無地ラベンダー)（参考モック）",
       "category": "tapestry",
       "slot": "wall_decor",
-      "furniture": "tapestry",
+      "model_key": "tapestry",
       "color": "#c3aee8",
       "color_name": null,
       "size": {
@@ -231,7 +231,7 @@
       "name": "カールトン フロアランプ ブラック",
       "category": "floor_lamp",
       "slot": "light",
-      "furniture": "floor_lamp",
+      "model_key": "floor_lamp",
       "color": "#222222",
       "color_name": null,
       "size": {
@@ -259,7 +259,7 @@
       "name": "PILSKOTT ピルスコット LEDフロアランプ スマート ブラック",
       "category": "floor_lamp",
       "slot": "light",
-      "furniture": "floor_lamp_slim",
+      "model_key": "floor_lamp_slim",
       "color": "#222222",
       "color_name": null,
       "size": {
@@ -287,7 +287,7 @@
       "name": "BAGGEBO バッゲボー コレクションケース - メタル/ホワイト 34x30x116 cm",
       "category": "display_case",
       "slot": "display",
-      "furniture": "display_case",
+      "model_key": "display_case",
       "color": "#d6d8d0",
       "color_name": "ホワイト",
       "size": {
@@ -371,7 +371,7 @@
       "name": "BLÅLIDEN ブローリーデン コレクションケース - ホワイト 35x32x151 cm",
       "category": "display_case",
       "slot": "display",
-      "furniture": "display_rack_open",
+      "model_key": "display_rack_open",
       "color": "#efefef",
       "color_name": "ホワイト",
       "size": {
@@ -455,7 +455,7 @@
       "name": "ポップコーンワッフル フロアクッション φ60 ライトパープル",
       "category": "cushion",
       "slot": "cushion",
-      "furniture": "cushion__107",
+      "model_key": "cushion__107",
       "color": "#cbb8e6",
       "color_name": null,
       "size": {
@@ -483,7 +483,7 @@
       "name": "アクリルコレクションスタンド引き扉付き・小",
       "category": "acrylic_stand_case",
       "slot": "desk_top",
-      "furniture": "acrylic_stand_case",
+      "model_key": "acrylic_stand_case",
       "color": "#eeeeee",
       "color_name": null,
       "size": {
@@ -511,7 +511,7 @@
       "name": "ÄNGSLILJA エングスリリア 掛け布団カバー＆枕カバー ペールグレーグリーン 150×200/50×60cm",
       "category": "bed_cover",
       "slot": "bed_cover",
-      "furniture": "bed_cover__201",
+      "model_key": "bed_cover__201",
       "color": "#9cae8c",
       "color_name": null,
       "size": {
@@ -539,7 +539,7 @@
       "name": "遮光・遮熱ドレープカーテン(100X200X2 リーフ グリーン DH164)",
       "category": "curtain",
       "slot": "curtain",
-      "furniture": "curtain_pair__202",
+      "model_key": "curtain_pair__202",
       "color": "#c8d6b4",
       "color_name": null,
       "size": {
@@ -567,7 +567,7 @@
       "name": "LOHALS ローハルス ラグ 平織り ナチュラル 133×195cm",
       "category": "rug",
       "slot": "rug",
-      "furniture": "rug_rect__203",
+      "model_key": "rug_rect__203",
       "color": "#cdb58a",
       "color_name": null,
       "size": {
@@ -595,7 +595,7 @@
       "name": "STOENSE ストエンセ ラグ パイル短 ミディアムグレー 130cm",
       "category": "rug",
       "slot": "rug",
-      "furniture": "rug_round__211",
+      "model_key": "rug_round__211",
       "color": "#aaaaa6",
       "color_name": null,
       "size": {
@@ -623,7 +623,7 @@
       "name": "FEJKA フェイカ 人工観葉植物 室内/屋外用 つり下げ型/モンステラ 9cm",
       "category": "wall_planter",
       "slot": "wall_decor",
-      "furniture": "wall_planter",
+      "model_key": "wall_planter",
       "color": "#5f8a4f",
       "color_name": null,
       "size": {
@@ -651,7 +651,7 @@
       "name": "KNOPPÄNG クノッペング フレーム ポスター付き ガーデン 40×50cm 2ピース",
       "category": "wall_art",
       "slot": "wall_decor",
-      "furniture": "wall_art",
+      "model_key": "wall_art",
       "color": "#e8eadc",
       "color_name": null,
       "size": {
@@ -679,7 +679,7 @@
       "name": "バンブーフロアランプ",
       "category": "floor_lamp",
       "slot": "light",
-      "furniture": "floor_lamp_rattan",
+      "model_key": "floor_lamp_rattan",
       "color": "#c49a5e",
       "color_name": null,
       "size": {
@@ -707,7 +707,7 @@
       "name": "LAUTERS ラウテルス フロアランプ アッシュ/ホワイト",
       "category": "floor_lamp",
       "slot": "light",
-      "furniture": "floor_lamp_tripod",
+      "model_key": "floor_lamp_tripod",
       "color": "#b08960",
       "color_name": null,
       "size": {
@@ -735,7 +735,7 @@
       "name": "FEJKA フェイカ 人工観葉植物 室内/屋外用 モンステラ 19cm",
       "category": "plant",
       "slot": "display",
-      "furniture": "plant_monstera",
+      "model_key": "plant_monstera",
       "color": "#3f7a3a",
       "color_name": null,
       "size": {
@@ -763,7 +763,7 @@
       "name": "FEJKA フェイカ 人工観葉植物 室内/屋外用 ユーカリ 19cm",
       "category": "plant",
       "slot": "display",
-      "furniture": "plant_eucalyptus",
+      "model_key": "plant_eucalyptus",
       "color": "#7d9c7a",
       "color_name": null,
       "size": {
@@ -791,7 +791,7 @@
       "name": "HALLONBUSKE ハロンブスケ クッションカバー グリーン/フローラルパターン 48×48cm",
       "category": "cushion",
       "slot": "cushion",
-      "furniture": "cushion__207",
+      "model_key": "cushion__207",
       "color": "#7c9a6a",
       "color_name": null,
       "size": {
@@ -819,7 +819,7 @@
       "name": "FEJKA フェイカ 人工観葉植物 室内/屋外用 ギボウシ 9cm",
       "category": "small_plant",
       "slot": "desk_top",
-      "furniture": "small_plant",
+      "model_key": "small_plant",
       "color": "#4f8a45",
       "color_name": null,
       "size": {
@@ -847,7 +847,7 @@
       "name": "ÄNGSLILJA エングスリリア 掛け布団カバー＆枕カバー ナチュラル 150×200cm",
       "category": "bed_cover",
       "slot": "bed_cover",
-      "furniture": "bed_cover__301",
+      "model_key": "bed_cover__301",
       "color": "#efe6d8",
       "color_name": null,
       "size": {
@@ -875,7 +875,7 @@
       "name": "SILVERLÖNN スィルヴェロン レースカーテン2枚組 ベージュ 145×250cm",
       "category": "curtain",
       "slot": "curtain",
-      "furniture": "curtain_sheer__302",
+      "model_key": "curtain_sheer__302",
       "color": "#e6d9c4",
       "color_name": null,
       "size": {
@@ -903,7 +903,7 @@
       "name": "ウェーブ ラグ くすみベージュ 130×185（参考モック）",
       "category": "rug",
       "slot": "rug",
-      "furniture": "rug_wave",
+      "model_key": "rug_wave",
       "color": "#d8c3a5",
       "color_name": null,
       "size": {
@@ -932,7 +932,7 @@
       "name": "STOENSE ストエンセ ラグ パイル短 - オフホワイト 130 cm",
       "category": "rug",
       "slot": "rug",
-      "furniture": "rug_round__311",
+      "model_key": "rug_round__311",
       "color": "#ceb9a6",
       "color_name": "ベージュ, ホワイト",
       "size": {
@@ -1015,7 +1015,7 @@
       "name": "壁掛けミラー ウェーブ ライトモカ HXDH25",
       "category": "wall_mirror",
       "slot": "wall_decor",
-      "furniture": "wall_mirror",
+      "model_key": "wall_mirror",
       "color": "#bba894",
       "color_name": null,
       "size": {
@@ -1043,7 +1043,7 @@
       "name": "VINDKAST ヴィンドカスト フロアランプ ホワイト",
       "category": "floor_lamp",
       "slot": "light",
-      "furniture": "floor_lamp_ball",
+      "model_key": "floor_lamp_ball",
       "color": "#f5f2ec",
       "color_name": null,
       "size": {
@@ -1071,7 +1071,7 @@
       "name": "ÅRSTID オースティード フロアランプ ニッケルメッキ／ホワイト",
       "category": "floor_lamp",
       "slot": "light",
-      "furniture": "floor_lamp_pleated",
+      "model_key": "floor_lamp_pleated",
       "color": "#f4f0e9",
       "color_name": null,
       "size": {
@@ -1099,7 +1099,7 @@
       "name": "GLADOM グラドム トレイテーブル ホワイト 直径45×高さ53cm",
       "category": "side_table",
       "slot": "display",
-      "furniture": "side_table",
+      "model_key": "side_table",
       "color": "#f3f3ef",
       "color_name": null,
       "size": {
@@ -1127,7 +1127,7 @@
       "name": "PROFETBLOMMA プロフェットブロマ クッション ライトベージュ 50×50cm",
       "category": "cushion",
       "slot": "cushion",
-      "furniture": "cushion__307",
+      "model_key": "cushion__307",
       "color": "#e7dcc8",
       "color_name": null,
       "size": {
@@ -1155,7 +1155,7 @@
       "name": "HEMSJÖ ヘムショー 香りなしブロックキャンドル ナチュラル 4個入り 高さ8cm",
       "category": "candle",
       "slot": "desk_top",
-      "furniture": "candle",
+      "model_key": "candle",
       "color": "#f2e8d5",
       "color_name": null,
       "size": {
@@ -1183,7 +1183,7 @@
       "name": "LILL リル レースカーテン1組 ホワイト/レース ポール通しカーテン 280×250cm",
       "category": "curtain",
       "slot": "curtain",
-      "furniture": "curtain_sheer__901",
+      "model_key": "curtain_sheer__901",
       "color": "#f5f3ee",
       "color_name": null,
       "size": {
@@ -1212,7 +1212,7 @@
       "name": "NÄVLINGE ネーヴリンゲ LEDクリップ式スポットライト ホワイト",
       "category": "desk_lamp",
       "slot": "desk_top",
-      "furniture": "desk_lamp_clip",
+      "model_key": "desk_lamp_clip",
       "color": "#f0f0f0",
       "color_name": null,
       "size": {
@@ -1242,7 +1242,7 @@
       "name": "GURLI グルリ クッションカバー - 生成り 50x50 cm",
       "category": "cushion",
       "slot": "cushion",
-      "furniture": "cushion",
+      "model_key": "cushion",
       "color": "#d5c8b8",
       "color_name": "ベージュ",
       "size": {
@@ -1328,7 +1328,7 @@
       "name": "SVALLET スヴァレット ワークランプ - ダークグレー/ホワイト",
       "category": "desk_lamp",
       "slot": "desk_top",
-      "furniture": "desk_lamp_arm",
+      "model_key": "desk_lamp_arm",
       "color": "#4e4e4e",
       "color_name": "グレー, ホワイト",
       "size": {
@@ -1408,7 +1408,7 @@
       "name": "MARIUS マリウス スツール - ブラック 45 cm",
       "category": "chair",
       "slot": "floor",
-      "furniture": "stool_round",
+      "model_key": "stool_round",
       "color": "#505156",
       "color_name": "ブラック",
       "size": {
@@ -1500,7 +1500,7 @@
       "name": "MARIUS マリウス スツール - ホワイト 45 cm",
       "category": "chair",
       "slot": "floor",
-      "furniture": "stool_round",
+      "model_key": "stool_round",
       "color": "#eae9e5",
       "color_name": "ホワイト",
       "size": {
@@ -1588,7 +1588,7 @@
       "name": "BLÅSKATA ブロースカータ クッションカバー - パープル/模様入り 50x50 cm",
       "category": "cushion",
       "slot": "cushion",
-      "furniture": "cushion",
+      "model_key": "cushion",
       "color": "#d3cfce",
       "color_name": "ライラック",
       "size": {
@@ -1674,7 +1674,7 @@
       "name": "SANELA サネーラ クッションカバー - ライトベージュ 50x50 cm",
       "category": "cushion",
       "slot": "cushion",
-      "furniture": "cushion",
+      "model_key": "cushion",
       "color": "#d3c9b4",
       "color_name": "ベージュ",
       "size": {
@@ -1760,7 +1760,7 @@
       "name": "SANELA サネーラ クッションカバー - イエローブラウン 50x50 cm",
       "category": "cushion",
       "slot": "cushion",
-      "furniture": "cushion",
+      "model_key": "cushion",
       "color": "#a77634",
       "color_name": "ブラウン, イエロー",
       "size": {
@@ -1846,7 +1846,7 @@
       "name": "GURLI グルリ クッションカバー - 生成り 65x65 cm",
       "category": "cushion",
       "slot": "cushion",
-      "furniture": "cushion",
+      "model_key": "cushion",
       "color": "#cec4ba",
       "color_name": "ベージュ",
       "size": {
@@ -1932,7 +1932,7 @@
       "name": "ＩＫＥＡ/イケア　SVALLET　ワークランプ　ダークグレー/ホワイト(303.584.94)",
       "category": "desk_lamp",
       "slot": "desk_top",
-      "furniture": "desk_lamp_arm",
+      "model_key": "desk_lamp_arm",
       "color": "#d0cfcd",
       "color_name": "ダークグレー/ホワイト",
       "size": {
@@ -2025,7 +2025,7 @@
       "name": "GUNDE グンデ 折りたたみスツール - ブラック",
       "category": "chair",
       "slot": "floor",
-      "furniture": "stool_round",
+      "model_key": "stool_round",
       "color": "#fdfdfd",
       "color_name": "ブラック",
       "size": {
@@ -2107,7 +2107,7 @@
       "name": "ÅSVEIG オースヴェイグ クッションカバー - グレーブラウン 50x50 cm",
       "category": "cushion",
       "slot": "cushion",
-      "furniture": "cushion",
+      "model_key": "cushion",
       "color": "#54473a",
       "color_name": "グレーブラウン",
       "size": {
@@ -2193,7 +2193,7 @@
       "name": "ÅSVEIG オースヴェイグ クッションカバー - ライトベージュ 40x58 cm",
       "category": "cushion",
       "slot": "cushion",
-      "furniture": "cushion",
+      "model_key": "cushion",
       "color": "#d6c9b6",
       "color_name": "ベージュ",
       "size": {
@@ -2279,7 +2279,7 @@
       "name": "折りたたみスツール ボンベイ(WH) ニトリ",
       "category": "chair",
       "slot": "floor",
-      "furniture": "stool_round",
+      "model_key": "stool_round",
       "color": "#f9f9f8",
       "color_name": "ホワイト",
       "size": {
@@ -2365,7 +2365,7 @@
       "name": "FEJAN フェヤン チェア 屋外用 - 折りたたみ式 ホワイト",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_folding",
+      "model_key": "chair_folding",
       "color": "#f7f6f4",
       "color_name": "ホワイト",
       "size": {
@@ -2447,7 +2447,7 @@
       "name": "ＩＫＥＡ/イケア　MOSSLANDA/モッスランダ　アート用飾り棚55cm　オーク調(905.869.40/90586940)80",
       "category": "wall_shelf",
       "slot": "wall_decor",
-      "furniture": "wall_shelf_hex",
+      "model_key": "wall_shelf_hex",
       "color": "#fdfdfd",
       "color_name": "オーク調",
       "size": {
@@ -2540,7 +2540,7 @@
       "name": "掛布団カバー シングル(PT112 Pステッチハナ パープル S) ニトリ",
       "category": "bed_cover",
       "slot": "bed_cover",
-      "furniture": "bed_cover",
+      "model_key": "bed_cover",
       "color": "#d4cfd2",
       "color_name": "レッドパープル",
       "size": {
@@ -2631,7 +2631,7 @@
       "name": "ウォールシェルフ 幅45cm (ライトブラウン HS) ニトリ",
       "category": "wall_shelf",
       "slot": "wall_decor",
-      "furniture": "wall_shelf_hex",
+      "model_key": "wall_shelf_hex",
       "color": "#e8e3dd",
       "color_name": "ライトブラウン",
       "size": {
@@ -2717,7 +2717,7 @@
       "name": "TIPHEDE ティプヘデ ラグ 平織り - ナチュラル/ブラック 120x180 cm",
       "category": "rug",
       "slot": "rug",
-      "furniture": "rug_rect",
+      "model_key": "rug_rect",
       "color": "#d1c6bb",
       "color_name": "ベージュ, ホワイト",
       "size": {
@@ -2799,7 +2799,7 @@
       "name": "BEGÅVNING ベゴーヴニング ガラスドーム ベース付き 26 cm",
       "category": "acrylic_stand_case",
       "slot": "desk_top",
-      "furniture": "acrylic_stand_case",
+      "model_key": "acrylic_stand_case",
       "color": "#d4d2cd",
       "color_name": "イエロー, ホワイト",
       "size": {
@@ -2891,7 +2891,7 @@
       "name": "SANDSBERG サンドスベリ チェア - ホワイト",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_dining",
+      "model_key": "chair_dining",
       "color": "#ecebe7",
       "color_name": "ホワイト",
       "size": {
@@ -2973,7 +2973,7 @@
       "name": "SANDSBERG サンドスベリ チェア - ブラック",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_dining",
+      "model_key": "chair_dining",
       "color": "#fdfdfd",
       "color_name": "ブラック",
       "size": {
@@ -3055,7 +3055,7 @@
       "name": "GUNDE グンデ 折りたたみチェア - ブラック",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_folding",
+      "model_key": "chair_folding",
       "color": "#fefefe",
       "color_name": "ブラック",
       "size": {
@@ -3137,7 +3137,7 @@
       "name": "STIG スティグ カウンターチェア 背もたれ付き - カウンターの高さ ブラック/ブラック 63 cm",
       "category": "chair",
       "slot": "floor",
-      "furniture": "stool_bar",
+      "model_key": "stool_bar",
       "color": "#fefefe",
       "color_name": "ブラック",
       "size": {
@@ -3219,7 +3219,7 @@
       "name": "KYRRE シルレ スツール - バーチ",
       "category": "chair",
       "slot": "floor",
-      "furniture": "stool_round",
+      "model_key": "stool_round",
       "color": "#e8cdb1",
       "color_name": "ベージュ, ブラウン",
       "size": {
@@ -3301,7 +3301,7 @@
       "name": "ÄNGSLILJA エングスリリア 掛け布団カバー＆枕カバー - ライトブラウン 150x200/50x60 cm",
       "category": "bed_cover",
       "slot": "bed_cover",
-      "furniture": "bed_cover",
+      "model_key": "bed_cover",
       "color": "#af8a72",
       "color_name": "ブラウン",
       "size": {
@@ -3394,7 +3394,7 @@
       "name": "VIHALS ヴィーハルス チェア - ホワイト",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_dining",
+      "model_key": "chair_dining",
       "color": "#edece6",
       "color_name": "ホワイト",
       "size": {
@@ -3476,7 +3476,7 @@
       "name": "ＩＫＥＡ/イケア　SANDSBERG/サンドスベリ　チェア　ホワイト（206.054.28/20605428）",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_dining",
+      "model_key": "chair_dining",
       "color": "#d2d2d1",
       "color_name": "ホワイト",
       "size": {
@@ -3566,7 +3566,7 @@
       "name": "BEKVÄM ベクヴェーム ステップスツール - ホワイト 50 cm",
       "category": "chair",
       "slot": "floor",
-      "furniture": "step_stool",
+      "model_key": "step_stool",
       "color": "#f9f7f5",
       "color_name": "ホワイト",
       "size": {
@@ -3648,7 +3648,7 @@
       "name": "PERJOHAN ペルヨハン スツール 収納付き - パイン材",
       "category": "chair",
       "slot": "floor",
-      "furniture": "vanity_stool",
+      "model_key": "vanity_stool",
       "color": "#e8cdad",
       "color_name": "ベージュ",
       "size": {
@@ -3730,7 +3730,7 @@
       "name": "BAGGEBO バッゲボー キャビネット 扉付 - ホワイト 50x30x80 cm",
       "category": "shelf",
       "slot": "floor",
-      "furniture": "shelf_metal",
+      "model_key": "shelf_metal",
       "color": "#f0f1ec",
       "color_name": "ホワイト",
       "size": {
@@ -3812,7 +3812,7 @@
       "name": "NYMÅNE ニーモーネ テーブルランプ - ホワイト 33 cm",
       "category": "desk_lamp",
       "slot": "desk_top",
-      "furniture": "table_lamp",
+      "model_key": "table_lamp",
       "color": "#d4d4d5",
       "color_name": "ホワイト",
       "size": {
@@ -3899,7 +3899,7 @@
       "name": "FRÖSVI フロースヴィ 折りたたみチェア - ホワイト",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_folding",
+      "model_key": "chair_folding",
       "color": "#f2f3f1",
       "color_name": "ホワイト",
       "size": {
@@ -3981,7 +3981,7 @@
       "name": "PINNTORP ピントルプ チェア - ホワイトステイン/パイン材",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_dining",
+      "model_key": "chair_dining",
       "color": "#f2f2f1",
       "color_name": "ホワイト",
       "size": {
@@ -4063,7 +4063,7 @@
       "name": "LOBERGET ローベルゲット / MALSKÄR マルシェール 回転チェア - ホワイト",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_office",
+      "model_key": "chair_office",
       "color": "#efefec",
       "color_name": "ホワイト",
       "size": {
@@ -4145,7 +4145,7 @@
       "name": "DEJSA デイサ テーブルランプ - ベージュ/オパールホワイト ガラス 28 cm",
       "category": "desk_lamp",
       "slot": "desk_top",
-      "furniture": "table_lamp",
+      "model_key": "table_lamp",
       "color": "#d8d5d3",
       "color_name": "ベージュ, ホワイト",
       "size": {
@@ -4237,7 +4237,7 @@
       "name": "TEODORES テオドレス チェア - ホワイト",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_shell",
+      "model_key": "chair_shell",
       "color": "#e7e7e7",
       "color_name": "ホワイト",
       "size": {
@@ -4319,7 +4319,7 @@
       "name": "ラグ ラグマット カーペット なめらかでやわらかい肌ざわりの洗えるラグ  200X240 約3帖 アイボリー FR02 ニトリ オールシーズン 洗える 洗えるラグ",
       "category": "rug",
       "slot": "rug",
-      "furniture": "rug_rect__203",
+      "model_key": "rug_rect__203",
       "color": "#eee7d5",
       "color_name": "アイボリー",
       "size": {
@@ -4405,7 +4405,7 @@
       "name": "ＩＫＥＡ/イケア　PINNTORP/ピントルプ　チェア　ホワイトステイン/パイン材（706.351.78/70635178）",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_dining",
+      "model_key": "chair_dining",
       "color": "#fafafa",
       "color_name": "ホワイトステイン/パイン材",
       "size": {
@@ -4495,7 +4495,7 @@
       "name": "STOENSE ストエンセ ラグ パイル短 - オフホワイト 80x150 cm",
       "category": "rug",
       "slot": "rug",
-      "furniture": "rug_rect",
+      "model_key": "rug_rect",
       "color": "#cdb7a6",
       "color_name": "ベージュ, ホワイト",
       "size": {
@@ -4577,7 +4577,7 @@
       "name": "ジェム スツール ホワイト",
       "category": "chair",
       "slot": "floor",
-      "furniture": "stool_round",
+      "model_key": "stool_round",
       "color": "#c6b8aa",
       "color_name": "ジェム スツール ホワイト",
       "size": {
@@ -4655,7 +4655,7 @@
       "name": "NYMÅNE ニーモーネ ワークランプ ワイヤレス充電機能付き - ホワイト",
       "category": "desk_lamp",
       "slot": "desk_top",
-      "furniture": "desk_lamp_arm",
+      "model_key": "desk_lamp_arm",
       "color": "#d4d2d3",
       "color_name": "ホワイト",
       "size": {
@@ -4735,7 +4735,7 @@
       "name": "大人かわいいチェア (Elance エランセ WH） ニトリ",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_wishbone",
+      "model_key": "chair_wishbone",
       "color": "#b2b0b0",
       "color_name": "ホワイト",
       "size": {
@@ -4821,7 +4821,7 @@
       "name": "IKEA PS 2026 折りたたみチェア - バーチ ブルー/ブラック レッド",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_folding",
+      "model_key": "chair_folding",
       "color": "#fefefe",
       "color_name": "ベージュ, ブルー, レッド, ブラック",
       "size": {
@@ -4903,7 +4903,7 @@
       "name": "ガラスコレクションケース(AN001 WH) ニトリ",
       "category": "display_case",
       "slot": "display",
-      "furniture": "display_case",
+      "model_key": "display_case",
       "color": "#d3cfcb",
       "color_name": "ホワイト",
       "size": {
@@ -4989,7 +4989,7 @@
       "name": "RUDSTA ルードスタ コレクションケース - チャコール 42x37x155 cm",
       "category": "display_case",
       "slot": "display",
-      "furniture": "display_case",
+      "model_key": "display_case",
       "color": "#292a29",
       "color_name": "グレー",
       "size": {
@@ -5071,7 +5071,7 @@
       "name": "オフィスチェア(OC106 WH) ニトリ",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_office",
+      "model_key": "chair_office",
       "color": "#e6e7ea",
       "color_name": "ホワイト",
       "size": {
@@ -5157,7 +5157,7 @@
       "name": "IKEA PS 2026 チェア - ブライトブルー/クネーベック ブライトブルー",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_shell",
+      "model_key": "chair_shell",
       "color": "#0b4c93",
       "color_name": "ブルー",
       "size": {
@@ -5239,7 +5239,7 @@
       "name": "ODGER オドゲル チェア - チャコール",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_dining",
+      "model_key": "chair_dining",
       "color": "#4d4d4d",
       "color_name": "グレー",
       "size": {
@@ -5321,7 +5321,7 @@
       "name": "ＩＫＥＡ/イケア　POANG/ポエング　パーソナルチェア　バーチ材突き板/クニーサ ライトベージュ（192.407.88/19240788）",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_lounge",
+      "model_key": "chair_lounge",
       "color": "#fcfcfc",
       "color_name": "バーチ材突き板/クニーサ ライトベージュ",
       "size": {
@@ -5411,7 +5411,7 @@
       "name": "TOBIAS トービアス チェア - 透明/クロムメッキ",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_shell",
+      "model_key": "chair_shell",
       "color": "#f9f9f9",
       "color_name": "グレー, ホワイト",
       "size": {
@@ -5493,7 +5493,7 @@
       "name": "PINNTORP ピントルプ テーブル - ライトブラウンステイン/ホワイトステイン パイン材 125x75 cm",
       "category": "table",
       "slot": "floor",
-      "furniture": "table_dining_rect",
+      "model_key": "table_dining_rect",
       "color": "#d0d3d5",
       "color_name": "ブラウン, ホワイト",
       "size": {
@@ -5575,7 +5575,7 @@
       "name": "STOENSE ストエンセ ラグ パイル短 - オフホワイト 170x240 cm",
       "category": "rug",
       "slot": "rug",
-      "furniture": "rug_rect__203",
+      "model_key": "rug_rect__203",
       "color": "#cab6a6",
       "color_name": "ベージュ, ホワイト",
       "size": {
@@ -5657,7 +5657,7 @@
       "name": "RUDSTA ルードスタ コレクションケース - チャコール 80x37x120 cm",
       "category": "display_case",
       "slot": "display",
-      "furniture": "cabinet_glass",
+      "model_key": "cabinet_glass",
       "color": "#1b1c17",
       "color_name": "グレー",
       "size": {
@@ -5739,7 +5739,7 @@
       "name": "STRANDMON ストランドモン ウィングチェア - ノールドヴァッラ ダークグレー",
       "category": "chair",
       "slot": "floor",
-      "furniture": "armchair_wing",
+      "model_key": "armchair_wing",
       "color": "#6d6d71",
       "color_name": "グレー",
       "size": {
@@ -5821,7 +5821,7 @@
       "name": "EKTORP エークトルプ パーソナルチェア - キランダ ライトベージュ",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_lounge",
+      "model_key": "chair_lounge",
       "color": "#d4c8b6",
       "color_name": "キランダ ライトベージュ",
       "size": {
@@ -5912,7 +5912,7 @@
       "name": "ゲーミングチェア(GM709 フットレスト付き WH/WH) ニトリ",
       "category": "chair",
       "slot": "floor",
-      "furniture": "chair_gaming",
+      "model_key": "chair_gaming",
       "color": "#d2d5d0",
       "color_name": "ホワイト/ホワイト",
       "size": {

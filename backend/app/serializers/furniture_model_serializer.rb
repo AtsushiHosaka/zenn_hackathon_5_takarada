@@ -3,7 +3,7 @@ class FurnitureModelSerializer
 
   attributes :name, :category, :shape, :variant, :format, :object_key,
              :triangle_count, :byte_size, :sha256, :materials
-  attribute(:id) { |model| model.key }
+  attribute(:id) { |model| model.model_key }
   attribute(:size) { |model| { w: model.width.to_f, h: model.height.to_f, d: model.depth.to_f } }
   attribute(:unit) { Furniture::UNIT }
   attribute(:axes) { Furniture::AXES }

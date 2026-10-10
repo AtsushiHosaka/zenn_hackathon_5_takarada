@@ -19,10 +19,10 @@ class FurnitureDetailImporter
     rows = @source.is_a?(Hash) && @source["details"]
     raise InvalidDetails, "details must be an array" unless rows.is_a?(Array)
 
-    furnitures = Furniture.where(key: rows.map { |row| row["furniture"] }).index_by(&:key)
+    furnitures = Furniture.where(model_key: rows.map { |row| row["model_key"] }).index_by(&:model_key)
     FurnitureDetail.transaction do
       keys = rows.each_with_index.map do |row, index|
-        furniture = furnitures[row["furniture"]] or raise InvalidDetails, "details[#{index}].furniture #{row['furniture'].inspect} is not imported"
+        furniture = furnitures[row["model_key"]] or raise InvalidDetails, "details[#{index}].model_key #{row["model_key"].inspect} is not imported"
         size = row["size"].to_h
         detail = FurnitureDetail.find_or_initialize_by(key: row["key"])
         detail.update!(
@@ -35,7 +35,7 @@ class FurnitureDetailImporter
         raise InvalidDetails, "details[#{index}] (#{row['key']}): #{error.record.errors.full_messages.join(', ')}"
       end
       FurnitureDetail.where.not(key: keys).delete_all
-      { details: keys.size, furnitures: rows.map { |row| row["furniture"] }.uniq.size }
+      { details: keys.size, furnitures: rows.map { |row| row["model_key"] }.uniq.size }
     end
   end
 end

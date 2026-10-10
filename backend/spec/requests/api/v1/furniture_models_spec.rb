@@ -28,7 +28,7 @@ RSpec.describe "Api::V1::FurnitureModels", type: :request do
       response "200", "モデルのメタデータ" do
         schema "$ref" => "#/components/schemas/FurnitureModel"
         before { FurnitureImporter.call }
-        let(:id) { Furniture.available.order(:key).first.key }
+        let(:id) { Furniture.available.order(:model_key).first.model_key }
 
         run_test!
       end
