@@ -44,7 +44,7 @@ end
 create_table "coordinations", force: :cascade do |t|
   t.references "room", null: false, foreign_key: true
   t.text "prompt", null: false
-  t.integer "budget", null: false
+  t.integer "budget"
   t.jsonb "kept_object_ids", null: false, default: []
   t.jsonb "edited_objects", null: false, default: []
   t.jsonb "furniture_operations", null: false, default: []

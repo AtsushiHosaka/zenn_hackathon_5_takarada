@@ -1,9 +1,11 @@
-import { useQuery, type QueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router';
+import { useRepositories } from '../../core/repositories';
 import { DomainError } from '../../domain/error';
 import { isRoomDesign, type RoomDesign, type RoomItem } from '../../domain/room';
 import { copyFurniture } from '../../domain/furnitureCopy';
 import { isRoomTemplate, type RoomTemplate } from '../../domain/roomTemplate';
-import { scopedRoomPlanKeys, useRoomPlanScope } from './plans';
+import { saveRoomPlan, scopedRoomPlanKeys, useRoomPlanScope } from './plans';
 import { getFurniturePlacementBounds } from './roomBounds';
 import { readRoomTemplates, templateKeys, templateStorageKey } from './templateStorage';
 
@@ -13,6 +15,26 @@ export function useRoomTemplates() {
   const query = useQuery({ queryKey: keys.list, queryFn: () => readRoomTemplates(scope), staleTime: Infinity });
   const warning = useQuery({ queryKey: keys.warning, queryFn: () => '', initialData: '', staleTime: Infinity }).data;
   return { ...query, data: query.data ?? [], warning };
+}
+// テンプレートから部屋を作り、その部屋の画面へ進む。
+export function useCreateRoomFromTemplate() {
+  const scope = useRoomPlanScope();
+  const { rooms, tokenStore } = useRepositories();
+  const client = useQueryClient();
+  const navigate = useNavigate();
+  return useMutation({
+    mutationFn: async (design: RoomDesign) => {
+      const token = tokenStore.load();
+      const room = await rooms.createFromTemplate(design);
+      if (tokenStore.load() !== token) throw new Error('ログイン状態が変わりました。もう一度お試しください。');
+      return room;
+    },
+    onSuccess: room => {
+      let notice: string | undefined;
+      try { saveRoomPlan(client, room, scope); } catch { notice = 'このタブでは部屋を使えますが、編集内容をブラウザに保存できませんでした。'; }
+      navigate(`/rooms/${room.id}`, { state: { editing: true, notice } });
+    },
+  });
 }
 function writeTemplates(client: QueryClient, scope: string, next: RoomTemplate[]) {
   const keys = templateKeys(scope);
@@ -42,7 +64,7 @@ export function createTemplateSnapshot(design: RoomDesign, title: string): RoomD
   const snapshot: RoomDesign = {
     id: `room-template-${crypto.randomUUID()}`, source: design.source, kind: 'analysis', title: title.trim(),
     description: '保存した部屋のテンプレートです。', style: design.style, room, analysisInput,
-    wallColor: design.wallColor, floorColor: design.floorColor, budget: design.budget, prompt: design.prompt, roomPaletteId: design.roomPaletteId, characterThemeId: design.characterThemeId,
+    wallColor: design.wallColor, floorColor: design.floorColor, prompt: design.prompt, roomPaletteId: design.roomPaletteId, characterThemeId: design.characterThemeId,
     items: copyFurniture(design.items, 'template-object', design.room ? [0, 0, 0] : center).map(item => {
       return {...item, existing: true,
         name: item.name.slice(0,100),

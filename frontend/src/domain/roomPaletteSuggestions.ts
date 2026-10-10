@@ -1,4 +1,4 @@
-import { roomPalettes, type RoomPalette } from "./roomPalette";
+import { roomColor, roomPalettes, type RoomPalette } from "./roomPalette";
 
 export const roomPaletteSuggestionCount = 4;
 
@@ -87,7 +87,8 @@ export function suggestRoomPalettes(atmosphere: string, preferredId?: string): r
 
   const selected: RoomPalette[] = [];
   const families = new Map<string, number>();
-  const candidates = roomPalettes.filter(palette => !excluded.has(palette.id));
+  // 提案するのは単色に割り当てた配色と、保存済みの部屋が使っている配色だけ。
+  const candidates = roomPalettes.filter(palette => (roomColor(palette.id) || palette.id === preferredId) && !excluded.has(palette.id));
   while (selected.length < roomPaletteSuggestionCount && candidates.length) {
     const score = (palette: RoomPalette) => {
       const fallbackRank = fallbackIds.indexOf(palette.id);

@@ -37,6 +37,9 @@
 .room-generating-stage-tags>span:first-child{display:flex;align-items:center;gap:8px;background:#221F2C;border:1px solid #2E2A38;color:#B9B4C7}
 .room-generating-stage-tags>span:nth-child(2){background:rgba(46,118,82,.22);border:1px solid rgba(110,190,145,.35);color:#A9E2C2}
 .room-generating-scene-wrap{position:absolute;inset:72px 0 112px;display:flex;align-items:center;justify-content:center;padding:0 32px}
+.room-generating-room{position:absolute;inset:72px 0 150px}
+.room-generating-hint{display:flex;gap:10px;align-items:baseline;margin:0;font-size:13px;line-height:1.6;color:#D9D4E6}
+.room-generating-hint>span:first-child{flex:none;padding:1px 8px;border-radius:999px;background:#352A4C;color:#D0BDF7;font-size:11px;font-weight:700}
 .room-generating-scene{position:relative;width:min(100%,620px);aspect-ratio:480/410}
 .room-generating-scan{position:absolute;left:6%;right:6%;top:40%;height:2px;background:#CDB8FF;box-shadow:0 0 18px 6px rgba(160,120,255,.45);pointer-events:none;animation:room-generating-scan 2.4s ease-in-out infinite alternate}
 .room-generating-furniture{position:absolute;transform:translate(-50%,-100%);display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(22,20,28,.82);border:1px solid rgba(255,255,255,.18);font-size:12px;font-weight:700;white-space:nowrap}
@@ -61,6 +64,8 @@
  .room-generating-stage{flex:0 0 220px;width:100%;height:220px}
  .room-generating-stage-tags{top:10px;left:16px;right:16px}
  .room-generating-scene-wrap{inset:42px 0 88px;padding:0 16px}
+ .room-generating-room{inset:0}
+ .room-generating-hint{display:none}
  .room-generating-scene{width:100px}
  .room-generating-status{bottom:12px;width:calc(100% - 32px);padding:10px 12px}
 }

@@ -1,4 +1,4 @@
-# コーデ提案。要望と予算から商品を選び、配置後のシーンを after_scene に持つ
+# コーデ提案。要望から商品を選び (予算は任意。無ければ上限なし)、配置後のシーンを after_scene に持つ
 class Coordination < ApplicationRecord
   STATUSES = %w[pending processing done failed].freeze
   FLOOR_CATEGORIES = %w[sofa bed desk chair shelf table].freeze
@@ -12,13 +12,18 @@ class Coordination < ApplicationRecord
   belongs_to :base_coordination, class_name: "Coordination", optional: true
 
   validates :prompt, presence: true, length: { maximum: 500 }
-  validates :budget, numericality: { only_integer: true, greater_than: 0 }
+  validates :budget, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
   validates :status, inclusion: { in: STATUSES }
   validates :character_theme_id, inclusion: { in: ->(_) { CharacterRoomTheme::CATALOGUE.keys } }, allow_nil: true
   validate :valid_furniture_input
   validate :valid_operations, on: :create
   validate :valid_base_coordination
   validates :room_palette_id, inclusion: { in: ->(_) { RoomPalette::CATALOGUE.keys } }, allow_nil: true
+
+  # 予算が無いコーデは価格の上限なしで選ぶ。
+  def budget_limit
+    budget || Float::INFINITY
+  end
 
   # 写真で見つからなかった所有家具も、今回の提案の元の部屋に含める。
   def input_scene

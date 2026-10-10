@@ -1767,7 +1767,8 @@ components:
               example: 紫色の推し活ルームにしたい
             budget:
               type: integer
-              description: 追加・入れ替え商品の予算 (円・送料別)
+              nullable: true
+              description: 追加・入れ替え商品の予算 (円・送料別)。省略すると上限なしで選ぶ
               example: 30000
             kept_object_ids:
               type: array
@@ -1805,7 +1806,6 @@ components:
               example: []
           required:
           - prompt
-          - budget
       required:
       - coordination
     CoordinationItem:
@@ -1913,6 +1913,8 @@ components:
           example: 紫色の推し活ルームにしたい
         budget:
           type: integer
+          nullable: true
+          description: 省略したコーデでは null
           example: 30000
         kept_object_ids:
           type: array

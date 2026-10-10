@@ -14,3 +14,6 @@ Furniture totals cover items being bought, excluding existing furniture whose pu
 - Browser checks use an isolated context of the existing Chromium process and local dummy fixtures. They cover empty state, previous/next and wrap, keyboard navigation, linked room/new-room navigation, synchronized title/size/map, one canvas per slide, missing prices, one-room disabled controls, and 390px mobile overflow. No page errors occurred.
 - Screenshots at `docs/pr-evidence/issue-61/` show desktop first/next slides and a 390px mobile view. The measured-room sample uses the existing analysis fixture and a sample product; these are local UI evidence, not live API or production data.
 - API, DB, environment variables and iOS are unchanged. Deployed/authenticated real-room rendering is unverified.
+
+
+2026-10-10: この仕様の画面まわりは `specs/screen-refactor/spec.md` で置き換えた。

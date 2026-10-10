@@ -1,18 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import type { RoomDesign, RoomShape } from '../../domain/room';
 import type { SavedRoom } from '../../domain/roomRepository';
-import { motionStaggerStyle } from '../../core/motion';
+import { motionStaggerStyle, prefersReducedMotion, useReducedMotion } from '../../core/motion';
 import AccountMenu from './AccountMenu';
-import { useSavedRooms } from './plans';
+import { useRoomPlanScope, useSavedRooms } from './plans';
 import ReferenceSvg from './ReferenceSvg';
-import RoomPreview from './RoomPreview';
-import RoomFloorPlan from './RoomFloorPlan';
+import { useRoomSnapshots } from './useRoomSnapshots';
 import ErrorText from '../shared/ErrorText';
 import './room-list.css';
 
 const shapes: Record<RoomShape, string> = { square: '正方形に近い', standard: 'やや縦長', long: '細長い' };
 const money = (value: number) => `¥${value.toLocaleString('ja-JP')}`;
+const roomPath = (design: RoomDesign) => `/rooms/${encodeURIComponent(design.id)}`;
+const heroInterval = 5000;
 
 function roomDimensions(design: RoomDesign): string {
   const input = design.analysisInput;
@@ -25,38 +26,83 @@ function roomDimensions(design: RoomDesign): string {
   return `${(room.width * room.depth).toFixed(1)} m² · ${shapes[shape]} · ${dimensions}`;
 }
 
-function RoomDetails({ room }: { room: SavedRoom }) {
-  const design = room.design;
-  const additions = design?.items.filter(item => !item.existing) ?? [];
-  const unknownPrices = additions.filter(item => item.price === undefined).length;
+function purchaseSummary(design: RoomDesign): string | undefined {
+  const additions = design.items.filter(item => !item.existing);
+  if (!additions.length) return undefined;
   const total = additions.reduce((sum, item) => sum + (item.price ?? 0), 0);
-  return <div className="room-list-details motion-enter" style={motionStaggerStyle(1)}>
-    <div className="room-list-copy">
-      <h2 id="selected-room-title">{room.title}</h2>
-      {design ? <>
-        <p className="room-list-dimensions">{roomDimensions(design)}</p>
-        <dl className="room-list-finances">
-          <div><dt>家具価格の合計（買い足し）</dt><dd>{unknownPrices ? `確認済み ${money(total)}` : money(total)}</dd></div>
-          {design.budget !== undefined && <div><dt>予算</dt><dd>{money(design.budget)}</dd></div>}
-        </dl>
-        {unknownPrices > 0 && <p className="room-list-price-note">{unknownPrices}点の価格が未確認です。</p>}
-        <Link className="room-list-open motion-control" to={`/rooms/${encodeURIComponent(design.id)}`}>この部屋を開く <span aria-hidden="true">↗</span></Link>
-      </> : <p className="room-list-feedback" role="status">{room.status === 'analyzing' ? '部屋を作成しています…' : room.errorMessage || '部屋を作成できませんでした。'}</p>}
+  const unknown = additions.filter(item => item.price === undefined).length;
+  return `買い足し ${money(total)}${unknown ? `（${unknown}点は価格未確認）` : ''}`;
+}
+
+// 3Dモデルを撮った写真。準備中は読み込み中の印を出す。
+function RoomShot({ url }: { url: string | null | undefined }) {
+  if (url) return <img src={url} alt="" draggable={false}/>;
+  return <span className={`room-list-preview-placeholder${url === null ? ' is-unavailable' : ''}`} role="status" aria-label={url === null ? '3Dモデルを表示できませんでした' : '3Dモデルを読み込み中'}>{url === null ? '◇' : ''}</span>;
+}
+
+type ReadyRoom = SavedRoom & { design: RoomDesign };
+
+// 横長の大きな写真が、自動で横に流れていく。
+function RoomHero({ rooms, snapshot }: { rooms: ReadyRoom[]; snapshot: (design: RoomDesign) => string | null | undefined }) {
+  const track = useRef<HTMLDivElement>(null);
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const reducedMotion = useReducedMotion();
+  const current = Math.min(index, rooms.length - 1);
+  function show(next: number) {
+    const host = track.current;
+    const slide = host?.children[(next + rooms.length) % rooms.length] as HTMLElement | undefined;
+    if (host && slide) host.scrollTo({ left: slide.offsetLeft - (host.clientWidth - slide.clientWidth) / 2, behavior: prefersReducedMotion() ? 'instant' : 'smooth' });
+  }
+  const advance = useEffectEvent(() => show(current + 1));
+  useEffect(() => {
+    if (paused || reducedMotion || rooms.length < 2) return;
+    const timer = window.setInterval(advance, heroInterval);
+    return () => window.clearInterval(timer);
+  }, [paused, reducedMotion, rooms.length]);
+  return <section className="room-hero" aria-label="保存した部屋" aria-roledescription="カルーセル" tabIndex={0}
+    onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}
+    onKeyDown={event => {
+      if (event.target !== event.currentTarget) return;
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); show(current + (event.key === 'ArrowLeft' ? -1 : 1)); }
+    }}>
+    <div ref={track} id="room-hero-track" className="room-hero-track" onScroll={event => {
+      const host = event.currentTarget;
+      const center = host.scrollLeft + host.clientWidth / 2;
+      const distances = Array.from(host.children, child => Math.abs((child as HTMLElement).offsetLeft + (child as HTMLElement).clientWidth / 2 - center));
+      setIndex(distances.indexOf(Math.min(...distances)));
+    }}>
+      {rooms.map((room, position) => <Link key={room.id} className="room-hero-slide" to={roomPath(room.design)} aria-roledescription="スライド" aria-current={position === current ? 'true' : undefined}>
+        <RoomShot url={snapshot(room.design)}/>
+        <span className="room-hero-caption"><strong>{room.title}</strong><span>{roomDimensions(room.design)}</span></span>
+      </Link>)}
     </div>
-    {design && <RoomFloorPlan design={design}/>}
-  </div>;
+    {rooms.length > 1 && <>
+      <button className="room-list-arrow is-previous motion-control" type="button" aria-label="前の部屋" aria-controls="room-hero-track" onClick={() => show(current - 1)}><span aria-hidden="true">‹</span></button>
+      <button className="room-list-arrow is-next motion-control" type="button" aria-label="次の部屋" aria-controls="room-hero-track" onClick={() => show(current + 1)}><span aria-hidden="true">›</span></button>
+      <p className="room-list-position" aria-live="polite" aria-atomic="true">{current + 1} / {rooms.length}<span className="room-list-sr-only"> · {rooms[current].title}</span></p>
+    </>}
+  </section>;
+}
+
+function RoomCard({ room, index, snapshot }: { room: SavedRoom; index: number; snapshot: (design: RoomDesign) => string | null | undefined }) {
+  const design = room.design;
+  if (!design) return <article className="room-card is-pending motion-enter" style={motionStaggerStyle(index)}>
+    <div className="room-card-image"><p role="status">{room.status === 'analyzing' ? '部屋を作成しています…' : room.errorMessage || '部屋を作成できませんでした。'}</p></div>
+    <div className="room-card-body"><h3>{room.title}</h3></div>
+  </article>;
+  const purchases = purchaseSummary(design);
+  return <Link className="room-card motion-enter" style={motionStaggerStyle(index)} to={roomPath(design)}>
+    <div className="room-card-image"><RoomShot url={snapshot(design)}/><span className="room-card-open" aria-hidden="true">この部屋を開く ↗</span></div>
+    <div className="room-card-body"><h3>{room.title}</h3><p>{roomDimensions(design)}</p>{purchases && <p>{purchases}</p>}</div>
+  </Link>;
 }
 
 export default function RoomListPage() {
   const rooms = useSavedRooms();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const foundIndex = rooms.data.findIndex(room => room.id === selectedId);
-  const index = foundIndex < 0 ? 0 : foundIndex;
-  const selected = rooms.data[index];
-  function move(direction: number) {
-    const next = rooms.data[(index + direction + rooms.data.length) % rooms.data.length];
-    if (next) setSelectedId(next.id);
-  }
+  const scope = useRoomPlanScope();
+  const ready = rooms.data.filter((room): room is ReadyRoom => Boolean(room.design));
+  const { snapshot, studio } = useRoomSnapshots(ready.map(room => room.design), scope);
   return <div className="room-list-page">
     <header className="room-list-header">
       <Link to="/rooms" className="room-list-brand"><ReferenceSvg page={2} index={0}/><span>へやいろ</span></Link>
@@ -65,24 +111,16 @@ export default function RoomListPage() {
     </header>
     <main className="room-list-main">
       <div className="room-list-heading"><h1>マイルーム</h1><Link to="/rooms/new" className="room-list-new motion-control"><span aria-hidden="true">＋</span> 新しいルームを作る</Link></div>
-      {selected && <section className="room-list-carousel" aria-label="保存した部屋" aria-roledescription="カルーセル" tabIndex={0} onKeyDown={event => {
-        if (event.target !== event.currentTarget) return;
-        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); move(event.key === 'ArrowLeft' ? -1 : 1); }
-      }}>
-        <div className="room-list-stage">
-          <button className="room-list-arrow is-previous motion-control" type="button" aria-label="前の部屋" aria-controls="selected-room" disabled={rooms.data.length < 2} onClick={() => move(-1)}><span aria-hidden="true">‹</span></button>
-          <div className="room-list-scene" key={selected.id}>
-            {selected.design ? <RoomPreview design={selected.design}/> : <p className="room-list-pending" role="status">{selected.status === 'analyzing' ? '部屋を作成しています…' : '部屋を作成できませんでした。'}</p>}
-          </div>
-          <button className="room-list-arrow is-next motion-control" type="button" aria-label="次の部屋" aria-controls="selected-room" disabled={rooms.data.length < 2} onClick={() => move(1)}><span aria-hidden="true">›</span></button>
-          <p className="room-list-position" aria-live="polite" aria-atomic="true">{index + 1} / {rooms.data.length}<span className="room-list-sr-only"> · {selected.title}</span></p>
-        </div>
-        <div id="selected-room" role="group" aria-roledescription="スライド" aria-labelledby="selected-room-title"><RoomDetails key={selected.id} room={selected}/></div>
+      {ready.length > 0 && <RoomHero rooms={ready} snapshot={snapshot}/>}
+      {rooms.data.length > 0 && <section className="room-card-section" aria-labelledby="room-card-heading">
+        <h2 id="room-card-heading">すべての部屋</h2>
+        <div className="room-card-grid">{rooms.data.map((room, index) => <RoomCard key={room.id} room={room} index={index} snapshot={snapshot}/>)}</div>
       </section>}
-      {!selected && !rooms.isLoading && !rooms.error && <div className="room-list-empty"><p>保存した部屋はまだありません。</p><Link className="motion-control" to="/rooms/new">最初の部屋を作る</Link></div>}
+      {rooms.data.length === 0 && !rooms.isLoading && !rooms.error && <div className="room-list-empty"><p>保存した部屋はまだありません。</p><Link className="motion-control" to="/rooms/new">最初の部屋を作る</Link></div>}
       {rooms.isLoading && <p className="room-list-feedback" role="status">読み込み中…</p>}
       {rooms.persistenceWarning && <p className="room-list-feedback motion-fade" role="alert">{rooms.persistenceWarning}</p>}
       {rooms.error && <div className="room-list-feedback"><ErrorText error={rooms.error}/><button className="rc-secondary" type="button" onClick={()=>void rooms.refetch()}>再試行</button></div>}
     </main>
+    {studio}
   </div>;
 }

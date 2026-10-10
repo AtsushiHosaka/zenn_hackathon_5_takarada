@@ -28,7 +28,7 @@ namespace :coordinations do
     c = Coordination.find(args.fetch(:id))
     meta = c.analysis.to_h["meta"].to_h
     puts "コーデ ##{c.id} (部屋 ##{c.room_id})  #{c.status}  選び方: #{c.planned_by || '-'}  #{meta['model']} #{meta['elapsed_s']}秒"
-    puts "要望: #{c.prompt}  予算: #{c.budget.to_fs(:delimited)}円  活かす家具: #{c.kept_object_ids.presence&.join(', ') || '全部'}"
+    puts "要望: #{c.prompt}  予算: #{c.budget ? "#{c.budget.to_fs(:delimited)}円" : 'なし'}  活かす家具: #{c.kept_object_ids.presence&.join(', ') || '全部'}"
     puts "タイトル: #{c.title}\nコメント: #{c.comment}\n\n"
 
     placed = c.analysis.to_h["placed_item_ids"].to_a

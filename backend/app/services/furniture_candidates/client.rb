@@ -23,6 +23,7 @@ module FurnitureCandidates
     def search(slots:, max_price:, theme: nil, categories: nil, **)
       slots = Array(slots).map(&:to_s)
       categories = Array(categories).map(&:to_s)
+      max_price ||= Float::INFINITY
       scope = FurnitureDetail.joins(:furniture).merge(Furniture.available).includes(detail_textures: :furniture_texture)
         .where(slot: slots).where(price: ..max_price).order(:position, :id)
       scope = scope.where("furniture_details.themes @> ?", [ theme ].to_json) if theme

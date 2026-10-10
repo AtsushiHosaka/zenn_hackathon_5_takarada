@@ -30,3 +30,6 @@ The final normal-merge source also passes explicit halo-volume exclusion, transp
 ## Combined ownership correction
 
 Independent review of `756917b` found that an explicitly owned mesh containing a child mesh with a different owner included that child in its collision and outline traversal. Correction `1a61649` preserves exact world matrices while regrouping owned meshes; 15 temporary probes reproduce the original defect and verify actual installed OutlinePass membership, disjoint collisions, mirrored/nonuniform/nested transforms, hidden geometry and partial coverage. No repository tests were added. Final combined WebGL verification is recorded with the release evidence.
+
+
+2026-10-10: この仕様の画面まわりは `specs/screen-refactor/spec.md` で置き換えた。

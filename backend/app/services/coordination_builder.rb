@@ -57,7 +57,7 @@ class CoordinationBuilder
       chosen = placed.to_h { |entry| [ entry[:slot], entry[:item] ] }
     end
     placed = floor_placed + placed
-    raise ArgumentError, "商品合計が予算を超えています" if placed.sum { |entry| entry[:item].price } > @coordination.budget
+    raise ArgumentError, "商品合計が予算を超えています" if placed.sum { |entry| entry[:item].price } > @coordination.budget_limit
 
     placed.each.with_index(1) do |entry, marker|
       entry[:placement].object["marker"] = marker
@@ -113,7 +113,7 @@ class CoordinationBuilder
   def place_floor_choices(chosen, by_group, kept, coherent: false, reserved_budget: 0, removed_object_ids: [])
     active = @coordination.furniture_operations.empty? ? kept.dup : @scene.fetch("objects").reject { |object| removed_object_ids.include?(object["id"]) }
     placed = []
-    remaining = @coordination.budget - reserved_budget
+    remaining = @coordination.budget_limit - reserved_budget
     entries = chosen.to_a
     entries.each_with_index do |(group, item), index|
       original_id = item.metadata["replaces_object_id"]
@@ -158,7 +158,7 @@ class CoordinationBuilder
       edit.merge("slot" => item.slot) if item
     end
     layout = SlotLayout.new(@scene, kept, edited_objects: edits, reserved_object_ids: chosen.values.map { |item| SlotLayout.object_id_for(item) })
-    remaining = @coordination.budget - reserved_budget
+    remaining = @coordination.budget_limit - reserved_budget
     entries = chosen.to_a
     entries.each_with_index.filter_map do |(slot, item), index|
       # Geminiが承認した同グループだけで代替し、後続商品の予算を予約する。
@@ -184,7 +184,7 @@ class CoordinationBuilder
 
     selections = selections.select { |selection| selection.is_a?(Hash) }
       .sort_by { |selection| Array(by_group[selection["group_id"]]).first&.slot == "floor" ? 0 : 1 }
-    remaining = @coordination.budget
+    remaining = @coordination.budget_limit
     @budget_adjusted_groups = []
     selections.each_with_object({}) do |selection, chosen|
       group = selection["group_id"]
@@ -207,7 +207,7 @@ class CoordinationBuilder
   # まず優先度の高い枠から各枠の最安値を入れてできるだけ多くの枠を埋め、
   # 余った予算で優先度の高い枠から順に、よりおすすめの商品へ格上げする
   def choose_within_budget(by_slot)
-    budget = @coordination.budget
+    budget = @coordination.budget_limit
     chosen = {}
     total = 0
     by_slot.each do |slot, items|

@@ -23,3 +23,6 @@ Validation of the original 60-palette implementation completed locally on 2026-1
 - A temporary SSR bundle of the dummy repository confirmed all 60 colors, restored selection after repository recreation, Warm Ivory default, and rejection of an invalid id. Catalogue copies exactly match the 60 source rows.
 
 Root browser verification confirmed all 60 accessible swatches, Warm Ivory initially checked, Teal Studio selection, generated wall/floor colors, and restoration after reload. A 390px viewport had no horizontal overflow. Screenshot is in docs/pr-evidence/issue-74/sixty-palettes.png. Live Gemini/EC and deployed environments remain unverified. No new test files are added. The optional API field is implemented; existing iOS clients may omit it and retain previous behavior. No iOS UI change is included.
+
+
+2026-10-10: この仕様の画面まわりは `specs/screen-refactor/spec.md` で置き換えた。

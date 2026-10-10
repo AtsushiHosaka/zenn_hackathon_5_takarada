@@ -7,3 +7,6 @@ Show current-room versus new-room radio choices for post-analysis coordination a
 Send only the follow-up text: backend already receives preceding prompt and products through base_coordination_id. Repeated concatenation could otherwise exceed the 500-character API limit. Current-room updates produce a new coordination on the same backend room; prior coordination history remains available. New-room uses the entered request, dimensions, and budget without silently inheriting current furniture edits or reuploading photos.
 
 Verify with a controlled local API fixture: current followup GETs the same room, sends preceding coordination id and edits; new followup POSTs a new room without preceding coordination/edit references; saved old record remains unchanged. Frontend lint/build. Live provider interpretation and production are unverified. Offline mode does not offer prompt interpretation, consistent with its capabilities.
+
+
+2026-10-10: この仕様の画面まわりは `specs/screen-refactor/spec.md` で置き換えた。

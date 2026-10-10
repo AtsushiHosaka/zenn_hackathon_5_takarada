@@ -1,13 +1,11 @@
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router';
-import { useRepositories } from '../../core/repositories';
-import type { RoomDesign } from '../../domain/room';
+import { useQueryClient } from '@tanstack/react-query';
+import { Link } from 'react-router';
 import AccountMenu from './AccountMenu';
 import RoomPreview from './RoomPreview';
 import ErrorText from '../shared/ErrorText';
-import { saveRoomPlan, useRoomPlanScope } from './plans';
-import { deleteRoomTemplate, useRoomTemplates } from './templates';
+import { useRoomPlanScope } from './plans';
+import { deleteRoomTemplate, useCreateRoomFromTemplate, useRoomTemplates } from './templates';
 import { motionStaggerStyle } from '../../core/motion';
 import './room-templates.css';
 export default function RoomTemplatePage() {
@@ -15,28 +13,14 @@ export default function RoomTemplatePage() {
   const scope = useRoomPlanScope();
   const [previewId,setPreviewId] = useState<string>();
   const activePreview = templates.data.some(template=>template.id===previewId) ? previewId : templates.data[0]?.id;
-  const {rooms,tokenStore} = useRepositories();
   const client = useQueryClient();
-  const navigate = useNavigate();
-  const create = useMutation({
-    mutationFn: async (design: RoomDesign) => {
-      const token = tokenStore.load();
-      const room = await rooms.createFromTemplate(design);
-      if (tokenStore.load() !== token) throw new Error('ログイン状態が変わりました。もう一度お試しください。');
-      return room;
-    },
-    onSuccess: room => {
-      let notice: string | undefined;
-      try {saveRoomPlan(client,room,scope);} catch {notice='このタブでは部屋を使えますが、編集内容をブラウザに保存できませんでした。';}
-      navigate(`/rooms/${room.id}`, {state: {editing:true,notice}});
-    },
-  });
+  const create = useCreateRoomFromTemplate();
   return <div className="room-template-page"><header><Link to="/rooms">← マイルーム</Link><AccountMenu/></header><main className="motion-enter">
     <h1>部屋のテンプレート</h1><p>部屋の配置と色を保存し、何度でも別の部屋を作れます。テンプレートはこのブラウザに利用者別で保存します。</p>
     {templates.isPending && <p role="status">読み込み中…</p>}
     <ErrorText error={templates.error}/><ErrorText error={create.error}/>
     {templates.warning && <p className="rc-error" role="alert">{templates.warning}</p>}
-    {!templates.isPending && !templates.error && templates.data.length===0 && <div className="room-template-empty"><p>部屋を開き、「テンプレートに保存」から追加してください。</p><Link className="rc-primary" to="/rooms">部屋を選ぶ</Link></div>}
+    {!templates.isPending && !templates.error && templates.data.length===0 && <div className="room-template-empty"><p>部屋の3Dモデルができた画面の「この部屋をテンプレートに保存」から追加してください。</p><Link className="rc-primary" to="/rooms">部屋を選ぶ</Link></div>}
     <div className="room-template-grid">{templates.data.map((template,index) => <article key={template.id} className="motion-enter" style={motionStaggerStyle(index)}>
       <div className="room-template-preview">{activePreview===template.id ? <RoomPreview design={template.design}/> : <button type="button" className="room-template-show-preview motion-control" onClick={()=>setPreviewId(template.id)} aria-label={`${template.design.title}の3D表示`}>この部屋を3Dで見る</button>}</div><h2>{template.design.title}</h2>
       <p>{template.design.analysisInput?.tatami.toLocaleString('ja-JP',{maximumFractionDigits:1})}畳 · {template.design.items.length}点の家具</p>

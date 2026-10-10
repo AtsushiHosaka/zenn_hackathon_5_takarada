@@ -29,3 +29,6 @@ Temporary authenticated Rails POST → mock job → GET checks covered all eight
 Browser verification generated/reloaded all eight themes with Teal Studio, checked identity/title/palette persistence and a 390px chooser without horizontal overflow. The Miku Before view hid its music motif and After restored it. Screenshots in docs/pr-evidence/issue-73 show the chooser, Miku room and Kuromi room from the final source. The existing browser/server was reused with an isolated context.
 
 These checks use deterministic dummy rendering and mock API providers. Live Gemini, live EC search, production and native iOS remain unverified. No deployment was performed.
+
+
+2026-10-10: この仕様の画面まわりは `specs/screen-refactor/spec.md` で置き換えた。

@@ -3,6 +3,8 @@ import type { RoomDesign } from './room';
 
 export type CharacterTheme = { id: string; name: string; title: string; instructions: string; motif: string; base: string; secondary: string; accent: string };
 export const characterThemes: readonly CharacterTheme[] = catalogue;
+// 新しく選べるのは初音ミクだけ。ほかのテーマは保存済みの部屋を表示するために残す。
+export const selectableCharacterThemes: readonly CharacterTheme[] = characterThemes.filter(theme => theme.id === "hatsune-miku");
 export function characterTheme(value: unknown): CharacterTheme | undefined {
   return typeof value === 'string' ? characterThemes.find(theme => theme.id === value) : undefined;
 }
