@@ -192,12 +192,10 @@ Cloud Run がゼロまで縮んでいるためのコールドスタート。常�
 
 `make infra-release` とGitHub Actionsは、スキーマ適用に続けて `furniture:import` と `furniture_detail:import` を実行し、家具（3Dモデルの台帳）と家具ごとの色・寸法・購入リンクをDBへ取り込んでからCloud Runを更新します。APIは既存の `MODELS_BUCKET` から公開URLを作るため、本番への新しい秘密情報の登録は不要です。GLBのアップロードはリリース前に行います。詳しくは[家具モデルの運用](../../docs/furniture-models.md)を参照してください。
 
-## 登録された家具と生成テクスチャ
+## 登録された家具と模様
 
 コーデ生成と家具検索は、DBに登録した家具（`furnitures`・`furniture_details`）だけを使い、外部のECは検索しない。登録内容は`backend/db/furnitures.json`と`backend/db/furniture_details.json`が正で、リリース時に取り込む。Gemini認証とownerの利用許可があれば商品選定をGeminiで行い、未設定時はモックのプランナーで動く。
 
-画像生成は`GEMINI_IMAGE_MODEL=gemini-3.1-flash-image`、`GEMINI_IMAGE_LOCATION=global`が既定で、`FURNITURE_TEXTURES_ENABLED=false`で停止できる。商品写真は入力せず、公式の色・素材の説明から近似テクスチャを生成する。1コーデにつき生成試行は最大3回、画像生成全体の期限は90秒。
+模様（質感の画像）は静的に用意し、`MODELS_BUCKET`の`textures/v1/<texture_key>.png`に置く。一覧は`backend/db/furniture_textures.json`が正で、detailの部位ごとの模様は`furniture_details.json`の`texture_materials`に書く。表示では模様に部位の色を掛ける（`tinted: false`の柄物は掛けない）。APIは画像を生成・保存しない。
 
-生成結果は既存`MODELS_BUCKET`の`textures/description-seamless-v1/`へ保存する。`storage.tf`はAPIサービスアカウントに、この接頭辞だけの`roles/storage.objectCreator`を追加する。既存GLBへの書き込み権限は付けない。このIAM変更の本番適用は通常のインフラ反映で行う。旧`ec_products`・`furniture_models`・`furniture_model_bindings`は2026-10-10にJSONへ移行して削除した。`db:apply`はSchemafileにないテーブルを削除する（`--drop-table`）。
-
-ローカルでは画像を`backend/tmp/storage`へ保存し、開発限定の`GET /api/v1/assets/{key}`から配信する。`DEV_API_ORIGIN`にはブラウザから到達できるAPIのURLを設定する。本番ではこの配信APIは404となり、GCSの公開URLを使う。
+リリース時のタスクは`furniture_texture:clear_legacy`→`db:apply`→`furniture:import`→`furniture_texture:import`→`furniture_detail:import`の順。`db:apply`はSchemafileにないテーブルを削除する（`--drop-table`）。

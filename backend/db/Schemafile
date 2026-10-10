@@ -64,20 +64,6 @@ create_table "coordinations", force: :cascade do |t|
   t.datetime "updated_at", null: false
 end
 
-# Description-derived images are immutable and shared by their complete generation key.
-create_table "furniture_textures", force: :cascade do |t|
-  t.string "generation_key", null: false
-  t.string "bucket", null: false
-  t.string "object_key", null: false
-  t.string "generator_model", null: false
-  t.string "material_name", null: false
-  t.text "source_description", null: false
-  t.decimal "tile_size_m", precision: 6, scale: 3, null: false
-  t.datetime "created_at", null: false
-  t.datetime "updated_at", null: false
-  t.index [ "generation_key" ], unique: true
-end
-
 # 家具。1 件 = 3D モデル (GLB) 1 つ。GLB 本体は GCS。db/furnitures.json から rails furniture:import で入れる
 create_table "furnitures", force: :cascade do |t|
   t.string "model_key", null: false # モデルの安定 ID。GLB のファイル名 (例: sofa_2seat__w130)。API の id。GLB のパスもここから決まる
@@ -146,4 +132,28 @@ create_table "furniture_details", force: :cascade do |t|
   t.index [ "slot", "position" ]
   t.check_constraint "price > 0", name: "furniture_details_positive_price"
   t.check_constraint "width > 0::numeric AND height > 0::numeric AND depth > 0::numeric", name: "furniture_details_positive_dimensions"
+end
+
+# 模様 (質感の画像)。静的に用意し、db/furniture_textures.json から rails furniture_texture:import で入れる
+create_table "furniture_textures", force: :cascade do |t|
+  t.string "texture_key", null: false # 安定 ID (例: linen)。画像は textures/v1/<texture_key>.png
+  t.string "name", null: false # 表示名 (例: リネン)
+  t.decimal "tile_size_m", precision: 6, scale: 3, null: false # 画像 1 枚が何 m 四方か
+  t.boolean "tinted", null: false, default: true # true: 部位の色を掛ける (色の無い質感画像) / false: 柄物なので画像の色のまま
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+
+  t.index [ "texture_key" ], unique: true
+  t.check_constraint "tile_size_m > 0::numeric", name: "furniture_textures_positive_tile_size"
+end
+
+# detail の部位に貼る模様 (detail 1 : 0〜n)
+create_table "furniture_detail_textures", force: :cascade do |t|
+  t.references "furniture_detail", null: false, foreign_key: true
+  t.references "furniture_texture", null: false, foreign_key: true
+  t.string "material_key", null: false # 貼る部位 (家具の color_material_keys のどれか)
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+
+  t.index [ "furniture_detail_id", "material_key" ], unique: true
 end

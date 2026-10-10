@@ -1,5 +1,6 @@
 class FurnitureDetail < ApplicationRecord
   belongs_to :furniture, inverse_of: :details
+  has_many :detail_textures, class_name: "FurnitureDetailTexture", dependent: :delete_all, inverse_of: :furniture_detail
 
   validates :key, presence: true, uniqueness: true
   validates :name, :category, :shop, :url, presence: true

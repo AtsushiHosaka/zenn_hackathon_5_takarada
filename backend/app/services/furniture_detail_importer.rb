@@ -1,7 +1,8 @@
 require "json"
 
 # db/furniture_details.json (家具の色・寸法・購入リンク) を furniture_details に取り込む。
-# JSON を正とし、載っていない detail は消す。家具は先に FurnitureImporter で入れておく。
+# JSON を正とし、載っていない detail は消す。家具と模様は先に FurnitureImporter / FurnitureTextureImporter で入れておく。
+# texture_materials は部位ごとの模様 ({"tint": "linen"})。
 class FurnitureDetailImporter
   class InvalidDetails < StandardError; end
 
@@ -20,6 +21,7 @@ class FurnitureDetailImporter
     raise InvalidDetails, "details must be an array" unless rows.is_a?(Array)
 
     furnitures = Furniture.where(model_key: rows.map { |row| row["model_key"] }).index_by(&:model_key)
+    textures = FurnitureTexture.all.index_by(&:texture_key)
     FurnitureDetail.transaction do
       keys = rows.each_with_index.map do |row, index|
         furniture = furnitures[row["model_key"]] or raise InvalidDetails, "details[#{index}].model_key #{row["model_key"].inspect} is not imported"
@@ -30,11 +32,18 @@ class FurnitureDetailImporter
           **row.slice("name", "category", "slot", "symbolic_color", "color_materials", "color_name", "price", "shop", "url", "image_url", "themes", "metadata", "checked_at").symbolize_keys,
           width: size["w"], height: size["h"], depth: size["d"]
         )
+        detail.detail_textures.delete_all
+        row.fetch("texture_materials", {}).each do |material_key, texture_key|
+          texture = textures[texture_key] or raise InvalidDetails, "details[#{index}].texture_materials #{texture_key.inspect} is not imported"
+          detail.detail_textures.create!(furniture_texture: texture, material_key:)
+        end
         detail.key
       rescue ActiveRecord::RecordInvalid => error
         raise InvalidDetails, "details[#{index}] (#{row['key']}): #{error.record.errors.full_messages.join(', ')}"
       end
-      FurnitureDetail.where.not(key: keys).delete_all
+      removed = FurnitureDetail.where.not(key: keys)
+      FurnitureDetailTexture.where(furniture_detail: removed).delete_all
+      removed.delete_all
       { details: keys.size, furnitures: rows.map { |row| row["model_key"] }.uniq.size }
     end
   end

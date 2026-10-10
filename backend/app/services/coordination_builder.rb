@@ -67,7 +67,7 @@ class CoordinationBuilder
     end
     scene = { "room" => @scene["room"], "objects" => active + placed.map { |entry| entry[:placement].object } }
     items = placed.map.with_index(1) { |entry, marker| item_json(entry[:item], entry[:placement].note, marker) }
-    appearance = FurnitureProductAppearance.call(scene:, items:, user_id: @coordination.room.user_id)
+    appearance = FurnitureProductAppearance.call(scene:, items:)
     product_source = InteriorLinks.provider
     failures = operation_failures(floor_placed)
     failures << "商品価格の合計を予算内に収めるため、提案の一部を調整しました。" if @budget_adjusted_groups&.any?

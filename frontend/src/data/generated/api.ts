@@ -4,53 +4,6 @@
  */
 
 export interface paths {
-    "/api/v1/assets/{key}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description textures/description-seamless-v1/<64桁のハッシュ>.png等 */
-                key: string;
-            };
-            cookie?: never;
-        };
-        /**
-         * 開発環境の生成テクスチャを取得する
-         * @description 開発・テスト限定。本番は404となり、SceneObjectのGCS公開texture_urlを使用する。
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description textures/description-seamless-v1/<64桁のハッシュ>.png等 */
-                    key: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description 生成画像 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "image/png": string;
-                        "image/jpeg": string;
-                        "image/webp": string;
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/signup": {
         parameters: {
             query?: never;

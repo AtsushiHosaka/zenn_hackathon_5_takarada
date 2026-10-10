@@ -5,36 +5,6 @@ info:
   version: v1
   description: Rails API
 paths:
-  "/api/v1/assets/{key}":
-    parameters:
-    - name: key
-      in: path
-      required: true
-      description: textures/description-seamless-v1/<64桁のハッシュ>.png等
-      schema:
-        type: string
-    get:
-      summary: 開発環境の生成テクスチャを取得する
-      tags:
-      - Assets
-      description: 開発・テスト限定。本番は404となり、SceneObjectのGCS公開texture_urlを使用する。
-      security: []
-      responses:
-        '200':
-          description: 生成画像
-          content:
-            image/png:
-              schema:
-                type: string
-                format: binary
-            image/jpeg:
-              schema:
-                type: string
-                format: binary
-            image/webp:
-              schema:
-                type: string
-                format: binary
   "/api/v1/signup":
     post:
       summary: サインアップしてトークンを受け取る
