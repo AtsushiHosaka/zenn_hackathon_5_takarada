@@ -56,7 +56,7 @@ paths:
       summary: 商品を編集する
       tags:
       - Admin
-      description: 保存した商品には admin_edited_at が入り、以後 furniture_detail:import は上書きしない。
+      description: 商品は DB が正。編集はそのまま提案・検索に使われ、デプロイ時の furniture_detail:import では戻らない。
       security:
       - bearerAuth: []
       parameters: []
@@ -78,12 +78,28 @@ paths:
           application/json:
             schema:
               "$ref": "#/components/schemas/AdminFurnitureDetailInput"
+    delete:
+      summary: 商品を削除する
+      tags:
+      - Admin
+      description: 保存済みの部屋・提案は商品の写しを持っているので変わらない。一時的に外すだけなら enabled を false にする。
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: 削除に成功
+        '404':
+          description: 商品が無い
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFound"
   "/api/v1/admin/furniture_details/export":
     get:
       summary: 商品を db/furniture_details.json の形で書き出す
       tags:
       - Admin
-      description: 管理画面での編集をリポジトリの JSON に戻すときに使う。非表示の商品は含まない。
+      description: 控えを取るときと、初期データ (db/furniture_details.json) を今の DB に合わせるときに使う。非表示の商品は含まない。
       security:
       - bearerAuth: []
       responses:
@@ -732,7 +748,7 @@ components:
           example: 1
         key:
           type: string
-          description: 安定 ID。db/furniture_details.json の key
+          description: 安定 ID。初期データ (db/furniture_details.json) の key。管理画面で足した商品は admin:<uuid>
           example: static:101
         name:
           type: string
@@ -813,11 +829,6 @@ components:
           type: boolean
           description: false なら提案・検索に出さない
           example: true
-        admin_edited_at:
-          type: string
-          format: date-time
-          nullable: true
-          description: 管理画面で作成・編集した時刻。入っていれば furniture_detail:import は上書きしない
         checked_at:
           type: string
           format: date-time
@@ -841,7 +852,6 @@ components:
       - themes
       - position
       - enabled
-      - admin_edited_at
       - checked_at
     AdminFurnitureDetailList:
       type: object

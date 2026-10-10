@@ -58,8 +58,8 @@ RSpec.describe "Api::V1::Admin::FurnitureDetails", type: :request do
         end
 
         run_test! do
-          # 管理画面で足した商品は、JSON に無くても取り込みで消えない
-          FurnitureDetailImporter.call
+          # 商品は DB が正。JSON に無い商品も、デプロイ時の取り込みでは消えない
+          expect(FurnitureDetailImporter.call).to include(skipped: true)
           expect(FurnitureDetail.where(name: "管理画面で足した商品")).to exist
         end
       end
@@ -71,7 +71,7 @@ RSpec.describe "Api::V1::Admin::FurnitureDetails", type: :request do
 
     patch "商品を編集する" do
       tags "Admin"
-      description "保存した商品には admin_edited_at が入り、以後 furniture_detail:import は上書きしない。"
+      description "商品は DB が正。編集はそのまま提案・検索に使われ、デプロイ時の furniture_detail:import では戻らない。"
       security [ { bearerAuth: [] } ]
       consumes "application/json"
       produces "application/json"
@@ -83,7 +83,7 @@ RSpec.describe "Api::V1::Admin::FurnitureDetails", type: :request do
         let(:params) { { furniture_detail: { price: 4321, enabled: false } } }
 
         run_test! do
-          FurnitureDetailImporter.call
+          expect(FurnitureDetailImporter.call).to include(skipped: true)
           expect(FurnitureDetail.find(id)).to have_attributes(price: 4321, enabled: false)
         end
       end
@@ -95,12 +95,36 @@ RSpec.describe "Api::V1::Admin::FurnitureDetails", type: :request do
         run_test!
       end
     end
+
+    delete "商品を削除する" do
+      tags "Admin"
+      description "保存済みの部屋・提案は商品の写しを持っているので変わらない。一時的に外すだけなら enabled を false にする。"
+      security [ { bearerAuth: [] } ]
+      produces "application/json"
+      let(:id) { FurnitureDetail.order(:id).first.id }
+
+      response "204", "削除に成功" do
+        run_test! do
+          expect(FurnitureDetail.where(id:)).not_to exist
+          # 消した商品は、デプロイ時の取り込みで復活しない
+          FurnitureDetailImporter.call
+          expect(FurnitureDetail.where(id:)).not_to exist
+        end
+      end
+
+      response "404", "商品が無い" do
+        schema "$ref" => "#/components/schemas/NotFound"
+        let(:id) { 0 }
+
+        run_test!
+      end
+    end
   end
 
   path "/api/v1/admin/furniture_details/export" do
     get "商品を db/furniture_details.json の形で書き出す" do
       tags "Admin"
-      description "管理画面での編集をリポジトリの JSON に戻すときに使う。非表示の商品は含まない。"
+      description "控えを取るときと、初期データ (db/furniture_details.json) を今の DB に合わせるときに使う。非表示の商品は含まない。"
       security [ { bearerAuth: [] } ]
       produces "application/json"
 
@@ -108,7 +132,7 @@ RSpec.describe "Api::V1::Admin::FurnitureDetails", type: :request do
         schema "$ref" => "#/components/schemas/AdminFurnitureDetailExport"
 
         run_test! do |response|
-          # 書き出した JSON をそのまま取り込める
+          # 書き出した JSON をそのまま初期データとして取り込める
           expect(FurnitureDetailImporter.new(JSON.parse(response.body)).call).to include(details: FurnitureDetail.count)
         end
       end

@@ -114,7 +114,7 @@ RSpec.configure do |config|
             description: "管理画面用の商品 (家具の色・寸法・購入リンク)。非表示のものも含む",
             properties: {
               id: { type: :integer, minimum: 1, example: 1 },
-              key: { type: :string, description: "安定 ID。db/furniture_details.json の key", example: "static:101" },
+              key: { type: :string, description: "安定 ID。初期データ (db/furniture_details.json) の key。管理画面で足した商品は admin:<uuid>", example: "static:101" },
               name: { type: :string, example: "SANDSBERG サンドスベリ チェア - ホワイト" },
               category: { type: :string, example: "chair" },
               slot: { type: :string, enum: FurnitureCandidates::SLOTS, description: "置き場所の枠", example: "floor" },
@@ -131,10 +131,9 @@ RSpec.configure do |config|
               themes: { type: :array, items: { type: :string }, example: [] },
               position: { type: :integer, description: "候補の並び順 (小さいほど先)", example: 0 },
               enabled: { type: :boolean, description: "false なら提案・検索に出さない", example: true },
-              admin_edited_at: { type: :string, format: "date-time", nullable: true, description: "管理画面で作成・編集した時刻。入っていれば furniture_detail:import は上書きしない" },
               checked_at: { type: :string, format: "date-time", nullable: true }
             },
-            required: %w[id key name category slot model_key symbolic_color color_materials texture_materials color_name size price shop url image_url themes position enabled admin_edited_at checked_at]
+            required: %w[id key name category slot model_key symbolic_color color_materials texture_materials color_name size price shop url image_url themes position enabled checked_at]
           },
           AdminFurnitureDetailList: {
             type: :object,

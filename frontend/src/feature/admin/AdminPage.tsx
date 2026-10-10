@@ -5,7 +5,7 @@ import type { AdminFurnitureDetail, AdminFurnitureDetailInput, AdminFurnitureMod
 import ErrorText from "../shared/ErrorText";
 import ModelPreview from "./ModelPreview";
 import ModelThumbnail from "./ModelThumbnail";
-import { useAdminFurnitureDetails, useAdminFurnitureModels, useExportFurnitureDetails, useSaveFurnitureDetail, useSetFurnitureModelEnabled } from "./queries";
+import { useAdminFurnitureDetails, useAdminFurnitureModels, useDeleteFurnitureDetail, useExportFurnitureDetails, useSaveFurnitureDetail, useSetFurnitureModelEnabled } from "./queries";
 
 const HEX = /^#[0-9a-f]{6}$/i;
 const field = "motion-field w-full rounded border border-slate-300 bg-white px-2 py-1 text-sm";
@@ -59,7 +59,7 @@ function DetailsTab() {
 function DetailsBoard({ catalog, models }: { catalog: FurnitureAdminCatalog; models: AdminFurnitureModel[] }) {
   const [query, setQuery] = useState("");
   const [slot, setSlot] = useState("");
-  const [state, setState] = useState<"" | "hidden" | "no_image" | "edited">("");
+  const [state, setState] = useState<"" | "hidden" | "no_image">("");
   // 編集中の商品。"new" は新規作成、null は未選択
   const [selected, setSelected] = useState<number | "new" | null>(null);
   const panel = useRef<HTMLElement>(null);
@@ -69,7 +69,7 @@ function DetailsBoard({ catalog, models }: { catalog: FurnitureAdminCatalog; mod
   const terms = normalized(query).split(/\s+/).filter(Boolean);
   const details = catalog.details
     .filter((detail) => !slot || detail.slot === slot)
-    .filter((detail) => state === "" || (state === "hidden" ? !detail.enabled : state === "no_image" ? !detail.imageUrl : detail.adminEditedAt !== null))
+    .filter((detail) => state === "" || (state === "hidden" ? !detail.enabled : !detail.imageUrl))
     .filter((detail) => {
       const text = normalized([detail.name, detail.shop, detail.category, detail.key, detail.modelKey ?? "", detail.colorName ?? ""].join(" "));
       return terms.every((term) => text.includes(term));
@@ -94,13 +94,13 @@ function DetailsBoard({ catalog, models }: { catalog: FurnitureAdminCatalog; mod
       <div className="flex flex-wrap items-end gap-2">
         <label className="grow text-xs text-slate-600">検索<input className={field} type="search" placeholder="商品名・ショップ・種類・モデル" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
         <label className="text-xs text-slate-600">置き場所の枠<select className={field} value={slot} onChange={(event) => setSlot(event.target.value)}><option value="">すべて</option>{catalog.slots.map((value) => <option key={value}>{value}</option>)}</select></label>
-        <label className="text-xs text-slate-600">状態<select className={field} value={state} onChange={(event) => setState(event.target.value as typeof state)}><option value="">すべて</option><option value="hidden">非表示</option><option value="no_image">画像なし</option><option value="edited">管理画面で編集済み</option></select></label>
+        <label className="text-xs text-slate-600">状態<select className={field} value={state} onChange={(event) => setState(event.target.value as typeof state)}><option value="">すべて</option><option value="hidden">非表示</option><option value="no_image">画像なし</option></select></label>
         <button type="button" className={primaryButton} onClick={() => select("new")}>商品を追加</button>
       </div>
       <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600">
         <span role="status">{details.length}件 / 全{catalog.details.length}件</span>
         <button type="button" className={button} disabled={exporter.isPending} onClick={download}>{exporter.isPending ? "書き出し中…" : "JSONを書き出す"}</button>
-        <span>書き出したファイルを backend/db/furniture_details.json に置くと、編集をリポジトリへ戻せます。</span>
+        <span>商品はDBが正です。書き出しは控えと、初期データ（backend/db/furniture_details.json）の更新に使えます。</span>
       </div>
       <ErrorText error={exporter.error} />
       <div className="overflow-x-auto rounded-lg border border-[#E4E1EC] bg-white">
@@ -117,7 +117,6 @@ function DetailsBoard({ catalog, models }: { catalog: FurnitureAdminCatalog; mod
                 <div className="flex flex-wrap items-center gap-1 text-xs text-slate-500">
                   <span>{detail.shop}</span><span>・{detail.category}</span><span>・{detail.modelKey ?? "モデルなし"}</span>
                   {!detail.enabled && <Badge>非表示</Badge>}
-                  {detail.adminEditedAt && <Badge>編集済み</Badge>}
                 </div>
               </td>
               <td className="px-2 py-1.5 text-xs whitespace-nowrap">{detail.slot}<br />{detail.position}番</td>
@@ -168,6 +167,8 @@ function DetailEditor({ detail, catalog, models, onCreated, onClose }: {
   onCreated: (detail: AdminFurnitureDetail) => void; onClose: () => void;
 }) {
   const save = useSaveFurnitureDetail();
+  const remove = useDeleteFurnitureDetail();
+  const [confirming, setConfirming] = useState(false);
   const [draft, setDraft] = useState(() => draftOf(detail, catalog));
   const [validation, setValidation] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -192,7 +193,7 @@ function DetailEditor({ detail, catalog, models, onCreated, onClose }: {
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    if (save.isPending) return;
+    if (save.isPending || remove.isPending) return;
     const price = Number(draft.price), position = Number(draft.position);
     if (!model) return setValidation("3Dモデルを一覧から選んでください");
     if (!validSize) return setValidation("寸法は0より大きい数字で入力してください");
@@ -252,10 +253,19 @@ function DetailEditor({ detail, catalog, models, onCreated, onClose }: {
     {validation && <p role="alert" className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{validation}</p>}
     <ErrorText error={save.error} />
     <div className="flex items-center gap-3">
-      <button type="submit" className={primaryButton} disabled={save.isPending}>{save.isPending ? "保存中…" : "保存"}</button>
+      <button type="submit" className={primaryButton} disabled={save.isPending || remove.isPending}>{save.isPending ? "保存中…" : "保存"}</button>
       {saved && <span role="status" className="text-sm text-emerald-700">保存しました</span>}
+      {detail && !confirming && <button type="button" className="motion-control ml-auto text-sm text-red-700" onClick={() => setConfirming(true)}>削除…</button>}
     </div>
-    <p className="text-xs text-slate-500">{detail ? `ID ${detail.id}・${detail.key}` : "保存すると新しい商品として登録されます。"} 保存した商品は、デプロイ時のJSON取り込みで上書きされなくなります。</p>
+    {detail && confirming && <div role="alertdialog" aria-label="商品の削除の確認" className="space-y-2 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+      <p>この商品を削除します。元に戻せません。保存済みの部屋や提案には残ります。一時的に外すだけなら「提案・検索に出す」のチェックを外してください。</p>
+      <div className="flex gap-2">
+        <button type="button" className="motion-control rounded bg-red-700 px-3 py-1 font-semibold text-white disabled:opacity-50" disabled={remove.isPending} onClick={() => remove.mutate(detail.id, { onSuccess: onClose })}>{remove.isPending ? "削除中…" : "削除する"}</button>
+        <button type="button" className={button} disabled={remove.isPending} onClick={() => { setConfirming(false); remove.reset(); }}>やめる</button>
+      </div>
+      <ErrorText error={remove.error} />
+    </div>}
+    <p className="text-xs text-slate-500">{detail ? `ID ${detail.id}・${detail.key}` : "保存すると新しい商品として登録されます。"} 保存するとすぐに提案・検索へ反映されます。</p>
   </form>;
 }
 

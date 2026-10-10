@@ -126,7 +126,7 @@ infra-psql:    ## Cloud SQL に psql で繋ぐ (自分の IP を一時的に許�
 		--database=$$($(GTF) output -raw db_database) \
 		--project $$($(GTF) output -raw project_id)
 
-furniture-import: ## キャラクター・家具・模様・色と購入リンク (db/characters.json, furnitures.json, furniture_textures.json, furniture_details.json) をDBへ取り込む
+furniture-import: ## キャラクター・家具・模様 (db/characters.json, furnitures.json, furniture_textures.json) をDBへ取り込む。色と購入リンク (furniture_details.json) は空のときだけ入れる
 	docker compose exec api bin/rails character:import furniture:import furniture_texture:import furniture_detail:import
 
 infra-models-publish: ## 生成済み家具GLBをMODELS_BUCKETまたはTerraformのバケットへ配置

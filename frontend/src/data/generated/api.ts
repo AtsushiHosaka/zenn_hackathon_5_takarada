@@ -88,12 +88,44 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * 商品を削除する
+         * @description 保存済みの部屋・提案は商品の写しを持っているので変わらない。一時的に外すだけなら enabled を false にする。
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 削除に成功 */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 商品が無い */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFound"];
+                    };
+                };
+            };
+        };
         options?: never;
         head?: never;
         /**
          * 商品を編集する
-         * @description 保存した商品には admin_edited_at が入り、以後 furniture_detail:import は上書きしない。
+         * @description 商品は DB が正。編集はそのまま提案・検索に使われ、デプロイ時の furniture_detail:import では戻らない。
          */
         patch: {
             parameters: {
@@ -141,7 +173,7 @@ export interface paths {
         };
         /**
          * 商品を db/furniture_details.json の形で書き出す
-         * @description 管理画面での編集をリポジトリの JSON に戻すときに使う。非表示の商品は含まない。
+         * @description 控えを取るときと、初期データ (db/furniture_details.json) を今の DB に合わせるときに使う。非表示の商品は含まない。
          */
         get: {
             parameters: {
@@ -1185,7 +1217,7 @@ export interface components {
             /** @example 1 */
             id: number;
             /**
-             * @description 安定 ID。db/furniture_details.json の key
+             * @description 安定 ID。初期データ (db/furniture_details.json) の key。管理画面で足した商品は admin:<uuid>
              * @example static:101
              */
             key: string;
@@ -1257,11 +1289,6 @@ export interface components {
              * @example true
              */
             enabled: boolean;
-            /**
-             * Format: date-time
-             * @description 管理画面で作成・編集した時刻。入っていれば furniture_detail:import は上書きしない
-             */
-            admin_edited_at: string | null;
             /** Format: date-time */
             checked_at: string | null;
         };

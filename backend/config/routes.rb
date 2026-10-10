@@ -36,7 +36,7 @@ Rails.application.routes.draw do
       # 家具・商品の管理画面用。ADMIN_EMAILS の人だけ (Admin::BaseController)
       namespace :admin do
         get "furniture_details/export", to: "furniture_details#export"
-        resources :furniture_details, only: %i[index create update]
+        resources :furniture_details, only: %i[index create update destroy]
         resources :furniture_models, only: %i[index update]
       end
     end

@@ -3,7 +3,7 @@ export type FurnitureSize = { w: number; h: number; d: number };
 
 export type AdminFurnitureDetail = {
   id: number;
-  // db/furniture_details.json の key
+  // 安定 ID。初期データ (db/furniture_details.json) の key、管理画面で足した商品は admin:<uuid>
   key: string;
   name: string;
   category: string;
@@ -25,8 +25,6 @@ export type AdminFurnitureDetail = {
   position: number;
   // false なら提案・検索に出さない
   enabled: boolean;
-  // 管理画面で編集した時刻。入っていればデプロイ時の取り込みで上書きされない
-  adminEditedAt: Date | null;
   checkedAt: Date | null;
 };
 

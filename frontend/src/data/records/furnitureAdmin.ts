@@ -26,7 +26,6 @@ export function toAdminFurnitureDetail(record: AdminFurnitureDetailRecord): Admi
     themes: record.themes,
     position: record.position,
     enabled: record.enabled,
-    adminEditedAt: record.admin_edited_at ? new Date(record.admin_edited_at) : null,
     checkedAt: record.checked_at ? new Date(record.checked_at) : null,
   };
 }

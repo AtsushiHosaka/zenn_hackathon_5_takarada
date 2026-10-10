@@ -21,6 +21,10 @@ export function createApiFurnitureAdminRepository(api: ApiClient): FurnitureAdmi
       return toAdminFurnitureDetail(await api.send<AdminFurnitureDetailRecord>(`/api/v1/admin/furniture_details/${id}`, { method: "PATCH", body }));
     },
 
+    async removeDetail(id) {
+      await api.send<void>(`/api/v1/admin/furniture_details/${id}`, { method: "DELETE" });
+    },
+
     async exportDetails() {
       return api.send<unknown>("/api/v1/admin/furniture_details/export");
     },

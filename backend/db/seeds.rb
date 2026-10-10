@@ -19,5 +19,6 @@ puts "seeded #{furnitures.fetch(:models)} furnitures"
 textures = FurnitureTextureImporter.call
 puts "seeded #{textures.fetch(:textures)} furniture textures"
 
+# 商品は DB が正。空のときだけ初期データを入れる
 details = FurnitureDetailImporter.call
-puts "seeded #{details.fetch(:details)} furniture details for #{details.fetch(:furnitures)} furnitures"
+puts details.fetch(:skipped) ? "kept #{FurnitureDetail.count} furniture details" : "seeded #{details.fetch(:details)} furniture details for #{details.fetch(:furnitures)} furnitures"

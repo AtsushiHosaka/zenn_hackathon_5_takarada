@@ -11,8 +11,8 @@ const initialModels: AdminFurnitureModel[] = [
 ];
 
 const initialDetails: AdminFurnitureDetail[] = [
-  { id: 1, key: "dummy:1", name: "ダミーのチェア ホワイト", category: "chair", slot: "floor", modelKey: "chair_dining", symbolicColor: "#f2efe8", colorMaterials: { tint: "#f2efe8" }, colorName: "ホワイト", size: { w: 0.45, h: 0.8, d: 0.5 }, price: 4990, shop: "ダミーショップ", url: "https://example.com/chair", imageUrl: null, themes: [], position: 0, enabled: true, adminEditedAt: null, checkedAt: null },
-  { id: 2, key: "dummy:2", name: "ダミーのラグ ラベンダー", category: "rug", slot: "rug", modelKey: "rug_round", symbolicColor: "#b9a3e3", colorMaterials: { tint: "#b9a3e3" }, colorName: null, size: { w: 1.4, h: 0.02, d: 1.4 }, price: 7990, shop: "ダミーショップ", url: "https://example.com/rug", imageUrl: null, themes: ["oshi_purple"], position: 1, enabled: true, adminEditedAt: null, checkedAt: null },
+  { id: 1, key: "dummy:1", name: "ダミーのチェア ホワイト", category: "chair", slot: "floor", modelKey: "chair_dining", symbolicColor: "#f2efe8", colorMaterials: { tint: "#f2efe8" }, colorName: "ホワイト", size: { w: 0.45, h: 0.8, d: 0.5 }, price: 4990, shop: "ダミーショップ", url: "https://example.com/chair", imageUrl: null, themes: [], position: 0, enabled: true, checkedAt: null },
+  { id: 2, key: "dummy:2", name: "ダミーのラグ ラベンダー", category: "rug", slot: "rug", modelKey: "rug_round", symbolicColor: "#b9a3e3", colorMaterials: { tint: "#b9a3e3" }, colorName: null, size: { w: 1.4, h: 0.02, d: 1.4 }, price: 7990, shop: "ダミーショップ", url: "https://example.com/rug", imageUrl: null, themes: ["oshi_purple"], position: 1, enabled: true, checkedAt: null },
 ];
 
 export function createDummyFurnitureAdminRepository(tokenStore: TokenStore): FurnitureAdminRepository {
@@ -34,7 +34,7 @@ export function createDummyFurnitureAdminRepository(tokenStore: TokenStore): Fur
       await tick();
       requireAdmin();
       const id = Math.max(0, ...details.map((detail) => detail.id)) + 1;
-      const detail: AdminFurnitureDetail = { ...input, id, key: `dummy:${id}`, adminEditedAt: new Date(), checkedAt: null };
+      const detail: AdminFurnitureDetail = { ...input, id, key: `dummy:${id}`, checkedAt: null };
       details = [...details, detail];
       return detail;
     },
@@ -44,9 +44,16 @@ export function createDummyFurnitureAdminRepository(tokenStore: TokenStore): Fur
       requireAdmin();
       const existing = details.find((detail) => detail.id === id);
       if (!existing) throw new DomainError("見つかりません", 404);
-      const detail = { ...existing, ...input, adminEditedAt: new Date() };
+      const detail = { ...existing, ...input };
       details = details.map((candidate) => candidate.id === id ? detail : candidate);
       return detail;
+    },
+
+    async removeDetail(id) {
+      await tick();
+      requireAdmin();
+      if (!details.some((detail) => detail.id === id)) throw new DomainError("見つかりません", 404);
+      details = details.filter((detail) => detail.id !== id);
     },
 
     async exportDetails() {

@@ -37,6 +37,18 @@ export function useSaveFurnitureDetail() {
   });
 }
 
+export function useDeleteFurnitureDetail() {
+  const { furnitureAdmin } = useRepositories();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => furnitureAdmin.removeDetail(id),
+    onSuccess: (_result, id) => {
+      queryClient.setQueryData<FurnitureAdminCatalog>(adminKeys.details, (catalog) => catalog && { ...catalog, details: catalog.details.filter((detail) => detail.id !== id) });
+      void queryClient.invalidateQueries({ queryKey: adminKeys.models });
+    },
+  });
+}
+
 export function useSetFurnitureModelEnabled() {
   const { furnitureAdmin } = useRepositories();
   const queryClient = useQueryClient();

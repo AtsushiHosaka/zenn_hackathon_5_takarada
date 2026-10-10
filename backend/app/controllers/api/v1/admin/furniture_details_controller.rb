@@ -1,8 +1,8 @@
 module Api
   module V1
     module Admin
-      # 商品 (家具の色・寸法・購入リンク) の一覧・作成・編集と、db/furniture_details.json の形での書き出し。
-      # ここで保存した detail は admin_edited_at が入り、furniture_detail:import に上書きされない
+      # 商品 (家具の色・寸法・購入リンク) の一覧・作成・編集・削除と、db/furniture_details.json の形での書き出し。
+      # 商品は DB が正で、ここでの変更がそのまま提案・検索に使われる
       class FurnitureDetailsController < BaseController
         # GET /api/v1/admin/furniture_details : 非表示のものも含む全件
         def index
@@ -19,6 +19,12 @@ module Api
         # PATCH /api/v1/admin/furniture_details/:id
         def update
           save(FurnitureDetail.find(params[:id]), :ok)
+        end
+
+        # DELETE /api/v1/admin/furniture_details/:id : 保存済みの部屋・提案は商品の写しを持っているので変わらない
+        def destroy
+          FurnitureDetail.find(params[:id]).destroy!
+          head :no_content
         end
 
         # GET /api/v1/admin/furniture_details/export : db/furniture_details.json にそのまま置ける JSON
@@ -38,7 +44,6 @@ module Api
             detail.furniture = Furniture3DModel.find_by(model_key:)&.furniture
             return render json: { errors: [ "3Dモデル #{model_key} が見つかりません" ] }, status: :unprocessable_entity unless detail.furniture
           end
-          detail.admin_edited_at = Time.current
           if detail.save
             render json: AdminFurnitureDetailSerializer.new(detail), status:
           else
