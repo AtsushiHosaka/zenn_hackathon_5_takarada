@@ -1,4 +1,4 @@
-# 3D モデルと、それを持つ家具の名前・種類
+# 3D モデルと、それを持つ家具の名前・種類・キャラクター・権利表記
 class FurnitureModelSerializer
   include Alba::Resource
 
@@ -11,6 +11,13 @@ class FurnitureModelSerializer
   attribute(:unit) { Furniture3DModel::UNIT }
   attribute(:axes) { Furniture3DModel::AXES }
   attribute(:model_url) { |model| model.url(base: model_base_url) }
+  attribute(:characters) { |model| model.furniture.characters.map(&:character_key) }
+  attribute(:credits) { |model| FurnitureModelSerializer.credits(model.furniture) }
+
+  # キャラクターのフランチャイズごとの権利表記。モデルを表示する画面で併記する
+  def self.credits(furniture)
+    furniture.characters.map(&:franchise).uniq.map(&:credit_attributes)
+  end
 
   private
 

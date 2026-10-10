@@ -668,6 +668,18 @@ components:
           nullable: true
           description: GCS の公開 GLB URL。ベース URL が未設定なら null
           example:
+        characters:
+          type: array
+          items:
+            type: string
+          description: この家具がグッズになっているキャラクターのキー
+          example:
+          - hatsune_miku
+        credits:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Credit"
+          description: 表示する権利表記。キャラクターのフランチャイズごとに1件
       required:
       - id
       - name
@@ -684,6 +696,8 @@ components:
       - sha256
       - color_material_keys
       - model_url
+      - characters
+      - credits
     Position:
       type: object
       description: 物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き
@@ -1284,9 +1298,19 @@ components:
           type: string
           nullable: true
           example: blue
+        interpretation:
+          "$ref": "#/components/schemas/SearchInterpretation"
+        models:
+          type: array
+          maxItems: 24
+          description: 推し活グッズの 3D モデル。家具検索では空
+          items:
+            "$ref": "#/components/schemas/FurnitureModel"
       required:
       - products
       - color
+      - interpretation
+      - models
     ProductColorVariant:
       type: object
       properties:
@@ -1415,7 +1439,19 @@ components:
           -
           nullable: true
           example:
+        characters:
+          type: array
+          items:
+            type: string
+          description: この商品の家具がグッズになっているキャラクターのキー
+          example: []
+        credits:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Credit"
       required:
+      - characters
+      - credits
       - furniture_detail_id
       - furniture_id
       - name
@@ -1433,6 +1469,85 @@ components:
       - model_match
       - model_size
       - model_fit
+    Credit:
+      type: object
+      properties:
+        franchise:
+          type: string
+          example: piapro
+        credit:
+          type: string
+          nullable: true
+          example: "© Crypton Future Media, INC. www.piapro.net"
+        notice:
+          type: string
+          nullable: true
+          example: 非公式の二次創作です。
+        license_url:
+          type: string
+          nullable: true
+          example: https://piapro.jp/license/character_guideline
+      required:
+      - franchise
+      - credit
+      - notice
+      - license_url
+    SearchInterpretation:
+      type: object
+      description: 検索語を推し活グッズとしてどう解釈したか。家具検索では各一覧が空で source は none
+      properties:
+        characters:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              franchise:
+                type: string
+            required:
+            - id
+            - name
+            - franchise
+        franchises:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+            required:
+            - id
+            - name
+        categories:
+          type: array
+          description: グッズ種別 (= 家具の category)
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+            required:
+            - id
+            - name
+        source:
+          type: string
+          enum:
+          - dictionary
+          - llm
+          - none
+          example: dictionary
+      required:
+      - characters
+      - franchises
+      - categories
+      - source
     FurnitureSearchProduct:
       allOf:
       - "$ref": "#/components/schemas/FurnitureDetail"

@@ -23,7 +23,8 @@ class FurnitureModelMatcher
     return if missing.empty?
 
     categories = missing.map { |object| object["category"] }.uniq
-    available = Furniture3DModel.joins(:furniture).merge(Furniture.available)
+    # キャラクターのグッズは、写真の家具 (例: ただのアクスタ) に当てない
+    available = Furniture3DModel.joins(:furniture).merge(Furniture.available.without_characters)
     models = available.where(furnitures: { category: categories }).or(available.where(shape: categories)).preload(:furniture).to_a
     missing.each do |object|
       candidates = models.select { |model| model.furniture.category == object["category"] || model.shape == object["category"] }

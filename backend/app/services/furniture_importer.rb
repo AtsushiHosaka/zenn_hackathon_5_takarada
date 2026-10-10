@@ -1,7 +1,8 @@
 require "json"
 
 # db/furnitures.json (家具と 3D モデルの台帳) を検証してから furnitures / furniture_3d_models に取り込む。
-# 1 件ごとに家具と 3D モデルを 1 つずつ作る。GLB のアップロードは行わない。
+# 1 件ごとに家具と 3D モデルを 1 つずつ作り、characters からキャラクターとの対応 (character_goods) を作る。
+# キャラクターは先に CharacterImporter で入れておく。GLB のアップロードは行わない。
 class FurnitureImporter
   class InvalidManifest < StandardError; end
 
@@ -18,11 +19,13 @@ class FurnitureImporter
   def call
     models = validate_manifest
 
+    characters = Character.includes(:franchise).index_by(&:character_key)
     Furniture.transaction do
       models.each do |attributes|
         model = Furniture3DModel.find_by(model_key: attributes.fetch(:model_key)) || Furniture3DModel.new(furniture: Furniture.new)
         model.furniture.update!(attributes.slice(:name, :category))
-        model.update!(attributes.except(:name, :category))
+        model.update!(attributes.except(:name, :category, :characters))
+        link_characters(model, attributes.fetch(:characters), characters)
       end
     end
 
@@ -60,14 +63,27 @@ class FurnitureImporter
     check(model["triangles"].is_a?(Integer) && model["triangles"].between?(0, 2_147_483_647), "#{label}.triangles must be a nonnegative 32-bit integer")
     check(model["bytes"].is_a?(Integer) && model["bytes"].between?(1, 9_223_372_036_854_775_807), "#{label}.bytes must be a positive 64-bit integer")
     check(model["color_material_keys"].is_a?(Array) && model["color_material_keys"].all? { |key| key.is_a?(String) }, "#{label}.color_material_keys must be an array of strings")
+    characters = model.fetch("characters", [])
+    check(characters.is_a?(Array) && characters.all? { |key| key.is_a?(String) } && characters.uniq == characters, "#{label}.characters must be unique character keys")
+    check(characters.empty? || GoodsCategories.find(model["category"]), "#{label}.category must be a goods category in config/goods_categories.json when characters are set")
 
     {
       model_key: model.fetch("id"), name: model.fetch("name"), category: model.fetch("category"),
       shape: model.fetch("shape"), variant: model["variant"], format: model.fetch("format"),
       width: size[0], height: size[1], depth: size[2],
       triangle_count: model.fetch("triangles"), byte_size: model.fetch("bytes"),
-      sha256: model.fetch("sha256"), color_material_keys: model.fetch("color_material_keys")
+      sha256: model.fetch("sha256"), color_material_keys: model.fetch("color_material_keys"), characters:
     }
+  end
+
+  def link_characters(model, keys, characters)
+    wanted = keys.map do |key|
+      characters[key] or raise InvalidManifest, "#{model.model_key}.characters #{key.inspect} is not imported (run character:import first)"
+    end
+    model.furniture.character_goods.where.not(character: wanted).delete_all
+    wanted.each { |character| model.furniture.character_goods.find_or_create_by!(character:) }
+  rescue ActiveRecord::RecordInvalid => error
+    raise InvalidManifest, "#{model.model_key}.characters: #{error.record.errors.full_messages.join(', ')}"
   end
 
   def check(condition, message)

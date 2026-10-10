@@ -10,7 +10,7 @@ RSpec.describe "Api::V1::FurnitureModels", type: :request do
 
       response "200", "モデル一覧" do
         schema type: :array, items: { "$ref" => "#/components/schemas/FurnitureModel" }
-        before { FurnitureImporter.call }
+        before { CharacterImporter.call; FurnitureImporter.call }
 
         run_test!
       end
@@ -27,7 +27,7 @@ RSpec.describe "Api::V1::FurnitureModels", type: :request do
 
       response "200", "モデルのメタデータ" do
         schema "$ref" => "#/components/schemas/FurnitureModel"
-        before { FurnitureImporter.call }
+        before { CharacterImporter.call; FurnitureImporter.call }
         let(:id) { Furniture3DModel.order(:model_key).first.model_key }
 
         run_test!

@@ -2,8 +2,9 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRepositories } from '../../core/repositories';
 import { furnitureCategories, type RoomDesign, type RoomItem } from '../../domain/room';
-import type { FurnitureDetailChoice, FurnitureSearchProduct } from '../../domain/roomRepository';
+import type { FurnitureDetailChoice, FurnitureSearchInterpretation, FurnitureSearchProduct, SearchModel } from '../../domain/roomRepository';
 import ErrorText from '../shared/ErrorText';
+import ModelCredits from './ModelCredits';
 import { furniturePositionInRoom } from './roomBounds';
 import { productReplacementPosition } from './productReplacement';
 
@@ -44,13 +45,54 @@ export default function FurnitureSearchPanel({ design, disabled, onAddItem, repl
     </form>
     {search.isError && <ErrorText error={search.error}/>}
     {search.data && currentResults && !search.isPending && <>
-      <p role="status" className="rc-planner-note">{search.data.products.length ? `${search.data.products.length}件の商品` : 'この条件の商品は見つかりませんでした。検索語や色を変えてお試しください。'}</p>
-      <div className="rc-furniture-search-results">{search.data.products.map(({ item, colorName, variants }) => <button key={item.furnitureDetailId} type="button" className="rc-furniture-search-card" aria-pressed={selectedId === item.furnitureDetailId} disabled={disabled} onClick={() => setSelectedId(item.furnitureDetailId)}>
-        <ProductPhoto key={item.imageUrl} src={item.imageUrl} name={item.name}/><span>{item.name}</span><span>{colorName ?? '色の掲載なし'} · ¥{item.price?.toLocaleString('ja-JP')}{variants.length > 1 ? ` · 他${variants.length - 1}件` : ''}</span>
+      <SearchInterpretation interpretation={search.data.interpretation}/>
+      {!!search.data.models.length && <SearchModels models={search.data.models} interpretation={search.data.interpretation}/>}
+      <p role="status" className="rc-planner-note">{search.data.products.length ? `${search.data.products.length}件の商品` : search.data.models.length ? 'この条件で購入できる商品はまだ登録されていません。' : 'この条件の商品は見つかりませんでした。検索語や色を変えてお試しください。'}</p>
+      <div className="rc-furniture-search-results">{search.data.products.map(({ item, colorName, variants, characters }) => <button key={item.furnitureDetailId} type="button" className="rc-furniture-search-card" aria-pressed={selectedId === item.furnitureDetailId} disabled={disabled} onClick={() => setSelectedId(item.furnitureDetailId)}>
+        <ProductPhoto key={item.imageUrl} src={item.imageUrl} name={item.name}/><span>{item.name}</span><CharacterChips ids={characters} interpretation={search.data!.interpretation}/><span>{colorName ?? '色の掲載なし'} · ¥{item.price?.toLocaleString('ja-JP')}{variants.length > 1 ? ` · 他${variants.length - 1}件` : ''}</span>
       </button>)}</div>
       {selected && <FurnitureSearchSelection key={selected.item.furnitureDetailId} product={selected} design={design} disabled={disabled} onAddItem={onAddItem} replacementTarget={replacementTarget}/>}
     </>}
   </div>;
+}
+
+function characterNames(ids: string[], interpretation: FurnitureSearchInterpretation): string[] {
+  return ids.flatMap(id => interpretation.characters.find(character => character.id === id)?.name ?? []);
+}
+
+// 自然言語の検索語をどう解釈したかを示す。家具検索(source=none)では何も出さない。
+function SearchInterpretation({ interpretation }: { interpretation: FurnitureSearchInterpretation }) {
+  const characterFranchises = new Set(interpretation.characters.map(character => character.franchise));
+  const labels = [...interpretation.characters.map(character => character.name), ...interpretation.franchises.filter(franchise => !characterFranchises.has(franchise.id)).map(franchise => franchise.name), ...interpretation.categories.map(category => category.name)];
+  if (interpretation.source === 'none' || !labels.length) return null;
+  return <div className="rc-search-interpretation">
+    <span className="rc-planner-note">{interpretation.source === 'llm' ? 'AIが読み取った条件' : '読み取った条件'}</span>
+    <ul className="rc-search-chips" aria-label="検索語から読み取った条件">{labels.map(label => <li key={label}>{label}</li>)}</ul>
+  </div>;
+}
+
+function CharacterChips({ ids, interpretation }: { ids: string[]; interpretation: FurnitureSearchInterpretation }) {
+  const names = characterNames(ids, interpretation);
+  if (!names.length) return null;
+  return <span className="rc-search-chips rc-search-chips-compact" aria-label="キャラクター">{names.map(name => <span key={name}>{name}</span>)}</span>;
+}
+
+// 推し活グッズの3Dモデル。購入できる商品が無くても表示する。
+function SearchModels({ models, interpretation }: { models: SearchModel[]; interpretation: FurnitureSearchInterpretation }) {
+  const headingId = useId();
+  return <section className="rc-search-models" aria-labelledby={headingId}>
+    <h4 id={headingId}>3Dモデル</h4>
+    <ul>{models.map(model => {
+      const category = interpretation.categories.find(value => value.id === model.category)?.name;
+      const characters = characterNames(model.characters, interpretation);
+      return <li key={model.id} className="rc-search-model">
+        <span className="rc-search-model-name">{model.name}</span>
+        {(category || !!characters.length) && <span className="rc-search-chips rc-search-chips-compact">{category && <span>{category}</span>}{characters.map(name => <span key={name}>{name}</span>)}</span>}
+        <span className="rc-planner-note">幅{Math.round(model.size.w*100)} × 高さ{Math.round(model.size.h*100)} × 奥行き{Math.round(model.size.d*100)}cm</span>
+        <ModelCredits credits={model.credits}/>
+      </li>;
+    })}</ul>
+  </section>;
 }
 
 const sizeLabel = (size: RoomItem['size']) => `幅${Math.round(size[0]*100)} × 高さ${Math.round(size[1]*100)} × 奥行き${Math.round(size[2]*100)}cm`;
@@ -80,6 +122,7 @@ function FurnitureSearchSelection({ product, design, disabled, onAddItem, replac
     <ProductPhoto key={item.imageUrl} className="rc-furniture-variant-photo" src={item.imageUrl} name={item.name}/>
     <p>{item.name} · {chosen.colorName ?? '色の掲載なし'} · ¥{item.price?.toLocaleString('ja-JP')}{item.shop ? ` · ${item.shop}` : ''}</p>
     <p className="rc-planner-note">{sizeLabel(item.size)}</p>
+    <ModelCredits credits={chosen.credits}/>
     {item.productUrl && <a className="rc-furniture-product-link" href={item.productUrl} target="_blank" rel="noopener noreferrer">選んだ商品のページを見る</a>}
     {!sameCategory && <p role="alert" className="rc-planner-input-error">選んだ商品のカテゴリが元の家具と一致しません。</p>}
     {!fits && sameCategory && <p role="status" className="rc-planner-input-error">この家具は部屋の寸法に収まりません。</p>}

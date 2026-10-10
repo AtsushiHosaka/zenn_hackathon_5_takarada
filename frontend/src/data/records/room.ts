@@ -3,7 +3,7 @@ import { characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
 import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
 import { productCategories, furnitureCategories, isManualFurniture, isImageArtwork, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
-import type { FurnitureDetailChoice, FurnitureSearchResult, SavedRoom } from "../../domain/roomRepository";
+import type { FurnitureDetailChoice, FurnitureSearchInterpretation, FurnitureSearchResult, ModelCredit, SavedRoom, SearchModel } from "../../domain/roomRepository";
 import type { components } from "../generated/api";
 
 export type AnalysisRoomRecord = components["schemas"]["Room"];
@@ -26,7 +26,62 @@ export function toFurnitureSearch(value: unknown, baseUrl: string): FurnitureSea
       return { ...toFurnitureDetail(product, baseUrl), variants: variants.map(variant => toFurnitureDetail(variant, baseUrl)) };
     }),
     color: record.color == null ? null : text(record.color, "FurnitureSearch.color"),
+    interpretation: searchInterpretation(record.interpretation),
+    models: list(record.models, "FurnitureSearch.models").map(model => searchModel(model, baseUrl)),
   };
+}
+
+function searchInterpretation(value: unknown): FurnitureSearchInterpretation {
+  const record = object(value, "FurnitureSearch.interpretation");
+  const source = record.source;
+  if (source !== "dictionary" && source !== "llm" && source !== "none") invalid("SearchInterpretation.source");
+  const named = (entry: unknown, field: string) => {
+    const named = object(entry, field);
+    return { id: text(named.id, `${field}.id`), name: text(named.name, `${field}.name`) };
+  };
+  return {
+    characters: list(record.characters, "SearchInterpretation.characters").map(entry => ({
+      ...named(entry, "SearchInterpretation.characters"),
+      franchise: text(object(entry, "SearchInterpretation.characters").franchise, "SearchInterpretation.characters.franchise"),
+    })),
+    franchises: list(record.franchises, "SearchInterpretation.franchises").map(entry => named(entry, "SearchInterpretation.franchises")),
+    categories: list(record.categories, "SearchInterpretation.categories").map(entry => named(entry, "SearchInterpretation.categories")),
+    source,
+  };
+}
+
+function searchModel(value: unknown, baseUrl: string): SearchModel {
+  const record = object(value, "FurnitureModel");
+  return {
+    id: text(record.id, "FurnitureModel.id"),
+    name: text(record.name, "FurnitureModel.name"),
+    category: text(record.category, "FurnitureModel.category"),
+    size: sizeRecord(record.size),
+    modelUrl: url(record.model_url, baseUrl),
+    characters: characterKeys(record.characters, "FurnitureModel.characters"),
+    credits: credits(record.credits, "FurnitureModel.credits", baseUrl),
+  };
+}
+
+function characterKeys(value: unknown, field: string): string[] {
+  return list(value, field).map(key => text(key, field));
+}
+
+function credits(value: unknown, field: string, baseUrl: string): ModelCredit[] {
+  return list(value, field).map(entry => {
+    const record = object(entry, field);
+    return {
+      franchise: text(record.franchise, `${field}.franchise`),
+      credit: optionalText(record.credit, `${field}.credit`),
+      notice: optionalText(record.notice, `${field}.notice`),
+      licenseUrl: url(record.license_url, baseUrl),
+    };
+  });
+}
+
+function list(value: unknown, field: string): unknown[] {
+  if (!Array.isArray(value)) invalid(field);
+  return value;
 }
 
 function toFurnitureDetail(value: unknown, baseUrl: string): FurnitureDetailChoice {
@@ -52,7 +107,11 @@ function toFurnitureDetail(value: unknown, baseUrl: string): FurnitureDetailChoi
     modelFit: record.model_fit == null ? undefined : containFit(record.model_fit),
   };
   if (!isRoomItem(item)) invalid("FurnitureDetail");
-  return { item, colorName: record.color_name == null ? undefined : text(record.color_name, "FurnitureDetail.color_name") };
+  return {
+    item, colorName: record.color_name == null ? undefined : text(record.color_name, "FurnitureDetail.color_name"),
+    characters: characterKeys(record.characters, "FurnitureDetail.characters"),
+    credits: credits(record.credits, "FurnitureDetail.credits", baseUrl),
+  };
 }
 
 export function toSavedRoom(value: unknown, baseUrl: string): SavedRoom {

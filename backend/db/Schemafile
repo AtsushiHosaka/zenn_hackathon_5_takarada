@@ -68,7 +68,7 @@ end
 # db/furnitures.json から rails furniture:import で入れる
 create_table "furnitures", force: :cascade do |t|
   t.string "name", null: false # 表示名 (例: 2人掛けソファ)
-  t.string "category", null: false # 家具の種類 (sofa, chair, rug など)。写真の家具にモデルを付けるときにも使う
+  t.string "category", null: false # 家具の種類 (sofa, chair, rug など)。推し活グッズはグッズ種別 (acrylic_stand など、config/goods_categories.json)
   t.boolean "enabled", null: false, default: true # false なら使わない (API・提案から外す)
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
@@ -150,4 +150,48 @@ create_table "furniture_detail_textures", force: :cascade do |t|
   t.datetime "updated_at", null: false
 
   t.index [ "furniture_detail_id", "material_key" ], unique: true
+end
+
+# 作品・事務所 (ピアプロ、ホロライブなど)。db/characters.json から rails character:import で入れる
+create_table "franchises", force: :cascade do |t|
+  t.string "franchise_key", null: false # 安定 ID (例: piapro)
+  t.string "name", null: false
+  t.jsonb "aliases", null: false, default: [] # 検索の別名 ([{text, ambiguous}])
+  t.string "license" # ライセンスの種類
+  t.string "license_url" # 利用ガイドライン
+  t.string "credit" # 表示するクレジット
+  t.text "notice" # 表示する注意書き
+  t.boolean "likeness_allowed", null: false, default: false # キャラクターの 3D モデルを作ってよいか
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+
+  t.index [ "franchise_key" ], unique: true
+end
+
+# キャラクター。db/characters.json から rails character:import で入れる
+create_table "characters", force: :cascade do |t|
+  t.string "character_key", null: false # 安定 ID (例: hatsune_miku)
+  t.references "franchise", null: false, foreign_key: true
+  t.string "name", null: false
+  t.string "name_en"
+  t.string "group" # ユニット・グループ名
+  t.string "status", null: false, default: "active" # 活動状況
+  t.string "color" # イメージカラー (#rrggbb)
+  t.string "color_source" # color の出典 (official / community)
+  t.string "theme_id" # キャラクターテーマ (config/character_themes.json) の ID
+  t.jsonb "aliases", null: false, default: [] # 検索の別名 ([{text, ambiguous}])。ambiguous は手掛かりの語があるときだけ使う
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+
+  t.index [ "character_key" ], unique: true
+end
+
+# キャラクターと、そのキャラクターのグッズである家具 (多対多)。db/furnitures.json の characters から rails furniture:import で作る
+create_table "character_goods", force: :cascade do |t|
+  t.references "character", null: false, foreign_key: true
+  t.references "furniture", null: false, foreign_key: true
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+
+  t.index [ "character_id", "furniture_id" ], unique: true
 end

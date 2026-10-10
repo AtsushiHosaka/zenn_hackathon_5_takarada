@@ -36,10 +36,23 @@ export type SavedRoom = {
 
 export type FurnitureSearchInput = { query: string; color?: string; category?: string };
 // 登録された家具の色・寸法・購入リンク1つ。itemはそのまま部屋へ置ける形 (furnitureDetailId付き)。
-export type FurnitureDetailChoice = { item: RoomItem; colorName?: string };
+// characters: グッズになっているキャラクターのキー。credits: 表示が必要な権利表記。
+export type FurnitureDetailChoice = { item: RoomItem; colorName?: string; characters: string[]; credits: ModelCredit[] };
 // 家具ごとに1件。variantsは同じ家具の全detail (自身を含む)。
 export type FurnitureSearchProduct = FurnitureDetailChoice & { variants: FurnitureDetailChoice[] };
-export type FurnitureSearchResult = { products: FurnitureSearchProduct[]; color: string | null };
+// キャラクターの権利表記。フランチャイズごとに1件。
+export type ModelCredit = { franchise: string; credit?: string; notice?: string; licenseUrl?: string };
+// 検索語を推し活グッズとしてどう読んだか。家具検索では各一覧が空で source は none。
+export type FurnitureSearchInterpretation = {
+  characters: { id: string; name: string; franchise: string }[];
+  franchises: { id: string; name: string }[];
+  // グッズ種別 (= 家具の category)
+  categories: { id: string; name: string }[];
+  source: "dictionary" | "llm" | "none";
+};
+// 推し活グッズの3Dモデル (sizeはメートル)。
+export type SearchModel = { id: string; name: string; category: string; size: { w: number; h: number; d: number }; modelUrl?: string; characters: string[]; credits: ModelCredit[] };
+export type FurnitureSearchResult = { products: FurnitureSearchProduct[]; color: string | null; interpretation: FurnitureSearchInterpretation; models: SearchModel[] };
 
 export type RoomRepository = {
   demo(style?: Style): RoomDesign;

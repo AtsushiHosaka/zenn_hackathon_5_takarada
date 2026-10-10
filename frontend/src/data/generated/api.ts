@@ -986,6 +986,15 @@ export interface components {
              * @example null
              */
             model_url: string | null;
+            /**
+             * @description この家具がグッズになっているキャラクターのキー
+             * @example [
+             *       "hatsune_miku"
+             *     ]
+             */
+            characters: string[];
+            /** @description 表示する権利表記。キャラクターのフランチャイズごとに1件 */
+            credits: components["schemas"]["Credit"][];
         };
         /** @description 物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き */
         Position: {
@@ -1322,6 +1331,9 @@ export interface components {
             products: components["schemas"]["FurnitureSearchProduct"][];
             /** @example blue */
             color: string | null;
+            interpretation: components["schemas"]["SearchInterpretation"];
+            /** @description 推し活グッズの 3D モデル。家具検索では空 */
+            models: components["schemas"]["FurnitureModel"][];
         };
         ProductColorVariant: {
             /** @example ホワイト */
@@ -1390,6 +1402,44 @@ export interface components {
              * @enum {string|null}
              */
             model_fit: "contain" | null;
+            /**
+             * @description この商品の家具がグッズになっているキャラクターのキー
+             * @example []
+             */
+            characters: string[];
+            credits: components["schemas"]["Credit"][];
+        };
+        Credit: {
+            /** @example piapro */
+            franchise: string;
+            /** @example © Crypton Future Media, INC. www.piapro.net */
+            credit: string | null;
+            /** @example 非公式の二次創作です。 */
+            notice: string | null;
+            /** @example https://piapro.jp/license/character_guideline */
+            license_url: string | null;
+        };
+        /** @description 検索語を推し活グッズとしてどう解釈したか。家具検索では各一覧が空で source は none */
+        SearchInterpretation: {
+            characters: {
+                id: string;
+                name: string;
+                franchise: string;
+            }[];
+            franchises: {
+                id: string;
+                name: string;
+            }[];
+            /** @description グッズ種別 (= 家具の category) */
+            categories: {
+                id: string;
+                name: string;
+            }[];
+            /**
+             * @example dictionary
+             * @enum {string}
+             */
+            source: "dictionary" | "llm" | "none";
         };
         FurnitureSearchProduct: components["schemas"]["FurnitureDetail"] & {
             /** @description 同じ家具の全detail (自身を含む) */

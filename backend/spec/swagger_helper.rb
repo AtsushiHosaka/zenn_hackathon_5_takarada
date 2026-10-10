@@ -135,9 +135,11 @@ RSpec.configure do |config|
               byte_size: { type: :integer, minimum: 1, example: 48000 },
               sha256: { type: :string, pattern: "^[0-9a-f]{64}$", example: "a" * 64 },
               color_material_keys: { type: :array, items: { type: :string }, description: "色が分かれている部位の名前 (GLB の素材名)", example: [ "tint", "wood" ] },
-              model_url: { type: :string, nullable: true, description: "GCS の公開 GLB URL。ベース URL が未設定なら null", example: nil }
+              model_url: { type: :string, nullable: true, description: "GCS の公開 GLB URL。ベース URL が未設定なら null", example: nil },
+              characters: { type: :array, items: { type: :string }, description: "この家具がグッズになっているキャラクターのキー", example: [ "hatsune_miku" ] },
+              credits: { type: :array, items: { "$ref" => "#/components/schemas/Credit" }, description: "表示する権利表記。キャラクターのフランチャイズごとに1件" }
             },
-            required: %w[id name category shape variant format object_key size unit axes triangle_count byte_size sha256 color_material_keys model_url]
+            required: %w[id name category shape variant format object_key size unit axes triangle_count byte_size sha256 color_material_keys model_url characters credits]
           },
           Position: {
             type: :object,
@@ -341,9 +343,11 @@ RSpec.configure do |config|
             type: :object,
             properties: {
               products: { type: :array, maxItems: 24, description: "家具ごとに1件。同じ家具の他の色・寸法・購入先はvariants", items: { "$ref" => "#/components/schemas/FurnitureSearchProduct" } },
-              color: { type: :string, nullable: true, example: "blue" }
+              color: { type: :string, nullable: true, example: "blue" },
+              interpretation: { "$ref" => "#/components/schemas/SearchInterpretation" },
+              models: { type: :array, maxItems: 24, description: "推し活グッズの 3D モデル。家具検索では空", items: { "$ref" => "#/components/schemas/FurnitureModel" } }
             },
-            required: %w[products color]
+            required: %w[products color interpretation models]
           },
           ProductColorVariant: {
             type: :object,
@@ -375,9 +379,32 @@ RSpec.configure do |config|
               model_url: { type: :string, nullable: true, example: nil },
               model_match: { allOf: [ { "$ref" => "#/components/schemas/ModelMatch" } ], nullable: true, example: nil },
               model_size: { allOf: [ { "$ref" => "#/components/schemas/Size" } ], nullable: true, example: nil },
-              model_fit: { type: :string, enum: [ "contain", nil ], nullable: true, example: nil }
+              model_fit: { type: :string, enum: [ "contain", nil ], nullable: true, example: nil },
+              characters: { type: :array, items: { type: :string }, description: "この商品の家具がグッズになっているキャラクターのキー", example: [] },
+              credits: { type: :array, items: { "$ref" => "#/components/schemas/Credit" } }
             },
-            required: %w[furniture_detail_id furniture_id name category symbolic_color color_materials color_name size price shop url image_url product_metadata model_url model_match model_size model_fit]
+            required: %w[characters credits furniture_detail_id furniture_id name category symbolic_color color_materials color_name size price shop url image_url product_metadata model_url model_match model_size model_fit]
+          },
+          Credit: {
+            type: :object,
+            properties: {
+              franchise: { type: :string, example: "piapro" },
+              credit: { type: :string, nullable: true, example: "© Crypton Future Media, INC. www.piapro.net" },
+              notice: { type: :string, nullable: true, example: "非公式の二次創作です。" },
+              license_url: { type: :string, nullable: true, example: "https://piapro.jp/license/character_guideline" }
+            },
+            required: %w[franchise credit notice license_url]
+          },
+          SearchInterpretation: {
+            type: :object,
+            description: "検索語を推し活グッズとしてどう解釈したか。家具検索では各一覧が空で source は none",
+            properties: {
+              characters: { type: :array, items: { type: :object, properties: { id: { type: :string }, name: { type: :string }, franchise: { type: :string } }, required: %w[id name franchise] } },
+              franchises: { type: :array, items: { type: :object, properties: { id: { type: :string }, name: { type: :string } }, required: %w[id name] } },
+              categories: { type: :array, description: "グッズ種別 (= 家具の category)", items: { type: :object, properties: { id: { type: :string }, name: { type: :string } }, required: %w[id name] } },
+              source: { type: :string, enum: %w[dictionary llm none], example: "dictionary" }
+            },
+            required: %w[characters franchises categories source]
           },
           FurnitureSearchProduct: {
             allOf: [

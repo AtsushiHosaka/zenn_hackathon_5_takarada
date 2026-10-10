@@ -10,6 +10,9 @@ end
 
 puts "seeded #{User.count} users"
 
+characters = CharacterImporter.call
+puts "seeded #{characters.fetch(:franchises)} franchises and #{characters.fetch(:characters)} characters"
+
 furnitures = FurnitureImporter.call
 puts "seeded #{furnitures.fetch(:models)} furnitures"
 
