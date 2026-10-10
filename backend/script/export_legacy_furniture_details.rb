@@ -27,7 +27,8 @@ FURNITURE_OVERRIDES = {
   15 => "chair_gaming", 19 => "chair_office", 41 => "chair_office", 24 => "armchair_wing", 28 => "chair_lounge", 47 => "chair_lounge",
   31 => "stool_bar", 33 => "chair_shell", 40 => "step_stool"
 }.freeze
-DROP_METADATA = %w[color_variants source_url access_policy discovery_source source_verification].freeze
+# metadata はコードが読む項目だけを残す (配置・検索・AI への商品情報)
+KEEP_METADATA = %w[provider size estimated_axes official_color shape material color_name].freeze
 PATH = Rails.root.join("db/furniture_details.json")
 
 class LegacyRecord < ActiveRecord::Base
@@ -66,14 +67,14 @@ products.each do |row|
     next
   end
 
-  metadata = data.fetch("metadata").except(*DROP_METADATA)
+  metadata = data.fetch("metadata").slice(*KEEP_METADATA)
   detail = {
     "key" => key, "name" => data["name"], "category" => data["category"], "slot" => data["slot"], "model_key" => furniture,
     "symbolic_color" => data["color"].downcase,
     "color_materials" => { models.fetch(furniture).primary_color_key => data["color"].downcase }, "color_name" => metadata["color_name"].presence, "size" => data["size"],
     "price" => data["price"], "shop" => data["shop"], "url" => row["source_url"], "image_url" => data["image_url"],
     "themes" => existing&.fetch("themes") || [], "metadata" => metadata,
-    "checked_at" => metadata["price_checked_at"] || Time.zone.parse(row["fetched_at"].to_s).iso8601
+    "checked_at" => data.fetch("metadata")["price_checked_at"] || Time.zone.parse(row["fetched_at"].to_s).iso8601
   }
   report[existing ? "updated" : "added"] << key
   by_key[key] = detail
