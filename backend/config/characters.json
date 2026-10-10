@@ -1,6 +1,6 @@
 {
  "version": 1,
- "note": "推し活グッズ検索用のキャラクター辞書。aliasのambiguous=trueは単独では一致させず、グッズ種別・作品名などの語が同時にある場合だけ使う。colorはcolor_sourceがofficialのものだけを公式値として扱う。",
+ "note": "推し活グッズ検索用のキャラクター辞書。aliasのambiguous=trueは単独では一致させず、グッズ種別・作品名などの語が同時にある場合だけ使う。colorはcolor_sourceがofficialのものだけを公式値として扱う。 goods_typesのstandalone=trueは、キャラクター名がなくても推し活グッズ検索として扱う（アクスタなど）。falseはキャラクターかフランチャイズの語がある場合だけ使う（クッション、タペストリーなど一般のインテリアと重なるもの）。",
  "franchises": [
   {
    "id": "piapro",
@@ -1083,7 +1083,8 @@
     "bigアクスタ",
     "acrylic stand",
     "acryl stand"
-   ]
+   ],
+   "standalone": true
   },
   {
    "id": "tapestry",
@@ -1094,7 +1095,8 @@
     "b2タペストリー",
     "b1タペストリー",
     "tapestry"
-   ]
+   ],
+   "standalone": false
   },
   {
    "id": "plush",
@@ -1109,7 +1111,8 @@
     "plushie",
     "plushy",
     "stuffed toy"
-   ]
+   ],
+   "standalone": false
   },
   {
    "id": "cushion",
@@ -1118,7 +1121,8 @@
     "ダイカットクッション",
     "クッション",
     "cushion"
-   ]
+   ],
+   "standalone": false
   },
   {
    "id": "can_badge",
@@ -1128,7 +1132,8 @@
     "缶バ",
     "badge",
     "button badge"
-   ]
+   ],
+   "standalone": true
   },
   {
    "id": "poster",
@@ -1136,7 +1141,8 @@
    "synonyms": [
     "ポスター",
     "poster"
-   ]
+   ],
+   "standalone": false
   },
   {
    "id": "uchiwa",
@@ -1145,7 +1151,8 @@
     "うちわ",
     "団扇",
     "uchiwa"
-   ]
+   ],
+   "standalone": true
   },
   {
    "id": "rubber_mat",
@@ -1155,7 +1162,8 @@
     "プレイマット",
     "rubber mat",
     "playmat"
-   ]
+   ],
+   "standalone": true
   },
   {
    "id": "blanket",
@@ -1163,7 +1171,8 @@
    "synonyms": [
     "ブランケット",
     "blanket"
-   ]
+   ],
+   "standalone": false
   },
   {
    "id": "acrylic_panel",
@@ -1173,7 +1182,8 @@
     "アクリルブロック",
     "acrylic panel",
     "acrylic block"
-   ]
+   ],
+   "standalone": true
   },
   {
    "id": "figure",
@@ -1183,7 +1193,8 @@
     "プライズフィギュア",
     "figure",
     "figurine"
-   ]
+   ],
+   "standalone": false
   }
  ]
 }
