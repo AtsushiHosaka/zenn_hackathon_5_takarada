@@ -11,6 +11,8 @@ import { createDummyAuthRepository } from "../data/dummy/dummyAuthRepository";
 import { createDummyUserRepository } from "../data/dummy/dummyUserRepository";
 import { createDummyRoomRepository } from "../data/dummy/dummyRoomRepository";
 import { createApiRoomRepository } from "../data/repositories/apiRoomRepository";
+import { createApiFurnitureAdminRepository } from "../data/repositories/apiFurnitureAdminRepository";
+import { createDummyFurnitureAdminRepository } from "../data/dummy/dummyFurnitureAdminRepository";
 
 export function createRepositories(connection: Connection): Repositories {
   const tokenStore = createTokenStore(connection);
@@ -21,6 +23,7 @@ export function createRepositories(connection: Connection): Repositories {
       auth: createDummyAuthRepository(tokenStore),
       users: createDummyUserRepository(tokenStore),
       rooms: createDummyRoomRepository(tokenStore),
+      furnitureAdmin: createDummyFurnitureAdminRepository(tokenStore),
     };
   }
 
@@ -30,5 +33,6 @@ export function createRepositories(connection: Connection): Repositories {
     auth: createApiAuthRepository(api),
     users: createApiUserRepository(api),
     rooms: createApiRoomRepository(api, appConfig.roomApi, appConfig.apiEndpoint),
+    furnitureAdmin: createApiFurnitureAdminRepository(api),
   };
 }

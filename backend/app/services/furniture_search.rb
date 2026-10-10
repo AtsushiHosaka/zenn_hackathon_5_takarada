@@ -23,7 +23,7 @@ class FurnitureSearch
     return goods_search(color:, interpretation:) if interpretation.goods_search?
 
     categories = requested_categories(query, category)
-    scope = FurnitureDetail.joins(:furniture).merge(Furniture.available).includes(furniture: { characters: :franchise }).order(:position, :id)
+    scope = FurnitureDetail.available.joins(:furniture).merge(Furniture.available).includes(furniture: { characters: :franchise }).order(:position, :id)
     details = (categories.any? ? scope.where(category: categories) : scope.where(slot: "floor")).to_a
     tokens = query.unicode_normalize(:nfkc).downcase.split(/[\s、,]+/).reject(&:blank?)
     scored = details.map { |detail| [ detail, tokens.count { |token| detail.name.unicode_normalize(:nfkc).downcase.include?(token) } ] }
@@ -59,7 +59,7 @@ class FurnitureSearch
     # キャラクターを探しているときは、キャラクターの付いていない家具の商品 (一般のクッションなど) は出さない
     sold = wanted.any? ? ranked.reject { |_, rank| rank == 2 } : ranked
     ranked = ranked.map(&:first)
-    details = FurnitureDetail.where(furniture: sold.map(&:first)).includes(furniture: { characters: :franchise }).order(:position, :id).to_a
+    details = FurnitureDetail.available.where(furniture: sold.map(&:first)).includes(furniture: { characters: :franchise }).order(:position, :id).to_a
       .sort_by.with_index { |detail, index| [ ranked.index(detail.furniture), index ] }
     Result.new(products: products(details, details, color), color: color.presence, interpretation:,
                models: ranked.filter_map(&:model).first(MAX_RESULTS))

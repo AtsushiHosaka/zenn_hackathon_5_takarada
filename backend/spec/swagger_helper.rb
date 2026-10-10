@@ -101,6 +101,112 @@ RSpec.configure do |config|
             },
             required: %w[error]
           },
+          Forbidden: {
+            type: :object,
+            properties: {
+              error: { type: :string, example: "管理者だけが使えます" }
+            },
+            required: %w[error]
+          },
+          AdminFurnitureDetail: {
+            type: :object,
+            description: "管理画面用の商品 (家具の色・寸法・購入リンク)。非表示のものも含む",
+            properties: {
+              id: { type: :integer, minimum: 1, example: 1 },
+              key: { type: :string, description: "安定 ID。初期データ (db/furniture_details.json) の key。管理画面で足した商品は admin:<uuid>", example: "static:101" },
+              name: { type: :string, example: "SANDSBERG サンドスベリ チェア - ホワイト" },
+              category: { type: :string, example: "chair" },
+              slot: { type: :string, enum: FurnitureCandidates::SLOTS, description: "置き場所の枠", example: "floor" },
+              model_key: { type: :string, nullable: true, description: "使う 3D モデルの ID", example: "chair_dining" },
+              symbolic_color: { type: :string, description: "代表色", example: "#f2efe8" },
+              color_materials: { type: :object, additionalProperties: { type: :string, pattern: "^#[0-9a-fA-F]{6}$" }, description: "部位ごとの色。キーはモデルの color_material_keys", example: { "tint" => "#f2efe8" } },
+              texture_materials: { type: :object, additionalProperties: { type: :string }, description: "部位ごとの模様 (texture_key)", example: {} },
+              color_name: { type: :string, nullable: true, example: "ホワイト" },
+              size: { "$ref" => "#/components/schemas/Size" },
+              price: { type: :integer, minimum: 1, description: "リンク先の参考価格 (税込)", example: 2000 },
+              shop: { type: :string, example: "IKEA" },
+              url: { type: :string, description: "購入リンク", example: "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/" },
+              image_url: { type: :string, nullable: true, description: "商品画像", example: nil },
+              themes: { type: :array, items: { type: :string }, example: [] },
+              position: { type: :integer, description: "候補の並び順 (小さいほど先)", example: 0 },
+              enabled: { type: :boolean, description: "false なら提案・検索に出さない", example: true },
+              checked_at: { type: :string, format: "date-time", nullable: true }
+            },
+            required: %w[id key name category slot model_key symbolic_color color_materials texture_materials color_name size price shop url image_url themes position enabled checked_at]
+          },
+          AdminFurnitureDetailList: {
+            type: :object,
+            properties: {
+              details: { type: :array, items: { "$ref" => "#/components/schemas/AdminFurnitureDetail" } },
+              slots: { type: :array, items: { type: :string }, description: "選べる置き場所の枠" },
+              categories: { type: :array, items: { type: :string }, description: "家具検索で使う家具の種類" }
+            },
+            required: %w[details slots categories]
+          },
+          AdminFurnitureDetailInput: {
+            type: :object,
+            properties: {
+              furniture_detail: {
+                type: :object,
+                description: "作成では name, category, slot, model_key, symbolic_color, color_materials, size, price, shop, url が必須。更新では変える項目だけ",
+                properties: {
+                  name: { type: :string, example: "SANDSBERG サンドスベリ チェア - ホワイト" },
+                  category: { type: :string, example: "chair" },
+                  slot: { type: :string, enum: FurnitureCandidates::SLOTS, example: "floor" },
+                  model_key: { type: :string, example: "chair_dining" },
+                  symbolic_color: { type: :string, pattern: "^#[0-9a-fA-F]{6}$", example: "#f2efe8" },
+                  color_materials: { type: :object, additionalProperties: { type: :string, pattern: "^#[0-9a-fA-F]{6}$" }, example: { "tint" => "#f2efe8" } },
+                  color_name: { type: :string, nullable: true, example: "ホワイト" },
+                  size: { "$ref" => "#/components/schemas/Size" },
+                  price: { type: :integer, minimum: 1, example: 2000 },
+                  shop: { type: :string, example: "IKEA" },
+                  url: { type: :string, example: "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/" },
+                  image_url: { type: :string, nullable: true, example: nil },
+                  themes: { type: :array, items: { type: :string }, example: [] },
+                  position: { type: :integer, example: 0 },
+                  enabled: { type: :boolean, example: true }
+                }
+              }
+            },
+            required: %w[furniture_detail]
+          },
+          AdminFurnitureDetailExport: {
+            type: :object,
+            description: "db/furniture_details.json と同じ形。非表示の商品は含まない",
+            properties: {
+              details: { type: :array, items: { type: :object, additionalProperties: true } }
+            },
+            required: %w[details]
+          },
+          AdminFurnitureModel: {
+            type: :object,
+            description: "管理画面用の 3D モデル。無効なものも含む",
+            properties: {
+              id: { type: :string, description: "モデルの安定 ID (GLB ファイル名から拡張子を除いた値)", example: "chair_dining" },
+              name: { type: :string, example: "ダイニングチェア" },
+              category: { type: :string, example: "chair" },
+              shape: { type: :string, example: "chair_dining" },
+              variant: { type: :string, nullable: true, example: nil },
+              size: { "$ref" => "#/components/schemas/Size" },
+              color_material_keys: { type: :array, items: { type: :string }, description: "色が分かれている部位の名前", example: [ "tint", "wood" ] },
+              object_key: { type: :string, description: "バケット内の GLB のパス。モデル ID から決まる", example: "models/furniture/v1/chair_dining.glb" },
+              model_url: { type: :string, nullable: true, example: nil },
+              enabled: { type: :boolean, description: "false なら API・提案から外す", example: true },
+              details_count: { type: :integer, minimum: 0, description: "このモデルを使っている商品の数", example: 2 }
+            },
+            required: %w[id name category shape variant size color_material_keys object_key model_url enabled details_count]
+          },
+          AdminFurnitureModelInput: {
+            type: :object,
+            properties: {
+              furniture_model: {
+                type: :object,
+                properties: { enabled: { type: :boolean, example: false } },
+                required: %w[enabled]
+              }
+            },
+            required: %w[furniture_model]
+          },
           NotFound: {
             type: :object,
             properties: {

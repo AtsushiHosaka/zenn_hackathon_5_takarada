@@ -190,12 +190,12 @@ Cloud Run がゼロまで縮んでいるためのコールドスタート。常�
 
 公開モデル用バケットはTerraformの `models_bucket` 出力で確認できます。BlenderでGLBを生成した後、`make infra-models-publish` で台帳と照合してアップロードします。Terraformのローカル設定がない場合は `MODELS_BUCKET=<バケット名> make infra-models-publish` を使います。
 
-`make infra-release` とGitHub Actionsは、スキーマ適用に続けて `furniture:import` と `furniture_detail:import` を実行し、家具（3Dモデルの台帳）と家具ごとの色・寸法・購入リンクをDBへ取り込んでからCloud Runを更新します。APIは既存の `MODELS_BUCKET` から公開URLを作るため、本番への新しい秘密情報の登録は不要です。GLBのアップロードはリリース前に行います。詳しくは[家具モデルの運用](../../docs/furniture-models.md)を参照してください。
+`make infra-release` とGitHub Actionsは、スキーマ適用に続けて `furniture:import` と `furniture_detail:import` を実行し、家具（3Dモデルの台帳）をDBへ取り込んでからCloud Runを更新します。家具ごとの色・寸法・購入リンクはDBが正で、`furniture_detail:import` は空のときだけ初期データを入れます（本番の商品は管理画面 `/admin` で編集します）。APIは既存の `MODELS_BUCKET` から公開URLを作るため、本番への新しい秘密情報の登録は不要です。GLBのアップロードはリリース前に行います。詳しくは[家具モデルの運用](../../docs/furniture-models.md)を参照してください。
 
 ## 登録された家具と模様
 
-コーデ生成と家具検索は、DBに登録した家具（`furnitures`・`furniture_details`）だけを使い、外部のECは検索しない。登録内容は`backend/db/furnitures.json`と`backend/db/furniture_details.json`が正で、リリース時に取り込む。Gemini認証とownerの利用許可があれば商品選定をGeminiで行い、未設定時はモックのプランナーで動く。
+コーデ生成と家具検索は、DBに登録した家具（`furnitures`・`furniture_details`）だけを使い、外部のECは検索しない。家具（3Dモデルの台帳）は`backend/db/furnitures.json`が正で、リリース時に取り込む。色・寸法・購入リンク（`furniture_details`）はDBが正で、管理画面`/admin`で編集する。`backend/db/furniture_details.json`は空のDBへ入れる初期データ。Gemini認証とownerの利用許可があれば商品選定をGeminiで行い、未設定時はモックのプランナーで動く。
 
-模様（質感の画像）は静的に用意し、`MODELS_BUCKET`の`textures/v1/<texture_key>.png`に置く。一覧は`backend/db/furniture_textures.json`が正で、detailの部位ごとの模様は`furniture_details.json`の`texture_materials`に書く。表示では模様に部位の色を掛ける（`tinted: false`の柄物は掛けない）。APIは画像を生成・保存しない。
+模様（質感の画像）は静的に用意し、`MODELS_BUCKET`の`textures/v1/<texture_key>.png`に置く。一覧は`backend/db/furniture_textures.json`が正で、detailの部位ごとの模様は初期データ`furniture_details.json`の`texture_materials`で入れる（管理画面からの模様の変更は未対応）。表示では模様に部位の色を掛ける（`tinted: false`の柄物は掛けない）。APIは画像を生成・保存しない。
 
-リリース時のタスクは`furniture_texture:clear_legacy`→`db:apply`→`furniture:import`→`furniture_texture:import`→`furniture_detail:import`の順。`db:apply`はSchemafileにないテーブルを削除する（`--drop-table`）。
+リリース時のタスクは`furniture_texture:clear_legacy`→`db:apply`→`furniture:import`→`furniture_texture:import`→`furniture_detail:import`の順（最後は商品が空のときだけ入れる）。`db:apply`はSchemafileにないテーブルを削除する（`--drop-table`）。

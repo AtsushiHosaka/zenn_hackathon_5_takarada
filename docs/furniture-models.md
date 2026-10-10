@@ -4,7 +4,7 @@
 
 ## DBには寸法と用途、GCSの保存先を持つ
 
-`furnitures`にモデルごとの情報を保存する（家具1件＝モデル1つ）。家具の色・寸法・購入リンクは`furniture_details`に持つ。
+`furnitures`にモデルごとの情報を保存する（家具1件＝モデル1つ）。家具の色・寸法・購入リンクは`furniture_details`に持ち、こちらはDBが正で管理画面から編集する（後述）。
 
 | 項目 | 意味 |
 | --- | --- |
@@ -81,7 +81,7 @@ make db-apply
 make furniture-models-import
 ```
 
-本番ではデプロイCIと`make infra-release`が、Cloud Runジョブで`db:apply`・`furniture:import`・`furniture_detail:import`を順に実行する。その後、APIとWebのサービスを新しいイメージへ更新する。
+本番ではデプロイCIと`make infra-release`が、Cloud Runジョブで`db:apply`・`furniture:import`・`furniture_detail:import`を順に実行する。`furniture_detail:import`は商品が空のときだけ初期データを入れる。その後、APIとWebのサービスを新しいイメージへ更新する。
 
 取り込みはJSON全体を検証してからトランザクション内で更新する。同じモデルIDや対応IDを再取り込みしても行は増えない。入力から外した対応関係はDBから削除する。入力にないモデルは削除せず、手動で無効にしたモデルは無効のまま保つ。
 
@@ -92,6 +92,32 @@ DBの一覧は公開API`GET /api/v1/furniture_models`、単体は`GET /api/v1/fu
 旧ローカルURLに対応するモデルがなければ、そのURLを解除してYAML補完か簡易形状へ戻す。Webは取得したカタログを検証し、不正な行を除外する。正常なモデルは表示に使い続ける。
 
 Webが取得した台帳はブラウザのセッション中にキャッシュする。DBの更新や配信元URLの設定後は、ページを再読み込みして反映する。変更前に保存した提案に商品IDがない場合は、簡易形状のまま表示する。
+
+## 管理画面で商品を編集する
+
+Webの`/admin`を直接開くと（画面内に入口のリンクは置いていない）、商品（`furniture_details`）のリンク・画像・価格・寸法・置き場所の枠・並び順・色を編集し、3Dで見た目を確かめられる。3Dモデルは有効・無効だけを切り替えられる。GLBと寸法は従来どおり`backend/db/furnitures.json`で管理する。
+
+使えるのは管理者（`users.admin`が`true`の人）だけで、`/api/v1/admin/*`が403を返す。管理者かどうかはユーザー情報の応答には出さず、画面はこの403で判断する。APIからは管理者を変えられず、メールアドレスを指定してタスクで付け外しする。ローカルではseedが管理者`admin@example.com`（パスワード`password`）を作る。このアカウントは開発環境にだけ作り、本番には作らない。
+
+```bash
+# ローカル
+docker compose exec api bin/rails 'admin:grant[you@example.com]'
+docker compose exec api bin/rails admin:list
+
+# 本番 (Cloud Run ジョブ)
+make infra-task T='admin:grant[you@example.com]'
+make infra-task T='admin:revoke[you@example.com]'
+```
+
+商品はDBが正で、管理画面での追加・編集・削除がそのまま提案と家具検索に使われる。`backend/db/furniture_details.json`は空のDBへ入れる初期データで、`furniture_detail:import`は`furniture_details`に1件でもあれば何もしない。デプロイのたびに実行しても、本番の編集は消えない。JSONを直してマージしても本番の商品は変わらないので、本番の商品は管理画面で直す。
+
+商品を一時的に外すときは「提案・検索に出す」を外して非表示にする。削除は元に戻せない。保存済みの部屋と提案は商品の写しを持っているので、削除しても変わらない。
+
+「JSONを書き出す」は、今のDBを`furniture_details.json`と同じ形で保存する（並び順どおり、非表示の商品は含まない）。本番の控えを取るときと、初期データを本番の内容へ合わせてコミットするときに使う。手元のDBを初期データへ戻すには`FORCE=1`を付けて取り込む（JSONに無い商品は消える）。
+
+```bash
+docker compose exec -e FORCE=1 api bin/rails furniture_detail:import
+```
 
 ## 更新時はファイルと台帳をそろえる
 

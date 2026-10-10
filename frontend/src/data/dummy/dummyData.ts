@@ -8,4 +8,6 @@ export const dummyUsers: User[] = [
   { id: 1, name: "User 1", email: "user1@example.com", createdAt: at("2026-01-01T00:00:00Z"), updatedAt: at("2026-01-01T00:00:00Z") },
   { id: 2, name: "User 2", email: "user2@example.com", createdAt: at("2026-01-02T00:00:00Z"), updatedAt: at("2026-01-02T00:00:00Z") },
   { id: 3, name: "User 3", email: "user3@example.com", createdAt: at("2026-01-03T00:00:00Z"), updatedAt: at("2026-01-03T00:00:00Z") },
+  // 管理画面 (/admin) を使える管理者。ダミーでは data/dummy/dummyFurnitureAdminRepository.ts がこのメールアドレスで判定する
+  { id: 4, name: "Admin", email: "admin@example.com", createdAt: at("2026-01-04T00:00:00Z"), updatedAt: at("2026-01-04T00:00:00Z") },
 ];

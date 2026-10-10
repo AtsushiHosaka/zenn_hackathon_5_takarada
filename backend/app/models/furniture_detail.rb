@@ -2,12 +2,16 @@ class FurnitureDetail < ApplicationRecord
   belongs_to :furniture, inverse_of: :details
   has_many :detail_textures, class_name: "FurnitureDetailTexture", dependent: :delete_all, inverse_of: :furniture_detail
 
+  # 提案・検索に出す detail。管理画面で非表示にしたものを除く
+  scope :available, -> { where(enabled: true) }
+
   validates :key, presence: true, uniqueness: true
   validates :name, :category, :shop, :url, presence: true
   validates :slot, inclusion: { in: FurnitureCandidates::SLOTS }
   validates :symbolic_color, format: { with: /\A#[0-9a-f]{6}\z/i }
   validates :price, numericality: { only_integer: true, greater_than: 0 }
   validates :width, :height, :depth, numericality: { greater_than: 0 }
+  validates :enabled, inclusion: { in: [ true, false ] }
   validate :valid_themes
   validate :valid_color_materials
 
