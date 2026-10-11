@@ -27,3 +27,20 @@ python3 tools/furniture_models/manifest.py
 - 柄・織り目 (リネン調、ワッフル、ジュート、リーフ柄、ボタニカル柄、ブークレ) はGLBに含めていない。上記のテクスチャ差し替えで付ける。
 
 GLBはGit管理外の`output/`に保存し、フロントへ同梱しない。GCSへの配置とDBへの取り込みは[家具モデルの運用手順](../../docs/furniture-models.md)を参照。
+
+## AI で作る (`generator/`)
+
+管理画面の「3Dモデルを作る」が使うジョブ。商品の画像と寸法から Gemini にモデルの定義 (上の `@asset` の書き方) を書かせ、検査・組み立て・描画までを行う。仕様は [specs/model-generation/spec.md](../../specs/model-generation/spec.md)。
+
+- `generate.py`: ジョブの本体。置き場 (`GENERATION_URI`。`gs://...` か手元のディレクトリ) の `request.json` を読み、`result.json`・`model.py`・`model.glb`・`front.png`・`side.png` を置く。
+- `checks.py`: 検査 (許した書き方、浮いた部品、部位の名前、光る素材、三角形数など)。
+- `build.py` / `render.py`: 検査済みの定義の組み立てと、確認用の画像の描画 (Cycles の CPU)。別プロセスで動かす。
+- `Dockerfile`: Cloud Run のジョブのイメージ。Blender 本体は入れず、`bpy` だけを使う。
+
+```bash
+# 手元で 1 つ作る (Python 3.13 の環境に bpy==5.1.2 numpy google-auth requests google-cloud-storage を入れておく)
+mkdir -p /tmp/gen && echo '{"model_key": "ai_test", "name": "ラウンドスツール", "category": "chair", "size": {"w": 0.35, "h": 0.45, "d": 0.35}, "color": "#e2c08f", "material": "木", "image_url": null}' > /tmp/gen/request.json
+GENERATION_URI=/tmp/gen GOOGLE_CLOUD_PROJECT=<project> python tools/furniture_models/generator/generate.py
+```
+
+AI で作ったモデルは DB だけが持ち、`backend/db/furnitures.json` には載せない。
