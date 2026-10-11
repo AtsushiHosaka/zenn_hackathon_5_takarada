@@ -48,6 +48,18 @@ docker buildx build \
   --push \
   "$ROOT/frontend"
 
+echo "-- 3D モデルを作るジョブ"
+# Blender の部品 (約 400MB) を含むので、初回のビルドは数分かかる
+model_builder_repo="$(tfout model_builder_image_repo)"
+docker buildx build \
+  --platform "$platform" \
+  -f "$ROOT/tools/furniture_models/generator/Dockerfile" \
+  -t "$model_builder_repo:$tag" -t "$model_builder_repo:latest" \
+  --push \
+  "$ROOT/tools/furniture_models"
+gcloud run jobs update "$(tfout model_builder_job)" --image "$model_builder_repo:$tag" \
+  --region "$region" --project "$project_id" --quiet
+
 echo
 echo "== 2/3 db/Schemafile を Cloud SQL に適用します"
 # 新しいイメージでスキーマを当ててから、下でサービスを差し替える
