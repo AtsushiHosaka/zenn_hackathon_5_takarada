@@ -59,3 +59,26 @@ export type AdminFurnitureModel = {
   enabled: boolean;
   detailsCount: number;
 };
+
+// AI による 3D モデルの生成 1 回分。running のあいだは数秒おきに取得し直す
+export type ModelGenerationStatus = "running" | "succeeded" | "failed" | "adopted" | "rejected";
+export type ModelGenerationFile = "front.png" | "side.png" | "model.glb";
+
+export type ModelGeneration = {
+  id: number;
+  furnitureDetailId: number;
+  // 作るモデルの ID。採用すると 3D モデルの ID になる
+  modelKey: string;
+  status: ModelGenerationStatus;
+  errorMessage: string | null;
+  // AI が書いた、形の捉え方のメモ
+  notes: string | null;
+  checks: { name: string; ok: boolean; detail: string }[];
+  // 組み立てられたときだけ入る
+  stats: { triangles: number; materials: string[]; bytes: number; size: FurnitureSize } | null;
+  ai: { model: string; calls: number; seconds: number } | null;
+  // 取得できるファイル
+  files: ModelGenerationFile[];
+  createdAt: Date;
+  finishedAt: Date | null;
+};

@@ -78,5 +78,28 @@ export function createDummyFurnitureAdminRepository(tokenStore: TokenStore): Fur
       models = models.map((candidate) => candidate.id === id ? model : candidate);
       return model;
     },
+
+    // ダミーには生成のジョブが無い
+    async listModelGenerations() {
+      await tick();
+      requireAdmin();
+      return [];
+    },
+
+    async startModelGeneration() {
+      throw new DomainError("ダミー接続では3Dモデルを作れません。接続先を API にしてください", 422);
+    },
+
+    async adoptModelGeneration() {
+      throw new DomainError("見つかりません", 404);
+    },
+
+    async rejectModelGeneration() {
+      throw new DomainError("見つかりません", 404);
+    },
+
+    async modelGenerationFile() {
+      throw new DomainError("見つかりません", 404);
+    },
   };
 }
