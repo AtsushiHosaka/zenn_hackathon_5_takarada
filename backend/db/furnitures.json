@@ -22,7 +22,8 @@
    ],
    "bytes": 10500,
    "sha256": "f1d73105a0d15d6dedcb10e15b9cb116ff8ef293b8b439caa1e50633ef6d4f4e",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "acrylic_stand",
@@ -45,7 +46,8 @@
    ],
    "bytes": 50684,
    "sha256": "cbedf4a6bdaf5fbbab8bc30d315a6ea1a6bb1eb2da8944b82c4973754d143e3a",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "acrylic_stand_big",
@@ -67,7 +69,8 @@
    ],
    "bytes": 29192,
    "sha256": "c8ee5507f44c066ecb506e20ca1677c3e50b5a514e623bb3116381515fa02bcc",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "acrylic_stand_case",
@@ -88,7 +91,12 @@
    ],
    "bytes": 42648,
    "sha256": "e34e7c24ce2d4f2ce3db18e5ee6047560ba4e94d3df09dab445e34a54bd1a6d5",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "acrylic_stand_l",
@@ -110,7 +118,8 @@
    ],
    "bytes": 29444,
    "sha256": "30ab1b1162ec2eb048436978252e3839a0f12c48db9e14dcbd5f6cf2d7a51edb",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "acrylic_stand_m",
@@ -132,7 +141,8 @@
    ],
    "bytes": 29444,
    "sha256": "d7d4f881c05b8e1c33c423ecc61281ca8fea044a7d53b7af56f8246aaafe924a",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "acrylic_stand_s",
@@ -154,7 +164,8 @@
    ],
    "bytes": 29476,
    "sha256": "901f83a03bc74a5653e26faf177aa4a6856f4a89f1d7869ad7e620436651bdb0",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "air_purifier",
@@ -177,7 +188,8 @@
    ],
    "bytes": 140524,
    "sha256": "258e875889ff423bc3850d21059477313ce4fe802a7aaca0363e3c3b0d8ce478",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "aquarium",
@@ -202,7 +214,8 @@
    ],
    "bytes": 325236,
    "sha256": "a10567b2d41cf1ebf86e7d89fb94a9cdcdabac7cd762847e550b1ed329214ca0",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "armchair_wing",
@@ -224,7 +237,8 @@
    ],
    "bytes": 158984,
    "sha256": "77b50ca16679e0eefdf9d6d44f134cb31b3ba4f6692ae81f6b348d23232fed28",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "badge_display",
@@ -249,7 +263,8 @@
    ],
    "bytes": 165692,
    "sha256": "87ebc43b39ecec832df938368266ab5e11c5fe73e8e1ef43985c35517e864972",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "balcony_set",
@@ -271,7 +286,8 @@
    ],
    "bytes": 131756,
    "sha256": "4f36e3ee58961aead3dd09739b83bb24ab60c05166f8979ac7c865f5a7bbe741",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "beanbag",
@@ -292,7 +308,8 @@
    ],
    "bytes": 15188,
    "sha256": "4eaf9deb534a665b980e965507edbff8556b973baa2c0a8616a21de418903ed6",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bed_bunk",
@@ -315,7 +332,8 @@
    ],
    "bytes": 223284,
    "sha256": "802756d05829d7cdbbf36cce8459f86b3f02847eb0dbecc0e95514b13bc5b570",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bed_canopy",
@@ -339,7 +357,8 @@
    ],
    "bytes": 319424,
    "sha256": "a8e57f7a2517205b71fdb1989f3c10d2d6b76b53a1766bd05132ec31748f71e8",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bed_cover",
@@ -360,7 +379,11 @@
    ],
    "bytes": 66968,
    "sha256": "2956ab8924c55d2d7544ac0225bf0f556bf17f06c9b118f7761c4d1685b44544",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "h",
+    "d"
+   ]
   },
   {
    "id": "bed_cover__101",
@@ -381,7 +404,12 @@
    ],
    "bytes": 66976,
    "sha256": "39812e8d3238c3d7a1ed3913fc64e924582553cea79afbf98f00d527aec0c7a0",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "bed_cover__201",
@@ -402,7 +430,12 @@
    ],
    "bytes": 66976,
    "sha256": "ab4dffd69bf3aee75ab2a6823735fea9e623192a2f7a2cf60a7e2372f4a99d74",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "bed_cover__301",
@@ -423,7 +456,12 @@
    ],
    "bytes": 66976,
    "sha256": "caf32e2de88a465bb713db2df54574a99a0b148d4b388589e4e02f3578fee83f",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "bed_double",
@@ -446,7 +484,8 @@
    ],
    "bytes": 82348,
    "sha256": "eeb845691502522dbd1bf7cbf3fc1606dfa43947ab73e0c366a332efc5c9a407",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bed_headboard_double",
@@ -470,7 +509,8 @@
    ],
    "bytes": 250296,
    "sha256": "e11c7d4ef45cf983394ec41832169f213faa3101b045b56b22a31dd0fd778bec",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bed_kids",
@@ -494,7 +534,8 @@
    ],
    "bytes": 148480,
    "sha256": "4d92d928e2b0be408fd8bb690650939bfdbe83df443064c80bdea3ab84618a6f",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bed_loft",
@@ -517,7 +558,8 @@
    ],
    "bytes": 160376,
    "sha256": "b0782c373e5a5928ef280c2b0093a5f4e1d80e7dbe6748b71343e9f663d6c119",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bed_semidouble",
@@ -540,7 +582,8 @@
    ],
    "bytes": 70448,
    "sha256": "2c2cb119746fde1fdadc00762338232f7b680e1b6c287ef2e269362789544ca0",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bed_single",
@@ -563,7 +606,8 @@
    ],
    "bytes": 70540,
    "sha256": "da0f7f15fd82c7341aa53ef49a9a520c42293ec5d0ba91d581de4339c1f32031",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bed_slatted",
@@ -587,7 +631,8 @@
    ],
    "bytes": 175804,
    "sha256": "4df336071c742007eb7c02c33ea71b398e5d091c19c53a6db72cf5c084b2f0f6",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bed_storage",
@@ -611,7 +656,8 @@
    ],
    "bytes": 68364,
    "sha256": "728093f221f62d3af81061ea2a7e3b9a37565b8754f8982696b4c51d9b1b900c",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bench_upholstered",
@@ -634,7 +680,8 @@
    ],
    "bytes": 63520,
    "sha256": "42804194e96c9fafc24b48624e9951ef6b3d1344aeae08b13dbf30477acb6910",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bench_wood",
@@ -655,7 +702,8 @@
    ],
    "bytes": 21068,
    "sha256": "9c2dc2f6ccf4eb6beecebed8af530b77c21373ee83b58f60cf77313ad5aea95d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "blanket_folded",
@@ -676,7 +724,8 @@
    ],
    "bytes": 76920,
    "sha256": "460c31c3594cf33c1123842368f789d3daa7d9d4b54a470bf41b3a6275a1d3ab",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "blanket_print",
@@ -698,7 +747,8 @@
    ],
    "bytes": 47968,
    "sha256": "2139a37467a590861072d2be0983bda3d954e7700e0c739807436b5b132005dd",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "blind_roller",
@@ -721,7 +771,8 @@
    ],
    "bytes": 39012,
    "sha256": "0292a0d10f85cf9fe52345ce4fb844dc1c437f0efeee110816c51b46bf3cacf7",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "body_pillow",
@@ -743,7 +794,8 @@
    ],
    "bytes": 41344,
    "sha256": "04ef4aa84ea7c469efa12a160a77fa85cb0c7e975f40115b585a474ea1c42ad3",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "books_row",
@@ -767,7 +819,8 @@
    ],
    "bytes": 196664,
    "sha256": "20d7cb5f4c61f9f73d4e0d09f9b9d6e069cbba2bb3d4602ef9a5bd22b5842feb",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "books_stack",
@@ -791,7 +844,8 @@
    ],
    "bytes": 75556,
    "sha256": "c83232e0943a6e7575c7c79ac9b3b6edc486d55a6a9778e04c0f768c9c923608",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bookshelf",
@@ -812,7 +866,8 @@
    ],
    "bytes": 33492,
    "sha256": "6c203164f840d876f51632203227aabe9a5b57c9cc52657579b735fac0152978",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bookshelf__w060",
@@ -833,7 +888,8 @@
    ],
    "bytes": 33244,
    "sha256": "ecc4ec349fc657519a2cd9c8681f7672f5f88aef07a58baf32d1c76e875101c8",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "bookshelf__w100",
@@ -854,7 +910,8 @@
    ],
    "bytes": 33376,
    "sha256": "c42f325fdebb55aafe5e72700352403414840199b906fc2f905247d575910351",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "cabinet_glass",
@@ -877,7 +934,8 @@
    ],
    "bytes": 88496,
    "sha256": "1494434eeecb0992ec11aed32c6a3c7b6aae737ab9b038bd04766316f4c948e1",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "can_badge",
@@ -900,7 +958,8 @@
    ],
    "bytes": 20636,
    "sha256": "8dba80ab7144cc7c6cd715a04160daedee352e19293d0adf345dbdd8c61733b1",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "candle",
@@ -922,7 +981,12 @@
    ],
    "bytes": 20008,
    "sha256": "d2b927db8413c62de7f30c0e9e9506f91d00138901a74c11903ed788e0f2dc49",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "cat_tower",
@@ -945,7 +1009,8 @@
    ],
    "bytes": 298576,
    "sha256": "c1ac7ee00b013d2c406a9be5f5c1a2fd73e17c0b415f0712f7f227888e569da5",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "ceiling_light",
@@ -968,7 +1033,8 @@
    ],
    "bytes": 87304,
    "sha256": "59acad32a11f9c045a899669d7a39d69d73e3c717d3880c56dd808cbbffe37ff",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "chair_dining",
@@ -990,7 +1056,8 @@
    ],
    "bytes": 72592,
    "sha256": "fa3e660276162bb8300be88c8066bd9b51538f6b3ff5e4c2c8d341ff44e57ca1",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "chair_folding",
@@ -1013,7 +1080,8 @@
    ],
    "bytes": 39828,
    "sha256": "c02a840a56c64278382782404b89acdbd4e36c3ee0c124a9cd32f205f537f215",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "chair_gaming",
@@ -1037,7 +1105,8 @@
    ],
    "bytes": 284108,
    "sha256": "86b82713de6dc3dc2c402c5db1f6f4b0f8f04ef643ade9913e8fd0859a179ca8",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "chair_lounge",
@@ -1059,7 +1128,12 @@
    ],
    "bytes": 101576,
    "sha256": "9ad2d78ce455e5920442b96f550fdcf2ad062161ab72f0cfc9aaa93211bcd887",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "chair_office",
@@ -1082,7 +1156,8 @@
    ],
    "bytes": 106940,
    "sha256": "f7e9100ed72f5029914bac6dc65c5d4767926fcf755e86ba93e46e20b0d46604",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "chair_rattan",
@@ -1104,7 +1179,8 @@
    ],
    "bytes": 257824,
    "sha256": "ae32f309770c70015e529e8dbe8aa83bcc64048d51bc0da93c5e7ca0378ec5cd",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "chair_shell",
@@ -1127,7 +1203,8 @@
    ],
    "bytes": 68864,
    "sha256": "957dc30cb46e61d62f5f0c69967f823476e4678acab3440b29cd1fbf8831b4c5",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "chair_windsor",
@@ -1149,7 +1226,8 @@
    ],
    "bytes": 64288,
    "sha256": "d1f29a3c0584f1fb0e88a9a4db87dbeed6b935ee991228d95ac51eaf244cf8b5",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "chair_wishbone",
@@ -1171,7 +1249,8 @@
    ],
    "bytes": 116372,
    "sha256": "cb160a29ad5a1f679c053fee9b5585412b7019fbc736b279b509eec0fff8ae5d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "chaise_longue",
@@ -1193,7 +1272,8 @@
    ],
    "bytes": 102620,
    "sha256": "34cee4865abf28856919441ce52b64747504f759dbf86d3bc73ef9653cb382fa",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_acrylic_stand",
@@ -1228,7 +1308,8 @@
    "sha256": "3fb83a1d733add7b9b4c9e64f62d380b783147c286f54373e84a47de235564a7",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_bed_cover",
@@ -1266,7 +1347,8 @@
    "sha256": "a1dcc600660e7f8f086cc74e78b294a377770b424063813b06e32b247417b581",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_blanket",
@@ -1303,7 +1385,8 @@
    "sha256": "0e3add40aca1b621463da01d013c0bb1d5eef8a368a86c28b84ed74939f432f5",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_can_badge",
@@ -1337,7 +1420,8 @@
    "sha256": "89de19bbb2c11d7531be495057edd15da1a47701e5b3503d21a300465bcad82b",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_cushion",
@@ -1366,7 +1450,8 @@
    "sha256": "03baba4baddb97e86bb87db9ead39afdd52299577e4afa994411005bd2203c00",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_cushion_body",
@@ -1402,7 +1487,8 @@
    "sha256": "576bbf824fc4062defc459b1cea178c7a5adbcb94b2cf03c30b9f878ffa0752e",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_cushion_round",
@@ -1435,7 +1521,8 @@
    "sha256": "7ed8ad7f1503a61b70e99d974e4c2536d333be7c6cee6c80428e20846087b76f",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_cushion_square",
@@ -1472,7 +1559,8 @@
    "sha256": "586523a302c7bf30f1a84a4240a9088b45a8d4f162aaca1ec0217ccf7d9811da",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_dakimakura",
@@ -1508,7 +1596,8 @@
    "sha256": "191933a8d58cbe6f10cb6430b8e95ee391d43b70b7f56543aebb3ca351ab4e31",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_desk_mat",
@@ -1545,7 +1634,8 @@
    "sha256": "513904d00a567921dd950fa8b08a498e091c35c06ad3616be3cfef62ed855de0",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_diorama",
@@ -1583,7 +1673,8 @@
    "sha256": "b2cb3703d90a0d5acd3c1b493b1dec412d9707915edeb67b8f7fb79fc8a2d19e",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_figure",
@@ -1618,7 +1709,8 @@
    "sha256": "a8ff3bba87a8bdda241c9e95548f204a17d48f45aa17a14010b550981525a743",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_led_light",
@@ -1643,7 +1735,8 @@
    "sha256": "1a7900d44916d4d1a7d16dfae6c85c85a5dc1cbf46c15acc08466b802fff9dcc",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_mug",
@@ -1676,7 +1769,8 @@
    "sha256": "bb5ab268720e6f271817ccdbf185f27a93b8660abce0673cb2c9fc4bcae281ec",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_pc_cushion",
@@ -1710,7 +1804,8 @@
    "sha256": "335b31c4b824ae5f7bc2a764cf9fdd77cbd77ea9a08d56b68827b9ede5d4b68f",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_penlight",
@@ -1746,7 +1841,8 @@
    "sha256": "ee9cd872afd6e8465be9ab516e9d636466ee2d3ca88b5659ae9ea32f38a996fa",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_plush",
@@ -1780,7 +1876,8 @@
    "sha256": "cfd783e20f696d2dcfce0cc8b920bf083fc850131d1f8d70aee9b0b02a46c1fc",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_plush_big",
@@ -1814,7 +1911,8 @@
    "sha256": "ab40d28643e67e1b21c1286c49340015814b9a09b2d906860e9a8cbfae4b3958",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_plush_lying",
@@ -1848,7 +1946,8 @@
    "sha256": "6607ca2f7046b5ce832bedc51c8c355c34090af057b8cd3084eeefa4eea1db00",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_plush_negi",
@@ -1886,7 +1985,8 @@
    "sha256": "e6913615618748724b83cb09540e041a39a2aa668808fc2bb712df844b687c32",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_poster_a3",
@@ -1923,7 +2023,8 @@
    "sha256": "4ce8dd0057722c4c47a12fd6dfb0b3c8657c436d0a1d744492d98598ca0ba764",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_rug",
@@ -1951,7 +2052,8 @@
    "sha256": "c8bb127a083058fc2933d12b528fbf379eb7d018dd656d5a1c53e13afefd221c",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_seat_cushion",
@@ -1984,7 +2086,8 @@
    "sha256": "d000cf603b7e57c60d8720b0ca004e008e410615230e6ba59ddfcd8a8d20461e",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_standee",
@@ -2020,7 +2123,8 @@
    "sha256": "21136d8faee12d4200ccb99657ec0e1f3dc3b1809596868a4aa9c5b06c2483e8",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_tapestry_b2",
@@ -2058,7 +2162,8 @@
    "sha256": "6d3d0f871cc898e8f70bd51a38c1c1cec06b58178be3641bf05a40b03d1a94b2",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_tapestry_life",
@@ -2096,7 +2201,8 @@
    "sha256": "d47238296e2ca78fdf11d42a419a410123e4fa2267e94adf639d5956f4454ebf",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_uchiwa",
@@ -2133,7 +2239,8 @@
    "sha256": "1209fa5e7be28a84e2206bc5f611cc516dd0aa90996f0e962ba23ce2ee9189b1",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "char_hatsune_miku_wall_clock",
@@ -2167,7 +2274,8 @@
    "sha256": "bdd2075c369627f676f1353f1241c8fc73c05a6f097d693ec77076ce7468a50f",
    "characters": [
     "hatsune_miku"
-   ]
+   ],
+   "estimated_axes": []
   },
   {
    "id": "chest_drawers",
@@ -2189,7 +2297,8 @@
    ],
    "bytes": 97024,
    "sha256": "6190585809d03db0421a55994e2dc9bec0d6e795ac2743268ec66966e697e3b3",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "chest_low",
@@ -2211,7 +2320,8 @@
    ],
    "bytes": 47900,
    "sha256": "ab2c3acfb2bc47f3c153c84f30cee6980c5120442794b51975b4a7eaa11b88c7",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "chest_tall",
@@ -2233,7 +2343,8 @@
    ],
    "bytes": 89136,
    "sha256": "7d6490a9782bec0abc98a50f89a8e59fa789ee14ffa73e1426e76cd574dfee55",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "coat_stand",
@@ -2255,7 +2366,8 @@
    ],
    "bytes": 129980,
    "sha256": "1fadaeb9907cef425fbb2af2c160fcde2b277bd44c3d5067ac6ac522f912567b",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "coffee_maker",
@@ -2279,7 +2391,8 @@
    ],
    "bytes": 69796,
    "sha256": "43e845ddcc2d0ae450741150b7b7eeb3e8e78bce547efc65600fec7462f13c35",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "console_table",
@@ -2301,7 +2414,8 @@
    ],
    "bytes": 39932,
    "sha256": "852ec2ec3354e0c6932046874b43e76c0569932a9e4dcd85c2f24e719511d98c",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "crib",
@@ -2325,7 +2439,8 @@
    ],
    "bytes": 300504,
    "sha256": "40ea8d9a3ef9cf66f524f5860d379e8d4fa1ea7b2c2e9159ce4944ed9fc2bc88",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "cupboard",
@@ -2348,7 +2463,8 @@
    ],
    "bytes": 110952,
    "sha256": "5f724aa42634b63e54794f91c11ef50f6d87a199ee2bb818dba24550c2c92e29",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "curtain_pair",
@@ -2369,7 +2485,8 @@
    ],
    "bytes": 211784,
    "sha256": "46bf56fe5169ae52921876dd16a2264bac1d4dcab68ac2ae368708b077c149bc",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "curtain_pair__102",
@@ -2390,7 +2507,12 @@
    ],
    "bytes": 211796,
    "sha256": "664bcaea2aa1219373f635c9bdd69c667a5eb7f66247faa09abc9847e8352b3a",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "curtain_pair__202",
@@ -2411,7 +2533,12 @@
    ],
    "bytes": 211792,
    "sha256": "7fc9fd820ccdbefd04ff1bafd623e9f93672f8791443f94700f610382a4b0a5f",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "curtain_sheer",
@@ -2432,7 +2559,8 @@
    ],
    "bytes": 329840,
    "sha256": "16d2f74a37099164f380a6c4d10c2df7c39a9617fd8f58a0ef87d78c1680c766",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "curtain_sheer__115",
@@ -2453,7 +2581,12 @@
    ],
    "bytes": 221360,
    "sha256": "3cdddfe9c33862868c19884dac586a5141f552f558b42b738f4becefdea01c3e",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "curtain_sheer__302",
@@ -2474,7 +2607,12 @@
    ],
    "bytes": 329852,
    "sha256": "35ffa83199768abb605fd39fe4e2612d292415cea895611a36272210ba9e0755",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "curtain_sheer__901",
@@ -2495,7 +2633,12 @@
    ],
    "bytes": 201308,
    "sha256": "604c3ce055ada3d685f17fe42a435ca122b167c54fd9a4efc1e2a46c87fe8546",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "curtain_tieback",
@@ -2518,7 +2661,8 @@
    ],
    "bytes": 296396,
    "sha256": "3b90b7bc770422d654225bbdecedf765891c0fc6eee1833341b7ab9989020c72",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "cushion",
@@ -2539,7 +2683,10 @@
    ],
    "bytes": 35024,
    "sha256": "2319c20835d8664d12ff3f370eefb30de8425be9554e4101773fd199fca63818",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "h"
+   ]
   },
   {
    "id": "cushion__107",
@@ -2560,7 +2707,12 @@
    ],
    "bytes": 35036,
    "sha256": "b706239c3bb65c7951e2eec0ace1c8929a43e38b38704922c2b6109df3b29773",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "cushion__207",
@@ -2581,7 +2733,12 @@
    ],
    "bytes": 35032,
    "sha256": "8a4643c5c22962ad6e2ad0c074edb27ec42a38c5ce0830cb7ae0ce3997014a9d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "cushion__307",
@@ -2602,7 +2759,12 @@
    ],
    "bytes": 35032,
    "sha256": "395059e50b229a640deacf6b903c38c91641e74ea72ef62dedeee837e54d3a3f",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "cushion_diecut",
@@ -2624,7 +2786,8 @@
    ],
    "bytes": 55740,
    "sha256": "149d844397f87499baf076f18284d221863a123cb9ae7ea15fb8b59e325ac9dd",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "cushion_round",
@@ -2646,7 +2809,8 @@
    ],
    "bytes": 26040,
    "sha256": "d3869988ed77cca3b185ca5ae9cbf423d84cc76da7c705c5fff04d4a60567e91",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "daybed",
@@ -2670,7 +2834,8 @@
    ],
    "bytes": 162436,
    "sha256": "ef55eb32ee71e80f3d2e0e942bb71536a946dd9f5b374568658163391adb591d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "desk_fold",
@@ -2692,7 +2857,8 @@
    ],
    "bytes": 45800,
    "sha256": "314902925cdcd17422a473f44de399eb56352b64742ae27525b4e31a36421ee2",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "desk_l_left",
@@ -2714,7 +2880,8 @@
    ],
    "bytes": 34380,
    "sha256": "30abeda7dee4a5245f295c57c86983c99ff8be422d4de271dc45657b21211fb3",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "desk_lamp_arm",
@@ -2737,7 +2904,11 @@
    ],
    "bytes": 76980,
    "sha256": "a5175e47e69c10a08ec3546b320c6c6e23bb12d840142714885e985e6e7412b9",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "d"
+   ]
   },
   {
    "id": "desk_lamp_clip",
@@ -2760,7 +2931,12 @@
    ],
    "bytes": 62036,
    "sha256": "dba69bb1cae9bac166aeb17f88d845226f470685427923b42bcac7bc022c448a",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "desk_shelf",
@@ -2782,7 +2958,8 @@
    ],
    "bytes": 25356,
    "sha256": "8630b12d96e4a4a66a6f604414b335b42e7aefc9678f8aa9334743c998a1c3dc",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "desk_standing",
@@ -2805,7 +2982,8 @@
    ],
    "bytes": 86468,
    "sha256": "64153cc76ab29b4c7a292058ba38db9ae4ed4ccbff31e7c395b41b03a2519589",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "desk_wide",
@@ -2827,7 +3005,8 @@
    ],
    "bytes": 47984,
    "sha256": "548404db7b8d4dadfee3df8ecdd576ebf2e4f910b1345e3829eaae29ae6c10dd",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "desk_wood",
@@ -2848,7 +3027,8 @@
    ],
    "bytes": 28096,
    "sha256": "b19f113a1727277cc4d1261880730a833d7b2e6c6259764d77aa15587259553f",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "desk_wood__w080",
@@ -2869,7 +3049,8 @@
    ],
    "bytes": 28168,
    "sha256": "07fee5e6bd3cc4a397af732e801a6065633b4def7f6c3a1b39279ae6c378f892",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "desk_wood__w120",
@@ -2890,7 +3071,8 @@
    ],
    "bytes": 28008,
    "sha256": "35f8d39c23efdf4f647d6745acb5fe418742d6df5f558af76d459c47cd498e6e",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "desktop_pc",
@@ -2914,7 +3096,8 @@
    ],
    "bytes": 103720,
    "sha256": "2715d29432cd4178a91f8be7eae289205791a2f7115508c013cd5e89e8a9714f",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "dining_set_2",
@@ -2936,7 +3119,8 @@
    ],
    "bytes": 156092,
    "sha256": "a926282865bf656deb2127450a67f37c980aee440287fcfde60cd4a08e7f2010",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "dish_rack",
@@ -2960,7 +3144,8 @@
    ],
    "bytes": 208564,
    "sha256": "3ee47c494409102f9650c5d9b8d8676c8a5a813a0ef2f678f164be94b87741d0",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "display_case",
@@ -2983,7 +3168,8 @@
    ],
    "bytes": 40428,
    "sha256": "4245c5665440637c242e8f26f73fb084c8db294d51919e90f63ad23c0a94b611",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "display_rack_open",
@@ -3004,7 +3190,8 @@
    ],
    "bytes": 38164,
    "sha256": "974fd6e3fce6e7fa66e8c69d72bfb5d402ca33bc2cfcf0b475c4c0e8d5b5e649",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "display_stand_floor",
@@ -3025,7 +3212,8 @@
    ],
    "bytes": 36332,
    "sha256": "bcc92158cedd16708487fa65744bc9e22880f21e043aadb9b2420b9644f3fa6f",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "dresser",
@@ -3049,7 +3237,8 @@
    ],
    "bytes": 55928,
    "sha256": "a5d041a683f3c23c11fc6141c53dd4a202a6fce291b95ec2e9ea4d6ca2e2e312",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "dried_flowers",
@@ -3073,7 +3262,8 @@
    ],
    "bytes": 202316,
    "sha256": "b3fa1e2474b074e989dd8b9eda3d0ca203f60799123e2b6bab284514b4a4b098",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "drying_rack",
@@ -3095,7 +3285,8 @@
    ],
    "bytes": 64148,
    "sha256": "53b2e51630c43f608b9d0e6b2e3f0b89eec751ae6d3fd732532b11676c5211c0",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "duvet_set",
@@ -3117,7 +3308,8 @@
    ],
    "bytes": 142228,
    "sha256": "0e34c9fd649824247571c8cac8dab6772166873c91b07dd71f8263a5e439dbd3",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "fairy_lights",
@@ -3139,7 +3331,8 @@
    ],
    "bytes": 173076,
    "sha256": "aeaa16d02f95f47f8c58f53fb5031e8f9950925e625f27799234432312e1aab4",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "fan",
@@ -3162,7 +3355,8 @@
    ],
    "bytes": 336108,
    "sha256": "9c756e8975d2a1032d8865972336c7c867ef11186b034b97a98c96c869a09099",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "figurine",
@@ -3185,7 +3379,8 @@
    ],
    "bytes": 100388,
    "sha256": "b9dd6c2bfac40fab002e679abb542a349a4f4e498cbe4711ddf3a864bc7a6682",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "file_wagon",
@@ -3208,7 +3403,8 @@
    ],
    "bytes": 66196,
    "sha256": "327f6c231c60d6ca9a7c296e343406b2b4ff2851c06ad7118b8febe746a3b969",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "floor_chair",
@@ -3230,7 +3426,8 @@
    ],
    "bytes": 59988,
    "sha256": "592ac51eb8ce89fa658615fa0a946b10164221774f61391b5dd6f09e2a2a1ea1",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "floor_lamp",
@@ -3253,7 +3450,12 @@
    ],
    "bytes": 43376,
    "sha256": "862d0026b8598fbdc250c7344ce677578c76db49e3cb0b8b7ec016acb1076763",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "floor_lamp_arc",
@@ -3277,7 +3479,8 @@
    ],
    "bytes": 178764,
    "sha256": "722817b4f75ace2da1eaa1883245c1ac7d545b14d375d85db7acd652da3f7d2c",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "floor_lamp_ball",
@@ -3299,7 +3502,12 @@
    ],
    "bytes": 66804,
    "sha256": "a5d38f1c274c9771417064c34344f27e60029bb338910470176abc8ff768a934",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "floor_lamp_pleated",
@@ -3322,7 +3530,12 @@
    ],
    "bytes": 48912,
    "sha256": "1a7bdaf98da885ee3b2771066d23368821f385c502ba8ec5d7e90ff00a06bef5",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "floor_lamp_rattan",
@@ -3345,7 +3558,12 @@
    ],
    "bytes": 143424,
    "sha256": "d7cb3bfed2994b694c0cae38c408cea509d0eccb921dc9667b39262bd58afac1",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "floor_lamp_slim",
@@ -3367,7 +3585,12 @@
    ],
    "bytes": 29592,
    "sha256": "87f3f1a3eab417205ff0703e26ae993d23bd41e6b4132f77866540063a27b54b",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "floor_lamp_tripod",
@@ -3391,7 +3614,12 @@
    ],
    "bytes": 39860,
    "sha256": "44deabfe4f469811b5016506fdf1ddbc72b1c626cec6e89b32c47ea376cdc35a",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "fridge",
@@ -3414,7 +3642,8 @@
    ],
    "bytes": 45152,
    "sha256": "bde3116e09b5e96f90c6e0cf6e6db57b0f802d7ff35c3f9abf75c16582ffd761",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "futon_floor",
@@ -3436,7 +3665,8 @@
    ],
    "bytes": 51124,
    "sha256": "ebcdebf2a9b7a31e0788e5b5800970edc0d680971609187f43f4adea002cacf2",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "futon_set",
@@ -3459,7 +3689,8 @@
    ],
    "bytes": 188220,
    "sha256": "f91699adadf3fbc90ecbf98fafd240bbe14f4c6091dd0d174b1a7758d1cd9992",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "guitar",
@@ -3483,7 +3714,8 @@
    ],
    "bytes": 172632,
    "sha256": "3d660de998021bd5268f8801e874b3d26f81b534f20de4513ccdb249b39e394c",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "hanger_rack",
@@ -3505,7 +3737,8 @@
    ],
    "bytes": 27592,
    "sha256": "2b34d840dac9e9d30cfb23bfe3df3262acd13030b2b9c061e9dccd4b6d267c3b",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "headboard",
@@ -3527,7 +3760,8 @@
    ],
    "bytes": 38852,
    "sha256": "9b98886f6a3155c0f2259e3bee23788a936b973fcaee648b28e7e3e8e7f53d8b",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "heater",
@@ -3550,7 +3784,8 @@
    ],
    "bytes": 201792,
    "sha256": "59b2f5bcda926b54bbbc7ff82f2bc076587cd82293ddf1cf1aeb646e49064e96",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "high_chair",
@@ -3573,7 +3808,8 @@
    ],
    "bytes": 115908,
    "sha256": "aee4bb4918d60e1a54f2ddd8dad3bac22d13de2a9d23ec64fbc1f7702f7761e1",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "humidifier",
@@ -3597,7 +3833,8 @@
    ],
    "bytes": 55380,
    "sha256": "4c266862523b1529d636174bb2825ec95e8e802e654a8890844af5ec50812f16",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "kettle",
@@ -3620,7 +3857,8 @@
    ],
    "bytes": 126084,
    "sha256": "8c14d99d451b79cb7560af2d1aa7d9f595e7d3d42f949d911bd7a66ed0fb23e4",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "keyboard_mouse",
@@ -3644,7 +3882,8 @@
    ],
    "bytes": 183208,
    "sha256": "e04517b444fbd59e1d2f5ead588a40f38ec5761f036c8828fc97fdc4fc221e31",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "kids_chair",
@@ -3666,7 +3905,8 @@
    ],
    "bytes": 45836,
    "sha256": "bde90706bb49ea082230f5a1ec9471e71197239c0051682477051ba2084f0ea2",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "kids_table",
@@ -3689,7 +3929,8 @@
    ],
    "bytes": 77772,
    "sha256": "6b9ae82b715dedeca7ca21ca962272e6aba55c2465be9ac4cdee6e854cadb193",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "kitchen_counter",
@@ -3711,7 +3952,8 @@
    ],
    "bytes": 44104,
    "sha256": "a88ef2ae18cc7cf5b955539ccc178c9cfaa7fe6bb73ce4b3d6b15e78bc4f1d34",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "kotatsu",
@@ -3733,7 +3975,8 @@
    ],
    "bytes": 313912,
    "sha256": "b17c3a34bd12b34e3c55301301cd9390aae7e6d8772dc9da446744189e6d6113",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "ladder_shelf",
@@ -3754,7 +3997,8 @@
    ],
    "bytes": 46120,
    "sha256": "9ecfe68734f6d20b2ceb2af7d6a0b95808fd7ebcb188ce4171926a05bc1df070",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "lamp_lantern",
@@ -3776,7 +4020,8 @@
    ],
    "bytes": 108908,
    "sha256": "5e0d20adcf801394315cb07f8673c841aedb6305053428df558fcab97b70e16b",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "lamp_paper",
@@ -3799,7 +4044,8 @@
    ],
    "bytes": 308040,
    "sha256": "d50a7d4eb0dd245ce3ee6a13cd7b859831d6ca36b732ba504dc71504650c303a",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "lamp_wall",
@@ -3822,7 +4068,8 @@
    ],
    "bytes": 81956,
    "sha256": "f436ce1f1ae9b4d6c3648e710932a4efa972f7ec52b2be1e7a83bfb9dfa8f921",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "laptop",
@@ -3845,7 +4092,8 @@
    ],
    "bytes": 28212,
    "sha256": "b8046b843ee47a2f11de01e52db09f4ed59133e47daa89929f6fff072b3f4141",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "laundry_basket",
@@ -3867,7 +4115,8 @@
    ],
    "bytes": 256292,
    "sha256": "2b2598dcbd7a054b410524fbcf60feb42a11fc334f56acb85c1fa3154a5a47d0",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "led_strip_segment",
@@ -3889,7 +4138,8 @@
    ],
    "bytes": 9792,
    "sha256": "1e1c7a4694462fd1b68248d8273799d38d64d79ffd38d124c0664b0cf8f49b51",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "magazine_rack",
@@ -3911,7 +4161,8 @@
    ],
    "bytes": 51560,
    "sha256": "6835fbd43addab70a91d89bae2f763989eeae7c0604deaaf9974b1e36bce7260",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "mattress_floor",
@@ -3934,7 +4185,8 @@
    ],
    "bytes": 75184,
    "sha256": "6c54c3b3dac12ffccaad49e39eb0f901f9516f0fdcff29279354345a28a3e003",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "memo_board",
@@ -3958,7 +4210,8 @@
    ],
    "bytes": 57360,
    "sha256": "c908789937f9fefe436c9a3901ba5d2a340c22c5e73a33b8cdb3d9d62685ba3d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "microwave",
@@ -3982,7 +4235,8 @@
    ],
    "bytes": 64952,
    "sha256": "aebd9b925be02fbc02e11ea3fc2ff96bba2c29def4a539c7dd581c97ec3a78a1",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "mirror_arch",
@@ -4004,7 +4258,8 @@
    ],
    "bytes": 20688,
    "sha256": "3a32e7ee35360b976fd4fa388037997d08ed4c735c9157cfb0ddc84c1301ad4d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "mirror_cabinet",
@@ -4027,7 +4282,8 @@
    ],
    "bytes": 26356,
    "sha256": "b9aa5828d1e3b4085cee179e8e93c9f146a0916b612b5c95a097f581a6c5706c",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "mirror_stand",
@@ -4049,7 +4305,8 @@
    ],
    "bytes": 24068,
    "sha256": "daf593c813dd0448fcd31e45b13115971fb1ef4739c30d96de44033c34e2c62c",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "monitor",
@@ -4071,7 +4328,8 @@
    ],
    "bytes": 18024,
    "sha256": "f750dd9554830e56758266e5c5630164e1164684df76e6d75ddf437a6842eb55",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "neon_sign",
@@ -4094,7 +4352,8 @@
    ],
    "bytes": 361292,
    "sha256": "8d966cc1355680508ad3de8f4ee09917a484a3ac1818dd08c2fbccfb3b3caeda",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "nightstand",
@@ -4116,7 +4375,8 @@
    ],
    "bytes": 47952,
    "sha256": "44d4a284986994805abdbbc55e98f4ed6f20996f50bfb6431e20ea9332120ad4",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "oshiire_case",
@@ -4138,7 +4398,8 @@
    ],
    "bytes": 160392,
    "sha256": "c2dd56a68e399e9092ff1e0f23d8912967e8f00afcde2a55052187eae79915ad",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "ottoman_round",
@@ -4160,7 +4421,8 @@
    ],
    "bytes": 41396,
    "sha256": "15affc3dd5b780a7fd452babf455a2078c030d072029ff63bc6d54b41ddc1d0c",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "pegboard",
@@ -4182,7 +4444,8 @@
    ],
    "bytes": 221820,
    "sha256": "408432a951eb7ea43f1b1bdde25f9cb65551c086cdd811382c44cdaa70d546db",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "pendant_light",
@@ -4205,7 +4468,8 @@
    ],
    "bytes": 109056,
    "sha256": "1740bf6a7573c103436956bac5e843cba4bc3176dfd036f7ec0ffea27d761a1b",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "pet_bed",
@@ -4227,7 +4491,8 @@
    ],
    "bytes": 66796,
    "sha256": "f6f8a165e1980564c7d37a86cd3f52712aa62b2317f671c7da8d8741fc325aa5",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "photo_frame",
@@ -4249,7 +4514,8 @@
    ],
    "bytes": 23060,
    "sha256": "93e324df130d559b0b8de54517de24348ba10e9e8d34a1707ce066342a8f0638",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "photo_garland",
@@ -4273,7 +4539,8 @@
    ],
    "bytes": 112584,
    "sha256": "54c9866528adb2a49443f46c858a6f1cc1def92d3c94515e67bc1203daa25b17",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "photo_wall",
@@ -4297,7 +4564,8 @@
    ],
    "bytes": 80408,
    "sha256": "be9f9632767ec33af5523eba79a58fe31e590895854db448289feb7ed5412717",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "pillow",
@@ -4318,7 +4586,8 @@
    ],
    "bytes": 37072,
    "sha256": "9ada947865986963ef78becd5f02960bb0070ddc159fa96b07655a17a4defd3d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "plant_cactus",
@@ -4342,7 +4611,8 @@
    ],
    "bytes": 89272,
    "sha256": "72494c5ec9f22613de8785aa71bca68b681f726d9fc0459a6fce3617e894a928",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "plant_dracaena",
@@ -4366,7 +4636,8 @@
    ],
    "bytes": 309040,
    "sha256": "273e3c4a7b917c562a240cd0f6f5a359be8e0562d77651c68634cf072334ed9c",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "plant_eucalyptus",
@@ -4390,7 +4661,12 @@
    ],
    "bytes": 220736,
    "sha256": "c78854b502bc8208f4f3d25aa97de0b96b2d03b4074e66cd7e22126041f06c7c",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "plant_fiddle",
@@ -4414,7 +4690,8 @@
    ],
    "bytes": 285768,
    "sha256": "8f249f156dffcafb5df02bbdef7a8add983b93ea87889ee1895f3f16ebae4f11",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "plant_monstera",
@@ -4438,7 +4715,12 @@
    ],
    "bytes": 223116,
    "sha256": "93dfc27541f6638ecc260b4e0e68d181b9d673a4aa97db2d9ffca671d6a0f653",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "plant_olive",
@@ -4462,7 +4744,8 @@
    ],
    "bytes": 669384,
    "sha256": "b4a0009ac6cbf958e0ecc94d9a5400da5f29457d91ad3da17f9549ea52824fd2",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "plant_pachira",
@@ -4486,7 +4769,8 @@
    ],
    "bytes": 337492,
    "sha256": "217b18ad0d2fa64f7aba5a7b6a4c4bd919165b875992b1b905d36464df328c6d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "plant_pothos_hanging",
@@ -4510,7 +4794,8 @@
    ],
    "bytes": 386452,
    "sha256": "c5c379d142deb77d5a778bfa8ce1298f4b79306d5f36a8fc2bc76fe08b245543",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "plant_snake",
@@ -4534,7 +4819,8 @@
    ],
    "bytes": 100048,
    "sha256": "f3df79c73b63c7cf47e6b955ba337596fc10e09260810f4f4a22c5c58deec28a",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "plant_stand",
@@ -4555,7 +4841,8 @@
    ],
    "bytes": 45612,
    "sha256": "9d4cac24d99f4ce4559d03b17419b985dab4ab31d593d9219cac826bd900e0ee",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "plant_succulents",
@@ -4579,7 +4866,8 @@
    ],
    "bytes": 278340,
    "sha256": "d94d988d7ed3af6b4c872b2b7c8027cd22872c94b01ab38399f4fd78a73d323c",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "plush_base_l",
@@ -4601,7 +4889,8 @@
    ],
    "bytes": 81960,
    "sha256": "82ae6fb5c56b4e4ae86aabd454863685b6f1e165ce3a14ccf83a24ee7e4f928d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "plush_base_m",
@@ -4623,7 +4912,8 @@
    ],
    "bytes": 83240,
    "sha256": "b1fec0f6c4985008317bedfc7c9b7951a9654e18760c5dd8dafce47e2735cd68",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "plush_base_s",
@@ -4645,7 +4935,8 @@
    ],
    "bytes": 83248,
    "sha256": "5bff44b429d95872b34ee6479515d2f4ca879e11507c569433c4930b03c2bad4",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "plush_bear",
@@ -4668,7 +4959,8 @@
    ],
    "bytes": 135304,
    "sha256": "f447975febf477ba04b4c6b159dc5a19d8527a94e4807008538f58b6925543a7",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "plush_bunny",
@@ -4691,7 +4983,8 @@
    ],
    "bytes": 140596,
    "sha256": "58672f3337276f6351cbcbc48a4a224d1f00996c4e1d3808db7d41600660fc23",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "poster",
@@ -4715,7 +5008,8 @@
    ],
    "bytes": 32924,
    "sha256": "1fe836e14f4062d1a85814b3688d098eedcd5a169961e9a5fe1c189e15813fe3",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "pouf_square",
@@ -4736,7 +5030,8 @@
    ],
    "bytes": 61004,
    "sha256": "fd626422b9cae70e53dfa7f55d245d95b1296e2a8dc9f9a15213a79fa13f5cd8",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "projector",
@@ -4760,7 +5055,8 @@
    ],
    "bytes": 127452,
    "sha256": "f64b8067ecc161c4f5162b9d4bbd336787689d521804187508db3672c397b464",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "radio",
@@ -4784,7 +5080,8 @@
    ],
    "bytes": 116752,
    "sha256": "6e0ea1d612e4016c87d7b2becc639d4c1ddda3cd043c03310cd9fcfcc10e9993",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "range_rack",
@@ -4807,7 +5104,8 @@
    ],
    "bytes": 77428,
    "sha256": "5b28083872f5d45f3a0a0a3ccc32c912205aefdd937b5093315c0da76c6d036b",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "record_player",
@@ -4831,7 +5129,8 @@
    ],
    "bytes": 155348,
    "sha256": "2d5f019b44699e34e1bd0ee0e715cc343b88cdd0141c434a583e32f255cecfb2",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "reed_diffuser",
@@ -4854,7 +5153,8 @@
    ],
    "bytes": 35932,
    "sha256": "24d477c74f36b284c378350b1d4546744b52938324089ca047a0cbc44bd382ed",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "rice_cooker",
@@ -4878,7 +5178,8 @@
    ],
    "bytes": 96108,
    "sha256": "de2e1e87ce1d24134b74f284954fa76d03a4cb2706508dd3e1146f99593964c9",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "rocking_chair",
@@ -4900,7 +5201,8 @@
    ],
    "bytes": 134196,
    "sha256": "dd5b98f5976e8f831ee94cff1f8c2fe86a74869a66510b362d6d9ce982a45d07",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "room_divider",
@@ -4922,7 +5224,8 @@
    ],
    "bytes": 58508,
    "sha256": "699c0286868a3f1db9d94f1a259cef5504e5a93db67c73bd45a8aa681e85dabc",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "rubber_mat",
@@ -4944,7 +5247,8 @@
    ],
    "bytes": 10376,
    "sha256": "3b81d864a986fef809f8c0189b6cdaf27c25ddca82ecae18cc02d668e20a7afe",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "rug_checker",
@@ -4966,7 +5270,8 @@
    ],
    "bytes": 172608,
    "sha256": "774a79c4bef39b2d452a8032d28cf4512a593d3083b2cbf2fede0f4ac8deb7db",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "rug_oval",
@@ -4988,7 +5293,8 @@
    ],
    "bytes": 107588,
    "sha256": "817e902714f0fae4d42f6a44d55dd6fead5aa7b37c327f1937a47939453af909",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "rug_rect",
@@ -5010,7 +5316,8 @@
    ],
    "bytes": 19520,
    "sha256": "04123c210ac57254e2111f28ea8c7301ed4c4e4748d0b6e9c975b30d5a24d844",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "rug_rect__103",
@@ -5032,7 +5339,8 @@
    ],
    "bytes": 19528,
    "sha256": "7a044bdb7fefcfd7fc5d03ad9cfe650c5ca27aada729529858ef253e92b3ff3d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "rug_rect__203",
@@ -5054,7 +5362,12 @@
    ],
    "bytes": 19664,
    "sha256": "3e7a83b11b02b368891ee12c277a82be11f081ede488b730308c77795d036bf2",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "rug_round",
@@ -5076,7 +5389,8 @@
    ],
    "bytes": 47488,
    "sha256": "04e238522ef8f1a9795b76fa3532c450e1712a8cf696e44cb12e63cfa68f1898",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "rug_round__111",
@@ -5098,7 +5412,8 @@
    ],
    "bytes": 47500,
    "sha256": "78f9c5726101290e7b043b3f09121575347740cbd93da06f85062be80e469ba0",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "rug_round__211",
@@ -5120,7 +5435,12 @@
    ],
    "bytes": 47564,
    "sha256": "a81c688a6b1c33ce33df07f786c9ef1e5f1970c7b18539df63c93550e0bbf5b2",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "rug_round__311",
@@ -5142,7 +5462,8 @@
    ],
    "bytes": 52216,
    "sha256": "a0a78bf2658365ed8e38c7fdad6b3c35b0f762a2656e2aa8f8913d9fcda74185",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "rug_runner",
@@ -5165,7 +5486,8 @@
    ],
    "bytes": 71672,
    "sha256": "6b6a7eed1673ce503afe0b29b76aacb9d9fa2661c7cf0dfb6e09a67f370b35a1",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "rug_wave",
@@ -5186,7 +5508,12 @@
    ],
    "bytes": 111484,
    "sha256": "0860ad3a91ec5fe9a71354d85571bb5288017a13a36e68bc44bf7ffc7c44576f",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "seat_cushion",
@@ -5208,7 +5535,8 @@
    ],
    "bytes": 96104,
    "sha256": "7dd273f570ee72b747da3382b551b02398d534667ced4238dbdae69bb0af8596",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "shelf_corner",
@@ -5230,7 +5558,8 @@
    ],
    "bytes": 56924,
    "sha256": "cb1438b45dafa9ef01eb18ad8ac74fa51b692c7205fb9bb18246846acd0ed44c",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "shelf_cube",
@@ -5251,7 +5580,8 @@
    ],
    "bytes": 24888,
    "sha256": "3ad0908f876d2822d20a9e72369d4679d6d62997756482bd528c940c83e6d1f0",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "shelf_cube_4x4",
@@ -5272,7 +5602,8 @@
    ],
    "bytes": 40580,
    "sha256": "fc8f71d254c670189ba0e7d646a1bcab5f421e35c75701f035f488f78c125489",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "shelf_cube_boxes",
@@ -5295,7 +5626,8 @@
    ],
    "bytes": 59048,
    "sha256": "f1e98c4afb7394607b6b3e6ead1ee5e49ec1e7d9d26bd322cddfd7517aed69aa",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "shelf_floating",
@@ -5317,7 +5649,12 @@
    ],
    "bytes": 9612,
    "sha256": "e2722f142fa0de074efdef3f5c8de1e0aecbe06bab44679b523fd5910127bed5",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "shelf_gap",
@@ -5340,7 +5677,8 @@
    ],
    "bytes": 89212,
    "sha256": "4de99bf19122ce350900f6a3dfbff65c3fdde40ae0e07367da848be719b81bca",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "shelf_low",
@@ -5361,7 +5699,8 @@
    ],
    "bytes": 25760,
    "sha256": "6068c6ce784604687e524d6d4b748dbb4e53dfdb316b639104d89863fc997d32",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "shelf_metal",
@@ -5383,7 +5722,8 @@
    ],
    "bytes": 213304,
    "sha256": "3488fcf980fcbdcea7ae66495488f33c36e30eedfda346cca308d5a7cb3543a2",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "shoe_cabinet",
@@ -5405,7 +5745,8 @@
    ],
    "bytes": 38600,
    "sha256": "1298f9accba68f8ea546c6bb47a6402e1bceeb92c28f5b51c2988c9d025dc4fa",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "shoe_rack",
@@ -5427,7 +5768,8 @@
    ],
    "bytes": 79840,
    "sha256": "af9d4465544e2190b8ec9da070736d727b6faf03ecb0d663cd0a3c3543c30496",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "shoji_screen",
@@ -5450,7 +5792,8 @@
    ],
    "bytes": 134048,
    "sha256": "fde2055f37ab3a0a54e9d0f3d3b61ce95a6f20dcb78c05a23156015abcc3ebfc",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "side_table",
@@ -5471,7 +5814,12 @@
    ],
    "bytes": 47892,
    "sha256": "e806678f318c45ab12c5072291d51776add2bd8cfb9c84504682b53595a4094d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "side_table_c",
@@ -5493,7 +5841,8 @@
    ],
    "bytes": 24472,
    "sha256": "3d59bb5eecddb35b6d31620f21fe61f8135494c1a8fb8256acf60771e1e406be",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sideboard",
@@ -5515,7 +5864,8 @@
    ],
    "bytes": 59368,
    "sha256": "23a9a4d7485ac633ac1267d976fd57f8c3641a04b2c8042069a5bf9a345cdd45",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "slippers",
@@ -5537,7 +5887,8 @@
    ],
    "bytes": 102652,
    "sha256": "b82958ffcc0dc076f37c329fe46f7a12d46c02c641c4eefa7663c56c1e94408c",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "small_plant",
@@ -5561,7 +5912,12 @@
    ],
    "bytes": 60572,
    "sha256": "34af9fa953b5a8e52ec5cd817d858c1bcca72bd675df81c608f10212f8b29c2d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "sofa_1seat",
@@ -5583,7 +5939,8 @@
    ],
    "bytes": 116284,
    "sha256": "07ec4f49f99696c8f9663efcecd5f4537407c40a33abdf89943ab3e2cba14bd3",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_2seat",
@@ -5605,7 +5962,8 @@
    ],
    "bytes": 167088,
    "sha256": "0791e83c7980240fceced228952fcf8f3f9b63339854ec74cbb082b61784874e",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_2seat__w130",
@@ -5627,7 +5985,8 @@
    ],
    "bytes": 167640,
    "sha256": "0316c8d97e526f20dcd7129ae7d9f554e7f65a367f29a5f57a0681913576b69c",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_2seat__w170",
@@ -5649,7 +6008,8 @@
    ],
    "bytes": 167128,
    "sha256": "e9312ece328fbfc743b75bec5d6c10745495680c7cb42a2de441fe26d7676de2",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_3seat",
@@ -5671,7 +6031,8 @@
    ],
    "bytes": 218920,
    "sha256": "9537f77bf4edaaef47d72751e9bbe6c18c6d2de93ecb0de13e6a3a0a58d9158a",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_bed",
@@ -5694,7 +6055,8 @@
    ],
    "bytes": 201776,
    "sha256": "83541951ded7014f4f2753a01dc17fd1192abc17519a81ba63ef136e359f7472",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_bed_open",
@@ -5717,7 +6079,8 @@
    ],
    "bytes": 99740,
    "sha256": "8615804b25f907414304fef35fd8b531f7444faef818a7448c3a363f40bc4e92",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_chesterfield",
@@ -5740,7 +6103,8 @@
    ],
    "bytes": 335368,
    "sha256": "81fa65a6b5d3fa06432dd1d596a15a8e64947fd52239604007cdc1b6f318520a",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_cloud",
@@ -5762,7 +6126,8 @@
    ],
    "bytes": 220216,
    "sha256": "94dfe7dd894d4d49b6a7a6824999cb0f3338d11104c343e21c11537438a1a6ab",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_l_left",
@@ -5784,7 +6149,8 @@
    ],
    "bytes": 225268,
    "sha256": "f847d706f9531d1f5071ca68537f74e430c6cddc10a3497f878cd545b26d867b",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_l_left__l",
@@ -5806,7 +6172,8 @@
    ],
    "bytes": 226040,
    "sha256": "39f6a642f7bd86e8c673065029e99fb85c132c2eea3514caa1b09632b085e154",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_l_left__s",
@@ -5828,7 +6195,8 @@
    ],
    "bytes": 226808,
    "sha256": "55c90eb56a93e24a24a3e2f1165727acb7f01159c6f85e802980280ab0ded5cc",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_l_right",
@@ -5850,7 +6218,8 @@
    ],
    "bytes": 225272,
    "sha256": "4800b5790304006333c0c8ad02d6d060942a3ea5c5822c500170e7635d8bd5e6",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_l_right__l",
@@ -5872,7 +6241,8 @@
    ],
    "bytes": 226040,
    "sha256": "e26642601375d42e5aae7591a72d6ae11d7604f04db687da418fd5130a4a761a",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_l_right__s",
@@ -5894,7 +6264,8 @@
    ],
    "bytes": 226812,
    "sha256": "785294478a5044242ca2eae0b240f942976a10ff127dd026409c3ed7738b3691",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_low",
@@ -5916,7 +6287,8 @@
    ],
    "bytes": 159728,
    "sha256": "cf14f3bebcf2ef0bc3a9de7dc1d43879d149b85d3857b95e0df2273126164435",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_modular",
@@ -5938,7 +6310,8 @@
    ],
    "bytes": 240208,
    "sha256": "578b5716cfc0be095889f3ac218c076d007acc4fc506726bad4e1d13ab4c5bb8",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "sofa_wood_frame",
@@ -5960,7 +6333,8 @@
    ],
    "bytes": 189020,
    "sha256": "1c5bd793362d962c5e422378976116ccd72e19a8418e78c354f7ca3ac818c19e",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "speaker",
@@ -5983,7 +6357,8 @@
    ],
    "bytes": 83392,
    "sha256": "a83b8b3a5c6340c07fe0d8dde1fd3efa263dfbf63294ded4aa76871b1611adf5",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "step_stool",
@@ -6005,7 +6380,8 @@
    ],
    "bytes": 51732,
    "sha256": "5b04195075682915b6cbb78a5ba21e94f47b7b75b8b83ff9bb23b6da64f4b46f",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "stool_bar",
@@ -6028,7 +6404,8 @@
    ],
    "bytes": 77304,
    "sha256": "1d6453e550afb146de6a98cad898ef1c5d42e7a886c0eccae9ea549d0be7974d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "stool_round",
@@ -6050,7 +6427,10 @@
    ],
    "bytes": 44100,
    "sha256": "54bb873ee02e86c940ba11f1556a71a7e66afeb0c4359e25c891357125c1f0db",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "d"
+   ]
   },
   {
    "id": "storage_basket",
@@ -6072,7 +6452,8 @@
    ],
    "bytes": 141092,
    "sha256": "485096e4e5e48bab9e3c1239a37c3fb2eebf6ccc801567aa605357c770bffdad",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "storage_bench",
@@ -6096,7 +6477,8 @@
    ],
    "bytes": 138844,
    "sha256": "ecc9aaeab11c66cb4f453894516fe409bfc62941ad25751f1a54ae533e31d661",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "storage_box_fabric",
@@ -6118,7 +6500,8 @@
    ],
    "bytes": 66688,
    "sha256": "3c6290c3851d9bd9f70e9b454f16bfc9948d10f681638c3168bbbed9da9a191d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "suitcase",
@@ -6140,7 +6523,8 @@
    ],
    "bytes": 176732,
    "sha256": "e373b9ede46d3c61571b7da7c1322d596711290dab9a1cff52086a9316aa9c9f",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "table_bar",
@@ -6162,7 +6546,8 @@
    ],
    "bytes": 51208,
    "sha256": "7c6109c830f12efc9840e47149f09587bce101d6b5b977b96707fd6aa9460fb4",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "table_cafe",
@@ -6184,7 +6569,8 @@
    ],
    "bytes": 81120,
    "sha256": "ef2a28b227269f281dc03e216c2ce5fa624f0dd7f03ddef8079582fd7c44e1b9",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "table_dining_6",
@@ -6206,7 +6592,8 @@
    ],
    "bytes": 36440,
    "sha256": "5dce52514ea5ffe6073c3eca9ef1822de28e973946627429c1354fd4567a5df3",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "table_dining_rect",
@@ -6227,7 +6614,8 @@
    ],
    "bytes": 32856,
    "sha256": "c088c3220d4aea184ecbc61e40bfd58819c7c3a77aa2205c88c785609f2b5cd8",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "table_dining_round",
@@ -6248,7 +6636,8 @@
    ],
    "bytes": 48880,
    "sha256": "49a382ed2659d96aa833a274f38dfa96b8be528760889e8270a1cd1f91a5e1ec",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "table_folding_low",
@@ -6271,7 +6660,8 @@
    ],
    "bytes": 74224,
    "sha256": "5694f47d5727609b16362f0d9e3d1aeaec9196305f08a5c5cb55d59601b3a6e5",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "table_glass_low",
@@ -6293,7 +6683,8 @@
    ],
    "bytes": 39388,
    "sha256": "a732b78c294ed7e07b9364c0be97733e1dc9080b900884075fe8df0346e73076",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "table_lamp",
@@ -6315,7 +6706,11 @@
    ],
    "bytes": 65452,
    "sha256": "1fd1c9e5bb040c76b4889d138803cc1dc94ef3c0620ce3e59eacd3e533b96639",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "h",
+    "d"
+   ]
   },
   {
    "id": "table_low_oval",
@@ -6337,7 +6732,8 @@
    ],
    "bytes": 66248,
    "sha256": "b1aba02aad37fc81d55a31d5a49845e2cdd29cd010deddfc50b5d62966168f4a",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "table_low_rect",
@@ -6358,7 +6754,8 @@
    ],
    "bytes": 40504,
    "sha256": "86bf66290a8e3b5026794eb8d532c4f9d9f75b27d69154feba8969ee4cd09408",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "table_low_rect__w075",
@@ -6379,7 +6776,8 @@
    ],
    "bytes": 40488,
    "sha256": "cd7fc70d7b78fdba135b941599f8ceec03f1ead3e5acdbefc5aa178198b0dbf4",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "table_low_rect__w110",
@@ -6400,7 +6798,8 @@
    ],
    "bytes": 40576,
    "sha256": "c018781a482b2d13dad821a73577fda5e4a4ac53e8fe82dcd0c42142ed8ed9f0",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "table_low_round",
@@ -6422,7 +6821,8 @@
    ],
    "bytes": 35484,
    "sha256": "82f7adf4917fb13f968d52e9672ffced73ccd399c0d7262127b28690bfbb9227",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "table_nesting",
@@ -6444,7 +6844,8 @@
    ],
    "bytes": 77960,
    "sha256": "9488c9c0274d6ab210a7fb81df9445cb77057594b3764f85518e0d1feea5e51c",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "tableware_set",
@@ -6468,7 +6869,8 @@
    ],
    "bytes": 120532,
    "sha256": "43cb9d6c0e163bc6db49d17481cdfab3661dfc9bbefd77eae6da3b55bf671d71",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "tapestry",
@@ -6490,7 +6892,12 @@
    ],
    "bytes": 42524,
    "sha256": "f4b1e4e82d6d863aa72cab2d39a648055c7945021eb2989a25b46c3c1803ec2d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "tapestry_b1",
@@ -6513,7 +6920,8 @@
    ],
    "bytes": 71372,
    "sha256": "754e2b0586f9451664e864f16ec215f3c042f9d7a18b63014197d51fcd9f9e0f",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "tapestry_b2",
@@ -6536,7 +6944,8 @@
    ],
    "bytes": 71372,
    "sha256": "562e99b46cc2e0747d8fd63cfdf93c3cdfcdc1472ee965cdad937fd9b423a93e",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "terrarium",
@@ -6560,7 +6969,8 @@
    ],
    "bytes": 139340,
    "sha256": "a5529f559a6e248b8a52f4b25b0c92165b9707b74f5cf1ac267006b7b0b90941",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "toaster",
@@ -6584,7 +6994,8 @@
    ],
    "bytes": 84096,
    "sha256": "fa0e0984a4f63f7fe90625ad288ea8e441331a1239fd5061aea7636d3c570733",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "toy_storage",
@@ -6608,7 +7019,8 @@
    ],
    "bytes": 198120,
    "sha256": "b996fc0d24dce4868a655d77431699fc34b49a93e386c38b695aef56d8be2266",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "trash_bin",
@@ -6629,7 +7041,8 @@
    ],
    "bytes": 20516,
    "sha256": "53b503c0e5153c2426ea9a58840d96c98a2d500344f02ba30df52556dd71c505",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "tv",
@@ -6651,7 +7064,8 @@
    ],
    "bytes": 25328,
    "sha256": "b456b52dc8b2c9f9c19ac0be84f08f24013007e0588c6f16c0b87a8471a5c947",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "tv_stand",
@@ -6673,7 +7087,8 @@
    ],
    "bytes": 62640,
    "sha256": "5aaaaacc8352f8506b319ebc293e196dcef9a8c6d796b4dd8f010cb65ed1cb02",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "tv_stand_wide",
@@ -6695,7 +7110,8 @@
    ],
    "bytes": 47884,
    "sha256": "96a48296cdddbe632a01f506d35872b49eec5fc9ee6e5669c6f68a13aee76ed5",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "uchiwa_stand",
@@ -6719,7 +7135,8 @@
    ],
    "bytes": 106204,
    "sha256": "56312dd06b54e62bed954d4b0835a1d9796dcb7be343049b414be7afd6d940dc",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "umbrella_stand",
@@ -6741,7 +7158,8 @@
    ],
    "bytes": 47620,
    "sha256": "1969e3c4a818e0cc49a8b5f92e2f7e673cbbbd64cce1ba705c2e67b3b88f2f78",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "vacuum_stick",
@@ -6765,7 +7183,8 @@
    ],
    "bytes": 101584,
    "sha256": "eaeac486f38a21929d2bfbd16063d299371a40ea02f9252ab27ce765f6de778f",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "vanity_stool",
@@ -6787,7 +7206,8 @@
    ],
    "bytes": 44684,
    "sha256": "9cf7a98f91c6af46bbc45852a4100aea83d376c086b8e7bc64f78b30fa987aa2",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "vase_tulip",
@@ -6811,7 +7231,8 @@
    ],
    "bytes": 71512,
    "sha256": "ced4285d8ded10d230276c43834927ce0a40ca29285e7f426fea6eb28611f1bc",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "wagon_cart",
@@ -6833,7 +7254,8 @@
    ],
    "bytes": 108016,
    "sha256": "9f0f75d49e8a9b7f372597f914c2923c871720e7dfd2346bfa6070f89d1f1bf0",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "wall_art",
@@ -6856,7 +7278,12 @@
    ],
    "bytes": 35916,
    "sha256": "5a9aadcc9ae25be83cabf5fe9f32e6158339828632b16b79fca8043ed98ef180",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "wall_clock",
@@ -6879,7 +7306,8 @@
    ],
    "bytes": 47592,
    "sha256": "fcfb75ac9d883c9a3cb22be4287fbdb56b05e39fc1044471a021cd1a733f5bdd",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "wall_hooks",
@@ -6901,7 +7329,8 @@
    ],
    "bytes": 49904,
    "sha256": "996ff9b6cbfe94ba6b2931ac49ed2b8738ec535d4f5f0673cbcf0d70f68a59fd",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "wall_mirror",
@@ -6923,7 +7352,12 @@
    ],
    "bytes": 91392,
    "sha256": "6fadaa1067ee8bd4dc0c65a568cb5b62fdb7a1818fc0266d89d9cadf64eecaee",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "wall_planter",
@@ -6947,7 +7381,12 @@
    ],
    "bytes": 307084,
    "sha256": "b94619f233747dd7fb71be7d605f7ee4a6101b7e5c626aaf2783233ba4a04b4f",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "w",
+    "h",
+    "d"
+   ]
   },
   {
    "id": "wall_shelf",
@@ -6968,7 +7407,8 @@
    ],
    "bytes": 42192,
    "sha256": "3832e644ce1d99d59f46fd7fb8e62b281e448d7590c8c0ead4340625a5499bf3",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "wall_shelf_hex",
@@ -6990,7 +7430,10 @@
    ],
    "bytes": 34876,
    "sha256": "e4cc691227a1e882a9095c01a893b38fb7d60dd956e9b5cb547cae93cdcd766d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": [
+    "h"
+   ]
   },
   {
    "id": "wardrobe",
@@ -7013,7 +7456,8 @@
    ],
    "bytes": 40288,
    "sha256": "9fe787f137e29a22129a92f806c73fd14a5f05517b41269cf3802b0ccdadec57",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "wardrobe_open",
@@ -7036,7 +7480,8 @@
    ],
    "bytes": 71872,
    "sha256": "aa1131a8075db280aeac358976541653ed7e7cb0bb60ce9fbef77cf88efbaa9d",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "washing_machine",
@@ -7060,7 +7505,8 @@
    ],
    "bytes": 67820,
    "sha256": "f22bd6a582526665a59e1e9031830d31d92e9a10983a593ce09c436d00367ec5",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "watering_can",
@@ -7082,7 +7528,8 @@
    ],
    "bytes": 60304,
    "sha256": "a0270d283956233a9796839ac108535dfe56cbbb872d90e7946bd91a232c5f2f",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   },
   {
    "id": "yoga_mat",
@@ -7104,7 +7551,8 @@
    ],
    "bytes": 130224,
    "sha256": "40d4c5c16d4ef8c67a55551352001fbf1b3c1a14d87957af51ce1926c5ffc8be",
-   "characters": []
+   "characters": [],
+   "estimated_axes": []
   }
  ]
 }

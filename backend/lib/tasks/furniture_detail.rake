@@ -10,9 +10,9 @@ namespace :furniture_detail do
     end
   end
 
-  # metadata (jsonb) を持つ旧 furniture_details を、material・estimated_axes の列へ移す。db:apply が metadata を落とす前に流す。
-  # 推定した辺・色名は metadata から移す。metadata に寸法が無い行 (手入力) は 3 辺とも推定にして、配置を今までどおり部屋に合わせる。
-  # 短い素材は初期データ (db/furniture_details.json) を key で引いて入れる。新しい形なら何もしない
+  # metadata (jsonb) を持つ旧 furniture_details を、material の列へ移す。db:apply が metadata を落とす前に流す。
+  # 色名は metadata から移す。短い素材は初期データ (db/furniture_details.json) を key で引いて入れる。新しい形なら何もしない。
+  # 推定した辺は商品ではなく 3D モデルが持つので、ここでは移さない (furniture:import が db/furnitures.json から入れる)
   desc "Move legacy furniture_details.metadata into columns before db:apply"
   task migrate_fields: :environment do
     connection = ActiveRecord::Base.connection
@@ -21,13 +21,11 @@ namespace :furniture_detail do
     connection.transaction do
       connection.execute(<<~SQL)
         ALTER TABLE furniture_details
-          ADD COLUMN IF NOT EXISTS material character varying,
-          ADD COLUMN IF NOT EXISTS estimated_axes jsonb NOT NULL DEFAULT '[]'
+          ADD COLUMN IF NOT EXISTS material character varying
       SQL
       connection.execute(<<~SQL)
         UPDATE furniture_details SET
           material = NULLIF(metadata->>'material', ''),
-          estimated_axes = CASE WHEN jsonb_typeof(metadata->'size') = 'object' THEN COALESCE(metadata->'estimated_axes', '[]') ELSE '["w", "h", "d"]' END,
           color_name = COALESCE(NULLIF(color_name, ''), NULLIF(metadata->>'official_color', ''), NULLIF(metadata->>'color_name', ''))
       SQL
       rows = JSON.parse(File.read(Rails.root.join("db/furniture_details.json"))).fetch("details")
