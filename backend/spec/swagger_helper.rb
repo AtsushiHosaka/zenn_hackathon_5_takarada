@@ -129,7 +129,7 @@ RSpec.configure do |config|
               shop: { type: :string, example: "IKEA" },
               url: { type: :string, description: "購入リンク", example: "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/" },
               image_url: { type: :string, nullable: true, description: "商品画像", example: nil },
-              themes: { type: :array, items: { type: :string }, example: [] },
+              themes: { type: :array, items: { type: :string, enum: FurnitureCandidates::THEMES.keys }, description: "雰囲気のタグ", example: %w[nordic simple] },
               position: { type: :integer, description: "候補の並び順 (小さいほど先)", example: 0 },
               enabled: { type: :boolean, description: "false なら提案・検索に出さない", example: true }
             },
@@ -140,9 +140,10 @@ RSpec.configure do |config|
             properties: {
               details: { type: :array, items: { "$ref" => "#/components/schemas/AdminFurnitureDetail" } },
               slots: { type: :array, items: { type: :string }, description: "選べる置き場所の枠" },
-              categories: { type: :array, items: { type: :string }, description: "家具検索で使う家具の種類" }
+              categories: { type: :array, items: { type: :string }, description: "家具検索で使う家具の種類" },
+              themes: { type: :array, description: "選べる雰囲気のタグ", items: { type: :object, properties: { id: { type: :string, example: "nordic" }, name: { type: :string, example: "北欧" } }, required: %w[id name] } }
             },
-            required: %w[details slots categories]
+            required: %w[details slots categories themes]
           },
           AdminFurnitureDetailInput: {
             type: :object,
@@ -165,7 +166,7 @@ RSpec.configure do |config|
                   shop: { type: :string, example: "IKEA" },
                   url: { type: :string, example: "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/" },
                   image_url: { type: :string, nullable: true, example: nil },
-                  themes: { type: :array, items: { type: :string }, example: [] },
+                  themes: { type: :array, items: { type: :string, enum: FurnitureCandidates::THEMES.keys }, description: "雰囲気のタグ", example: %w[nordic simple] },
                   position: { type: :integer, example: 0 },
                   enabled: { type: :boolean, example: true }
                 }

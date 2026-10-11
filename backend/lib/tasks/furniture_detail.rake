@@ -37,4 +37,23 @@ namespace :furniture_detail do
       puts "Moved furniture_details.metadata into columns (#{updated} rows got material from db/furniture_details.json)"
     end
   end
+
+  # themes が旧い 3 種類 (oshi_purple・botanical・korean) のままの DB を、雰囲気のタグ (FurnitureCandidates::THEMES) に付け直す。
+  # 初期データ (db/furniture_details.json) にある商品はそのタグにし、無い商品は oshi_purple を oshi に読み替えて一覧に無いものを外す。
+  # 一覧に無いタグが 1 つも無ければ何もしない (管理画面で直したタグを上書きしない)
+  desc "Replace legacy furniture_details.themes with the mood tags from db/furniture_details.json"
+  task retag_themes: :environment do
+    known = FurnitureCandidates::THEMES.keys
+    legacy = FurnitureDetail.pluck(:id, :themes).select { |_, themes| (Array(themes) - known).any? }
+    next if legacy.empty?
+
+    tags = JSON.parse(File.read(Rails.root.join("db/furniture_details.json"))).fetch("details").to_h { |row| [ row["key"], row["themes"] ] }
+    FurnitureDetail.transaction do
+      FurnitureDetail.find_each do |detail|
+        themes = tags[detail.key] || (detail.themes.map { |theme| theme == "oshi_purple" ? "oshi" : theme } & known)
+        detail.update_columns(themes:, updated_at: Time.current) if themes != detail.themes
+      end
+    end
+    puts "Retagged furniture details (#{legacy.size} rows had legacy themes)"
+  end
 end

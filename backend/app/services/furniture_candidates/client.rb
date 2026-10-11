@@ -20,7 +20,7 @@ module FurnitureCandidates
       @selected = selected
     end
 
-    def search(slots:, theme: nil, categories: nil, **)
+    def search(slots:, theme: nil, categories: nil, preference: nil, **)
       slots = Array(slots).map(&:to_s)
       categories = Array(categories).map(&:to_s)
       scope = FurnitureDetail.available.joins(:furniture).merge(Furniture.available).preload(furniture: :model).includes(detail_textures: :furniture_texture)
@@ -30,7 +30,9 @@ module FurnitureCandidates
       selected = @selected.select do |item|
         slots.include?(item.slot) && (item.slot != "floor" || categories.empty? || categories.include?(item.category))
       end
-      (selected + scope.map { |detail| self.class.item(detail) }).uniq { |item| [ item.metadata["group_id"], item.id ] }.group_by(&:slot)
+      items = scope.map { |detail| self.class.item(detail) }
+      items = items.sort_by.with_index { |item, index| [ -FurnitureCandidates.score(item, preference), index ] } if preference
+      (selected + items).uniq { |item| [ item.metadata["group_id"], item.id ] }.group_by(&:slot)
     end
   end
 end

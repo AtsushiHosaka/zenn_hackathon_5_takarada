@@ -64,7 +64,7 @@ class FurnitureDetail < ApplicationRecord
   end
 
   def valid_themes
-    errors.add(:themes, "must be an array of strings") unless themes.is_a?(Array) && themes.all? { |theme| theme.is_a?(String) }
+    errors.add(:themes, "must be a list of #{FurnitureCandidates::THEMES.keys.join(', ')}") unless themes.is_a?(Array) && (themes - FurnitureCandidates::THEMES.keys).empty?
   end
 
   def valid_estimated_axes

@@ -1282,8 +1282,14 @@ export interface components {
              * @example null
              */
             image_url: string | null;
-            /** @example [] */
-            themes: string[];
+            /**
+             * @description 雰囲気のタグ
+             * @example [
+             *       "nordic",
+             *       "simple"
+             *     ]
+             */
+            themes: ("simple" | "natural" | "nordic" | "korean" | "cute" | "modern" | "antique" | "japanese" | "botanical" | "oshi")[];
             /**
              * @description 候補の並び順 (小さいほど先)
              * @example 0
@@ -1301,6 +1307,13 @@ export interface components {
             slots: string[];
             /** @description 家具検索で使う家具の種類 */
             categories: string[];
+            /** @description 選べる雰囲気のタグ */
+            themes: {
+                /** @example nordic */
+                id: string;
+                /** @example 北欧 */
+                name: string;
+            }[];
         };
         AdminFurnitureDetailInput: {
             /** @description 作成では name, category, slot, model_key, symbolic_color, color_materials, size, price, shop, url が必須。更新では変える項目だけ */
@@ -1341,8 +1354,14 @@ export interface components {
                 url?: string;
                 /** @example null */
                 image_url?: string | null;
-                /** @example [] */
-                themes?: string[];
+                /**
+                 * @description 雰囲気のタグ
+                 * @example [
+                 *       "nordic",
+                 *       "simple"
+                 *     ]
+                 */
+                themes?: ("simple" | "natural" | "nordic" | "korean" | "cute" | "modern" | "antique" | "japanese" | "botanical" | "oshi")[];
                 /** @example 0 */
                 position?: number;
                 /** @example true */

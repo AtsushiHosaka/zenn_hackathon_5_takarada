@@ -830,7 +830,21 @@ components:
           type: array
           items:
             type: string
-          example: []
+            enum:
+            - simple
+            - natural
+            - nordic
+            - korean
+            - cute
+            - modern
+            - antique
+            - japanese
+            - botanical
+            - oshi
+          description: 雰囲気のタグ
+          example:
+          - nordic
+          - simple
         position:
           type: integer
           description: 候補の並び順 (小さいほど先)
@@ -877,10 +891,26 @@ components:
           items:
             type: string
           description: 家具検索で使う家具の種類
+        themes:
+          type: array
+          description: 選べる雰囲気のタグ
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: nordic
+              name:
+                type: string
+                example: 北欧
+            required:
+            - id
+            - name
       required:
       - details
       - slots
       - categories
+      - themes
     AdminFurnitureDetailInput:
       type: object
       properties:
@@ -959,7 +989,21 @@ components:
               type: array
               items:
                 type: string
-              example: []
+                enum:
+                - simple
+                - natural
+                - nordic
+                - korean
+                - cute
+                - modern
+                - antique
+                - japanese
+                - botanical
+                - oshi
+              description: 雰囲気のタグ
+              example:
+              - nordic
+              - simple
             position:
               type: integer
               example: 0

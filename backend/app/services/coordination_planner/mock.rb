@@ -2,7 +2,7 @@ class CoordinationPlanner
   # AI を使わないモック。要望文のキーワードで 3 つのテーマのどれかに決める
   class Mock
     THEMES = {
-      "oshi_purple" => { title: "ラベンダーの推し活ルーム", keywords: %w[推し 紫 パープル ラベンダー アクスタ ぬい] },
+      "oshi" => { title: "ラベンダーの推し活ルーム", keywords: %w[推し 紫 パープル ラベンダー アクスタ ぬい] },
       "botanical" => { title: "グリーンが映えるボタニカルルーム", keywords: %w[ボタニカル 植物 グリーン 緑 観葉] },
       "korean" => { title: "くすみベージュの韓国風ルーム", keywords: %w[韓国 ベージュ くすみ アイボリー ナチュラル] }
     }.freeze
@@ -40,7 +40,7 @@ class CoordinationPlanner
     def detect_theme
       scores = THEMES.transform_values { |t| t[:keywords].count { |k| @prompt.include?(k) } }
       best, score = scores.max_by { |_, s| s }
-      score.positive? ? best : "oshi_purple"
+      score.positive? ? best : "oshi"
     end
   end
 end
