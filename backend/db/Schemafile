@@ -129,6 +129,24 @@ create_table "furniture_details", force: :cascade do |t|
   t.check_constraint "width > 0::numeric AND height > 0::numeric AND depth > 0::numeric", name: "furniture_details_positive_dimensions"
 end
 
+# AI に 3D モデルを作らせた記録 (管理画面の「3Dモデルを作る」)。1 行 = 1 回の生成。
+# 生成はデータベースに触れない専用のジョブが行い、結果 (result.json・GLB・確認用の画像) を MODEL_BUILDS_BUCKET の generations/<id>/ に置く。
+# 採用すると GLB を公開バケットへ複製し、家具と 3D モデルを作って、その商品に割り当てる
+create_table "furniture_model_generations", force: :cascade do |t|
+  t.references "furniture_detail", null: false, foreign_key: { on_delete: :cascade } # もとにした商品
+  t.references "user", null: false, foreign_key: true # 依頼した管理者
+  t.string "model_key", null: false # 作るモデルの ID (ai_<商品ID>_<乱数>)。採用後は furniture_3d_models.model_key になる
+  t.string "status", null: false, default: "running" # running: 生成中 / succeeded: 検査に合格し採用待ち / failed: 失敗 / adopted: 採用した / rejected: 不採用にした
+  t.jsonb "request", null: false, default: {} # ジョブへ渡した内容 (商品名・種類・寸法・色・素材・画像の URL)
+  t.jsonb "result", null: false, default: {} # ジョブの結果 (検査の一覧・三角形数など・AI の呼び出し回数と時間)
+  t.text "error_message"
+  t.datetime "finished_at"
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+
+  t.index [ "model_key" ], unique: true
+end
+
 # 模様 (質感の画像)。静的に用意し、db/furniture_textures.json から rails furniture_texture:import で入れる
 create_table "furniture_textures", force: :cascade do |t|
   t.string "texture_key", null: false # 安定 ID (例: linen)。画像は textures/v1/<texture_key>.png

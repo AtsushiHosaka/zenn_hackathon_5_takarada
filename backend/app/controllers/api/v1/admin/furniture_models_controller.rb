@@ -2,7 +2,7 @@ module Api
   module V1
     module Admin
       # 3D モデルの一覧 (無効なものも含む) と、有効・無効の切り替え。
-      # GLB と寸法は db/furnitures.json が正で、ここでは変えない
+      # 台帳 (db/furnitures.json) のモデルは GLB と寸法を台帳が持ち、AI で作ったモデルは DB だけが持つ。どちらもここでは変えない
       class FurnitureModelsController < BaseController
         # GET /api/v1/admin/furniture_models
         def index
