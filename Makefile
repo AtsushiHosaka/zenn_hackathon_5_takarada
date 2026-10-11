@@ -1,5 +1,5 @@
 .PHONY: up down setup logs worker-logs sh test docs console reset db-apply db-dry-run db-export \
-	front-sh front-logs front-lint front-build front-types furniture-import infra-models-publish \
+	front-sh front-logs front-lint front-build front-types furniture-import models-publish infra-models-publish infra-models-export \
 	ios-setup ios-open ios-build \
 	infra-bootstrap infra-apply infra-plan infra-release infra-up infra-destroy \
 	infra-url infra-logs infra-db-apply infra-seed infra-task infra-psql infra-secrets
@@ -126,8 +126,15 @@ infra-psql:    ## Cloud SQL に psql で繋ぐ (自分の IP を一時的に許�
 		--database=$$($(GTF) output -raw db_database) \
 		--project $$($(GTF) output -raw project_id)
 
-furniture-import: ## キャラクター・家具・模様 (db/characters.json, furnitures.json, furniture_textures.json) をDBへ取り込む。色と購入リンク (furniture_details.json) は空のときだけ入れる
+furniture-import: ## キャラクター・模様 (db/characters.json, furniture_textures.json) をDBへ取り込む。家具 (furnitures.json) と色・購入リンク (furniture_details.json) は空のときだけ入れる
 	docker compose exec api bin/rails character:import furniture:import furniture_texture:import furniture_detail:import
 
-infra-models-publish: ## 生成済み家具GLBをMODELS_BUCKETまたはTerraformのバケットへ配置
-	$(GBIN)/models-publish.sh
+models-publish: ## バケットに置き済みの家具GLBを手元のDBへ登録 (例: make models-publish K="cushion bed_cover__101")
+	python3 tools/furniture_models/publish.py --api http://localhost:3000 --no-upload $(K)
+
+infra-models-publish: ## 家具GLBを公開バケットへ置き、本番DBへ登録 (例: make infra-models-publish K="cushion bed_cover__101")
+	python3 tools/furniture_models/publish.py --api "$$($(GTF) output -raw api_url)" \
+		--bucket "$${MODELS_BUCKET:-$$($(GTF) output -raw models_bucket)}" $(K)
+
+infra-models-export: ## 本番DBの3Dモデルを初期データ (backend/db/furnitures.json) へ書き出す
+	python3 tools/furniture_models/publish.py --api "$$($(GTF) output -raw api_url)" --export backend/db/furnitures.json

@@ -1,5 +1,4 @@
-"""GLB実測値とbuild_report.jsonからDB登録用カタログを作る。通常のPythonで実行。"""
-import argparse
+"""GLB実測値とbuild_report.jsonから、DBへ登録する3Dモデルの項目を作る。publish.pyから使う。"""
 import hashlib
 import json
 import math
@@ -412,43 +411,33 @@ def measure_glb(path):
             "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--models-dir", type=Path, default=ROOT / "output/furniture_models/furniture")
-    parser.add_argument("--report", type=Path, default=HERE / "build_report.json")
-    parser.add_argument("--output", type=Path, default=ROOT / "backend/db/furnitures.json")
-    args = parser.parse_args()
-    report = json.loads(args.report.read_text())
-    models = []
-    ids = set()
-    for item in sorted(report, key=lambda row: row["file"]):
+def load_report(path=HERE / "build_report.json"):
+    """build_report.json をファイル名 → 記録の辞書で返す。"""
+    report = {}
+    for item in json.loads(Path(path).read_text()):
         filename = item["file"]
-        if Path(filename).name != filename or not filename.endswith(".glb"):
-            raise ValueError(f"Invalid model filename: {filename}")
-        model_id = filename[:-4]
-        if model_id in ids:
-            raise ValueError(f"Duplicate model id: {model_id}")
-        ids.add(model_id)
-        base, _, variant = model_id.partition("__")
-        stats = measure_glb(args.models_dir / filename)
-        if item.get("sha256") != stats["sha256"]:
-            raise ValueError(f"Build report SHA256 differs from exported file: {filename}")
-        target = item["target"]
-        if len(target) != 3 or any(not math.isfinite(value) or value <= 0 for value in target):
-            raise ValueError(f"Invalid target dimensions: {filename}")
-        if any(abs(actual - expected) > 0.00001 for actual, expected in zip(stats["size"], target)):
-            raise ValueError(f"Exported size differs from target: {filename}: {stats['size']} vs {target}")
-        if stats["triangles"] != item["tris"] or stats["materials"] != item["materials"]:
-            raise ValueError(f"Build report differs from exported geometry/materials: {filename}")
-        models.append({"id": model_id, "name": NAMES[base], "category": GOODS.get(base, NOT_GOODS)[0] or category(base), "shape": base,
-                       "variant": variant or None, "format": "glb", "object_key": f"models/furniture/v1/{filename}",
-                       **{("color_material_keys" if key == "materials" else key): value for key, value in stats.items()},
-                       **goods(base)})
-    catalog = {"unit": "meter", "axes": "+Y up, +Z front, origin bottom center", "models": models}
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(catalog, ensure_ascii=False, indent=1) + "\n")
-    print(f"{len(models)} models -> {args.output}")
+        if Path(filename).name != filename or not filename.endswith(".glb") or filename in report:
+            raise ValueError(f"Invalid or duplicate model filename: {filename}")
+        report[filename] = item
+    return report
 
 
-if __name__ == "__main__":
-    main()
+def entry(item, models_dir):
+    """書き出し時の記録 item と実ファイルを照合し、DB へ登録する 1 件 (db/furnitures.json の models[] の形) を返す。"""
+    filename = item["file"]
+    model_id = filename[:-4]
+    base, _, variant = model_id.partition("__")
+    stats = measure_glb(Path(models_dir) / filename)
+    if item.get("sha256") != stats["sha256"]:
+        raise ValueError(f"Build report SHA256 differs from exported file: {filename}")
+    target = item["target"]
+    if len(target) != 3 or any(not math.isfinite(value) or value <= 0 for value in target):
+        raise ValueError(f"Invalid target dimensions: {filename}")
+    if any(abs(actual - expected) > 0.00001 for actual, expected in zip(stats["size"], target)):
+        raise ValueError(f"Exported size differs from target: {filename}: {stats['size']} vs {target}")
+    if stats["triangles"] != item["tris"] or stats["materials"] != item["materials"]:
+        raise ValueError(f"Build report differs from exported geometry/materials: {filename}")
+    return {"id": model_id, "name": NAMES[base], "category": GOODS.get(base, NOT_GOODS)[0] or category(base), "shape": base,
+            "variant": variant or None, "format": "glb", "object_key": f"models/furniture/v1/{filename}",
+            **{("color_material_keys" if key == "materials" else key): value for key, value in stats.items()},
+            **goods(base)}
