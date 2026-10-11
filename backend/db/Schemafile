@@ -105,7 +105,6 @@ create_table "furniture_details", force: :cascade do |t|
   t.references "furniture", null: false, foreign_key: true
   t.string "name", null: false
   t.string "category", null: false
-  t.string "kind" # カテゴリの中の種類 (例: chair の stool / desk_chair)。FurnitureCandidates::KINDS。候補が同じ種類に偏らないようにするのと、AI への商品情報に使う
   t.string "slot", null: false
   t.string "symbolic_color", null: false # 代表色 (#rrggbb)。モデルが無いときの表示・色での検索・AI への商品情報に使う
   t.jsonb "color_materials", null: false, default: {} # 部位ごとの色 (例: {"tint": "#123682", "wood": "#714248"})。キーは家具の color_material_keys。無い部位はモデルの色のまま
@@ -115,7 +114,6 @@ create_table "furniture_details", force: :cascade do |t|
   t.decimal "depth", precision: 10, scale: 6, null: false
   t.jsonb "estimated_axes", null: false, default: [] # 寸法のうち推定した辺 (例: ["h"])。それ以外の辺は公開されている寸法
   t.string "material" # 主な素材 (例: 綿、スチール)
-  t.string "shape" # 形 (FurnitureDetail::SHAPES)。四角か丸か分からなければ空
   t.integer "price", null: false
   t.string "shop", null: false
   t.string "url", null: false

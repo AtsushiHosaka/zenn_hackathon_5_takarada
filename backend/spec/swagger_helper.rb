@@ -116,7 +116,6 @@ RSpec.configure do |config|
               key: { type: :string, description: "安定 ID。初期データ (db/furniture_details.json) の key。管理画面で足した商品は admin:<uuid>", example: "static:101" },
               name: { type: :string, example: "SANDSBERG サンドスベリ チェア - ホワイト" },
               category: { type: :string, example: "chair" },
-              kind: { type: :string, nullable: true, description: "カテゴリの中の種類。選べる値は一覧の kinds", example: "dining_chair" },
               slot: { type: :string, enum: FurnitureCandidates::SLOTS, description: "置き場所の枠", example: "floor" },
               model_key: { type: :string, nullable: true, description: "使う 3D モデルの ID", example: "chair_dining" },
               symbolic_color: { type: :string, description: "代表色", example: "#f2efe8" },
@@ -126,7 +125,6 @@ RSpec.configure do |config|
               size: { "$ref" => "#/components/schemas/Size" },
               estimated_axes: { type: :array, items: { type: :string, enum: FurnitureDetail::AXES }, description: "寸法のうち推定した辺。それ以外は公開されている寸法", example: [] },
               material: { type: :string, nullable: true, description: "主な素材", example: "スチール" },
-              shape: { type: :string, nullable: true, enum: FurnitureDetail::SHAPES + [ nil ], description: "形。分からなければ null", example: nil },
               price: { type: :integer, minimum: 1, description: "リンク先の参考価格 (税込)", example: 2000 },
               shop: { type: :string, example: "IKEA" },
               url: { type: :string, description: "購入リンク", example: "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/" },
@@ -135,18 +133,16 @@ RSpec.configure do |config|
               position: { type: :integer, description: "候補の並び順 (小さいほど先)", example: 0 },
               enabled: { type: :boolean, description: "false なら提案・検索に出さない", example: true }
             },
-            required: %w[id key name category kind slot model_key symbolic_color color_materials texture_materials color_name size estimated_axes material shape price shop url image_url themes position enabled]
+            required: %w[id key name category slot model_key symbolic_color color_materials texture_materials color_name size estimated_axes material price shop url image_url themes position enabled]
           },
           AdminFurnitureDetailList: {
             type: :object,
             properties: {
               details: { type: :array, items: { "$ref" => "#/components/schemas/AdminFurnitureDetail" } },
               slots: { type: :array, items: { type: :string }, description: "選べる置き場所の枠" },
-              categories: { type: :array, items: { type: :string }, description: "家具検索で使う家具の種類" },
-              kinds: { type: :object, additionalProperties: { type: :array, items: { type: :string } }, description: "カテゴリごとの選べる種類 (kind)。載っていないカテゴリは種類なし", example: { "chair" => %w[dining_chair stool] } },
-              shapes: { type: :array, items: { type: :string }, description: "選べる形" }
+              categories: { type: :array, items: { type: :string }, description: "家具検索で使う家具の種類" }
             },
-            required: %w[details slots categories kinds shapes]
+            required: %w[details slots categories]
           },
           AdminFurnitureDetailInput: {
             type: :object,
@@ -157,7 +153,6 @@ RSpec.configure do |config|
                 properties: {
                   name: { type: :string, example: "SANDSBERG サンドスベリ チェア - ホワイト" },
                   category: { type: :string, example: "chair" },
-                  kind: { type: :string, nullable: true, example: "dining_chair" },
                   slot: { type: :string, enum: FurnitureCandidates::SLOTS, example: "floor" },
                   model_key: { type: :string, example: "chair_dining" },
                   symbolic_color: { type: :string, pattern: "^#[0-9a-fA-F]{6}$", example: "#f2efe8" },
@@ -166,7 +161,6 @@ RSpec.configure do |config|
                   size: { "$ref" => "#/components/schemas/Size" },
                   estimated_axes: { type: :array, items: { type: :string, enum: FurnitureDetail::AXES }, example: [] },
                   material: { type: :string, nullable: true, example: "スチール" },
-                  shape: { type: :string, nullable: true, enum: FurnitureDetail::SHAPES + [ nil ], example: nil },
                   price: { type: :integer, minimum: 1, example: 2000 },
                   shop: { type: :string, example: "IKEA" },
                   url: { type: :string, example: "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/" },

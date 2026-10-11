@@ -751,11 +751,6 @@ components:
         category:
           type: string
           example: chair
-        kind:
-          type: string
-          nullable: true
-          description: カテゴリの中の種類。選べる値は一覧の kinds
-          example: dining_chair
         slot:
           type: string
           enum:
@@ -814,15 +809,6 @@ components:
           nullable: true
           description: 主な素材
           example: スチール
-        shape:
-          type: string
-          nullable: true
-          enum:
-          - rectangular
-          - round
-          -
-          description: 形。分からなければ null
-          example:
         price:
           type: integer
           minimum: 1
@@ -858,7 +844,6 @@ components:
       - key
       - name
       - category
-      - kind
       - slot
       - model_key
       - symbolic_color
@@ -868,7 +853,6 @@ components:
       - size
       - estimated_axes
       - material
-      - shape
       - price
       - shop
       - url
@@ -893,28 +877,10 @@ components:
           items:
             type: string
           description: 家具検索で使う家具の種類
-        kinds:
-          type: object
-          additionalProperties:
-            type: array
-            items:
-              type: string
-          description: カテゴリごとの選べる種類 (kind)。載っていないカテゴリは種類なし
-          example:
-            chair:
-            - dining_chair
-            - stool
-        shapes:
-          type: array
-          items:
-            type: string
-          description: 選べる形
       required:
       - details
       - slots
       - categories
-      - kinds
-      - shapes
     AdminFurnitureDetailInput:
       type: object
       properties:
@@ -929,10 +895,6 @@ components:
             category:
               type: string
               example: chair
-            kind:
-              type: string
-              nullable: true
-              example: dining_chair
             slot:
               type: string
               enum:
@@ -979,14 +941,6 @@ components:
               type: string
               nullable: true
               example: スチール
-            shape:
-              type: string
-              nullable: true
-              enum:
-              - rectangular
-              - round
-              -
-              example:
             price:
               type: integer
               minimum: 1

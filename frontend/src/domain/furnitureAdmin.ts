@@ -8,8 +8,6 @@ export type AdminFurnitureDetail = {
   key: string;
   name: string;
   category: string;
-  // カテゴリの中の種類 (椅子の stool / desk_chair など)。選べる値は FurnitureAdminCatalog.kinds
-  kind: string | null;
   // 置き場所の枠
   slot: string;
   modelKey: string | null;
@@ -23,8 +21,6 @@ export type AdminFurnitureDetail = {
   estimatedAxes: FurnitureAxis[];
   // 主な素材
   material: string | null;
-  // 形 (FurnitureAdminCatalog.shapes)。分からなければ null
-  shape: string | null;
   price: number;
   shop: string;
   url: string;
@@ -37,16 +33,13 @@ export type AdminFurnitureDetail = {
 };
 
 export type AdminFurnitureDetailInput = Pick<AdminFurnitureDetail,
-  "name" | "category" | "kind" | "slot" | "symbolicColor" | "colorMaterials" | "colorName" | "size" | "estimatedAxes" | "material" | "shape" | "price" | "shop" | "url" | "imageUrl" | "themes" | "position" | "enabled"
+  "name" | "category" | "slot" | "symbolicColor" | "colorMaterials" | "colorName" | "size" | "estimatedAxes" | "material" | "price" | "shop" | "url" | "imageUrl" | "themes" | "position" | "enabled"
 > & { modelKey: string };
 
 export type FurnitureAdminCatalog = {
   details: AdminFurnitureDetail[];
   slots: string[];
   categories: string[];
-  // カテゴリごとの選べる種類。載っていないカテゴリは種類なし
-  kinds: Record<string, string[]>;
-  shapes: string[];
 };
 
 export type AdminFurnitureModel = {
