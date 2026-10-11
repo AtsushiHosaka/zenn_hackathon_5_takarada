@@ -15,12 +15,12 @@ ECサイトの自動検索をいったん止め、DBに登録した家具だけ�
 ## データ
 
 ```
-furnitures              名前・種類・有効か。db/furnitures.json → rails furniture:import
-  ├─ furniture_3d_models  3Dモデル (家具 1 : 1。Furniture#model)。model_key・形・寸法・部位。同じJSONから取り込む
+furnitures              名前・種類・有効か。DBが正 (管理APIで登録)。db/furnitures.json は空のDBへの初期データ
+  ├─ furniture_3d_models  3Dモデル (家具 1 : 1。Furniture#model)。model_key・形・寸法・部位。家具と一緒に登録する
   └─ furniture_details    色・寸法・価格(税込の参考価格)・店・URL・画像・テーマ。db/furniture_details.json → rails furniture_detail:import
 ```
 
-- 両JSONを正とする。`furniture_detail:import`はJSONにないdetailを消す。先に`furniture:import`が必要。
+- どちらもDBが正。両JSONは空のDBへ入れる初期データで、各取り込みは空のときだけ入れる（`FORCE=1`でJSONから作り直す）。先に`furniture:import`が必要。
 - デプロイ・`compose`・`make furniture-import`・seedは両タスクを順に流す。
 - 色はdetailに2つ持つ。`symbolic_color`は代表色（モデルがないときの表示・色での検索・AIへの商品情報）、`color_materials`は部位ごとの色（`{"tint": "#123682", "wood": "#714248"}`）。キーは家具の`color_material_keys`（GLBの素材名）に限り、書いていない部位はモデルの色のまま。
 - 3Dは`color_materials`のとおりに部位を塗る。画面で色を変えた家具は、主な部位（`Furniture#primary_color_key`）をその色にする。

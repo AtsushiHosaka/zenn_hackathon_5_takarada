@@ -1,15 +1,25 @@
 require "json"
 
-# db/furnitures.json (家具と 3D モデルの台帳) を検証してから furnitures / furniture_3d_models に取り込む。
+# 家具と 3D モデル (furnitures / furniture_3d_models) を検証してから入れる。
 # 1 件ごとに家具と 3D モデルを 1 つずつ作り、characters からキャラクターとの対応 (character_goods) を作る。
 # キャラクターは先に CharacterImporter で入れておく。GLB のアップロードは行わない。
+#
+# 3D モデルは DB が正。db/furnitures.json は空の DB に入れる初期データで、furnitures に 1 件でもあれば何もしない。
+# force: true のときだけ JSON で上書きする。モデルの追加・更新は管理 API (upsert) で 1 件ずつ行う。
 class FurnitureImporter
   class InvalidManifest < StandardError; end
 
-  def self.call(path = Rails.root.join("db/furnitures.json"))
-    new(JSON.parse(File.read(path))).call
+  def self.call(path = Rails.root.join("db/furnitures.json"), force: false)
+    return { models: 0, skipped: true } if !force && Furniture.exists?
+
+    new(JSON.parse(File.read(path))).call.merge(skipped: false)
   rescue JSON::ParserError => error
     raise InvalidManifest, "Invalid JSON: #{error.message}"
+  end
+
+  # 1 件 (db/furnitures.json の models[] と同じ形) を入れる。無ければ作り、あれば上書きする
+  def self.upsert(model)
+    new(nil).upsert(model)
   end
 
   def initialize(manifest)
@@ -21,18 +31,26 @@ class FurnitureImporter
 
     characters = Character.includes(:franchise).index_by(&:character_key)
     Furniture.transaction do
-      models.each do |attributes|
-        model = Furniture3DModel.find_by(model_key: attributes.fetch(:model_key)) || Furniture3DModel.new(furniture: Furniture.new)
-        model.furniture.update!(attributes.slice(:name, :category))
-        model.update!(attributes.except(:name, :category, :characters))
-        link_characters(model, attributes.fetch(:characters), characters)
-      end
+      models.each { |attributes| save(attributes, characters) }
     end
 
     { models: models.length }
   end
 
+  def upsert(model)
+    attributes = validate_model(model, "model")
+    Furniture.transaction { save(attributes, Character.includes(:franchise).index_by(&:character_key)) }
+  end
+
   private
+
+  def save(attributes, characters)
+    model = Furniture3DModel.find_by(model_key: attributes.fetch(:model_key)) || Furniture3DModel.new(furniture: Furniture.new)
+    model.furniture.update!(attributes.slice(:name, :category))
+    model.update!(attributes.except(:name, :category, :characters))
+    link_characters(model, attributes.fetch(:characters), characters)
+    model
+  end
 
   def validate_manifest
     check(@manifest.is_a?(Hash), "manifest must be an object")
@@ -40,14 +58,13 @@ class FurnitureImporter
     check(@manifest["axes"] == Furniture3DModel::AXES, "axes must be #{Furniture3DModel::AXES}")
     check(@manifest["models"].is_a?(Array), "models must be an array")
 
-    models = @manifest.fetch("models").map.with_index { |model, index| validate_model(model, index) }
+    models = @manifest.fetch("models").map.with_index { |model, index| validate_model(model, "models[#{index}]") }
     keys = models.map { |model| model.fetch(:model_key) }
     check(keys.uniq.length == keys.length, "model IDs must be unique")
     models
   end
 
-  def validate_model(model, index)
-    label = "models[#{index}]"
+  def validate_model(model, label)
     check(model.is_a?(Hash), "#{label} must be an object")
     %w[id name category shape format object_key sha256].each do |key|
       check(model[key].is_a?(String) && model[key].present?, "#{label}.#{key} must be a nonempty string")
