@@ -37,7 +37,10 @@ Rails.application.routes.draw do
       namespace :admin do
         get "furniture_details/export", to: "furniture_details#export"
         resources :furniture_details, only: %i[index create update destroy]
-        resources :furniture_models, only: %i[index update]
+        get "furniture_models/export", to: "furniture_models#export"
+        resources :furniture_models, only: :index
+        patch "furniture_models/:id", to: "furniture_models#update", as: :furniture_model
+        put "furniture_models/:id", to: "furniture_models#upsert", as: nil
       end
     end
   end
