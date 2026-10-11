@@ -1863,7 +1863,7 @@
  },
  {
   "name": "char_hatsune_miku_standee",
-  "tris": 876,
+  "tris": 900,
   "actual": [
    0.6000000238418579,
    1.5805539673892781,
@@ -1885,14 +1885,14 @@
    "hair_tie_accent",
    "eye_highlight"
   ],
-  "sha256": "21136d8faee12d4200ccb99657ec0e1f3dc3b1809596868a4aa9c5b06c2483e8",
+  "sha256": "69053de7c79af9939cacc01ad34f1d3acf7413c3d011230cdea45b7e0a830f67",
   "file": "char_hatsune_miku_standee.glb",
   "target": [
    0.6,
    1.58,
    0.3
   ],
-  "bytes": 69156
+  "bytes": 70448
  },
  {
   "name": "char_hatsune_miku_tapestry_b2",
@@ -1931,9 +1931,9 @@
  },
  {
   "name": "char_hatsune_miku_tapestry_life",
-  "tris": 1084,
+  "tris": 1108,
   "actual": [
-   0.6000000238418579,
+   0.6167441308498383,
    1.5799332857131976,
    0.012990540359169245
   ],
@@ -1955,14 +1955,14 @@
    "rod",
    "string"
   ],
-  "sha256": "d47238296e2ca78fdf11d42a419a410123e4fa2267e94adf639d5956f4454ebf",
+  "sha256": "30a632207f26b2560b75facfa8a094528c62367fb8bba59a65db4f454174660b",
   "file": "char_hatsune_miku_tapestry_life.glb",
   "target": [
    0.6,
    1.58,
    0.015
   ],
-  "bytes": 86840
+  "bytes": 87984
  },
  {
   "name": "char_hatsune_miku_uchiwa",

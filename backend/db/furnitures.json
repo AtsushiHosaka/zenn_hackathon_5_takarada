@@ -1999,7 +1999,7 @@
     1.58,
     0.3
    ],
-   "triangles": 876,
+   "triangles": 900,
    "color_material_keys": [
     "cardboard",
     "print_bg",
@@ -2016,8 +2016,8 @@
     "hair_tie_accent",
     "eye_highlight"
    ],
-   "bytes": 69156,
-   "sha256": "21136d8faee12d4200ccb99657ec0e1f3dc3b1809596868a4aa9c5b06c2483e8",
+   "bytes": 70448,
+   "sha256": "69053de7c79af9939cacc01ad34f1d3acf7413c3d011230cdea45b7e0a830f67",
    "characters": [
     "hatsune_miku"
    ]
@@ -2073,7 +2073,7 @@
     1.58,
     0.015
    ],
-   "triangles": 1084,
+   "triangles": 1108,
    "color_material_keys": [
     "fabric",
     "fabric_pattern",
@@ -2092,8 +2092,8 @@
     "rod",
     "string"
    ],
-   "bytes": 86840,
-   "sha256": "d47238296e2ca78fdf11d42a419a410123e4fa2267e94adf639d5956f4454ebf",
+   "bytes": 87984,
+   "sha256": "30a632207f26b2560b75facfa8a094528c62367fb8bba59a65db4f454174660b",
    "characters": [
     "hatsune_miku"
    ]
