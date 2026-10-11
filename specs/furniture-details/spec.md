@@ -17,7 +17,7 @@ ECサイトの自動検索をいったん止め、DBに登録した家具だけ�
 ```
 furnitures              名前・種類・有効か。db/furnitures.json → rails furniture:import
   ├─ furniture_3d_models  3Dモデル (家具 1 : 1。Furniture#model)。model_key・形・寸法・部位。同じJSONから取り込む
-  └─ furniture_details    色・寸法・価格(税込の参考価格)・店・URL・画像・テーマ。db/furniture_details.json → rails furniture_detail:import
+  └─ furniture_details    色・寸法・種類・素材・形・価格(税込の参考価格)・店・URL・画像・テーマ。db/furniture_details.json → rails furniture_detail:import
 ```
 
 - 両JSONを正とする。`furniture_detail:import`はJSONにないdetailを消す。先に`furniture:import`が必要。
@@ -52,10 +52,27 @@ furnitures              名前・種類・有効か。db/furnitures.json → rai
 - `POST /furniture_searches`はDB検索。商品名の一致を優先し、一致がなければ推定カテゴリ（なければ床置き）全体を返す。家具ごとに1件で、同じ家具のdetailを`variants`で返す。`failures`・`search_entry_points`は削除。
 - `POST /furniture_imports`は削除。
 - `Coordination.product_source`に`db`を追加。`ec`・`mock`は過去の提案用。
-- Geminiの説明文によるテクスチャ生成は、ECで確認した商品（metadataに`provider`がある）だけに行う。手入力の行は色の上書きのみ。
 
 - 実EC検索のコード（検索・ページ取得・HTML解析・商品画像の色抽出・`RealClient`・`MockClient`・`interior_links_mock.yml`）と関連の環境変数（`EC_PROVIDER`・`EC_SEARCH_MODEL`・`EC_EXTRACTION_MODEL`）を削除した。カテゴリ判定規則と色名は`InteriorLinks::ProductCategories`・`ProductColors`に残す。
 - 追加・入れ替えで候補がないとき、そのカテゴリが未登録なら「まだ登録されていない」と断る（予算・配置の都合と区別する）。
+
+## 商品の項目の整理（2026-10-11）
+
+2026-10-11のユーザー依頼（チャット）「いらないものは全部消し、最低限だけ入れたい」を根拠とする。Docsは未確認・未反映。
+
+- `furniture_details.metadata`（jsonb）と`checked_at`を削除した。`metadata`の中身は、読まれていた3つを列にした。
+  - `material`：主な素材（短い値。AIへの商品情報）
+  - `shape`：形（`rectangular` / `round`。AIへの商品情報と、鏡を丸く描く判定）
+  - `estimated_axes`：寸法のうち推定した辺。それ以外の辺が公開されている寸法（`FurnitureDetail#published_size`）
+- 削除した項目：`provider`、`official_color`、`metadata.color_name`（色名は`color_name`列だけ）、`metadata.size`（寸法の列と`estimated_axes`で表す）。
+- `kind`（カテゴリの中の種類）を追加した。選べる値は`FurnitureCandidates::KINDS`で、今は椅子だけ（`dining_chair` / `desk_chair` / `lounge_chair` / `folding_chair` / `counter_chair` / `stool`）。
+- シーン・提案に載せる`product_metadata`は列から組み立てる（`FurnitureDetail#product_metadata`）。保存済みのシーンには旧い項目が残るので、API定義の`ProductMetadata`と画面の読み取りは変えていない。
+- カーテン・ベッドカバーを実寸で置くかどうかは、`provider`の有無ではなく「公開されている寸法が1辺でもあるか」で決める。3辺とも推定の商品は、従来どおり窓・ベッドに合わせた大きさで置く。手入力の32件は3辺とも推定にしたので、既存92件の置き方は変わらない。
+- 候補は種類ごとに1件ずつ順に取る（`FurnitureCandidates.spread`）。椅子30件は価格の安い順に並んでいて、先頭12件だけだとデスク用・くつろぎ用の椅子がAIの候補に入らなかったため。種類のない枠は従来どおり先頭から。
+- AIへの商品情報に`kind`と`themes`を足した。`themes`は今までモックの絞り込みにしか使っていなかった。
+- 既存のDBは、リリース時に`furniture_detail:migrate_fields`が`db:apply`の前に移す（`metadata`列があるときだけ動く）。形・推定した辺・色名は`metadata`から、種類と短い素材は`db/furniture_details.json`を`key`で引いて入れる。
+- 未対応：値の誤り（ÄNGSLILJA ライトブラウンの高さ2m、EKTORPの寸法、紫の商品の代表色など）、参考モック3件、手入力32件の素材・色名、ソファ・ベッド・机の商品追加。
+- 未検証：Geminiのプランナーでの提案、管理画面の編集欄のブラウザでの操作、本番DBでの移し替え。手元では旧い形のDBの複製で移し替えを実行し、旧データと照合した。
 
 ## 未対応・未検証
 

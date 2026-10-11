@@ -51,6 +51,7 @@ class CoordinationPlanner
 
       # 商品候補 (JSON。寸法はm)
       sizeは配置する寸法、published_sizeは公開寸法 (nullは不明)、estimated_axesは描画用の推定軸です。推定値を公式寸法として説明しないでください。
+      kindはカテゴリの中の種類 (椅子ならdesk_chair・dining_chair・lounge_chair・folding_chair・counter_chair・stool)、themesは合う雰囲気です。
       %<items>s
 
       # 選び方
@@ -98,7 +99,7 @@ class CoordinationPlanner
 
     def plan
       items = (@client.search(prompt: @prompt, theme: nil, slots: @slots, max_price: @budget).values.flatten + @additional_candidates)
-        .uniq { |item| [ group_id(item), item.id ] }.group_by { |item| group_id(item) }.values.flat_map { |group| group.first(CANDIDATES_PER_GROUP) }
+        .uniq { |item| [ group_id(item), item.id ] }.group_by { |item| group_id(item) }.values.flat_map { |group| FurnitureCandidates.spread(group, CANDIDATES_PER_GROUP) }
       response = GeminiClient.new.generate_json(prompt: prompt_for(items), schema: SCHEMA)
       json = response.json.is_a?(Hash) ? response.json : {}
       ranked, selection = candidates(json["picks"], items)
@@ -151,9 +152,9 @@ class CoordinationPlanner
 
     def candidate_json(item)
       metadata = item.metadata
-      { id: item.id, group_id: group_id(item), slot: item.slot, category: item.category, name: item.name,
+      { id: item.id, group_id: group_id(item), slot: item.slot, category: item.category, kind: metadata["kind"], name: item.name,
         color: item.color, price: item.price, size: item.size, published_size: metadata["size"], estimated_axes: metadata["estimated_axes"],
-        material: metadata["material"], shape: metadata["shape"], color_name: metadata["color_name"],
+        material: metadata["material"], shape: metadata["shape"], color_name: metadata["color_name"], themes: metadata["themes"],
         target_size: metadata["target_size"], preferred_position: metadata["preferred_position"] }.compact
     end
 
