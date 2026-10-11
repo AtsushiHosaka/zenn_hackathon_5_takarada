@@ -6,7 +6,7 @@ import { applyMaterialOverrides } from "../room/furnitureMaterials";
 
 export type ThumbnailRequest = { modelUrl: string; size: FurnitureSize; colors: Record<string, string> };
 
-const PIXELS = 160;
+const PIXELS = 320;
 // 斜め上から見る向き。ModelPreview の初期位置と同じ
 const VIEW_DIRECTION = new THREE.Vector3(1.5, 0.9, 2.1).normalize();
 
