@@ -149,4 +149,4 @@ GLBを生成し、`make infra-models-publish`でGCSへ置いてからDBへ登録
 
 同日、初音ミクのグッズを22種追加し、台帳は301モデルになった。301ファイルを配置し、公開URLでの取得とハッシュの一致を確認した。
 
-2026-10-11にクッション (`cushion`と色違い3件) を平置きの角クッションの形に作り直し、4ファイルだけを`gcloud storage cp`で置き換えた。公開URLでの取得とハッシュの一致を確認した。公開バケットの`char_hatsune_miku_standee.glb`と`char_hatsune_miku_tapestry_life.glb`は台帳のハッシュと一致しておらず、`make infra-models-publish`は台帳の照合で止まる。
+2026-10-11にクッション (`cushion`と色違い3件) を平置きの角クッションの形に作り直し、公開バケットの4ファイルを置き換えた。公開URLでの取得とハッシュの一致を確認した。公開バケットの`char_hatsune_miku_standee.glb`と`char_hatsune_miku_tapestry_life.glb`は、DBのハッシュと一致していない。
