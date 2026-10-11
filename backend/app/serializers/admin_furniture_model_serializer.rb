@@ -5,7 +5,7 @@ class AdminFurnitureModelSerializer
   attribute(:id) { |model| model.model_key }
   attribute(:name) { |model| model.furniture.name }
   attribute(:category) { |model| model.furniture.category }
-  attributes :shape, :variant, :size, :color_material_keys, :object_key
+  attributes :shape, :variant, :size, :color_material_keys, :estimated_axes, :object_key
   attribute(:model_url) { |model| model.url }
   attribute(:enabled) { |model| model.furniture.enabled }
   attribute(:details_count) { |model| model.furniture.details.size }

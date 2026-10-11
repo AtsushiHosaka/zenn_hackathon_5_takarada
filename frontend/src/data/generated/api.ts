@@ -1256,11 +1256,6 @@ export interface components {
             color_name: string | null;
             size: components["schemas"]["Size"];
             /**
-             * @description 寸法のうち推定した辺。それ以外は公開されている寸法
-             * @example []
-             */
-            estimated_axes: ("w" | "h" | "d")[];
-            /**
              * @description 主な素材
              * @example スチール
              */
@@ -1342,8 +1337,6 @@ export interface components {
                 /** @example ホワイト */
                 color_name?: string | null;
                 size?: components["schemas"]["Size"];
-                /** @example [] */
-                estimated_axes?: ("w" | "h" | "d")[];
                 /** @example スチール */
                 material?: string | null;
                 /** @example 2000 */
@@ -1398,6 +1391,11 @@ export interface components {
              *     ]
              */
             color_material_keys: string[];
+            /**
+             * @description このモデルを使う商品の寸法のうち、公開されておらず推定した辺
+             * @example []
+             */
+            estimated_axes: ("w" | "h" | "d")[];
             /**
              * @description バケット内の GLB のパス。モデル ID から決まる
              * @example models/furniture/v1/chair_dining.glb

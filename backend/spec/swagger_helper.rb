@@ -123,7 +123,6 @@ RSpec.configure do |config|
               texture_materials: { type: :object, additionalProperties: { type: :string }, description: "部位ごとの模様 (texture_key)", example: {} },
               color_name: { type: :string, nullable: true, example: "ホワイト" },
               size: { "$ref" => "#/components/schemas/Size" },
-              estimated_axes: { type: :array, items: { type: :string, enum: FurnitureDetail::AXES }, description: "寸法のうち推定した辺。それ以外は公開されている寸法", example: [] },
               material: { type: :string, nullable: true, description: "主な素材", example: "スチール" },
               price: { type: :integer, minimum: 1, description: "リンク先の参考価格 (税込)", example: 2000 },
               shop: { type: :string, example: "IKEA" },
@@ -133,7 +132,7 @@ RSpec.configure do |config|
               position: { type: :integer, description: "候補の並び順 (小さいほど先)", example: 0 },
               enabled: { type: :boolean, description: "false なら提案・検索に出さない", example: true }
             },
-            required: %w[id key name category slot model_key symbolic_color color_materials texture_materials color_name size estimated_axes material price shop url image_url themes position enabled]
+            required: %w[id key name category slot model_key symbolic_color color_materials texture_materials color_name size material price shop url image_url themes position enabled]
           },
           AdminFurnitureDetailList: {
             type: :object,
@@ -160,7 +159,6 @@ RSpec.configure do |config|
                   color_materials: { type: :object, additionalProperties: { type: :string, pattern: "^#[0-9a-fA-F]{6}$" }, example: { "tint" => "#f2efe8" } },
                   color_name: { type: :string, nullable: true, example: "ホワイト" },
                   size: { "$ref" => "#/components/schemas/Size" },
-                  estimated_axes: { type: :array, items: { type: :string, enum: FurnitureDetail::AXES }, example: [] },
                   material: { type: :string, nullable: true, example: "スチール" },
                   price: { type: :integer, minimum: 1, example: 2000 },
                   shop: { type: :string, example: "IKEA" },
@@ -193,12 +191,13 @@ RSpec.configure do |config|
               variant: { type: :string, nullable: true, example: nil },
               size: { "$ref" => "#/components/schemas/Size" },
               color_material_keys: { type: :array, items: { type: :string }, description: "色が分かれている部位の名前", example: [ "tint", "wood" ] },
+              estimated_axes: { type: :array, items: { type: :string, enum: Furniture3DModel::SIZE_AXES }, description: "このモデルを使う商品の寸法のうち、公開されておらず推定した辺", example: [] },
               object_key: { type: :string, description: "バケット内の GLB のパス。モデル ID から決まる", example: "models/furniture/v1/chair_dining.glb" },
               model_url: { type: :string, nullable: true, example: nil },
               enabled: { type: :boolean, description: "false なら API・提案から外す", example: true },
               details_count: { type: :integer, minimum: 0, description: "このモデルを使っている商品の数", example: 2 }
             },
-            required: %w[id name category shape variant size color_material_keys object_key model_url enabled details_count]
+            required: %w[id name category shape variant size color_material_keys estimated_axes object_key model_url enabled details_count]
           },
           AdminFurnitureModelInput: {
             type: :object,

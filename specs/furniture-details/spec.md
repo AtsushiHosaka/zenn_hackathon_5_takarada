@@ -60,16 +60,17 @@ furnitures              名前・種類・有効か。db/furnitures.json → rai
 
 2026-10-11のユーザー依頼（チャット）「いらないものは全部消し、最低限だけ入れたい」「種類と形は商品ではなく家具の側で持つほうがよい」を根拠とする。Docsは未確認・未反映。
 
-- `furniture_details.metadata`（jsonb）と`checked_at`を削除した。`metadata`の中身は、商品ごとに違う2つだけを列にした。
-  - `material`：主な素材（短い値。AIへの商品情報）
-  - `estimated_axes`：寸法のうち推定した辺。それ以外の辺が公開されている寸法（`FurnitureDetail#published_size`）
+- `furniture_details.metadata`（jsonb）と`checked_at`を削除した。商品に足した列は`material`（主な素材。短い値。AIへの商品情報）だけ。
+- 寸法のうち推定した辺（`estimated_axes`）は、商品ではなく`furniture_3d_models`に持つ（ユーザー指定。「furniture detailに入れない」）。それ以外の辺が公開されている寸法（`FurnitureDetail#published_size`）。
+  - 同じモデルの商品で推定した辺が違う場合（商品が2件以上あるモデル15個のうち8個）は、どれかの商品で推定の辺をそのモデルの推定とした。このため15件の商品で、公開されている寸法の一部が公開寸法として表示されなくなる（例: POÄNG・ニトリのラグは3辺とも）。置き方が変わる商品は0件。
+  - 値は`db/furnitures.json`の各モデルの`estimated_axes`で、`furniture:import`が取り込む。台帳を作り直しても残るよう、`tools/furniture_models/manifest.py`の`ESTIMATED_AXES`に定義を持つ。管理画面では変えられない。
 - 削除した項目：`provider`、`official_color`、`metadata.color_name`（色名は`color_name`列だけ）、`metadata.size`（寸法の列と`estimated_axes`で表す）、`metadata.shape`。
 - 形は商品に持たせず、家具の3Dモデルの`shape`（`chair_office`・`stool_round`・`rug_round`など）を使う。同じモデルの商品は同じ形になるので、商品ごとに持つと重複する。椅子の種類（デスク用・スツールなど）も、モデルの形で分かるので別の列は作らない。
-- シーン・提案に載せる`product_metadata`は列と家具のモデルから組み立てる（`FurnitureDetail#product_metadata`）。`shape`には3Dモデルの形の名前が入る。保存済みのシーンには旧い項目が残るので、API定義の`ProductMetadata`と画面の読み取りは変えていない。
-- カーテン・ベッドカバーを実寸で置くかどうかは、`provider`の有無ではなく「公開されている寸法が1辺でもあるか」で決める。3辺とも推定の商品は、従来どおり窓・ベッドに合わせた大きさで置く。手入力の32件は3辺とも推定にしたので、既存92件の置き方は変わらない。
+- シーン・提案に載せる`product_metadata`は商品の列と家具の3Dモデル（形・推定した辺）から組み立てる（`FurnitureDetail#product_metadata`）。`shape`には3Dモデルの形の名前が入る。保存済みのシーンには旧い項目が残るので、API定義の`ProductMetadata`と画面の読み取りは変えていない。
+- カーテン・ベッドカバーを実寸で置くかどうかは、`provider`の有無ではなく「公開されている寸法が1辺でもあるか」で決める。3辺とも推定の商品は、従来どおり窓・ベッドに合わせた大きさで置く。手入力の32件が使うモデルは3辺とも推定にしたので、既存92件の置き方は変わらない。
 - 候補は3Dモデルの形ごとに1件ずつ順に取る（`FurnitureCandidates.spread`）。椅子30件は価格の安い順に並んでいて、先頭12件だけだとデスク用・くつろぎ用の椅子がAIの候補に入らなかったため。椅子の候補12件は12種類の形になる。
 - AIへの商品情報に3Dモデルの`shape`と`themes`を足した。`themes`は今までモックの絞り込みにしか使っていなかった。
-- 既存のDBは、リリース時に`furniture_detail:migrate_fields`が`db:apply`の前に移す（`metadata`列があるときだけ動く）。推定した辺・色名は`metadata`から、短い素材は`db/furniture_details.json`を`key`で引いて入れる。
+- 既存のDBは、リリース時に`furniture_detail:migrate_fields`が`db:apply`の前に移す（`metadata`列があるときだけ動く）。色名は`metadata`から、短い素材は`db/furniture_details.json`を`key`で引いて入れる。推定した辺は、続く`furniture:import`が3Dモデルへ入れる。
 - 未対応：値の誤り（ÄNGSLILJA ライトブラウンの高さ2m、EKTORPの寸法、紫の商品の代表色など）、参考モック3件、手入力32件の素材・色名、ソファ・ベッド・机の商品追加。
 - 未検証：管理画面の編集欄のブラウザでの操作、本番DBでの移し替え。手元では旧い形のDBの複製で移し替えを実行し、旧データと照合した。
 

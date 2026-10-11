@@ -35,7 +35,6 @@ class FurnitureDetailImporter
         detail.update!(
           furniture:, position: index,
           **row.slice("name", "category", "slot", "symbolic_color", "color_materials", "color_name", "price", "shop", "url", "image_url", "themes", "material").symbolize_keys,
-          estimated_axes: row.fetch("estimated_axes", []),
           width: size["w"], height: size["h"], depth: size["d"]
         )
         detail.detail_textures.delete_all

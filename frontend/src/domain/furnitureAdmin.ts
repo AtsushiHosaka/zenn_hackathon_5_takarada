@@ -17,8 +17,6 @@ export type AdminFurnitureDetail = {
   colorMaterials: Record<string, string>;
   colorName: string | null;
   size: FurnitureSize;
-  // 寸法のうち推定した辺。それ以外は公開されている寸法
-  estimatedAxes: FurnitureAxis[];
   // 主な素材
   material: string | null;
   price: number;
@@ -33,7 +31,7 @@ export type AdminFurnitureDetail = {
 };
 
 export type AdminFurnitureDetailInput = Pick<AdminFurnitureDetail,
-  "name" | "category" | "slot" | "symbolicColor" | "colorMaterials" | "colorName" | "size" | "estimatedAxes" | "material" | "price" | "shop" | "url" | "imageUrl" | "themes" | "position" | "enabled"
+  "name" | "category" | "slot" | "symbolicColor" | "colorMaterials" | "colorName" | "size" | "material" | "price" | "shop" | "url" | "imageUrl" | "themes" | "position" | "enabled"
 > & { modelKey: string };
 
 export type FurnitureAdminCatalog = {
@@ -53,6 +51,8 @@ export type AdminFurnitureModel = {
   variant: string | null;
   size: FurnitureSize;
   colorMaterialKeys: string[];
+  // このモデルを使う商品の寸法のうち、公開されておらず推定した辺
+  estimatedAxes: FurnitureAxis[];
   // バケット内の GLB のパス。モデル ID から決まる
   objectKey: string;
   modelUrl: string | null;

@@ -794,16 +794,6 @@ components:
           example: ホワイト
         size:
           "$ref": "#/components/schemas/Size"
-        estimated_axes:
-          type: array
-          items:
-            type: string
-            enum:
-            - w
-            - h
-            - d
-          description: 寸法のうち推定した辺。それ以外は公開されている寸法
-          example: []
         material:
           type: string
           nullable: true
@@ -865,7 +855,6 @@ components:
       - texture_materials
       - color_name
       - size
-      - estimated_axes
       - material
       - price
       - shop
@@ -958,15 +947,6 @@ components:
               example: ホワイト
             size:
               "$ref": "#/components/schemas/Size"
-            estimated_axes:
-              type: array
-              items:
-                type: string
-                enum:
-                - w
-                - h
-                - d
-              example: []
             material:
               type: string
               nullable: true
@@ -1054,6 +1034,16 @@ components:
           example:
           - tint
           - wood
+        estimated_axes:
+          type: array
+          items:
+            type: string
+            enum:
+            - w
+            - h
+            - d
+          description: このモデルを使う商品の寸法のうち、公開されておらず推定した辺
+          example: []
         object_key:
           type: string
           description: バケット内の GLB のパス。モデル ID から決まる
@@ -1079,6 +1069,7 @@ components:
       - variant
       - size
       - color_material_keys
+      - estimated_axes
       - object_key
       - model_url
       - enabled
