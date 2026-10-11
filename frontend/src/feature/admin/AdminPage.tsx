@@ -64,6 +64,8 @@ function DetailsBoard({ catalog, models }: { catalog: FurnitureAdminCatalog; mod
   const [state, setState] = useState<"" | "hidden" | "no_image">("");
   // 編集中の商品。"new" は新規作成、null は未選択
   const [selected, setSelected] = useState<number | "new" | null>(null);
+  // 一覧の見せ方。"list" は 1 行ずつ、"grid" は商品画像を大きく並べる
+  const [view, setView] = useState<"list" | "grid">("list");
   const panel = useRef<HTMLElement>(null);
   const select = (next: number | "new") => { setSelected(next); revealPanel(panel); };
   const exporter = useExportFurnitureDetails();
@@ -101,18 +103,44 @@ function DetailsBoard({ catalog, models }: { catalog: FurnitureAdminCatalog; mod
       </div>
       <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600">
         <span role="status">{details.length}件 / 全{catalog.details.length}件</span>
+        <span className="flex gap-1" role="group" aria-label="一覧の見せ方">
+          {([["list", "リスト"], ["grid", "ブロック"]] as const).map(([value, label]) =>
+            <button key={value} type="button" aria-pressed={view === value} onClick={() => setView(value)} className={`motion-control rounded px-3 py-1 text-sm ${view === value ? "bg-violet-700 text-white" : "border border-slate-300 bg-white hover:bg-slate-100"}`}>{label}</button>)}
+        </span>
         <button type="button" className={button} disabled={exporter.isPending} onClick={download}>{exporter.isPending ? "書き出し中…" : "JSONを書き出す"}</button>
         <span>商品はDBが正です。書き出しは控えと、初期データ（backend/db/furniture_details.json）の更新に使えます。</span>
       </div>
       <ErrorText error={exporter.error} />
-      <div className="overflow-x-auto rounded-lg border border-[#E4E1EC] bg-white">
+      {view === "grid" && (details.length === 0
+        ? <p className="rounded-lg border border-[#E4E1EC] bg-white px-2 py-6 text-center text-sm text-slate-500">一致する商品がありません。</p>
+        : <ul className="grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(13rem,1fr))]">
+          {details.map((detail) => <li key={detail.id} aria-current={selected === detail.id} onClick={() => select(detail.id)} className={`cursor-pointer overflow-hidden rounded-lg border bg-white hover:border-violet-400 ${selected === detail.id ? "border-violet-700 ring-2 ring-violet-200" : "border-[#E4E1EC]"} ${detail.enabled ? "" : "opacity-60"}`}>
+            <div className="relative aspect-square bg-white">
+              {detail.imageUrl
+                ? <img src={detail.imageUrl} alt="" loading="lazy" referrerPolicy="no-referrer" className="h-full w-full object-contain" />
+                : <span className="grid h-full w-full place-items-center text-xs text-slate-500" style={{ backgroundColor: detail.symbolicColor }}>画像なし</span>}
+              <span className="absolute right-2 bottom-2 w-1/2 rounded shadow"><ModelThumbnail frame="aspect-square w-full" modelUrl={modelsById.get(detail.modelKey ?? "")?.modelUrl ?? null} size={detail.size} colors={detail.colorMaterials} fallbackColor={detail.symbolicColor} label={detail.name} /></span>
+            </div>
+            <div className="space-y-1 border-t border-[#F0EEF5] p-2">
+              <div className="flex items-start gap-1">
+                <button type="button" className="line-clamp-2 grow text-left text-sm font-medium" onClick={() => select(detail.id)}>{detail.name}</button>
+                <DetailLink detail={detail} />
+              </div>
+              <div className="flex flex-wrap items-center gap-1 text-xs text-slate-500">
+                <span>{detail.shop}</span><span>・{detail.category}</span>
+                {!detail.enabled && <Badge>非表示</Badge>}
+              </div>
+            </div>
+          </li>)}
+        </ul>)}
+      {view === "list" && <div className="overflow-x-auto rounded-lg border border-[#E4E1EC] bg-white">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-[#E4E1EC] text-xs text-slate-500"><tr><th className="px-2 py-2">画像</th><th className="px-2 py-2">3D</th><th className="px-2 py-2">商品</th><th className="px-2 py-2">枠・並び順</th><th className="px-2 py-2 text-right">価格</th><th className="px-2 py-2">リンク</th></tr></thead>
+          <thead className="border-b border-[#E4E1EC] text-xs text-slate-500"><tr><th className="px-2 py-2">画像</th><th className="px-2 py-2">3D</th><th className="px-2 py-2">商品</th><th className="px-2 py-2 whitespace-nowrap">リンク</th></tr></thead>
           <tbody>
             {details.map((detail) => <tr key={detail.id} aria-selected={selected === detail.id} onClick={() => select(detail.id)} className={`cursor-pointer border-b border-[#F0EEF5] last:border-0 hover:bg-violet-50 ${selected === detail.id ? "bg-violet-100" : ""} ${detail.enabled ? "" : "opacity-60"}`}>
               <td className="px-2 py-1.5">{detail.imageUrl
-                ? <img src={detail.imageUrl} alt="" loading="lazy" referrerPolicy="no-referrer" className="h-12 w-12 rounded object-cover" />
-                : <span className="grid h-12 w-12 place-items-center rounded text-[10px] text-slate-500" style={{ backgroundColor: detail.symbolicColor }}>なし</span>}</td>
+                ? <img src={detail.imageUrl} alt="" loading="lazy" referrerPolicy="no-referrer" className="h-18 w-18 max-w-none rounded object-cover" />
+                : <span className="grid h-18 w-18 place-items-center rounded text-[10px] text-slate-500" style={{ backgroundColor: detail.symbolicColor }}>なし</span>}</td>
               <td className="px-2 py-1.5"><ModelThumbnail modelUrl={modelsById.get(detail.modelKey ?? "")?.modelUrl ?? null} size={detail.size} colors={detail.colorMaterials} fallbackColor={detail.symbolicColor} label={detail.name} /></td>
               <td className="px-2 py-1.5">
                 <button type="button" className="text-left font-medium" onClick={() => select(detail.id)}>{detail.name}</button>
@@ -121,14 +149,12 @@ function DetailsBoard({ catalog, models }: { catalog: FurnitureAdminCatalog; mod
                   {!detail.enabled && <Badge>非表示</Badge>}
                 </div>
               </td>
-              <td className="px-2 py-1.5 text-xs whitespace-nowrap">{detail.slot}<br />{detail.position}番</td>
-              <td className="px-2 py-1.5 text-right whitespace-nowrap">{detail.price.toLocaleString("ja-JP")}円</td>
-              <td className="px-2 py-1.5 whitespace-nowrap"><a href={detail.url} target="_blank" rel="noopener noreferrer" className="text-violet-700" onClick={(event) => event.stopPropagation()}>開く ↗</a></td>
+              <td className="px-2 py-1.5"><DetailLink detail={detail} /></td>
             </tr>)}
-            {details.length === 0 && <tr><td colSpan={6} className="px-2 py-6 text-center text-slate-500">一致する商品がありません。</td></tr>}
+            {details.length === 0 && <tr><td colSpan={4} className="px-2 py-6 text-center text-slate-500">一致する商品がありません。</td></tr>}
           </tbody>
         </table>
-      </div>
+      </div>}
     </section>
     <aside className="order-first md:sticky md:top-4 md:order-none md:max-h-[calc(100dvh-2rem)] md:overflow-y-auto" aria-label="商品の編集" ref={panel}>
       {selected === null
@@ -136,6 +162,13 @@ function DetailsBoard({ catalog, models }: { catalog: FurnitureAdminCatalog; mod
         : <DetailEditor key={selected} detail={editing} catalog={catalog} models={models} onCreated={(detail) => setSelected(detail.id)} onClose={() => setSelected(null)} />}
     </aside>
   </div>;
+}
+
+// 購入リンクを別タブで開くアイコン。行やカードの選択は起こさない
+function DetailLink({ detail }: { detail: AdminFurnitureDetail }) {
+  return <a href={detail.url} target="_blank" rel="noopener noreferrer" aria-label={`${detail.name}の購入リンクを開く`} title="購入リンクを開く" className="motion-control inline-grid h-7 w-7 shrink-0 place-items-center rounded text-violet-700 hover:bg-violet-100" onClick={(event) => event.stopPropagation()}>
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14 4h6v6" /><path d="M20 4l-9 9" /><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" /></svg>
+  </a>;
 }
 
 function Badge({ children }: { children: ReactNode }) {
