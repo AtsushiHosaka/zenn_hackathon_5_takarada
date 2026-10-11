@@ -89,6 +89,7 @@ create_table "furniture_3d_models", force: :cascade do |t|
   t.bigint "byte_size", null: false # GLB のバイト数
   t.string "sha256", null: false # GLB のハッシュ。ファイルとの照合用
   t.jsonb "color_material_keys", null: false, default: [] # 色が分かれている部位の名前 (GLB の素材名。例: ["tint", "wood"])
+  t.jsonb "estimated_axes", null: false, default: [] # このモデルを使う商品の寸法のうち、公開されておらず推定した辺 (例: ["h"])。それ以外の辺は公開されている寸法
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
 
@@ -112,7 +113,6 @@ create_table "furniture_details", force: :cascade do |t|
   t.decimal "width", precision: 10, scale: 6, null: false
   t.decimal "height", precision: 10, scale: 6, null: false
   t.decimal "depth", precision: 10, scale: 6, null: false
-  t.jsonb "estimated_axes", null: false, default: [] # 寸法のうち推定した辺 (例: ["h"])。それ以外の辺は公開されている寸法
   t.string "material" # 主な素材 (例: 綿、スチール)
   t.integer "price", null: false
   t.string "shop", null: false

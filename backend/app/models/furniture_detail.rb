@@ -2,8 +2,6 @@ class FurnitureDetail < ApplicationRecord
   belongs_to :furniture, inverse_of: :details
   has_many :detail_textures, class_name: "FurnitureDetailTexture", dependent: :delete_all, inverse_of: :furniture_detail
 
-  AXES = %w[w h d].freeze
-
   # 提案・検索に出す detail。管理画面で非表示にしたものを除く
   scope :available, -> { where(enabled: true) }
 
@@ -16,7 +14,6 @@ class FurnitureDetail < ApplicationRecord
   validates :enabled, inclusion: { in: [ true, false ] }
   validate :valid_themes
   validate :valid_color_materials
-  validate :valid_estimated_axes
 
   normalizes :material, with: ->(value) { value.to_s.strip.presence }
 
@@ -24,14 +21,19 @@ class FurnitureDetail < ApplicationRecord
     { "w" => width.to_f, "h" => height.to_f, "d" => depth.to_f }
   end
 
+  # 寸法のうち推定した辺。商品ではなく家具の 3D モデルが持つ (同じモデルの商品で共通)
+  def estimated_axes
+    furniture.model&.estimated_axes || []
+  end
+
   # 公開されている寸法。推定した辺は nil。3 辺とも推定なら nil (寸法は目安で、配置は部屋に合わせる)
   def published_size
-    published = AXES - estimated_axes
+    published = Furniture3DModel::SIZE_AXES - estimated_axes
     size.to_h { |axis, value| [ axis, published.include?(axis) ? value : nil ] } if published.any?
   end
 
   # 提案・シーンの家具に載せる商品の補足。配置 (SlotLayout)・AI への商品情報・画面の商品寸法の表示が読む。
-  # 形は商品ではなく家具の 3D モデルが持つ (chair_office, rug_round など)。同じモデルの商品は同じ形になる
+  # 形と推定した辺は商品ではなく家具の 3D モデルが持つ (chair_office, rug_round など)。同じモデルの商品は同じ形になる
   def product_metadata
     { "size" => published_size, "estimated_axes" => estimated_axes, "material" => material, "shape" => furniture.model&.shape,
       "color_name" => color_name.presence, "themes" => themes.presence }.compact
@@ -65,9 +67,5 @@ class FurnitureDetail < ApplicationRecord
 
   def valid_themes
     errors.add(:themes, "must be an array of strings") unless themes.is_a?(Array) && themes.all? { |theme| theme.is_a?(String) }
-  end
-
-  def valid_estimated_axes
-    errors.add(:estimated_axes, "must be a list of w, h, d") unless estimated_axes.is_a?(Array) && (estimated_axes - AXES).empty? && estimated_axes.uniq == estimated_axes
   end
 end

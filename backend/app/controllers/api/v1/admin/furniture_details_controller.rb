@@ -54,7 +54,7 @@ module Api
         def detail_params
           params.require(:furniture_detail).permit(
             :name, :category, :slot, :model_key, :symbolic_color, :color_name, :material, :price, :shop, :url, :image_url, :position, :enabled,
-            color_materials: {}, size: %i[w h d], estimated_axes: [], themes: []
+            color_materials: {}, size: %i[w h d], themes: []
           ).to_h.symbolize_keys
         end
       end

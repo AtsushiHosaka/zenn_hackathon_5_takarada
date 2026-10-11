@@ -314,6 +314,51 @@ def category(name):
     raise KeyError(name)
 
 
+# 商品の寸法のうち、公開されておらず推定した辺 (w/h/d)。モデルID → 辺。同じモデルの商品のどれかで推定なら、そのモデルでは推定とする。
+# 載っていないモデルは 3 辺とも公開されている寸法として扱う
+ESTIMATED_AXES = {
+    "acrylic_stand_case": ["w", "h", "d"],
+    "bed_cover": ["h", "d"],
+    "bed_cover__101": ["w", "h", "d"],
+    "bed_cover__201": ["w", "h", "d"],
+    "bed_cover__301": ["w", "h", "d"],
+    "candle": ["w", "h", "d"],
+    "chair_lounge": ["w", "h", "d"],
+    "curtain_pair__102": ["w", "h", "d"],
+    "curtain_pair__202": ["w", "h", "d"],
+    "curtain_sheer__115": ["w", "h", "d"],
+    "curtain_sheer__302": ["w", "h", "d"],
+    "curtain_sheer__901": ["w", "h", "d"],
+    "cushion": ["h"],
+    "cushion__107": ["w", "h", "d"],
+    "cushion__207": ["w", "h", "d"],
+    "cushion__307": ["w", "h", "d"],
+    "desk_lamp_arm": ["w", "d"],
+    "desk_lamp_clip": ["w", "h", "d"],
+    "floor_lamp": ["w", "h", "d"],
+    "floor_lamp_ball": ["w", "h", "d"],
+    "floor_lamp_pleated": ["w", "h", "d"],
+    "floor_lamp_rattan": ["w", "h", "d"],
+    "floor_lamp_slim": ["w", "h", "d"],
+    "floor_lamp_tripod": ["w", "h", "d"],
+    "plant_eucalyptus": ["w", "h", "d"],
+    "plant_monstera": ["w", "h", "d"],
+    "rug_rect__203": ["w", "h", "d"],
+    "rug_round__211": ["w", "h", "d"],
+    "rug_wave": ["w", "h", "d"],
+    "shelf_floating": ["w", "h", "d"],
+    "side_table": ["w", "h", "d"],
+    "small_plant": ["w", "h", "d"],
+    "stool_round": ["d"],
+    "table_lamp": ["h", "d"],
+    "tapestry": ["w", "h", "d"],
+    "wall_art": ["w", "h", "d"],
+    "wall_mirror": ["w", "h", "d"],
+    "wall_planter": ["w", "h", "d"],
+    "wall_shelf_hex": ["h"],
+}
+
+
 def goods(shape):
     _, characters = GOODS.get(shape, NOT_GOODS)
     return {"characters": list(characters)}
@@ -443,7 +488,7 @@ def main():
         models.append({"id": model_id, "name": NAMES[base], "category": GOODS.get(base, NOT_GOODS)[0] or category(base), "shape": base,
                        "variant": variant or None, "format": "glb", "object_key": f"models/furniture/v1/{filename}",
                        **{("color_material_keys" if key == "materials" else key): value for key, value in stats.items()},
-                       **goods(base)})
+                       **goods(base), "estimated_axes": ESTIMATED_AXES.get(model_id, [])})
     catalog = {"unit": "meter", "axes": "+Y up, +Z front, origin bottom center", "models": models}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(catalog, ensure_ascii=False, indent=1) + "\n")

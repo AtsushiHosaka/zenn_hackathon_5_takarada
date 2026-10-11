@@ -16,11 +16,6 @@
         "h": 0.04,
         "d": 2.1
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 12800,
       "shop": "Francfranc",
@@ -46,11 +41,6 @@
         "h": 2.5,
         "d": 0.04
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 5999,
       "shop": "IKEA",
@@ -76,11 +66,6 @@
         "h": 2.0,
         "d": 0.04
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 1980,
       "shop": "楽天市場",
@@ -106,7 +91,6 @@
         "h": 0.018,
         "w": 1.33
       },
-      "estimated_axes": [],
       "material": "ポリプロピレン",
       "price": 12990,
       "shop": "IKEA",
@@ -132,11 +116,6 @@
         "h": 0.05,
         "d": 0.26
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 2999,
       "shop": "IKEA",
@@ -162,11 +141,6 @@
         "h": 0.9,
         "d": 0.01
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 1980,
       "shop": "楽天市場",
@@ -192,11 +166,6 @@
         "h": 1.53,
         "d": 0.255
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 14000,
       "shop": "Francfranc",
@@ -222,11 +191,6 @@
         "h": 1.12,
         "d": 0.3
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 14990,
       "shop": "IKEA",
@@ -252,7 +216,6 @@
         "h": 1.16,
         "w": 0.34
       },
-      "estimated_axes": [],
       "material": "スチール、ガラス",
       "price": 5999,
       "shop": "IKEA",
@@ -278,7 +241,6 @@
         "h": 1.51,
         "w": 0.35
       },
-      "estimated_axes": [],
       "material": "スチール、ガラス",
       "price": 12990,
       "shop": "IKEA",
@@ -304,11 +266,6 @@
         "h": 0.2,
         "d": 0.6
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 3480,
       "shop": "Francfranc",
@@ -334,11 +291,6 @@
         "h": 0.184,
         "d": 0.084
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 2490,
       "shop": "無印良品",
@@ -364,11 +316,6 @@
         "h": 0.04,
         "d": 2.0
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 2999,
       "shop": "IKEA",
@@ -394,11 +341,6 @@
         "h": 2.0,
         "d": 0.04
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 5990,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
@@ -424,11 +366,6 @@
         "h": 0.014,
         "d": 1.95
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 12990,
       "shop": "IKEA",
@@ -454,11 +391,6 @@
         "h": 0.018,
         "d": 1.3
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 9990,
       "shop": "IKEA",
@@ -484,11 +416,6 @@
         "h": 0.63,
         "d": 0.15
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 599,
       "shop": "IKEA",
@@ -514,11 +441,6 @@
         "h": 0.5,
         "d": 0.02
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 2799,
       "shop": "IKEA",
@@ -544,11 +466,6 @@
         "h": 1.0,
         "d": 0.2
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 13200,
       "shop": "KAJA",
@@ -574,11 +491,6 @@
         "h": 1.4,
         "d": 0.62
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 10990,
       "shop": "IKEA",
@@ -604,11 +516,6 @@
         "h": 0.9,
         "d": 0.6
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 4999,
       "shop": "IKEA",
@@ -634,11 +541,6 @@
         "h": 1.5,
         "d": 0.4
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 5990,
       "shop": "IKEA",
@@ -664,11 +566,6 @@
         "h": 0.15,
         "d": 0.48
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 2499,
       "shop": "IKEA",
@@ -694,11 +591,6 @@
         "h": 0.21,
         "d": 0.15
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 499,
       "shop": "IKEA",
@@ -724,11 +616,6 @@
         "h": 0.04,
         "d": 2
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 2999,
       "shop": "IKEA",
@@ -754,11 +641,6 @@
         "h": 2.5,
         "d": 0.04
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 3999,
       "shop": "IKEA",
@@ -784,11 +666,6 @@
         "h": 0.02,
         "d": 1.85
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 5480,
       "shop": "楽天市場",
@@ -814,7 +691,6 @@
         "h": 0.018,
         "w": 1.3
       },
-      "estimated_axes": [],
       "material": "ポリプロピレン",
       "price": 9990,
       "shop": "IKEA",
@@ -841,11 +717,6 @@
         "h": 0.2,
         "d": 0.018
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 799,
       "shop": "nitori",
@@ -871,11 +742,6 @@
         "h": 1.44,
         "d": 0.38
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 6999,
       "shop": "IKEA",
@@ -901,11 +767,6 @@
         "h": 1.55,
         "d": 0.36
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 9990,
       "shop": "IKEA",
@@ -931,11 +792,6 @@
         "h": 0.53,
         "d": 0.45
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 1999,
       "shop": "IKEA",
@@ -961,11 +817,6 @@
         "h": 0.15,
         "d": 0.5
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 499,
       "shop": "IKEA",
@@ -991,11 +842,6 @@
         "h": 0.08,
         "d": 0.057
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 399,
       "shop": "IKEA",
@@ -1021,11 +867,6 @@
         "h": 2.5,
         "d": 0.03
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 799,
       "shop": "IKEA",
@@ -1052,11 +893,6 @@
         "h": 0.35,
         "d": 0.15
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": null,
       "price": 1899,
       "shop": "IKEA",
@@ -1084,9 +920,6 @@
         "h": 0.15,
         "w": 0.5
       },
-      "estimated_axes": [
-        "h"
-      ],
       "material": "綿",
       "price": 499,
       "shop": "IKEA",
@@ -1110,7 +943,6 @@
         "h": 0.35,
         "w": 0.16
       },
-      "estimated_axes": [],
       "material": "ポリプロピレン",
       "price": 599,
       "shop": "IKEA",
@@ -1134,9 +966,6 @@
         "h": 0.45,
         "w": 0.4
       },
-      "estimated_axes": [
-        "d"
-      ],
       "material": "ポリプロピレン、スチール",
       "price": 899,
       "shop": "IKEA",
@@ -1160,9 +989,6 @@
         "h": 0.45,
         "w": 0.4
       },
-      "estimated_axes": [
-        "d"
-      ],
       "material": "ポリプロピレン、スチール",
       "price": 899,
       "shop": "IKEA",
@@ -1186,9 +1012,6 @@
         "h": 0.15,
         "w": 0.5
       },
-      "estimated_axes": [
-        "h"
-      ],
       "material": "ポリエステル",
       "price": 999,
       "shop": "IKEA",
@@ -1212,9 +1035,6 @@
         "h": 0.15,
         "w": 0.5
       },
-      "estimated_axes": [
-        "h"
-      ],
       "material": "綿",
       "price": 999,
       "shop": "IKEA",
@@ -1238,9 +1058,6 @@
         "h": 0.15,
         "w": 0.5
       },
-      "estimated_axes": [
-        "h"
-      ],
       "material": "綿",
       "price": 999,
       "shop": "IKEA",
@@ -1264,9 +1081,6 @@
         "h": 0.15,
         "w": 0.65
       },
-      "estimated_axes": [
-        "h"
-      ],
       "material": "綿",
       "price": 999,
       "shop": "IKEA",
@@ -1290,10 +1104,6 @@
         "h": 0.35,
         "w": 0.25
       },
-      "estimated_axes": [
-        "w",
-        "d"
-      ],
       "material": "ポリプロピレン",
       "price": 1380,
       "shop": "SelectShop Brain（Yahoo!ショッピング）",
@@ -1317,7 +1127,6 @@
         "h": 0.45,
         "w": 0.34
       },
-      "estimated_axes": [],
       "material": "スチール、ポリプロピレン",
       "price": 1490,
       "shop": "IKEA",
@@ -1341,9 +1150,6 @@
         "h": 0.15,
         "w": 0.5
       },
-      "estimated_axes": [
-        "h"
-      ],
       "material": "綿",
       "price": 1499,
       "shop": "IKEA",
@@ -1367,9 +1173,6 @@
         "h": 0.15,
         "w": 0.58
       },
-      "estimated_axes": [
-        "h"
-      ],
       "material": "綿",
       "price": 1499,
       "shop": "IKEA",
@@ -1393,7 +1196,6 @@
         "h": 0.495,
         "w": 0.3
       },
-      "estimated_axes": [],
       "material": "スチール、PVC",
       "price": 1790,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
@@ -1417,7 +1219,6 @@
         "h": 0.89,
         "w": 0.44
       },
-      "estimated_axes": [],
       "material": "スチール、ポリプロピレン",
       "price": 1800,
       "shop": "IKEA",
@@ -1441,9 +1242,6 @@
         "h": 0.15,
         "w": 0.55
       },
-      "estimated_axes": [
-        "h"
-      ],
       "material": "繊維板",
       "price": 1980,
       "shop": "SelectShop Brain（Yahoo!ショッピング）",
@@ -1467,9 +1265,6 @@
         "h": 0.04,
         "w": 1.5
       },
-      "estimated_axes": [
-        "h"
-      ],
       "material": "ポリエステル",
       "price": 1990,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
@@ -1493,7 +1288,6 @@
         "h": 0.12,
         "w": 0.45
       },
-      "estimated_axes": [],
       "material": "化粧繊維板",
       "price": 1990,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
@@ -1517,7 +1311,6 @@
         "h": 0.002,
         "w": 1.2
       },
-      "estimated_axes": [],
       "material": "綿",
       "price": 1999,
       "shop": "IKEA",
@@ -1541,10 +1334,6 @@
         "h": 0.26,
         "w": 0.3
       },
-      "estimated_axes": [
-        "w",
-        "d"
-      ],
       "material": "ガラス、ステンレススチール",
       "price": 1999,
       "shop": "IKEA",
@@ -1568,7 +1357,6 @@
         "h": 0.77,
         "w": 0.39
       },
-      "estimated_axes": [],
       "material": "スチール、ポリプロピレン",
       "price": 2000,
       "shop": "IKEA",
@@ -1592,7 +1380,6 @@
         "h": 0.77,
         "w": 0.39
       },
-      "estimated_axes": [],
       "material": "スチール、ポリプロピレン",
       "price": 2000,
       "shop": "IKEA",
@@ -1616,7 +1403,6 @@
         "h": 0.78,
         "w": 0.41
       },
-      "estimated_axes": [],
       "material": "スチール、ポリプロピレン",
       "price": 2500,
       "shop": "IKEA",
@@ -1640,7 +1426,6 @@
         "h": 0.9,
         "w": 0.4
       },
-      "estimated_axes": [],
       "material": "スチール、ポリプロピレン",
       "price": 2990,
       "shop": "IKEA",
@@ -1664,7 +1449,6 @@
         "h": 0.45,
         "w": 0.42
       },
-      "estimated_axes": [],
       "material": "バーチ材（合板）",
       "price": 2990,
       "shop": "IKEA",
@@ -1688,9 +1472,6 @@
         "h": 2.0,
         "w": 1.5
       },
-      "estimated_axes": [
-        "d"
-      ],
       "material": "綿",
       "price": 2999,
       "shop": "IKEA",
@@ -1714,7 +1495,6 @@
         "h": 0.79,
         "w": 0.45
       },
-      "estimated_axes": [],
       "material": "スチール、ポリプロピレン",
       "price": 3000,
       "shop": "IKEA",
@@ -1738,7 +1518,6 @@
         "h": 0.77,
         "w": 0.39
       },
-      "estimated_axes": [],
       "material": "スチール、ポリプロピレン",
       "price": 3480,
       "shop": "SelectShop Brain（Yahoo!ショッピング）",
@@ -1762,7 +1541,6 @@
         "h": 0.5,
         "w": 0.43
       },
-      "estimated_axes": [],
       "material": "アスペン無垢材",
       "price": 3499,
       "shop": "IKEA",
@@ -1786,7 +1564,6 @@
         "h": 0.45,
         "w": 0.49
       },
-      "estimated_axes": [],
       "material": "パイン無垢材",
       "price": 3990,
       "shop": "IKEA",
@@ -1810,7 +1587,6 @@
         "h": 0.8,
         "w": 0.5
       },
-      "estimated_axes": [],
       "material": "パーティクルボード",
       "price": 3999,
       "shop": "IKEA",
@@ -1834,9 +1610,6 @@
         "h": 0.4,
         "w": 0.18
       },
-      "estimated_axes": [
-        "h"
-      ],
       "material": "スチール、ガラス",
       "price": 4499,
       "shop": "IKEA",
@@ -1860,7 +1633,6 @@
         "h": 0.77,
         "w": 0.44
       },
-      "estimated_axes": [],
       "material": "ビーチ無垢材",
       "price": 5000,
       "shop": "IKEA",
@@ -1884,7 +1656,6 @@
         "h": 0.9,
         "w": 0.42
       },
-      "estimated_axes": [],
       "material": "パイン無垢材",
       "price": 5000,
       "shop": "IKEA",
@@ -1908,7 +1679,6 @@
         "h": 0.9,
         "w": 0.67
       },
-      "estimated_axes": [],
       "material": "ポリプロピレン、スチール",
       "price": 5990,
       "shop": "IKEA",
@@ -1932,9 +1702,6 @@
         "h": 0.28,
         "w": 0.26
       },
-      "estimated_axes": [
-        "d"
-      ],
       "material": "ガラス",
       "price": 5999,
       "shop": "IKEA",
@@ -1958,7 +1725,6 @@
         "h": 0.8,
         "w": 0.46
       },
-      "estimated_axes": [],
       "material": "スチール、ポリプロピレン",
       "price": 6000,
       "shop": "IKEA",
@@ -1982,7 +1748,6 @@
         "h": 0.02,
         "w": 2.0
       },
-      "estimated_axes": [],
       "material": "ポリエステル",
       "price": 6490,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
@@ -2006,7 +1771,6 @@
         "h": 0.9,
         "w": 0.42
       },
-      "estimated_axes": [],
       "material": "パイン無垢材",
       "price": 6880,
       "shop": "SelectShop Brain（Yahoo!ショッピング）",
@@ -2030,7 +1794,6 @@
         "h": 0.018,
         "w": 0.8
       },
-      "estimated_axes": [],
       "material": "ポリプロピレン",
       "price": 6999,
       "shop": "IKEA",
@@ -2054,7 +1817,6 @@
         "h": 0.41,
         "w": 0.35
       },
-      "estimated_axes": [],
       "material": "ポリエステル（張地）、ステンレス",
       "price": 7800,
       "shop": "Francfranc",
@@ -2078,7 +1840,6 @@
         "h": 0.67,
         "w": 0.21
       },
-      "estimated_axes": [],
       "material": "スチール、アルミニウム",
       "price": 7999,
       "shop": "IKEA",
@@ -2102,7 +1863,6 @@
         "h": 0.815,
         "w": 0.55
       },
-      "estimated_axes": [],
       "material": "スチール",
       "price": 8990,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
@@ -2126,7 +1886,6 @@
         "h": 0.76,
         "w": 0.45
       },
-      "estimated_axes": [],
       "material": "バーチ無垢材",
       "price": 10000,
       "shop": "IKEA",
@@ -2150,7 +1909,6 @@
         "h": 1.16,
         "w": 0.34
       },
-      "estimated_axes": [],
       "material": "ガラス",
       "price": 11990,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
@@ -2174,7 +1932,6 @@
         "h": 1.55,
         "w": 0.42
       },
-      "estimated_axes": [],
       "material": "スチール、ガラス",
       "price": 14990,
       "shop": "IKEA",
@@ -2198,7 +1955,6 @@
         "h": 0.72,
         "w": 0.62
       },
-      "estimated_axes": [],
       "material": "ポリエステル",
       "price": 14990,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
@@ -2222,7 +1978,6 @@
         "h": 0.76,
         "w": 0.44
       },
-      "estimated_axes": [],
       "material": "綿・ポリエステル（布地）、無垢材",
       "price": 15000,
       "shop": "IKEA",
@@ -2246,7 +2001,6 @@
         "h": 0.81,
         "w": 0.45
       },
-      "estimated_axes": [],
       "material": "木材・プラスチック複合材",
       "price": 15000,
       "shop": "IKEA",
@@ -2270,7 +2024,6 @@
         "h": 1.0,
         "w": 0.68
       },
-      "estimated_axes": [],
       "material": "バーチ材（積層合板）",
       "price": 15800,
       "shop": "SelectShop Brain（Yahoo!ショッピング）",
@@ -2294,7 +2047,6 @@
         "h": 0.82,
         "w": 0.55
       },
-      "estimated_axes": [],
       "material": "ポリカーボネート、スチール",
       "price": 16000,
       "shop": "IKEA",
@@ -2318,7 +2070,6 @@
         "h": 0.75,
         "w": 0.75
       },
-      "estimated_axes": [],
       "material": "パイン無垢材",
       "price": 17990,
       "shop": "IKEA",
@@ -2342,7 +2093,6 @@
         "h": 0.018,
         "w": 1.7
       },
-      "estimated_axes": [],
       "material": "ポリプロピレン",
       "price": 24990,
       "shop": "IKEA",
@@ -2366,7 +2116,6 @@
         "h": 1.2,
         "w": 0.8
       },
-      "estimated_axes": [],
       "material": "スチール、ガラス",
       "price": 24990,
       "shop": "IKEA",
@@ -2390,7 +2139,6 @@
         "h": 1.01,
         "w": 0.82
       },
-      "estimated_axes": [],
       "material": "ポリエステル（布地）、無垢材",
       "price": 29990,
       "shop": "IKEA",
@@ -2414,11 +2162,6 @@
         "h": 0.85,
         "w": 0.5
       },
-      "estimated_axes": [
-        "w",
-        "h",
-        "d"
-      ],
       "material": "布地、合板",
       "price": 34990,
       "shop": "IKEA",
@@ -2442,7 +2185,6 @@
         "h": 1.25,
         "w": 0.69
       },
-      "estimated_axes": [],
       "material": "合成皮革",
       "price": 34990,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
