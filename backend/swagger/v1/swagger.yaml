@@ -751,6 +751,11 @@ components:
         category:
           type: string
           example: chair
+        kind:
+          type: string
+          nullable: true
+          description: カテゴリの中の種類。選べる値は一覧の kinds
+          example: dining_chair
         slot:
           type: string
           enum:
@@ -794,6 +799,30 @@ components:
           example: ホワイト
         size:
           "$ref": "#/components/schemas/Size"
+        estimated_axes:
+          type: array
+          items:
+            type: string
+            enum:
+            - w
+            - h
+            - d
+          description: 寸法のうち推定した辺。それ以外は公開されている寸法
+          example: []
+        material:
+          type: string
+          nullable: true
+          description: 主な素材
+          example: スチール
+        shape:
+          type: string
+          nullable: true
+          enum:
+          - rectangular
+          - round
+          -
+          description: 形。分からなければ null
+          example:
         price:
           type: integer
           minimum: 1
@@ -824,15 +853,12 @@ components:
           type: boolean
           description: false なら提案・検索に出さない
           example: true
-        checked_at:
-          type: string
-          format: date-time
-          nullable: true
       required:
       - id
       - key
       - name
       - category
+      - kind
       - slot
       - model_key
       - symbolic_color
@@ -840,6 +866,9 @@ components:
       - texture_materials
       - color_name
       - size
+      - estimated_axes
+      - material
+      - shape
       - price
       - shop
       - url
@@ -847,7 +876,6 @@ components:
       - themes
       - position
       - enabled
-      - checked_at
     AdminFurnitureDetailList:
       type: object
       properties:
@@ -865,10 +893,28 @@ components:
           items:
             type: string
           description: 家具検索で使う家具の種類
+        kinds:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: カテゴリごとの選べる種類 (kind)。載っていないカテゴリは種類なし
+          example:
+            chair:
+            - dining_chair
+            - stool
+        shapes:
+          type: array
+          items:
+            type: string
+          description: 選べる形
       required:
       - details
       - slots
       - categories
+      - kinds
+      - shapes
     AdminFurnitureDetailInput:
       type: object
       properties:
@@ -883,6 +929,10 @@ components:
             category:
               type: string
               example: chair
+            kind:
+              type: string
+              nullable: true
+              example: dining_chair
             slot:
               type: string
               enum:
@@ -916,6 +966,27 @@ components:
               example: ホワイト
             size:
               "$ref": "#/components/schemas/Size"
+            estimated_axes:
+              type: array
+              items:
+                type: string
+                enum:
+                - w
+                - h
+                - d
+              example: []
+            material:
+              type: string
+              nullable: true
+              example: スチール
+            shape:
+              type: string
+              nullable: true
+              enum:
+              - rectangular
+              - round
+              -
+              example:
             price:
               type: integer
               minimum: 1

@@ -29,7 +29,7 @@ docs:          ## specs から OpenAPI(swagger.yaml) を再生成
 	docker compose exec api bundle exec rails rswag
 
 db-apply:      ## db/Schemafile を DB に適用
-	docker compose exec api bin/rails furniture_texture:clear_legacy db:apply
+	docker compose exec api bin/rails furniture_texture:clear_legacy furniture_detail:migrate_fields db:apply
 
 db-dry-run:    ## db/Schemafile と DB の差分を表示 (適用しない)
 	docker compose exec api bin/rails db:dry_run

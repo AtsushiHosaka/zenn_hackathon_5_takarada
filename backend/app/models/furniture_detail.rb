@@ -2,6 +2,9 @@ class FurnitureDetail < ApplicationRecord
   belongs_to :furniture, inverse_of: :details
   has_many :detail_textures, class_name: "FurnitureDetailTexture", dependent: :delete_all, inverse_of: :furniture_detail
 
+  AXES = %w[w h d].freeze
+  SHAPES = %w[rectangular round].freeze
+
   # 提案・検索に出す detail。管理画面で非表示にしたものを除く
   scope :available, -> { where(enabled: true) }
 
@@ -12,11 +15,28 @@ class FurnitureDetail < ApplicationRecord
   validates :price, numericality: { only_integer: true, greater_than: 0 }
   validates :width, :height, :depth, numericality: { greater_than: 0 }
   validates :enabled, inclusion: { in: [ true, false ] }
+  validates :shape, inclusion: { in: SHAPES }, allow_nil: true
   validate :valid_themes
   validate :valid_color_materials
+  validate :valid_estimated_axes
+  validate :valid_kind
+
+  normalizes :kind, :material, :shape, with: ->(value) { value.to_s.strip.presence }
 
   def size
     { "w" => width.to_f, "h" => height.to_f, "d" => depth.to_f }
+  end
+
+  # 公開されている寸法。推定した辺は nil。3 辺とも推定なら nil (寸法は目安で、配置は部屋に合わせる)
+  def published_size
+    published = AXES - estimated_axes
+    size.to_h { |axis, value| [ axis, published.include?(axis) ? value : nil ] } if published.any?
+  end
+
+  # 提案・シーンの家具に載せる商品の補足。配置 (SlotLayout)・AI への商品情報・画面の商品寸法の表示が読む
+  def product_metadata
+    { "size" => published_size, "estimated_axes" => estimated_axes, "material" => material, "shape" => shape,
+      "color_name" => color_name.presence, "kind" => kind, "themes" => themes.presence }.compact
   end
 
   # シーンの家具・検索結果に載せる商品とモデルの情報。寸法は商品、形は家具のモデルを使う
@@ -25,7 +45,7 @@ class FurnitureDetail < ApplicationRecord
     model_url = model&.url
     {
       "furniture_detail_id" => id, "label" => name, "category" => category, "color" => symbolic_color, "color_materials" => color_materials, "size" => size,
-      "price" => price, "shop" => shop, "url" => url, "image_url" => image_url, "product_metadata" => metadata,
+      "price" => price, "shop" => shop, "url" => url, "image_url" => image_url, "product_metadata" => product_metadata,
       "model_url" => model_url,
       "model_match" => model && { "model_id" => model.id, "reason" => "furniture_detail", "approximate" => true },
       "model_size" => model&.size,
@@ -47,5 +67,13 @@ class FurnitureDetail < ApplicationRecord
 
   def valid_themes
     errors.add(:themes, "must be an array of strings") unless themes.is_a?(Array) && themes.all? { |theme| theme.is_a?(String) }
+  end
+
+  def valid_estimated_axes
+    errors.add(:estimated_axes, "must be a list of w, h, d") unless estimated_axes.is_a?(Array) && (estimated_axes - AXES).empty? && estimated_axes.uniq == estimated_axes
+  end
+
+  def valid_kind
+    errors.add(:kind, "is not a kind of #{category}") unless kind.nil? || FurnitureCandidates::KINDS.fetch(category, []).include?(kind)
   end
 end

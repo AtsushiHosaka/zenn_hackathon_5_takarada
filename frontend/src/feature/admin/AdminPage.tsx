@@ -1,7 +1,7 @@
 import { useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
 import { Link } from "react-router";
 import { toDomainError } from "../../domain/error";
-import type { AdminFurnitureDetail, AdminFurnitureDetailInput, AdminFurnitureModel, FurnitureAdminCatalog, FurnitureSize } from "../../domain/furnitureAdmin";
+import type { AdminFurnitureDetail, AdminFurnitureDetailInput, AdminFurnitureModel, FurnitureAdminCatalog, FurnitureAxis, FurnitureSize } from "../../domain/furnitureAdmin";
 import ErrorText from "../shared/ErrorText";
 import ModelPreview from "./ModelPreview";
 import ModelThumbnail from "./ModelThumbnail";
@@ -179,7 +179,14 @@ type Draft = {
   name: string; url: string; imageUrl: string; shop: string; price: string; category: string; slot: string; position: string;
   themes: string; colorName: string; w: string; h: string; d: string; modelKey: string; symbolicColor: string;
   colorMaterials: Record<string, string>; enabled: boolean;
+  kind: string; estimatedAxes: FurnitureAxis[]; material: string; shape: string;
 };
+
+const AXES = ["w", "h", "d"] as const;
+const KIND_LABELS: Record<string, string> = {
+  dining_chair: "食卓用の椅子", desk_chair: "デスク用の椅子", lounge_chair: "くつろぎ用の椅子", folding_chair: "折りたたみ椅子", counter_chair: "カウンター用の椅子", stool: "スツール",
+};
+const SHAPE_LABELS: Record<string, string> = { rectangular: "四角", round: "丸" };
 
 function draftOf(detail: AdminFurnitureDetail | null, catalog: FurnitureAdminCatalog): Draft {
   if (!detail) {
@@ -187,6 +194,7 @@ function draftOf(detail: AdminFurnitureDetail | null, catalog: FurnitureAdminCat
       name: "", url: "", imageUrl: "", shop: "", price: "", category: "", slot: catalog.slots.includes("floor") ? "floor" : catalog.slots[0] ?? "",
       position: String(Math.max(-1, ...catalog.details.map((existing) => existing.position)) + 1),
       themes: "", colorName: "", w: "", h: "", d: "", modelKey: "", symbolicColor: "#cccccc", colorMaterials: {}, enabled: true,
+      kind: "", estimatedAxes: [], material: "", shape: "",
     };
   }
   return {
@@ -194,6 +202,7 @@ function draftOf(detail: AdminFurnitureDetail | null, catalog: FurnitureAdminCat
     slot: detail.slot, position: String(detail.position), themes: detail.themes.join(", "), colorName: detail.colorName ?? "",
     w: centimeters(detail.size.w), h: centimeters(detail.size.h), d: centimeters(detail.size.d), modelKey: detail.modelKey ?? "",
     symbolicColor: detail.symbolicColor, colorMaterials: detail.colorMaterials, enabled: detail.enabled,
+    kind: detail.kind ?? "", estimatedAxes: detail.estimatedAxes, material: detail.material ?? "", shape: detail.shape ?? "",
   };
 }
 
@@ -210,6 +219,8 @@ function DetailEditor({ detail, catalog, models, onCreated, onClose }: {
   const set = (changes: Partial<Draft>) => { setDraft((current) => ({ ...current, ...changes })); setValidation(null); setSaved(false); save.reset(); };
 
   const model = models.find((candidate) => candidate.id === draft.modelKey);
+  // 種類はカテゴリごとに決まっている。カテゴリを変えて選べなくなった種類は保存しない
+  const kinds = catalog.kinds[draft.category.trim()] ?? [];
   const size = { w: Number(draft.w) / 100, h: Number(draft.h) / 100, d: Number(draft.d) / 100 };
   const validSize = [size.w, size.h, size.d].every((value) => Number.isFinite(value) && value > 0);
 
@@ -237,8 +248,9 @@ function DetailEditor({ detail, catalog, models, onCreated, onClose }: {
     if (!HEX.test(draft.symbolicColor)) return setValidation("代表色を確認してください");
     if (!Object.keys(draft.colorMaterials).length) return setValidation("色を塗る部位を1つ以上選んでください");
     const input: AdminFurnitureDetailInput = {
-      name: draft.name.trim(), category: draft.category.trim(), slot: draft.slot, modelKey: model.id, symbolicColor: draft.symbolicColor,
-      colorMaterials: draft.colorMaterials, colorName: draft.colorName.trim() || null, size, price, shop: draft.shop.trim(), url: draft.url.trim(),
+      name: draft.name.trim(), category: draft.category.trim(), kind: kinds.includes(draft.kind) ? draft.kind : null, slot: draft.slot, modelKey: model.id, symbolicColor: draft.symbolicColor,
+      colorMaterials: draft.colorMaterials, colorName: draft.colorName.trim() || null, size, estimatedAxes: draft.estimatedAxes,
+      material: draft.material.trim() || null, shape: draft.shape || null, price, shop: draft.shop.trim(), url: draft.url.trim(),
       imageUrl: draft.imageUrl.trim() || null, themes: draft.themes.split(/[\s,、]+/).filter(Boolean), position, enabled: draft.enabled,
     };
     save.mutate({ id: detail?.id ?? null, input }, { onSuccess: (result) => { setSaved(true); if (!detail) onCreated(result); } });
@@ -259,14 +271,25 @@ function DetailEditor({ detail, catalog, models, onCreated, onClose }: {
       <Field label="ショップ"><input className={field} required value={draft.shop} onChange={(event) => set({ shop: event.target.value })} /></Field>
       <Field label="価格（税込・円）"><input className={field} type="number" min={1} step={1} required value={draft.price} onChange={(event) => set({ price: event.target.value })} /></Field>
       <Field label="家具の種類"><input className={field} required list="admin-categories" value={draft.category} onChange={(event) => set({ category: event.target.value })} /></Field>
+      {kinds.length > 0 && <Field label="細かい種類"><select className={field} value={kinds.includes(draft.kind) ? draft.kind : ""} onChange={(event) => set({ kind: event.target.value })}>
+        <option value="">未設定</option>{kinds.map((value) => <option key={value} value={value}>{KIND_LABELS[value] ?? value}</option>)}
+      </select></Field>}
       <Field label="置き場所の枠"><select className={field} value={draft.slot} onChange={(event) => set({ slot: event.target.value })}>{catalog.slots.map((value) => <option key={value}>{value}</option>)}</select></Field>
       <Field label="並び順（小さいほど先）"><input className={field} type="number" step={1} required value={draft.position} onChange={(event) => set({ position: event.target.value })} /></Field>
       <Field label="テーマ（カンマ区切り）"><input className={field} value={draft.themes} onChange={(event) => set({ themes: event.target.value })} /></Field>
     </div>
     <datalist id="admin-categories">{catalog.categories.map((value) => <option key={value} value={value} />)}</datalist>
     <fieldset className="grid grid-cols-3 gap-2"><legend className="text-xs text-slate-600">寸法（cm）</legend>
-      {(["w", "h", "d"] as const).map((axis) => <label key={axis} className="text-xs text-slate-600">{{ w: "幅", h: "高さ", d: "奥行き" }[axis]}<input className={field} type="number" min={0.1} step={0.1} required value={draft[axis]} onChange={(event) => set({ [axis]: event.target.value })} /></label>)}
+      {AXES.map((axis) => <label key={axis} className="text-xs text-slate-600">{{ w: "幅", h: "高さ", d: "奥行き" }[axis]}<input className={field} type="number" min={0.1} step={0.1} required value={draft[axis]} onChange={(event) => set({ [axis]: event.target.value })} /></label>)}
+      {AXES.map((axis) => <label key={axis} className="flex items-center gap-1 text-xs text-slate-600"><input type="checkbox" checked={draft.estimatedAxes.includes(axis)} onChange={(event) => set({ estimatedAxes: AXES.filter((value) => value === axis ? event.target.checked : draft.estimatedAxes.includes(value)) })} />推定</label>)}
     </fieldset>
+    <p className="text-xs text-slate-500">公開されている寸法でない辺は「推定」にします。3辺とも推定のカーテン・ベッドカバーは、窓・ベッドに合わせた大きさで置かれます。</p>
+    <div className="grid grid-cols-2 gap-2">
+      <Field label="主な素材"><input className={field} placeholder="例: 綿、スチール" value={draft.material} onChange={(event) => set({ material: event.target.value })} /></Field>
+      <Field label="形"><select className={field} value={draft.shape} onChange={(event) => set({ shape: event.target.value })}>
+        <option value="">未設定</option>{catalog.shapes.map((value) => <option key={value} value={value}>{SHAPE_LABELS[value] ?? value}</option>)}
+      </select></Field>
+    </div>
 
     <Field label="3Dモデル" hint={model ? `${model.name}・${sizeText(model.size)}cm${model.enabled ? "" : "・無効"}` : "モデルIDを入力して選ぶ"}>
       <input className={field} required list="admin-models" value={draft.modelKey} onChange={(event) => selectModel(event.target.value)} />

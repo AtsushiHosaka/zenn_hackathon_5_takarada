@@ -6,7 +6,7 @@ module FurnitureCandidates
       Item.build(
         id: detail.id, slot: detail.slot, category: detail.category, name: detail.name, price: detail.price,
         shop: detail.shop, url: detail.url, image_url: detail.image_url, color: detail.symbolic_color, size: detail.size,
-        metadata: detail.metadata.merge("furniture_detail_id" => detail.id, "furniture_id" => detail.furniture_id, "color_materials" => detail.color_materials,
+        metadata: detail.product_metadata.merge("furniture_detail_id" => detail.id, "furniture_id" => detail.furniture_id, "color_materials" => detail.color_materials,
                                         "texture_materials" => detail.detail_textures.to_h { |texture| [ texture.material_key, texture.furniture_texture.texture_key ] })
       )
     end

@@ -1,5 +1,6 @@
 // 管理画面 (/admin) で扱う商品 (家具の色・寸法・購入リンク) と 3D モデル。寸法はメートル。
 export type FurnitureSize = { w: number; h: number; d: number };
+export type FurnitureAxis = keyof FurnitureSize;
 
 export type AdminFurnitureDetail = {
   id: number;
@@ -7,6 +8,8 @@ export type AdminFurnitureDetail = {
   key: string;
   name: string;
   category: string;
+  // カテゴリの中の種類 (椅子の stool / desk_chair など)。選べる値は FurnitureAdminCatalog.kinds
+  kind: string | null;
   // 置き場所の枠
   slot: string;
   modelKey: string | null;
@@ -16,6 +19,12 @@ export type AdminFurnitureDetail = {
   colorMaterials: Record<string, string>;
   colorName: string | null;
   size: FurnitureSize;
+  // 寸法のうち推定した辺。それ以外は公開されている寸法
+  estimatedAxes: FurnitureAxis[];
+  // 主な素材
+  material: string | null;
+  // 形 (FurnitureAdminCatalog.shapes)。分からなければ null
+  shape: string | null;
   price: number;
   shop: string;
   url: string;
@@ -25,17 +34,19 @@ export type AdminFurnitureDetail = {
   position: number;
   // false なら提案・検索に出さない
   enabled: boolean;
-  checkedAt: Date | null;
 };
 
 export type AdminFurnitureDetailInput = Pick<AdminFurnitureDetail,
-  "name" | "category" | "slot" | "symbolicColor" | "colorMaterials" | "colorName" | "size" | "price" | "shop" | "url" | "imageUrl" | "themes" | "position" | "enabled"
+  "name" | "category" | "kind" | "slot" | "symbolicColor" | "colorMaterials" | "colorName" | "size" | "estimatedAxes" | "material" | "shape" | "price" | "shop" | "url" | "imageUrl" | "themes" | "position" | "enabled"
 > & { modelKey: string };
 
 export type FurnitureAdminCatalog = {
   details: AdminFurnitureDetail[];
   slots: string[];
   categories: string[];
+  // カテゴリごとの選べる種類。載っていないカテゴリは種類なし
+  kinds: Record<string, string[]>;
+  shapes: string[];
 };
 
 export type AdminFurnitureModel = {

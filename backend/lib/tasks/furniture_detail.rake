@@ -9,4 +9,36 @@ namespace :furniture_detail do
       puts "Imported #{result.fetch(:details)} furniture details for #{result.fetch(:furnitures)} furnitures"
     end
   end
+
+  # metadata (jsonb) を持つ旧 furniture_details を、kind・material・shape・estimated_axes の列へ移す。db:apply が metadata を落とす前に流す。
+  # 形・推定した辺・色名は metadata から移す。metadata に寸法が無い行 (手入力) は 3 辺とも推定にして、配置を今までどおり部屋に合わせる。
+  # 種類と短い素材は初期データ (db/furniture_details.json) を key で引いて入れる。新しい形なら何もしない
+  desc "Move legacy furniture_details.metadata into columns before db:apply"
+  task migrate_fields: :environment do
+    connection = ActiveRecord::Base.connection
+    next unless connection.table_exists?(:furniture_details) && connection.column_exists?(:furniture_details, :metadata)
+
+    connection.transaction do
+      connection.execute(<<~SQL)
+        ALTER TABLE furniture_details
+          ADD COLUMN IF NOT EXISTS kind character varying,
+          ADD COLUMN IF NOT EXISTS material character varying,
+          ADD COLUMN IF NOT EXISTS shape character varying,
+          ADD COLUMN IF NOT EXISTS estimated_axes jsonb NOT NULL DEFAULT '[]'
+      SQL
+      connection.execute(<<~SQL)
+        UPDATE furniture_details SET
+          shape = CASE WHEN metadata->>'shape' IN (#{FurnitureDetail::SHAPES.map { |shape| connection.quote(shape) }.join(', ')}) THEN metadata->>'shape' END,
+          material = NULLIF(metadata->>'material', ''),
+          estimated_axes = CASE WHEN jsonb_typeof(metadata->'size') = 'object' THEN COALESCE(metadata->'estimated_axes', '[]') ELSE '["w", "h", "d"]' END,
+          color_name = COALESCE(NULLIF(color_name, ''), NULLIF(metadata->>'official_color', ''), NULLIF(metadata->>'color_name', ''))
+      SQL
+      rows = JSON.parse(File.read(Rails.root.join("db/furniture_details.json"))).fetch("details")
+      updated = rows.sum do |row|
+        connection.update("UPDATE furniture_details SET kind = #{connection.quote(row['kind'])}, material = #{connection.quote(row['material'])} " \
+                          "WHERE key = #{connection.quote(row['key'])} AND category = #{connection.quote(row['category'])}")
+      end
+      puts "Moved furniture_details.metadata into columns (#{updated} rows got kind and material from db/furniture_details.json)"
+    end
+  end
 end

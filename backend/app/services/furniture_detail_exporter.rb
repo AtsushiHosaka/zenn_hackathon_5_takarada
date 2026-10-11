@@ -9,11 +9,12 @@ class FurnitureDetailExporter
   def self.row(detail)
     textures = detail.detail_textures.to_h { |texture| [ texture.material_key, texture.furniture_texture.texture_key ] }
     {
-      "key" => detail.key, "name" => detail.name, "category" => detail.category, "slot" => detail.slot,
+      "key" => detail.key, "name" => detail.name, "category" => detail.category, "kind" => detail.kind, "slot" => detail.slot,
       "model_key" => detail.furniture.model.model_key, "symbolic_color" => detail.symbolic_color,
       "color_materials" => detail.color_materials, "color_name" => detail.color_name, "size" => detail.size,
+      "estimated_axes" => detail.estimated_axes, "material" => detail.material, "shape" => detail.shape,
       "price" => detail.price, "shop" => detail.shop, "url" => detail.url, "image_url" => detail.image_url,
-      "themes" => detail.themes, "metadata" => detail.metadata, "checked_at" => detail.checked_at&.iso8601
+      "themes" => detail.themes
     }.merge(textures.present? ? { "texture_materials" => textures } : {})
   end
 end

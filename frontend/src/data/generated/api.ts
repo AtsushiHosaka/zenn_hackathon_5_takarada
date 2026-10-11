@@ -1221,6 +1221,11 @@ export interface components {
             /** @example chair */
             category: string;
             /**
+             * @description カテゴリの中の種類。選べる値は一覧の kinds
+             * @example dining_chair
+             */
+            kind: string | null;
+            /**
              * @description 置き場所の枠
              * @example floor
              * @enum {string}
@@ -1256,6 +1261,22 @@ export interface components {
             color_name: string | null;
             size: components["schemas"]["Size"];
             /**
+             * @description 寸法のうち推定した辺。それ以外は公開されている寸法
+             * @example []
+             */
+            estimated_axes: ("w" | "h" | "d")[];
+            /**
+             * @description 主な素材
+             * @example スチール
+             */
+            material: string | null;
+            /**
+             * @description 形。分からなければ null
+             * @example null
+             * @enum {string|null}
+             */
+            shape: "rectangular" | "round" | null;
+            /**
              * @description リンク先の参考価格 (税込)
              * @example 2000
              */
@@ -1284,8 +1305,6 @@ export interface components {
              * @example true
              */
             enabled: boolean;
-            /** Format: date-time */
-            checked_at: string | null;
         };
         AdminFurnitureDetailList: {
             details: components["schemas"]["AdminFurnitureDetail"][];
@@ -1293,6 +1312,20 @@ export interface components {
             slots: string[];
             /** @description 家具検索で使う家具の種類 */
             categories: string[];
+            /**
+             * @description カテゴリごとの選べる種類 (kind)。載っていないカテゴリは種類なし
+             * @example {
+             *       "chair": [
+             *         "dining_chair",
+             *         "stool"
+             *       ]
+             *     }
+             */
+            kinds: {
+                [key: string]: string[];
+            };
+            /** @description 選べる形 */
+            shapes: string[];
         };
         AdminFurnitureDetailInput: {
             /** @description 作成では name, category, slot, model_key, symbolic_color, color_materials, size, price, shop, url が必須。更新では変える項目だけ */
@@ -1301,6 +1334,8 @@ export interface components {
                 name?: string;
                 /** @example chair */
                 category?: string;
+                /** @example dining_chair */
+                kind?: string | null;
                 /**
                  * @example floor
                  * @enum {string}
@@ -1321,6 +1356,15 @@ export interface components {
                 /** @example ホワイト */
                 color_name?: string | null;
                 size?: components["schemas"]["Size"];
+                /** @example [] */
+                estimated_axes?: ("w" | "h" | "d")[];
+                /** @example スチール */
+                material?: string | null;
+                /**
+                 * @example null
+                 * @enum {string|null}
+                 */
+                shape?: "rectangular" | "round" | null;
                 /** @example 2000 */
                 price?: number;
                 /** @example IKEA */
