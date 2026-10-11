@@ -7,9 +7,8 @@ class CoordinationPlanner
       "korean" => { title: "くすみベージュの韓国風ルーム", keywords: %w[韓国 ベージュ くすみ アイボリー ナチュラル] }
     }.freeze
 
-    def initialize(prompt:, budget:, user_id: nil, client: nil, previous: nil, slots: SLOT_PRIORITY, **)
+    def initialize(prompt:, user_id: nil, client: nil, previous: nil, slots: SLOT_PRIORITY, **)
       @prompt = prompt
-      @budget = budget
       @slots = slots
       @previous = previous
       @user_id = user_id
@@ -18,7 +17,7 @@ class CoordinationPlanner
 
     def plan
       theme = detect_theme
-      items = @client.search(prompt: @prompt, theme:, slots: @slots, max_price: @budget)
+      items = @client.search(prompt: @prompt, theme:, slots: @slots)
       Plan.new(
         title: THEMES.fetch(theme)[:title],
         concept: nil,

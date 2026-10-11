@@ -2,8 +2,7 @@
 #
 # GEMINI_API_KEY があれば Gemini が要望文と部屋を見て候補を選ぶ (CoordinationPlanner::Gemini)。
 # 無ければキーワードでテーマを決めるモック (CoordinationPlanner::Mock)。
-# Geminiは予算内で相性のよい採用一式を選び、Rubyが合計と配置を最終確認する。
-# Mockの予算調整はCoordinationBuilder、座標はSlotLayoutの責務。
+# Geminiは相性のよい採用一式を選び、Rubyが配置を最終確認する。座標はSlotLayoutの責務。
 class CoordinationPlanner
   # candidates: 枠・操作グループごとの承認済み商品と代替順位。
   # Geminiの採用一式はanalysis.selection、MockはBuilderで枠ごとに選ぶ。
@@ -20,8 +19,8 @@ class CoordinationPlanner
 
   # kept_objects: 活かす家具 (Scene の object)。部屋の雰囲気に合わせて選ぶのに使う
   # slots: その部屋で置き場所がありうる枠 (SlotLayout.placeable_slots)。この枠の商品だけを候補にする
-  def self.call(prompt:, budget:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil, slots: SLOT_PRIORITY)
+  def self.call(prompt:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil, slots: SLOT_PRIORITY)
     planner = GeminiClient.configured?(user_id:) ? Gemini : Mock
-    planner.new(prompt:, budget:, room:, kept_objects:, user_id:, client:, additional_candidates:, previous:, slots:).plan
+    planner.new(prompt:, room:, kept_objects:, user_id:, client:, additional_candidates:, previous:, slots:).plan
   end
 end
