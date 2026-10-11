@@ -34,6 +34,9 @@ class SlotLayout
     edited_objects.each { |edit| reserve_edit(edit) if reserved_object_ids.include?(edit["id"]) }
     # 壁に掛けたもの (宙に浮いている) の床の占有と高さ。背の高い床置きのものがぶつからないようにする
     @raised = []
+    # 家具の上 (天板・枕元) に置いた物の範囲。同じ枠の 2 つ目以降が重ならないようにする
+    @top_rects = Hash.new { |h, k| h[k] = [] }
+    @floor_lamps = []
   end
 
   # 上に小物を置ける家具 (卓上の枠)。背の高い棚・収納の上には置かない
@@ -177,13 +180,15 @@ class SlotLayout
   # ベッドの枕元。ベッドが無ければソファの座面の奥
   def place_cushion(item)
     if (bed = find("bed"))
-      x, z = local_to_world(bed, 0, -(bed["size"]["d"] / 2 - 0.3))
+      spot = free_top_spot(bed, 0, -(bed["size"]["d"] / 2 - 0.3), item.size) or return
+      x, z = local_to_world(bed, *spot)
       position = { "x" => x, "y" => bed["size"]["h"] + 0.04, "z" => z }
       return build(item, item.size, position, bed["rotation_y"], bed["id"], "ベッドの枕元")
     end
 
     sofa = find("sofa") or return
-    x, z = local_to_world(sofa, 0, -(sofa["size"]["d"] / 2 - item.size["d"] / 2 - 0.12))
+    spot = free_top_spot(sofa, 0, -(sofa["size"]["d"] / 2 - item.size["d"] / 2 - 0.12), item.size) or return
+    x, z = local_to_world(sofa, *spot)
     # 座面はソファの高さのおよそ半分
     position = { "x" => x, "y" => sofa["size"]["h"] * 0.5, "z" => z }
     build(item, item.size, position, sofa["rotation_y"], sofa["id"], "#{sofa['label']}の上")
@@ -191,11 +196,31 @@ class SlotLayout
 
   # デスクの上。無ければテーブル・低い収納・テレビ台・低い棚の上 (天板に収まるものだけ)
   def place_desk_top(item)
-    anchor = TOP_ANCHORS.lazy.filter_map { |category| find(category) if top_anchor_fits?(category, item) }.first or return
-    lx = anchor["size"]["w"] / 2 - item.size["w"] / 2 - 0.08
-    lz = -(anchor["size"]["d"] / 2 - item.size["d"] / 2 - 0.05)
-    x, z = local_to_world(anchor, lx, lz)
-    build(item, item.size, { "x" => x, "y" => anchor["size"]["h"], "z" => z }, anchor["rotation_y"], anchor["id"], "#{anchor['label']}の上")
+    TOP_ANCHORS.each do |category|
+      next unless top_anchor_fits?(category, item)
+
+      # 天板がふさがっていたら、次の家具の上にする
+      anchor = find(category)
+      spot = free_top_spot(anchor, anchor["size"]["w"] / 2 - item.size["w"] / 2 - 0.08, -(anchor["size"]["d"] / 2 - item.size["d"] / 2 - 0.05), item.size) or next
+      x, z = local_to_world(anchor, *spot)
+      return build(item, item.size, { "x" => x, "y" => anchor["size"]["h"], "z" => z }, anchor["rotation_y"], anchor["id"], "#{anchor['label']}の上")
+    end
+    nil
+  end
+
+  # 家具の上で、先に置いた物と重ならない位置 (家具のローカル座標) を希望位置から近い順に探す。最初の 1 つは希望位置のまま。空きが無ければ nil
+  def free_top_spot(anchor, lx, lz, size)
+    taken = @top_rects[anchor["id"]]
+    half_w = [ anchor["size"]["w"] / 2 - size["w"] / 2, 0 ].max
+    half_d = [ anchor["size"]["d"] / 2 - size["d"] / 2, 0 ].max
+    spots = taken.empty? ? [ [ lx, lz ] ] : grid(-half_w, half_w).product(grid(-half_d, half_d)).sort_by { |x, z| Math.hypot(x - lx, z - lz) }
+    x, z = spots.find do |x, z|
+      taken.none? { |left, back, right, front| x - size["w"] / 2 < right + MARGIN && x + size["w"] / 2 > left - MARGIN && z - size["d"] / 2 < front + MARGIN && z + size["d"] / 2 > back - MARGIN }
+    end
+    return unless x
+
+    taken << [ x - size["w"] / 2, z - size["d"] / 2, x + size["w"] / 2, z + size["d"] / 2 ]
+    [ x, z ]
   end
 
   def top_anchor_fits?(category, item)
@@ -413,10 +438,12 @@ class SlotLayout
   def place_floor_lamp(item)
     corners = [ [ 0, 0 ], [ @room["width"], 0 ], [ 0, @room["depth"] ], [ @room["width"], @room["depth"] ] ]
     x, z, rotation = best_floor_spot(item.size, [ 0 ]) do |cx, cz, _|
-      corners.map { |px, pz| Math.hypot(cx - px, cz - pz) }.min
+      # 2 つ目は、先に置いた照明から離れた角にする
+      corners.map { |px, pz| Math.hypot(cx - px, cz - pz) }.min + (@floor_lamps.any? { |lx, lz| Math.hypot(cx - lx, cz - lz) < 1.5 } ? 10 : 0)
     end
     return unless x
 
+    @floor_lamps << [ x, z ]
     occupy_floor(x, z, item.size, rotation)
     build(item, item.size, { "x" => x, "y" => 0.0, "z" => z }, rotation, nil, "部屋の角")
   end
@@ -426,9 +453,9 @@ class SlotLayout
     anchor = SIDE_ANCHORS.lazy.filter_map { |category| find(category) }.first
     return place_on_floor_by_wall(item) unless anchor
 
-    if item.size["h"] < 0.3 && anchor["category"] == "shelf"
-      position = anchor["position"].merge("y" => anchor["size"]["h"])
-      return build(item, item.size, position, anchor["rotation_y"], anchor["id"], "本棚の上")
+    if item.size["h"] < 0.3 && anchor["category"] == "shelf" && (spot = free_top_spot(anchor, 0, 0, item.size))
+      x, z = local_to_world(anchor, *spot)
+      return build(item, item.size, anchor["position"].merge("x" => x, "y" => anchor["size"]["h"], "z" => z), anchor["rotation_y"], anchor["id"], "本棚の上")
     end
 
     # 家具の正面をふさがないよう、同じ壁に沿った横を優先する

@@ -17,6 +17,9 @@ class CoordinationPlanner
   # 雰囲気が大きく変わる順 (色の面積が大きい布もの → 壁 → 照明 → 小物)
   SLOT_PRIORITY = %w[bed_cover curtain rug wall_decor light display cushion desk_top].freeze
 
+  # 1 つの枠で採用できる商品の上限。何点にするかは AI が決める。無い枠 (ベッドカバー・カーテン・ラグ・床の家具の各操作) は 1 点
+  MAX_PICKS = { "wall_decor" => 3, "light" => 2, "display" => 2, "cushion" => 2, "desk_top" => 3 }.freeze
+
   # kept_objects: 活かす家具 (Scene の object)。部屋の雰囲気に合わせて選ぶのに使う
   # slots: その部屋で置き場所がありうる枠 (SlotLayout.placeable_slots)。この枠の商品だけを候補にする
   # preference: 要望文から読み取った色・雰囲気・形 (FurnitureQuery::Result)。合う商品を先に候補へ入れる (Gemini のみ)
