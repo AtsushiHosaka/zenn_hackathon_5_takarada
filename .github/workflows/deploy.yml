@@ -66,20 +66,42 @@ jobs:
           build-args: |
             VITE_API_ENDPOINT=
             API_UPSTREAM_ORIGIN=${{ secrets.GCP_API_URL }}
-            VITE_TERMS_URL=${{ vars.VITE_TERMS_URL }}
-            VITE_PRIVACY_URL=${{ vars.VITE_PRIVACY_URL }}
+            VITE_TERMS_URL=${{ vars.VITE_TERMS_URL || '/terms.html' }}
+            VITE_PRIVACY_URL=${{ vars.VITE_PRIVACY_URL || '/privacy.html' }}
           tags: |
             ${{ secrets.GCP_WEB_IMAGE_REPO }}:${{ github.event.workflow_run.head_sha }}
             ${{ secrets.GCP_WEB_IMAGE_REPO }}:latest
           cache-from: type=gha,scope=web
           cache-to: type=gha,mode=max,scope=web
 
+      # AI で 3D モデルを作るジョブ (infra/gcp/model_builder.tf)。ジョブがまだ無い (terraform を適用していない) 環境では何もしない。
+      # ジョブ名とイメージの置き場は、既存の値から決まる (<project>-task → <project>-model-builder、.../api → .../model-builder)
+      - name: 3D モデルを作るジョブのイメージをビルドして差し替え
+        env:
+          TASK_JOB: ${{ secrets.GCP_TASK_JOB }}
+          API_IMAGE_REPO: ${{ secrets.GCP_API_IMAGE_REPO }}
+          REGION: ${{ secrets.GCP_REGION }}
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          job="${TASK_JOB%-task}-model-builder"
+          repo="${API_IMAGE_REPO%/api}/model-builder"
+          if ! gcloud run jobs describe "$job" --region "$REGION" --project "$PROJECT_ID" >/dev/null 2>&1; then
+            echo "ジョブ $job がまだ無いので飛ばします (make infra-apply で作られます)"
+            exit 0
+          fi
+          docker buildx build --platform linux/amd64 \
+            -f tools/furniture_models/generator/Dockerfile \
+            -t "$repo:$SHA" -t "$repo:latest" \
+            --cache-from "type=registry,ref=$repo:latest" --cache-to type=inline \
+            --push tools/furniture_models
+          gcloud run jobs update "$job" --image "$repo:$SHA" --region "$REGION" --project "$PROJECT_ID" --quiet
+
       # 新しいコードを出す前にスキーマを当てる (ridgepole)
       - name: db/Schemafile を Cloud SQL に適用
         run: |
           gcloud run jobs update "${{ secrets.GCP_TASK_JOB }}" \
             --image "${{ secrets.GCP_API_IMAGE_REPO }}:$SHA" \
-            --args furniture_texture:clear_legacy,db:apply,character:import,furniture:import,furniture_texture:import,furniture_detail:import \
+            --args furniture_texture:clear_legacy,furniture_detail:migrate_fields,db:apply,character:import,furniture:import,furniture_texture:import,furniture_detail:import,furniture_detail:retag_themes \
             --region "${{ secrets.GCP_REGION }}" \
             --project "${{ secrets.GCP_PROJECT_ID }}" --quiet
           gcloud run jobs execute "${{ secrets.GCP_TASK_JOB }}" \
@@ -88,8 +110,8 @@ jobs:
 
       - name: Cloud Run を更新
         env:
-          VITE_TERMS_URL: ${{ vars.VITE_TERMS_URL }}
-          VITE_PRIVACY_URL: ${{ vars.VITE_PRIVACY_URL }}
+          VITE_TERMS_URL: ${{ vars.VITE_TERMS_URL || '/terms.html' }}
+          VITE_PRIVACY_URL: ${{ vars.VITE_PRIVACY_URL || '/privacy.html' }}
         run: |
           legal_separator="__LEGAL_DOCUMENTS__"
           while [[ "$VITE_TERMS_URL$VITE_PRIVACY_URL" == *"$legal_separator"* ]]; do

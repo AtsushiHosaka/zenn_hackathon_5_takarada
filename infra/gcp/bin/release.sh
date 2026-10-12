@@ -20,6 +20,8 @@ api_service="$(tfout api_service)"
 web_service="$(tfout web_service)"
 
 tag="${IMAGE_TAG:-$(date +%Y%m%d%H%M%S)}"
+terms_url="${VITE_TERMS_URL:-/terms.html}"
+privacy_url="${VITE_PRIVACY_URL:-/privacy.html}"
 # Cloud Run は x86_64 なので、Apple Silicon からはクロスビルドする
 platform="${IMAGE_PLATFORM:-linux/amd64}"
 
@@ -41,25 +43,37 @@ docker buildx build \
   --target runtime \
   --build-arg "VITE_API_ENDPOINT=" \
   --build-arg "API_UPSTREAM_ORIGIN=$api_url" \
-  --build-arg "VITE_TERMS_URL=${VITE_TERMS_URL:-}" \
-  --build-arg "VITE_PRIVACY_URL=${VITE_PRIVACY_URL:-}" \
+  --build-arg "VITE_TERMS_URL=$terms_url" \
+  --build-arg "VITE_PRIVACY_URL=$privacy_url" \
   -t "$web_repo:$tag" -t "$web_repo:latest" \
   --push \
   "$ROOT/frontend"
 
+echo "-- 3D モデルを作るジョブ"
+# Blender の部品 (約 400MB) を含むので、初回のビルドは数分かかる
+model_builder_repo="$(tfout model_builder_image_repo)"
+docker buildx build \
+  --platform "$platform" \
+  -f "$ROOT/tools/furniture_models/generator/Dockerfile" \
+  -t "$model_builder_repo:$tag" -t "$model_builder_repo:latest" \
+  --push \
+  "$ROOT/tools/furniture_models"
+gcloud run jobs update "$(tfout model_builder_job)" --image "$model_builder_repo:$tag" \
+  --region "$region" --project "$project_id" --quiet
+
 echo
 echo "== 2/3 db/Schemafile を Cloud SQL に適用します"
 # 新しいイメージでスキーマを当ててから、下でサービスを差し替える
-"$(dirname "$0")/task.sh" furniture_texture:clear_legacy,db:apply,character:import,furniture:import,furniture_texture:import,furniture_detail:import "$api_repo:$tag"
+"$(dirname "$0")/task.sh" furniture_texture:clear_legacy,furniture_detail:migrate_fields,db:apply,character:import,furniture:import,furniture_texture:import,furniture_detail:import,furniture_detail:retag_themes "$api_repo:$tag"
 
 echo
 echo "== 3/3 Cloud Run を更新します"
 # Use a separator absent from the values so URL query commas remain intact.
 legal_separator="__LEGAL_DOCUMENTS__"
-while [[ "${VITE_TERMS_URL:-}${VITE_PRIVACY_URL:-}" == *"$legal_separator"* ]]; do
+while [[ "$terms_url$privacy_url" == *"$legal_separator"* ]]; do
   legal_separator="${legal_separator}_"
 done
-legal_env="^${legal_separator}^VITE_TERMS_URL=${VITE_TERMS_URL:-}${legal_separator}VITE_PRIVACY_URL=${VITE_PRIVACY_URL:-}"
+legal_env="^${legal_separator}^VITE_TERMS_URL=${terms_url}${legal_separator}VITE_PRIVACY_URL=${privacy_url}"
 gcloud run services update "$api_service" \
   --update-env-vars "$legal_env" \
   --image "$api_repo:$tag" \

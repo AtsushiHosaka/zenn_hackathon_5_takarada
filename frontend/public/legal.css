@@ -1,0 +1,32 @@
+:root{font-family:'Hiragino Sans','Noto Sans JP',sans-serif;color:#292332;background:#f5f4f8;font-synthesis:none}
+*{box-sizing:border-box}
+body{margin:0;font-size:16px;line-height:1.9;overflow-wrap:anywhere}
+a{color:#5a2fc0;text-underline-offset:.2em}
+a:hover{color:#3f1d93}
+a:focus-visible{outline:3px solid #6a3cd6;outline-offset:5px;border-radius:2px}
+.skip-link{position:absolute;top:-100px;left:16px;background:#fff;padding:8px 16px;z-index:1}
+.skip-link:focus{top:12px}
+header{border-bottom:1px solid #e4e1ec;background:#fff}
+.header-inner{max-width:1040px;margin:auto;padding:20px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{font-weight:800;font-size:24px;letter-spacing:.06em;text-decoration:none;color:#292332}
+nav{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:14px}
+nav a[aria-current=page]{font-weight:700;color:#292332}
+main{max-width:880px;margin:48px auto;padding:48px 64px;background:#fff;border:1px solid #e4e1ec;border-radius:20px}
+.eyebrow{margin:0;color:#6a3cd6;font-size:13px;font-weight:700;letter-spacing:.12em}
+h1{font-size:clamp(26px,5vw,36px);line-height:1.5;margin:8px 0 16px;letter-spacing:.03em}
+.date{font-size:14px;color:#6e6679;margin:0 0 28px}
+.intro{padding-bottom:24px;border-bottom:1px solid #e4e1ec}
+.contents{margin:28px 0;padding:20px 24px;background:#f7f5fc;border-radius:12px;font-size:14px}
+.contents p{margin:0 0 8px;font-weight:700}
+.contents ol{margin:0;padding-left:24px;columns:2;column-gap:32px}
+.contents li{break-inside:avoid;margin:4px 0}
+section{scroll-margin-top:24px;margin-top:36px}
+h2{font-size:20px;line-height:1.6;margin:0 0 12px}
+p{margin:12px 0}
+ul{padding-left:24px}
+li{margin:8px 0}
+.note{padding:16px 20px;background:#f7f5fc;border-left:3px solid #6a3cd6;border-radius:0 8px 8px 0}
+.contact{padding:20px 24px;border:1px solid #e4e1ec;border-radius:12px}
+footer{max-width:880px;margin:0 auto 40px;padding:0 24px;color:#6e6679;font-size:13px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+@media(max-width:600px){.header-inner{padding:16px 20px;align-items:flex-start;flex-direction:column;gap:8px}nav{gap:8px 20px}main{margin:20px 12px;padding:28px 22px;border-radius:14px}.contents{padding:16px 20px}.contents ol{columns:1}section{margin-top:28px}h2{font-size:18px}footer{padding:0 20px}}
+@media print{:root{background:#fff}header,.skip-link,.contents,footer{display:none}main{max-width:none;margin:0;padding:0;border:0}a{color:inherit}.note,.contact{background:#fff}h2{break-after:avoid}section{margin-top:24px}}

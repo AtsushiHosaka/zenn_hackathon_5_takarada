@@ -198,4 +198,21 @@ Cloud Run がゼロまで縮んでいるためのコールドスタート。常�
 
 模様（質感の画像）は静的に用意し、`MODELS_BUCKET`の`textures/v1/<texture_key>.png`に置く。一覧は`backend/db/furniture_textures.json`が正で、detailの部位ごとの模様は初期データ`furniture_details.json`の`texture_materials`で入れる（管理画面からの模様の変更は未対応）。表示では模様に部位の色を掛ける（`tinted: false`の柄物は掛けない）。APIは画像を生成・保存しない。
 
-リリース時のタスクは`furniture_texture:clear_legacy`→`db:apply`→`furniture:import`→`furniture_texture:import`→`furniture_detail:import`の順（`furniture:import`と`furniture_detail:import`は空のときだけ入れる）。`db:apply`はSchemafileにないテーブルを削除する（`--drop-table`）。
+リリース時のタスクは`furniture_texture:clear_legacy`→`furniture_detail:migrate_fields`→`db:apply`→`furniture:import`→`furniture_texture:import`→`furniture_detail:import`→`furniture_detail:retag_themes`の順（`furniture:import`と`furniture_detail:import`は空のときだけ入れ、`retag_themes`は旧いテーマが残っているときだけ付け直す）。`db:apply`はSchemafileにないテーブルを削除する（`--drop-table`）。
+
+## AI で 3D モデルを作るジョブ
+
+管理画面の「3Dモデルを作る」が使う（[specs/model-generation/spec.md](../../specs/model-generation/spec.md)）。定義は`model_builder.tf`。
+
+- 作られるもの：サービスアカウント`<project>-model-builder`、非公開のバケット`<project_id>-model-builds`、Cloud Run ジョブ`<project>-model-builder`、API のサービスアカウントへの権限（builds バケットの読み書き、公開バケットへの追加、ジョブの起動）、API の環境変数 4 つ（`MODEL_BUILDS_BUCKET`など）。
+- **自動デプロイ（GitHub Actions）は Terraform を適用しない。**初めて使うときは、Terraform の状態を持つ端末で次を実行する。
+
+```bash
+make infra-apply     # アカウント・バケット・ジョブ・権限を作り、API に環境変数を足す
+make infra-release   # ジョブのイメージをビルドして差し替える (GitHub の Deploy をやり直してもよい)
+```
+
+- `infra-apply`の直後は、ジョブの中身が仮のイメージ。`infra-release`か Deploy のやり直しで、本物のイメージ（`tools/furniture_models/generator/Dockerfile`）が入る。Deploy は、ジョブがまだ無い環境ではこの手順を飛ばす。
+- 権限を付ける操作があるので、適用にはプロジェクトのオーナー（または IAM を変更できる権限）が要る。
+- Vertex AI を使う。`gemini_provider = "vertex"`の環境で使う。モデルは`model_generation_model`（既定は`gemini-3.1-pro-preview`）。
+- 確かめ方：管理画面（`/admin`）で商品を選び、「AIで3Dモデルを作る」の「作る」を押す。2〜5 分で画像が出る。ジョブのログは`gcloud run jobs executions list --job <project>-model-builder`から追える。

@@ -15,8 +15,28 @@ class FurnitureDetail < ApplicationRecord
   validate :valid_themes
   validate :valid_color_materials
 
+  normalizes :material, with: ->(value) { value.to_s.strip.presence }
+
   def size
     { "w" => width.to_f, "h" => height.to_f, "d" => depth.to_f }
+  end
+
+  # 寸法のうち推定した辺。商品ではなく家具の 3D モデルが持つ (同じモデルの商品で共通)
+  def estimated_axes
+    furniture.model&.estimated_axes || []
+  end
+
+  # 公開されている寸法。推定した辺は nil。3 辺とも推定なら nil (寸法は目安で、配置は部屋に合わせる)
+  def published_size
+    published = Furniture3DModel::SIZE_AXES - estimated_axes
+    size.to_h { |axis, value| [ axis, published.include?(axis) ? value : nil ] } if published.any?
+  end
+
+  # 提案・シーンの家具に載せる商品の補足。配置 (SlotLayout)・AI への商品情報・画面の商品寸法の表示が読む。
+  # 形と推定した辺は商品ではなく家具の 3D モデルが持つ (chair_office, rug_round など)。同じモデルの商品は同じ形になる
+  def product_metadata
+    { "size" => published_size, "estimated_axes" => estimated_axes, "material" => material, "shape" => furniture.model&.shape,
+      "color_name" => color_name.presence, "themes" => themes.presence }.compact
   end
 
   # シーンの家具・検索結果に載せる商品とモデルの情報。寸法は商品、形は家具のモデルを使う
@@ -25,7 +45,7 @@ class FurnitureDetail < ApplicationRecord
     model_url = model&.url
     {
       "furniture_detail_id" => id, "label" => name, "category" => category, "color" => symbolic_color, "color_materials" => color_materials, "size" => size,
-      "price" => price, "shop" => shop, "url" => url, "image_url" => image_url, "product_metadata" => metadata,
+      "price" => price, "shop" => shop, "url" => url, "image_url" => image_url, "product_metadata" => product_metadata,
       "model_url" => model_url,
       "model_match" => model && { "model_id" => model.id, "reason" => "furniture_detail", "approximate" => true },
       "model_size" => model&.size,
@@ -46,6 +66,6 @@ class FurnitureDetail < ApplicationRecord
   end
 
   def valid_themes
-    errors.add(:themes, "must be an array of strings") unless themes.is_a?(Array) && themes.all? { |theme| theme.is_a?(String) }
+    errors.add(:themes, "must be a list of #{FurnitureCandidates::THEMES.keys.join(', ')}") unless themes.is_a?(Array) && (themes - FurnitureCandidates::THEMES.keys).empty?
   end
 end

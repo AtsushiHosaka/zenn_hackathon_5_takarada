@@ -12,7 +12,7 @@ class FurnitureExporter
       "shape" => model.shape, "variant" => model.variant, "format" => model.format, "object_key" => model.object_key,
       "size" => [ model.width, model.height, model.depth ].map(&:to_f), "triangles" => model.triangle_count,
       "color_material_keys" => model.color_material_keys, "bytes" => model.byte_size, "sha256" => model.sha256,
-      "characters" => model.furniture.characters.map(&:character_key).sort
+      "characters" => model.furniture.characters.map(&:character_key).sort, "estimated_axes" => model.estimated_axes
     }
   end
 end

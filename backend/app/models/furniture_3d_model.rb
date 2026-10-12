@@ -8,6 +8,8 @@ class Furniture3DModel < ApplicationRecord
 
   UNIT = "meter".freeze
   AXES = "+Y up, +Z front, origin bottom center".freeze
+  # 寸法の辺 (幅・高さ・奥行き)
+  SIZE_AXES = %w[w h d].freeze
   KEY_PATTERN = /\A[a-zA-Z0-9][a-zA-Z0-9_-]*\z/
   OBJECT_KEY_PREFIX = "models/furniture/v1".freeze
   # 主な部位。形で決まるもの以外は、この順で最初に持っている部位
@@ -25,6 +27,7 @@ class Furniture3DModel < ApplicationRecord
   validates :byte_size, numericality: { only_integer: true, greater_than: 0 }
   validates :sha256, format: { with: /\A[0-9a-f]{64}\z/ }
   validate :valid_color_material_keys
+  validate :valid_estimated_axes
 
   def self.object_key_for(model_key)
     "#{OBJECT_KEY_PREFIX}/#{model_key}.glb"
@@ -87,6 +90,10 @@ class Furniture3DModel < ApplicationRecord
   end
 
   private
+
+  def valid_estimated_axes
+    errors.add(:estimated_axes, "must be a list of w, h, d") unless estimated_axes.is_a?(Array) && (estimated_axes - SIZE_AXES).empty? && estimated_axes.uniq == estimated_axes
+  end
 
   def valid_color_material_keys
     unless color_material_keys.is_a?(Array) && color_material_keys.all? { |key| key.is_a?(String) }

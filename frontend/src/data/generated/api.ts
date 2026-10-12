@@ -364,6 +364,251 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/furniture_details/{furniture_detail_id}/model_generations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                furniture_detail_id: number;
+            };
+            cookie?: never;
+        };
+        /** 商品の生成を新しい順に取得する */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    furniture_detail_id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 生成の一覧 (生成中のものは結果を取り込んでから返す) */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminModelGeneration"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * 商品の 3D モデルを AI に作らせる
+         * @description 管理者だけが使える。生成は数分かかる。状態は取得し直して確かめる。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    furniture_detail_id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 生成を始めた */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminModelGeneration"];
+                    };
+                };
+                /** @description 同じ商品を生成中 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ValidationErrors"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/model_generations/{id}/adopt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 生成したモデルを、商品の 3D モデルとして採用する */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 採用した */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminModelGeneration"];
+                    };
+                };
+                /** @description 採用待ちではない */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ValidationErrors"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/model_generations/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 生成したモデルを不採用にする */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 不採用にした */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminModelGeneration"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/model_generations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        /** 生成を 1 件取得する (生成中なら結果を取り込んでから返す) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 生成 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminModelGeneration"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/model_generations/{id}/files/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                /** @description front.png / side.png / model.glb */
+                name: string;
+            };
+            cookie?: never;
+        };
+        /** 確認用の画像・GLB を取得する */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    /** @description front.png / side.png / model.glb */
+                    name: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description ファイルの中身 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/signup": {
         parameters: {
             query?: never;
@@ -1332,6 +1577,11 @@ export interface components {
             color_name: string | null;
             size: components["schemas"]["Size"];
             /**
+             * @description 主な素材
+             * @example スチール
+             */
+            material: string | null;
+            /**
              * @description リンク先の参考価格 (税込)
              * @example 2000
              */
@@ -1348,8 +1598,14 @@ export interface components {
              * @example null
              */
             image_url: string | null;
-            /** @example [] */
-            themes: string[];
+            /**
+             * @description 雰囲気のタグ
+             * @example [
+             *       "nordic",
+             *       "simple"
+             *     ]
+             */
+            themes: ("simple" | "natural" | "nordic" | "korean" | "cute" | "modern" | "antique" | "japanese" | "botanical" | "oshi")[];
             /**
              * @description 候補の並び順 (小さいほど先)
              * @example 0
@@ -1360,8 +1616,6 @@ export interface components {
              * @example true
              */
             enabled: boolean;
-            /** Format: date-time */
-            checked_at: string | null;
         };
         AdminFurnitureDetailList: {
             details: components["schemas"]["AdminFurnitureDetail"][];
@@ -1369,6 +1623,13 @@ export interface components {
             slots: string[];
             /** @description 家具検索で使う家具の種類 */
             categories: string[];
+            /** @description 選べる雰囲気のタグ */
+            themes: {
+                /** @example nordic */
+                id: string;
+                /** @example 北欧 */
+                name: string;
+            }[];
         };
         AdminFurnitureDetailInput: {
             /** @description 作成では name, category, slot, model_key, symbolic_color, color_materials, size, price, shop, url が必須。更新では変える項目だけ */
@@ -1397,6 +1658,8 @@ export interface components {
                 /** @example ホワイト */
                 color_name?: string | null;
                 size?: components["schemas"]["Size"];
+                /** @example スチール */
+                material?: string | null;
                 /** @example 2000 */
                 price?: number;
                 /** @example IKEA */
@@ -1405,8 +1668,14 @@ export interface components {
                 url?: string;
                 /** @example null */
                 image_url?: string | null;
-                /** @example [] */
-                themes?: string[];
+                /**
+                 * @description 雰囲気のタグ
+                 * @example [
+                 *       "nordic",
+                 *       "simple"
+                 *     ]
+                 */
+                themes?: ("simple" | "natural" | "nordic" | "korean" | "cute" | "modern" | "antique" | "japanese" | "botanical" | "oshi")[];
                 /** @example 0 */
                 position?: number;
                 /** @example true */
@@ -1444,6 +1713,11 @@ export interface components {
              */
             color_material_keys: string[];
             /**
+             * @description このモデルを使う商品の寸法のうち、公開されておらず推定した辺
+             * @example []
+             */
+            estimated_axes: ("w" | "h" | "d")[];
+            /**
              * @description バケット内の GLB のパス。モデル ID から決まる
              * @example models/furniture/v1/chair_dining.glb
              */
@@ -1460,6 +1734,84 @@ export interface components {
              * @example 2
              */
             details_count: number;
+        };
+        /** @description AI による 3D モデルの生成 1 回分。running のあいだは数秒おきに取得し直す */
+        AdminModelGeneration: {
+            /** @example 1 */
+            id: number;
+            /**
+             * @description もとにした商品
+             * @example 39
+             */
+            furniture_detail_id: number;
+            /**
+             * @description 作るモデルの ID。採用すると 3D モデルの ID になる
+             * @example ai_39_1a2b3c4d
+             */
+            model_key: string;
+            /**
+             * @description running: 生成中 / succeeded: 検査に合格し採用待ち / failed: 失敗 / adopted: 採用した / rejected: 不採用にした
+             * @example succeeded
+             * @enum {string}
+             */
+            status: "running" | "succeeded" | "failed" | "adopted" | "rejected";
+            /** @example null */
+            error_message: string | null;
+            /**
+             * @description AI が書いた、形の捉え方のメモ
+             * @example 扉と取っ手を箱で表現
+             */
+            notes: string | null;
+            /** @description 検査の一覧 */
+            checks: {
+                /** @example connected */
+                name: string;
+                /** @example true */
+                ok: boolean;
+                /** @example すべての部品がつながっています */
+                detail: string;
+            }[];
+            /** @description 組み立てられたときだけ入る */
+            stats: {
+                /** @example 860 */
+                triangles?: number;
+                /**
+                 * @example [
+                 *       "tint",
+                 *       "metal"
+                 *     ]
+                 */
+                materials?: string[];
+                /** @example 33212 */
+                bytes?: number;
+                sha256?: string;
+                size?: components["schemas"]["Size"];
+            } | null;
+            ai: {
+                /** @example gemini-3.1-pro-preview */
+                model?: string;
+                /** @example 1 */
+                calls?: number;
+                /** @example 95 */
+                seconds?: number;
+                /** @example 23563 */
+                input_tokens?: number;
+                /** @example 10965 */
+                output_tokens?: number;
+            } | null;
+            /**
+             * @description 取得できるファイル名 (files/{name})
+             * @example [
+             *       "front.png",
+             *       "side.png",
+             *       "model.glb"
+             *     ]
+             */
+            files: ("front.png" | "side.png" | "model.glb")[];
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            finished_at: string | null;
         };
         AdminFurnitureModelInput: {
             furniture_model: {
@@ -1510,6 +1862,11 @@ export interface components {
                  * @example []
                  */
                 characters?: string[];
+                /**
+                 * @description このモデルを使う商品の寸法のうち推定した辺。省略すると今の値のまま (新規は空)
+                 * @example []
+                 */
+                estimated_axes?: ("w" | "h" | "d")[];
             };
         };
         /** @description db/furnitures.json と同じ形。無効な家具も含む */
@@ -2149,11 +2506,6 @@ export interface components {
                 /** @example 紫色の推し活ルームにしたい */
                 prompt: string;
                 /**
-                 * @description 追加・入れ替え商品の予算 (円・送料別)。省略すると上限なしで選ぶ
-                 * @example 30000
-                 */
-                budget?: number | null;
-                /**
                  * @description 活かす家具の id。空なら全部活かす
                  * @example [
                  *       "bed-1",
@@ -2240,11 +2592,6 @@ export interface components {
             character_theme_id?: null | "hatsune-miku" | "sanrio" | "hello-kitty" | "my-melody" | "kuromi" | "cinnamoroll" | "pompompurin" | "pochacco";
             /** @example 紫色の推し活ルームにしたい */
             prompt: string;
-            /**
-             * @description 省略したコーデでは null
-             * @example 30000
-             */
-            budget: number | null;
             /**
              * @example [
              *       "bed-1",

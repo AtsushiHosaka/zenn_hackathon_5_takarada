@@ -1,4 +1,4 @@
-import type { AdminFurnitureDetail, AdminFurnitureDetailInput, AdminFurnitureModel, FurnitureAdminCatalog } from "./furnitureAdmin";
+import type { AdminFurnitureDetail, AdminFurnitureDetailInput, AdminFurnitureModel, FurnitureAdminCatalog, ModelGeneration, ModelGenerationFile } from "./furnitureAdmin";
 
 export type FurnitureAdminRepository = {
   listDetails(): Promise<FurnitureAdminCatalog>;
@@ -9,4 +9,11 @@ export type FurnitureAdminRepository = {
   exportDetails(): Promise<unknown>;
   listModels(): Promise<AdminFurnitureModel[]>;
   setModelEnabled(id: string, enabled: boolean): Promise<AdminFurnitureModel>;
+  // AI による 3D モデルの生成。商品ごとに新しい順
+  listModelGenerations(detailId: number): Promise<ModelGeneration[]>;
+  startModelGeneration(detailId: number): Promise<ModelGeneration>;
+  adoptModelGeneration(id: number): Promise<ModelGeneration>;
+  rejectModelGeneration(id: number): Promise<ModelGeneration>;
+  // 確認用の画像・GLB の中身
+  modelGenerationFile(id: number, name: ModelGenerationFile): Promise<Blob>;
 };

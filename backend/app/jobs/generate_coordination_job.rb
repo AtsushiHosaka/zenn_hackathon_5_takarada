@@ -1,4 +1,4 @@
-# 要望と予算から、登録された家具の選定・配置・素材生成まで実行する。Gemini 未設定時はモックのプランナー。
+# 要望から、登録された家具の選定・配置・素材生成まで実行する。Gemini 未設定時はモックのプランナー。
 class GenerateCoordinationJob < ApplicationJob
   queue_as :default
   DEADLINE_SECONDS = 240

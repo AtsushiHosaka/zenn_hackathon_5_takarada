@@ -40,6 +40,12 @@ locals {
 
     # 署名付き URL の発行者。秘密鍵が無いので signBlob で署名する (storage.tf 参照)
     STORAGE_SIGNER_EMAIL = google_service_account.api.email
+
+    # AI で 3D モデルを作るジョブ (model_builder.tf)。API は依頼を置いて、このジョブを起動する
+    MODEL_BUILDS_BUCKET   = google_storage_bucket.model_builds.name
+    MODEL_BUILDER_JOB     = google_cloud_run_v2_job.model_builder.name
+    MODEL_BUILDER_REGION  = var.region
+    MODEL_BUILDER_PROJECT = var.project_id
   }
 
   # 空なら Web フロントの Cloud Run URL だけを許可する
@@ -130,6 +136,16 @@ resource "google_cloud_run_v2_service" "api" {
       env {
         name  = "CORS_ORIGINS"
         value = local.cors_origins
+      }
+
+      env {
+        name  = "VITE_TERMS_URL"
+        value = "/terms.html"
+      }
+
+      env {
+        name  = "VITE_PRIVACY_URL"
+        value = "/privacy.html"
       }
 
       dynamic "env" {
