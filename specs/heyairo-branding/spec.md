@@ -13,3 +13,7 @@
 ## 根拠と範囲
 
 Google DocsのURLは`docs/project.md`で未設定のため未確認。このチャットの名前決定、アイコンの採用とfavicon対応の依頼を暫定の根拠とする。Google Docsへは未反映。API・DB・環境変数・iOSの変更はない。ホーム画面用のメタデータを追加し、オフライン機能は追加しない。
+
+## Auth logo update (2026-10-12)
+
+The user's attached screenshot and explicit request require removing the “AI” badge beside へやいろ. The shared login/signup hero must display only the existing cube icon and product name. Remove the badge element and its unused CSS rule. Google Docs remains unconfigured and unverified; this change has not been reflected there.

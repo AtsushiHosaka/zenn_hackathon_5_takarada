@@ -3,7 +3,6 @@
 .reference-auth-brand{display:flex;align-items:center;gap:10px}
 .reference-auth-brand>svg{display:block;flex:none}
 .reference-auth-brand>span{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:19px;letter-spacing:-.01em}
-.reference-auth-brand>span.reference-auth-ai{font-size:11px;letter-spacing:.06em;padding:3px 7px;border-radius:6px;background:#2C2838;color:#CDB8FF}
 .reference-auth-illustration{position:relative;width:min(100%,560px);align-self:center;aspect-ratio:480/410}
 .reference-auth-illustration-signup{width:min(100%,520px)}
 .reference-auth-prompt{position:absolute;left:0%;top:6%;max-width:260px;padding:12px 16px;border-radius:16px 16px 16px 4px;background:#fff;color:#1D1B26;font-size:15px;font-weight:500;line-height:1.5;box-shadow:0 10px 30px rgba(0,0,0,.35)}
