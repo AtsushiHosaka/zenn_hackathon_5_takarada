@@ -276,3 +276,5 @@
 .rc-scene-stage.is-bleed.has-panel {right:calc(var(--rc-panel-width) - 8px)}
 .rc-scene-stage.is-bleed .rc-scene {width:100%;height:100%;aspect-ratio:auto}
 .rc-scene-stage.is-bleed .viewer-model-notice {left:20px;margin-bottom:72px}
+
+.rc-toolbar .rc-number-toggle {width:auto;gap:6px;padding:0 10px;font-size:12px;white-space:nowrap}
