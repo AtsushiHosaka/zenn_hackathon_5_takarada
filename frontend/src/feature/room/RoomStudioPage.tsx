@@ -24,6 +24,7 @@ import ErrorText from '../shared/ErrorText';
 import { useMotionDialog } from '../shared/useMotionDialog';
 import { DomainError } from '../../domain/error';
 import CharacterThemePicker from './CharacterThemePicker';
+import RoomStartChoices from './RoomStartChoices';
 import RoomTemplateChooser from './RoomTemplateChooser';
 import { roomPhotoLimits, roomPhotoRequirements, roomPhotoValidationError } from '../../domain/roomPhoto';
 import { motionScrollIntoView } from '../../core/motion';
@@ -103,7 +104,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const client=useQueryClient();
   const location=useLocation();
   const navigate=useNavigate();
-  const inputState=location.state as {prompt?:string;photos?:File[];editing?:boolean;view?:PlannerView;selectedId?:string|null;dimensions?:boolean;notice?:string}|null;
+  const inputState=location.state as {prompt?:string;photos?:File[];characterThemeId?:string;editing?:boolean;view?:PlannerView;selectedId?:string|null;dimensions?:boolean;notice?:string}|null;
   const design=initialDesign;
   const capability=useQuery({queryKey:roomPlanKeys.capabilities,queryFn:()=>rooms.capabilities(),staleTime:Infinity});
   const analysisMode=capability.data?.input==='dimensions';
@@ -121,13 +122,14 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const [message,setMessage]=useState('');
   // 選ぶまでは未指定にし、雰囲気に合う色の先頭を選んだ状態にする。
   const [roomPaletteId,setRoomPaletteId]=useState<string|undefined>(design.roomPaletteId);
-  const [characterThemeId,setCharacterThemeId]=useState<string|undefined>(design.characterThemeId);
+  const [characterThemeId,setCharacterThemeId]=useState<string|undefined>(inputState?.characterThemeId??design.characterThemeId);
   // 追加の指示は現在の部屋を修正する。APIに保存されていない部屋だけは、同じ広さ・形で作り直す。
   const canModify=Boolean(design.source==='api'&&design.backendRoomId);
   const [generationPhase,setGenerationPhase]=useState<RoomGenerationPhase>('analyzing');
-  const [style,setStyle]=useState<Style>(isNew?'oshi':design.style);
+  const [style,setStyle]=useState<Style>(isNew||inputState?.characterThemeId?'oshi':design.style);
   const [preset,setPreset]=useState<number|null>(null);
   const [stepIndex,setStepIndex]=useState(0);
+  const [personalEntry,setPersonalEntry]=useState(false);
   const wantsPalette=canCoordinate||loadConnection()==='dummy';
   // 解析した部屋にコーディネートを頼める接続先では、第2部を部屋の3Dモデルができた後の画面で聞く。
   const asksRequestLater=analysisMode&&canCoordinate;
@@ -349,6 +351,8 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
       {pending||id==='sample-game'?<RoomGenerating design={isNew||id==='sample-game'?undefined:design} phase={generationPhase} prompt={generation.variables?.analyzeOnly?analysisPrompt:generation.variables?.request??(analysisMode?analysisPrompt:prompt)} photos={acceptsPhotos?photos:[]} sample={loadConnection()==='dummy'} dimensions={analysisMode} coordination={canCoordinate&&!generation.variables?.analyzeOnly} onCancel={()=>{if(pending){abort.current?.abort();generation.reset();setNotice('生成を停止しました。');}else navigate('/rooms');}}/>:<>
         <section className="rc-chat" aria-label="チャット">
           {isNew?<>
+            {!personalEntry?<RoomStartChoices onPersonal={()=>setPersonalEntry(true)}/>:<>
+            <button type="button" className="rc-secondary rc-start-back" onClick={()=>setPersonalEntry(false)}>始め方を選び直す</button>
             <div ref={messages} onScroll={event=>{const node=event.currentTarget;nearBottom.current=node.scrollHeight-node.scrollTop-node.clientHeight<64;}} className="rc-messages is-new">{stepIndex>0&&<div className="rc-input-summary">{inputSteps.slice(0,stepIndex).map(step=><p className="motion-enter" key={step}>{step==='room'?[analysisMode&&`${tatami}畳・${shapeLabel(shape)}`,acceptsPhotos&&`写真 ${photos.length||samplePhotos.length}枚`].filter(Boolean).join(' / '):prompt}</p>)}</div>}<Intro key={inputStep} step={inputStep}/></div>
             <form ref={composer} className={`rc-new-composer${photoDrop?' is-photo-drop':''}`} onSubmit={start} onDragOver={event=>{event.preventDefault();if(inputStep==='room'&&acceptsPhotos&&event.dataTransfer.types.includes('Files'))setPhotoDrop(true);}} onDragLeave={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null))setPhotoDrop(false);}} onDrop={event=>{event.preventDefault();setPhotoDrop(false);if(inputStep==='room'&&acceptsPhotos)addPhotos(Array.from(event.dataTransfer.files));}}>
               {inputStep&&progressSteps.length>1&&<InputProgress steps={progressSteps} current={inputStep}/>}
@@ -369,6 +373,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
               <ErrorText error={capability.error}/>
               {photoError&&<p className="rc-error" role="alert">{photoError}</p>}<ErrorText error={generation.error}/>
             </form>
+            </>}
           </>:<>
             <div ref={messages} onScroll={event=>{const node=event.currentTarget;nearBottom.current=node.scrollHeight-node.scrollTop-node.clientHeight<64;}} className="rc-messages">
               <div key={`user-${design.id}`} className="rc-user-message motion-enter">{!design.analysisInput&&<div className="rc-user-photos">{photos.length?photos.map(file=><div key={`${file.name}-${file.size}-${file.lastModified}`}><PhotoImage file={file}/></div>):[3,4,5,6].map(index=><div key={index}><ReferenceSvg page={5} index={index}/></div>)}</div>}<p>{design.kind==='analysis'&&design.analysisInput?`${design.analysisInput.tatami}畳・${shapeLabel(design.analysisInput.shape)}の部屋を3Dで確認したい。`:prompt}</p></div>

@@ -6,6 +6,7 @@ import { useRepositories } from '../../core/repositories';
 import { loadConnection } from '../../core/connection';
 import { DomainError } from '../../domain/error';
 import { isTemplateId } from '../../domain/roomTemplate';
+import { starterRoomTemplates } from '../../domain/starterRoomTemplates';
 import { readRoomTemplates } from './templateStorage';
 import { appConfig } from '../../core/config';
 
@@ -72,7 +73,7 @@ export function useRoomPlan(id: string, enabled: boolean, initialDesign?: () => 
     queryFn: async ({ signal }) => {
       if (isTemplateId(id)) {
         const templates = client.getQueryData<import('../../domain/roomTemplate').RoomTemplate[]>(['room', scope, 'templates']) ?? readRoomTemplates(scope);
-        const template = templates.find(item => item.id === id);
+        const template = templates.find(item => item.id === id) ?? starterRoomTemplates.find(item => item.id === id);
         if (!template) throw new DomainError('テンプレートが見つかりません。');
         return template.design;
       }

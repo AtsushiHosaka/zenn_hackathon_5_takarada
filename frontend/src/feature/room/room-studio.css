@@ -263,3 +263,13 @@
 .rc-template-save:hover {color:#5A2FC0}
 .rc-template-save:focus-visible {outline:2px solid #BBA5EE;outline-offset:2px}
 .rc-coordinate-form .rc-input-progress {margin-bottom:12px}
+
+.rc-start-choices {padding:24px;overflow-y:auto;display:grid;gap:16px}
+.rc-start-choices h2 {font-size:20px;margin:0}
+.rc-start-choices article {padding:20px;border:1px solid #e4e1ec;border-radius:16px;background:#fff}
+.rc-start-choices article:first-of-type {border-color:#bba5ee;background:#f8f5fe}
+.rc-start-choices h3 {margin:0 0 10px;font-size:17px}
+.rc-start-choices small {font-size:12px;font-weight:400;color:#6e6a7c}
+.rc-start-choices p,.rc-start-choices li {font-size:13px;line-height:1.8}
+.rc-start-choices ol {padding-left:20px}
+.rc-start-back {align-self:flex-start;margin:12px 24px 0}
