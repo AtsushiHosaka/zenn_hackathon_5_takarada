@@ -8,10 +8,6 @@
 .room-list-heading h1{margin:0;font-size:26px;line-height:1.4;font-weight:700}
 .room-list-new{display:inline-flex;align-items:center;justify-content:center;gap:12px;padding:12px 20px;border:1px solid #615176;border-radius:10px;background:#6A3CD6;color:#FFF;text-decoration:none;font-size:14px;font-weight:700;min-height:44px}
 .room-list-new:hover{background:#7950DB}
-.room-list-arrow{position:absolute;z-index:2;top:calc(50% - 24px);width:48px;height:48px;display:grid;place-items:center;padding:0;border:1px solid #615176;border-radius:50%;background:#221F2C;color:#EDEAF4;cursor:pointer;font-size:38px;line-height:1}
-.room-list-arrow.is-previous{left:16px}.room-list-arrow.is-next{right:16px}
-.room-list-arrow:hover:enabled{background:#352A4C;border-color:#B49CF0}
-.room-list-arrow:disabled{opacity:.35;cursor:default}
 .room-list-position{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);margin:0;padding:5px 12px;border-radius:8px;background:#221F2C;color:#B9B4C7;font-size:12px;font-variant-numeric:tabular-nums}
 .room-list-empty{padding:80px 24px;border:1px dashed #615176;border-radius:20px;text-align:center;color:#B9B4C7}.room-list-empty a{display:inline-block;padding:12px;color:#D0BDF7}
 .room-list-page :is(a,button,section):focus-visible{outline:2px solid #B49CF0;outline-offset:-3px}
@@ -30,13 +26,13 @@
 .room-hero-track{position:relative;display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:0 clamp(16px,7vw,96px)}
 .room-hero-track::-webkit-scrollbar{display:none}
 .room-hero-slide{position:relative;flex:0 0 100%;aspect-ratio:21/9;min-height:260px;max-height:62vh;scroll-snap-align:center;overflow:hidden;border-radius:24px;background:#221F2C;color:#FFF;text-decoration:none;opacity:.45;transition:opacity var(--motion-control-duration) var(--motion-ease)}
+.room-hero-slide:hover{color:#FFF}
 .room-hero-slide[aria-current=true]{opacity:1;box-shadow:0 24px 60px #0008}
 .room-hero-slide img{display:block;width:100%;height:100%;object-fit:cover}
 .room-hero-slide::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#16141C00 45%,#16141CCC 100%),radial-gradient(120% 90% at 50% 40%,#0000 55%,#3B2A5C66 100%);pointer-events:none}
 .room-hero-caption{position:absolute;z-index:1;left:clamp(20px,4vw,48px);right:clamp(20px,4vw,48px);bottom:clamp(20px,4vw,40px);display:flex;flex-direction:column;gap:6px}
 .room-hero-caption strong{font-size:clamp(22px,3.2vw,40px);line-height:1.3;font-weight:700;letter-spacing:.02em;overflow-wrap:anywhere;text-shadow:0 2px 18px #000A}
 .room-hero-caption span{font-size:14px;color:#E4DDF3}
-.room-hero .room-list-arrow.is-previous{left:clamp(8px,2vw,28px)}.room-hero .room-list-arrow.is-next{right:clamp(8px,2vw,28px)}
 .room-hero .room-list-position{bottom:14px;left:auto;right:clamp(28px,8vw,120px);transform:none;background:#16141CB3}
 
 /* 写真が大きいカードの一覧。 */
@@ -57,6 +53,5 @@ a.room-card:focus-visible .room-card-open{opacity:1}
 .room-snapshot-studio{position:fixed;left:-10000px;top:0;width:960px;height:540px;pointer-events:none}
 .room-snapshot-studio .room-viewer{position:absolute;inset:0}
 
-@media(max-width:640px){.room-list-main{padding-top:20px;gap:18px}.room-list-heading h1{font-size:22px}.room-list-new{padding:10px;font-size:12px;gap:4px}.room-hero-track{gap:10px;padding:0 16px}.room-hero-slide{aspect-ratio:4/3;border-radius:16px}.room-list-arrow{width:36px;height:44px;font-size:30px;top:calc(50% - 22px)}.room-card-grid{grid-template-columns:1fr}}
+@media(max-width:640px){.room-list-main{padding-top:20px;gap:18px}.room-list-heading h1{font-size:22px}.room-list-new{padding:10px;font-size:12px;gap:4px}.room-hero-track{gap:10px;padding:0 16px}.room-hero-slide{aspect-ratio:4/3;border-radius:16px}.room-card-grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.room-hero-slide,.room-card,.room-card-open{transition:none}}
-

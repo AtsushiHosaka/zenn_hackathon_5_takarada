@@ -8,7 +8,8 @@ module Api
         def index
           details = FurnitureDetail.preload(furniture: :model, detail_textures: :furniture_texture).order(:slot, :position, :id)
           render json: { details: AdminFurnitureDetailSerializer.new(details).serializable_hash,
-                         slots: FurnitureCandidates::SLOTS, categories: FurnitureSearch::CATEGORIES }
+                         slots: FurnitureCandidates::SLOTS, categories: FurnitureSearch::CATEGORIES,
+                         themes: FurnitureCandidates::THEMES.map { |id, name| { id:, name: } } }
         end
 
         # POST /api/v1/admin/furniture_details
@@ -53,7 +54,7 @@ module Api
 
         def detail_params
           params.require(:furniture_detail).permit(
-            :name, :category, :slot, :model_key, :symbolic_color, :color_name, :price, :shop, :url, :image_url, :position, :enabled,
+            :name, :category, :slot, :model_key, :symbolic_color, :color_name, :material, :price, :shop, :url, :image_url, :position, :enabled,
             color_materials: {}, size: %i[w h d], themes: []
           ).to_h.symbolize_keys
         end

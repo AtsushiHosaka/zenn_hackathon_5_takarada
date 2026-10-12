@@ -16,15 +16,15 @@
         "h": 0.04,
         "d": 2.1
       },
+      "material": null,
       "price": 12800,
       "shop": "Francfranc",
       "url": "https://francfranc.com/products/1102030047044",
       "image_url": "https://francfranc.com/cdn/shop/products/1102030047044_d1_1200x1200.jpg?v=1674514150",
       "themes": [
-        "oshi_purple"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+        "cute",
+        "oshi"
+      ]
     },
     {
       "key": "static:102",
@@ -42,15 +42,16 @@
         "h": 2.5,
         "d": 0.04
       },
+      "material": null,
       "price": 5999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/merete-room-darkening-curtains-1-pair-white-with-heading-tape-60364747/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/merete-room-darkening-curtains-1-pair-white-with-heading-tape__0501261_pe631635_s5.jpg",
       "themes": [
-        "oshi_purple"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+        "simple",
+        "nordic",
+        "oshi"
+      ]
     },
     {
       "key": "static:115",
@@ -68,15 +69,15 @@
         "h": 2.0,
         "d": 0.04
       },
+      "material": null,
       "price": 1980,
       "shop": "楽天市場",
       "url": "https://search.rakuten.co.jp/search/mall/%E3%83%A9%E3%83%99%E3%83%B3%E3%83%80%E3%83%BC%20%E3%83%AC%E3%83%BC%E3%82%B9%E3%82%AB%E3%83%BC%E3%83%86%E3%83%B3/",
       "image_url": null,
       "themes": [
-        "oshi_purple"
-      ],
-      "metadata": {},
-      "checked_at": null
+        "cute",
+        "oshi"
+      ]
     },
     {
       "key": "ec:ikea:904.255.27:904.255.27",
@@ -94,27 +95,17 @@
         "h": 0.018,
         "w": 1.33
       },
+      "material": "ポリプロピレン",
       "price": 12990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-90425527/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/stoense-rug-low-pile-off-white__0624373_pe691791_s5.jpg",
       "themes": [
-        "oshi_purple"
-      ],
-      "metadata": {
-        "size": {
-          "d": 1.95,
-          "h": 0.018,
-          "w": 1.33
-        },
-        "shape": "rectangular",
-        "material": "表面:ポリプロピレン 100%裏面:合成ゴム100%",
-        "provider": "ikea",
-        "color_name": "ベージュ, ホワイト",
-        "estimated_axes": [],
-        "official_color": "ベージュ, ホワイト"
-      },
-      "checked_at": "2026-10-09T04:03:00Z"
+        "simple",
+        "natural",
+        "nordic",
+        "oshi"
+      ]
     },
     {
       "key": "static:104",
@@ -132,15 +123,15 @@
         "h": 0.05,
         "d": 0.26
       },
+      "material": null,
       "price": 2999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/lack-wall-shelf-white-70282181/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/lack-wall-shelf-white__0641087_pe700250_s5.jpg",
       "themes": [
-        "oshi_purple"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+        "simple",
+        "oshi"
+      ]
     },
     {
       "key": "static:114",
@@ -158,15 +149,15 @@
         "h": 0.9,
         "d": 0.01
       },
+      "material": null,
       "price": 1980,
       "shop": "楽天市場",
       "url": "https://search.rakuten.co.jp/search/mall/%E3%82%BF%E3%83%9A%E3%82%B9%E3%83%88%E3%83%AA%E3%83%BC%20%E3%83%A9%E3%83%99%E3%83%B3%E3%83%80%E3%83%BC%20%E7%84%A1%E5%9C%B0/",
       "image_url": null,
       "themes": [
-        "oshi_purple"
-      ],
-      "metadata": {},
-      "checked_at": null
+        "simple",
+        "oshi"
+      ]
     },
     {
       "key": "static:105",
@@ -184,15 +175,15 @@
         "h": 1.53,
         "d": 0.255
       },
+      "material": null,
       "price": 14000,
       "shop": "Francfranc",
       "url": "https://francfranc.com/products/1109040028100",
       "image_url": "https://francfranc.com/cdn/shop/products/1109040028100_1200x1200.jpg?v=1579159284",
       "themes": [
-        "oshi_purple"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+        "modern",
+        "oshi"
+      ]
     },
     {
       "key": "static:112",
@@ -210,15 +201,16 @@
         "h": 1.12,
         "d": 0.3
       },
+      "material": null,
       "price": 14990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/pilskott-led-floor-lamp-smart-black-00478129/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/pilskott-led-floor-lamp-smart-black__1077629_pe856958_s5.jpg",
       "themes": [
-        "oshi_purple"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+        "simple",
+        "modern",
+        "oshi"
+      ]
     },
     {
       "key": "ec:ikea:105.029.92:105.029.92",
@@ -236,27 +228,15 @@
         "h": 1.16,
         "w": 0.34
       },
+      "material": "スチール、ガラス",
       "price": 5999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/baggebo-glass-door-cabinet-metal-white-10502992/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/baggebo-glass-door-cabinet-metal-white__0981557_pe815393_s5.jpg",
       "themes": [
-        "oshi_purple"
-      ],
-      "metadata": {
-        "size": {
-          "d": 0.3,
-          "h": 1.16,
-          "w": 0.34
-        },
-        "shape": null,
-        "material": "チューブ/ トップパネル/ 底板/ サイドパネル/ バックパネル:スチール, エポキシ/ポリエステル粉体塗装棚板:強化ガラスガラス扉:スチール, 強化ガラス, エポキシ/ポリエステル粉体塗装",
-        "provider": "ikea",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T04:03:01Z"
+        "simple",
+        "oshi"
+      ]
     },
     {
       "key": "ec:ikea:405.012.60:405.012.60",
@@ -274,27 +254,15 @@
         "h": 1.51,
         "w": 0.35
       },
+      "material": "スチール、ガラス",
       "price": 12990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/blaliden-glass-door-cabinet-white-40501260/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/blaliden-glass-door-cabinet-white__1186284_pe898752_s5.jpg",
       "themes": [
-        "oshi_purple"
-      ],
-      "metadata": {
-        "size": {
-          "d": 0.32,
-          "h": 1.51,
-          "w": 0.35
-        },
-        "shape": null,
-        "material": "上部パネル/ 上部フレーム/ 底板/ 底部レール/ 側部フレーム/ 固定プレート/ 扉枠/ 固定プレート:スチール, エポキシ/ポリエステル粉体塗装リベット/ 差し込み式ネジ/ ヒンジ/ ポール:スチール保護層:EVA樹脂, ポリプロピレン ., EVA樹脂サイドパネル/ バックパネル/ ドアパネル/ 棚板:強化ガラス",
-        "provider": "ikea",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T04:02:43Z"
+        "simple",
+        "oshi"
+      ]
     },
     {
       "key": "static:107",
@@ -312,15 +280,16 @@
         "h": 0.2,
         "d": 0.6
       },
+      "material": null,
       "price": 3480,
       "shop": "Francfranc",
       "url": "https://francfranc.com/products/1102130131612",
       "image_url": "https://francfranc.com/cdn/shop/files/1102130131612_d1_1200x1200.jpg?v=1742458976",
       "themes": [
-        "oshi_purple"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+        "korean",
+        "cute",
+        "oshi"
+      ]
     },
     {
       "key": "static:108",
@@ -338,15 +307,15 @@
         "h": 0.184,
         "d": 0.084
       },
+      "material": null,
       "price": 2490,
       "shop": "無印良品",
       "url": "https://www.muji.com/jp/ja/store/cmdty/detail/4550002856120",
       "image_url": null,
       "themes": [
-        "oshi_purple"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+        "simple",
+        "oshi"
+      ]
     },
     {
       "key": "static:201",
@@ -364,15 +333,17 @@
         "h": 0.04,
         "d": 2.0
       },
+      "material": null,
       "price": 2999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-pale-grey-green-20632455/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/aengslilja-duvet-cover-and-pillowcase-pale-grey-green__1599491_pe1042324_s5.jpg",
       "themes": [
+        "simple",
+        "natural",
+        "nordic",
         "botanical"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:202",
@@ -390,15 +361,14 @@
         "h": 2.0,
         "d": 0.04
       },
+      "material": null,
       "price": 5990,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
       "url": "https://store.shopping.yahoo.co.jp/nitori-net/2114100125179.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_2114100125179_i_20250119115307",
       "themes": [
         "botanical"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:203",
@@ -416,15 +386,16 @@
         "h": 0.014,
         "d": 1.95
       },
+      "material": null,
       "price": 12990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/lohals-rug-flatwoven-natural-50511287/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/lohals-rug-flatwoven-natural__0280221_pe419173_s5.jpg",
       "themes": [
+        "simple",
+        "natural",
         "botanical"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:211",
@@ -442,15 +413,16 @@
         "h": 0.018,
         "d": 1.3
       },
+      "material": null,
       "price": 9990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-medium-grey-60426830/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/stoense-rug-low-pile-medium-grey__0622587_pe690625_s5.jpg",
       "themes": [
+        "simple",
+        "modern",
         "botanical"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:204",
@@ -468,15 +440,14 @@
         "h": 0.63,
         "d": 0.15
       },
+      "material": null,
       "price": 599,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/fejka-artificial-potted-plant-in-outdoor-hanging-monstera-00608404/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/fejka-artificial-potted-plant-in-outdoor-hanging-monstera__1445436_pe988212_s5.jpg",
       "themes": [
         "botanical"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:214",
@@ -494,15 +465,14 @@
         "h": 0.5,
         "d": 0.02
       },
+      "material": null,
       "price": 2799,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/knoppaeng-frame-with-poster-garden-20465772/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/knoppaeng-frame-with-poster-garden__0771328_pe755690_s5.jpg",
       "themes": [
         "botanical"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:205",
@@ -520,15 +490,15 @@
         "h": 1.0,
         "d": 0.2
       },
+      "material": null,
       "price": 13200,
       "shop": "KAJA",
       "url": "https://www.kaja-online.jp/view/item/000000000206",
       "image_url": "https://makeshop-multi-images.akamaized.net/kajashop0409/shopimages/06/02/1_000000000206.jpg?1767854126",
       "themes": [
+        "natural",
         "botanical"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:212",
@@ -546,15 +516,17 @@
         "h": 1.4,
         "d": 0.62
       },
+      "material": null,
       "price": 10990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/lauters-floor-lamp-ash-white-00405053/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/lauters-floor-lamp-ash-white__0663863_pe712536_s5.jpg",
       "themes": [
+        "simple",
+        "natural",
+        "nordic",
         "botanical"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:206",
@@ -572,15 +544,14 @@
         "h": 0.9,
         "d": 0.6
       },
+      "material": null,
       "price": 4999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/fejka-artificial-potted-plant-in-outdoor-monstera-60615246/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/fejka-artificial-potted-plant-in-outdoor-monstera__0614197_pe686822_s5.jpg",
       "themes": [
         "botanical"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:213",
@@ -598,15 +569,14 @@
         "h": 1.5,
         "d": 0.4
       },
+      "material": null,
       "price": 5990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/fejka-artificial-potted-plant-in-outdoor-eucalyptus-90600875/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/fejka-artificial-potted-plant-in-outdoor-eucalyptus__1288928_pe934321_s5.jpg",
       "themes": [
         "botanical"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:207",
@@ -624,15 +594,14 @@
         "h": 0.15,
         "d": 0.48
       },
+      "material": null,
       "price": 2499,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/hallonbuske-cushion-cover-green-floral-pattern-60636734/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/hallonbuske-cushion-cover-green-floral-pattern__1500209_pe1006928_s5.jpg",
       "themes": [
         "botanical"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:208",
@@ -650,15 +619,14 @@
         "h": 0.21,
         "d": 0.15
       },
+      "material": null,
       "price": 499,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/fejka-artificial-potted-plant-in-outdoor-plantain-lily-00610746/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/fejka-artificial-potted-plant-in-outdoor-plantain-lily__1467005_pe995611_s5.jpg",
       "themes": [
         "botanical"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:301",
@@ -676,15 +644,17 @@
         "h": 0.04,
         "d": 2
       },
+      "material": null,
       "price": 2999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-natural-40591982/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/aengslilja-duvet-cover-and-pillowcase-natural__1599654_pe1042487_s5.jpg",
       "themes": [
+        "simple",
+        "natural",
+        "nordic",
         "korean"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:302",
@@ -702,15 +672,16 @@
         "h": 2.5,
         "d": 0.04
       },
+      "material": null,
       "price": 3999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/silverloenn-sheer-curtains-1-pair-beige-with-heading-tape-30493977/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/silverloenn-sheer-curtains-1-pair-beige-with-heading-tape__0917496_pe785763_s5.jpg",
       "themes": [
+        "simple",
+        "natural",
         "korean"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:303",
@@ -728,15 +699,15 @@
         "h": 0.02,
         "d": 1.85
       },
+      "material": null,
       "price": 5480,
       "shop": "楽天市場",
       "url": "https://search.rakuten.co.jp/search/mall/%E3%82%A6%E3%82%A7%E3%83%BC%E3%83%96%20%E3%83%A9%E3%82%B0%20%E3%83%99%E3%83%BC%E3%82%B8%E3%83%A5%20%E9%9F%93%E5%9B%BD/",
       "image_url": null,
       "themes": [
+        "natural",
         "korean"
-      ],
-      "metadata": {},
-      "checked_at": null
+      ]
     },
     {
       "key": "ec:ikea:804.268.05:804.268.05",
@@ -754,28 +725,18 @@
         "h": 0.018,
         "w": 1.3
       },
+      "material": "ポリプロピレン",
       "price": 9990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-80426805/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/stoense-rug-low-pile-off-white__0622593_pe690629_s5.jpg",
       "themes": [
-        "oshi_purple",
-        "korean"
-      ],
-      "metadata": {
-        "size": {
-          "d": 1.3,
-          "h": 0.018,
-          "w": 1.3
-        },
-        "shape": "round",
-        "material": "表面:ポリプロピレン 100%裏面:合成ゴム100%",
-        "provider": "ikea",
-        "color_name": "ベージュ, ホワイト",
-        "estimated_axes": [],
-        "official_color": "ベージュ, ホワイト"
-      },
-      "checked_at": "2026-10-09T04:02:59Z"
+        "simple",
+        "natural",
+        "nordic",
+        "korean",
+        "oshi"
+      ]
     },
     {
       "key": "static:304",
@@ -793,15 +754,14 @@
         "h": 0.2,
         "d": 0.018
       },
+      "material": null,
       "price": 799,
       "shop": "nitori",
       "url": "https://www.nitori-net.jp/ec/product/2117100013088s/",
       "image_url": "https://www.nitori-net.jp/ecstatic/image/product/2117100013088/211710001308801.jpg?ts=20260204180630861",
       "themes": [
         "korean"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:305",
@@ -819,15 +779,16 @@
         "h": 1.44,
         "d": 0.38
       },
+      "material": null,
       "price": 6999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/vindkast-floor-lamp-white-30539094/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/vindkast-floor-lamp-white__1180020_pe896176_s5.jpg",
       "themes": [
-        "korean"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+        "nordic",
+        "korean",
+        "cute"
+      ]
     },
     {
       "key": "static:312",
@@ -845,15 +806,16 @@
         "h": 1.55,
         "d": 0.36
       },
+      "material": null,
       "price": 9990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/arstid-floor-lamp-nickel-plated-white-70163866/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/arstid-floor-lamp-nickel-plated-white__0684004_pe720967_s5.jpg",
       "themes": [
+        "simple",
+        "nordic",
         "korean"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:306",
@@ -871,15 +833,16 @@
         "h": 0.53,
         "d": 0.45
       },
+      "material": null,
       "price": 1999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/gladom-tray-table-white__0470732_pe612912_s5.jpg",
       "themes": [
-        "korean"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+        "simple",
+        "korean",
+        "modern"
+      ]
     },
     {
       "key": "static:307",
@@ -897,15 +860,16 @@
         "h": 0.15,
         "d": 0.5
       },
+      "material": null,
       "price": 499,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/profetblomma-cushion-light-beige-70614208/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/profetblomma-cushion-light-beige__1415116_pe975142_s5.jpg",
       "themes": [
+        "simple",
+        "natural",
         "korean"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:308",
@@ -923,15 +887,17 @@
         "h": 0.08,
         "d": 0.057
       },
+      "material": null,
       "price": 399,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/hemsjoe-unscented-block-candle-natural-00176117/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/hemsjoe-unscented-pillar-candle-natural__0637443_pe698308_s5.jpg",
       "themes": [
+        "simple",
+        "natural",
+        "nordic",
         "korean"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+      ]
     },
     {
       "key": "static:901",
@@ -949,16 +915,17 @@
         "h": 2.5,
         "d": 0.03
       },
+      "material": null,
       "price": 799,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/lill-net-curtains-1-pair-white-with-rod-pocket-70171927/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/lill-net-curtains-1-pair-white-with-rod-pocket__0099863_pe242253_s5.jpg",
       "themes": [
-        "botanical",
-        "korean"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+        "simple",
+        "nordic",
+        "korean",
+        "botanical"
+      ]
     },
     {
       "key": "static:902",
@@ -976,17 +943,18 @@
         "h": 0.35,
         "d": 0.15
       },
+      "material": null,
       "price": 1899,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/naevlinge-led-clamp-spotlight-white-70449893/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/naevlinge-led-clamp-spotlight-white__0710474_pe727575_s5.jpg",
       "themes": [
-        "oshi_purple",
+        "simple",
+        "nordic",
+        "korean",
         "botanical",
-        "korean"
-      ],
-      "metadata": {},
-      "checked_at": "2026-10-05"
+        "oshi"
+      ]
     },
     {
       "key": "ec:ikea:005.987.30:005.987.30",
@@ -1004,27 +972,15 @@
         "h": 0.15,
         "w": 0.5
       },
+      "material": "綿",
       "price": 499,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-00598730/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/gurli-cushion-cover-unbleached__1409327_pe972205_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.5,
-          "h": null,
-          "w": 0.5
-        },
-        "shape": null,
-        "material": "綿 100%",
-        "provider": "ikea",
-        "color_name": "ベージュ",
-        "estimated_axes": [
-          "h"
-        ],
-        "official_color": "ベージュ"
-      },
-      "checked_at": "2026-10-10T08:10:55Z"
+      "themes": [
+        "simple",
+        "natural"
+      ]
     },
     {
       "key": "ec:ikea:303.584.94:303.584.94",
@@ -1042,25 +998,15 @@
         "h": 0.35,
         "w": 0.16
       },
+      "material": "ポリプロピレン",
       "price": 599,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/svallet-work-lamp-dark-grey-white-30358494/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/svallet-work-lamp-dark-grey-white__0703502_pe724751_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.16,
-          "h": 0.35,
-          "w": 0.16
-        },
-        "shape": null,
-        "material": "ポリプロピレン ...",
-        "provider": "ikea",
-        "color_name": "グレー, ホワイト",
-        "estimated_axes": [],
-        "official_color": "グレー, ホワイト"
-      },
-      "checked_at": "2026-10-10T08:17:19Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:ikea:001.623.80:001.623.80",
@@ -1078,27 +1024,15 @@
         "h": 0.45,
         "w": 0.4
       },
+      "material": "ポリプロピレン、スチール",
       "price": 899,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/marius-stool-black-00162380/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/marius-stool-black__0727386_pe735638_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": null,
-          "h": 0.45,
-          "w": 0.4
-        },
-        "shape": null,
-        "material": "シート/ バンパー/ 足:ポリプロピレン. ....脚:スチール, エポキシ/ポリエステル粉体塗装",
-        "provider": "ikea",
-        "color_name": "ブラック",
-        "estimated_axes": [
-          "d"
-        ],
-        "official_color": "ブラック"
-      },
-      "checked_at": "2026-10-09T01:51:28Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:ikea:301.840.50:301.840.50",
@@ -1116,27 +1050,15 @@
         "h": 0.45,
         "w": 0.4
       },
+      "material": "ポリプロピレン、スチール",
       "price": 899,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/marius-stool-white-30184050/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/marius-stool-white__0727398_pe735650_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": null,
-          "h": 0.45,
-          "w": 0.4
-        },
-        "shape": null,
-        "material": "シート/ バンパー/ 足:ポリプロピレン. ....脚:スチール, エポキシ/ポリエステル粉体塗装",
-        "provider": "ikea",
-        "color_name": "ホワイト",
-        "estimated_axes": [
-          "d"
-        ],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T01:31:07Z"
+      "themes": [
+        "simple",
+        "nordic"
+      ]
     },
     {
       "key": "ec:ikea:205.695.19:205.695.19",
@@ -1154,27 +1076,14 @@
         "h": 0.15,
         "w": 0.5
       },
+      "material": "ポリエステル",
       "price": 999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/blaskata-cushion-cover-purple-patterned-20569519/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/blaskata-cushion-cover-purple-patterned__1198277_pe903999_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.5,
-          "h": null,
-          "w": 0.5
-        },
-        "shape": null,
-        "material": "ポリエステル 100%..",
-        "provider": "ikea",
-        "color_name": "ライラック",
-        "estimated_axes": [
-          "h"
-        ],
-        "official_color": "ライラック"
-      },
-      "checked_at": "2026-10-09T15:56:38Z"
+      "themes": [
+        "oshi"
+      ]
     },
     {
       "key": "ec:ikea:305.908.98:305.908.98",
@@ -1192,27 +1101,15 @@
         "h": 0.15,
         "w": 0.5
       },
+      "material": "綿",
       "price": 999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/sanela-cushion-cover-light-beige__1284678_pe933086_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.5,
-          "h": null,
-          "w": 0.5
-        },
-        "shape": null,
-        "material": "綿 100%",
-        "provider": "ikea",
-        "color_name": "ベージュ",
-        "estimated_axes": [
-          "h"
-        ],
-        "official_color": "ベージュ"
-      },
-      "checked_at": "2026-10-10T08:10:41Z"
+      "themes": [
+        "simple",
+        "natural"
+      ]
     },
     {
       "key": "ec:ikea:706.359.89:706.359.89",
@@ -1230,27 +1127,14 @@
         "h": 0.15,
         "w": 0.5
       },
+      "material": "綿",
       "price": 999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/sanela-cushion-cover-yellow-brown__1502327_pe1007597_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.5,
-          "h": null,
-          "w": 0.5
-        },
-        "shape": null,
-        "material": "綿 100%",
-        "provider": "ikea",
-        "color_name": "ブラウン, イエロー",
-        "estimated_axes": [
-          "h"
-        ],
-        "official_color": "ブラウン, イエロー"
-      },
-      "checked_at": "2026-10-10T08:10:55Z"
+      "themes": [
+        "simple"
+      ]
     },
     {
       "key": "ec:ikea:905.987.78:905.987.78",
@@ -1268,27 +1152,15 @@
         "h": 0.15,
         "w": 0.65
       },
+      "material": "綿",
       "price": 999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-90598778/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/gurli-cushion-cover-unbleached__1373591_pe960019_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.65,
-          "h": null,
-          "w": 0.65
-        },
-        "shape": null,
-        "material": "綿 100%",
-        "provider": "ikea",
-        "color_name": "ベージュ",
-        "estimated_axes": [
-          "h"
-        ],
-        "official_color": "ベージュ"
-      },
-      "checked_at": "2026-10-09T04:03:02Z"
+      "themes": [
+        "simple",
+        "natural"
+      ]
     },
     {
       "key": "ec:yahoo_shopping:shop-brain/30358494:shop-brain/30358494",
@@ -1306,28 +1178,15 @@
         "h": 0.35,
         "w": 0.25
       },
+      "material": "ポリプロピレン",
       "price": 1380,
       "shop": "SelectShop Brain（Yahoo!ショッピング）",
       "url": "https://store.shopping.yahoo.co.jp/shop-brain/30358494.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/shop-brain_30358494",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": null,
-          "h": 0.35,
-          "w": null
-        },
-        "shape": null,
-        "material": "ポリプロピレンプラスチック",
-        "provider": "yahoo_shopping",
-        "color_name": "ダークグレー/ホワイト",
-        "estimated_axes": [
-          "w",
-          "d"
-        ],
-        "official_color": "ダークグレー/ホワイト"
-      },
-      "checked_at": "2026-10-10T08:17:19Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:ikea:705.704.07:705.704.07",
@@ -1345,25 +1204,15 @@
         "h": 0.45,
         "w": 0.34
       },
+      "material": "スチール、ポリプロピレン",
       "price": 1490,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/gunde-folding-stool-black-70570407/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/gunde-folding-stool-black__1321494_pe941625_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.32,
-          "h": 0.45,
-          "w": 0.34
-        },
-        "shape": null,
-        "material": "フレーム:スチール, エポキシ/ポリエステル粉体塗装シート/ 足:ポリプロピレン .",
-        "provider": "ikea",
-        "color_name": "ブラック",
-        "estimated_axes": [],
-        "official_color": "ブラック"
-      },
-      "checked_at": "2026-10-09T01:30:46Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:ikea:606.264.19:606.264.19",
@@ -1381,27 +1230,15 @@
         "h": 0.15,
         "w": 0.5
       },
+      "material": "綿",
       "price": 1499,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-grey-brown-60626419/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/asveig-cushion-cover-grey-brown__1478230_pe999460_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.5,
-          "h": null,
-          "w": 0.5
-        },
-        "shape": null,
-        "material": "綿 100%",
-        "provider": "ikea",
-        "color_name": "グレーブラウン",
-        "estimated_axes": [
-          "h"
-        ],
-        "official_color": "グレーブラウン"
-      },
-      "checked_at": "2026-10-10T08:10:56Z"
+      "themes": [
+        "simple",
+        "natural"
+      ]
     },
     {
       "key": "ec:ikea:805.724.20:805.724.20",
@@ -1419,27 +1256,16 @@
         "h": 0.15,
         "w": 0.58
       },
+      "material": "綿",
       "price": 1499,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-light-beige-80572420/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/asveig-cushion-cover-light-beige__1207685_pe908134_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.4,
-          "h": null,
-          "w": 0.58
-        },
-        "shape": null,
-        "material": "綿 100%",
-        "provider": "ikea",
-        "color_name": "ベージュ",
-        "estimated_axes": [
-          "h"
-        ],
-        "official_color": "ベージュ"
-      },
-      "checked_at": "2026-10-09T04:02:58Z"
+      "themes": [
+        "simple",
+        "natural",
+        "nordic"
+      ]
     },
     {
       "key": "ec:yahoo_shopping:nitori-net/8700458:nitori-net/8700458",
@@ -1457,25 +1283,14 @@
         "h": 0.495,
         "w": 0.3
       },
+      "material": "スチール、PVC",
       "price": 1790,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
       "url": "https://store.shopping.yahoo.co.jp/nitori-net/8700458.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_8700458",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.315,
-          "h": 0.495,
-          "w": 0.3
-        },
-        "shape": "round",
-        "material": "スチール、PVC",
-        "provider": "yahoo_shopping",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T01:33:16Z"
+      "themes": [
+        "simple"
+      ]
     },
     {
       "key": "ec:ikea:902.553.08:902.553.08",
@@ -1493,25 +1308,15 @@
         "h": 0.89,
         "w": 0.44
       },
+      "material": "スチール、ポリプロピレン",
       "price": 1800,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/fejan-chair-outdoor-foldable-white-90255308/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/fejan-chair-outdoor-foldable-white__0728344_pe736190_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.42,
-          "h": 0.89,
-          "w": 0.44
-        },
-        "shape": null,
-        "material": "フレーム:スチール、亜鉛メッキ, ポリエステル粉体塗装シート及び背もたれ/ 脚:ポリプロピレン .リベット:スチールワッシャー:ポリアミド .",
-        "provider": "ikea",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T01:33:06Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:yahoo_shopping:shop-brain/90586940:shop-brain/90586940",
@@ -1529,27 +1334,16 @@
         "h": 0.15,
         "w": 0.55
       },
+      "material": "繊維板",
       "price": 1980,
       "shop": "SelectShop Brain（Yahoo!ショッピング）",
       "url": "https://store.shopping.yahoo.co.jp/shop-brain/90586940.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/shop-brain_90586940",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.12,
-          "h": null,
-          "w": 0.55
-        },
-        "shape": "rectangular",
-        "material": "繊維板, ペーパーフォイル",
-        "provider": "yahoo_shopping",
-        "color_name": "オーク調",
-        "estimated_axes": [
-          "h"
-        ],
-        "official_color": "オーク調"
-      },
-      "checked_at": "2026-10-10T08:17:17Z"
+      "themes": [
+        "simple",
+        "natural",
+        "nordic"
+      ]
     },
     {
       "key": "ec:yahoo_shopping:nitori-net/2115100099156:nitori-net/2115100099156",
@@ -1567,27 +1361,15 @@
         "h": 0.04,
         "w": 1.5
       },
+      "material": "ポリエステル",
       "price": 1990,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
       "url": "https://store.shopping.yahoo.co.jp/nitori-net/2115100099156.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_2115100099156",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 2.1,
-          "h": null,
-          "w": 1.5
-        },
-        "shape": "rectangular",
-        "material": "ポリエステル100％",
-        "provider": "yahoo_shopping",
-        "color_name": "レッドパープル",
-        "estimated_axes": [
-          "h"
-        ],
-        "official_color": "レッドパープル"
-      },
-      "checked_at": "2026-10-09T15:56:53Z"
+      "themes": [
+        "simple",
+        "nordic"
+      ]
     },
     {
       "key": "ec:yahoo_shopping:nitori-net/2117100002310:nitori-net/2117100002310",
@@ -1605,25 +1387,15 @@
         "h": 0.12,
         "w": 0.45
       },
+      "material": "化粧繊維板",
       "price": 1990,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
       "url": "https://store.shopping.yahoo.co.jp/nitori-net/2117100002310.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_2117100002310",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.12,
-          "h": 0.12,
-          "w": 0.45
-        },
-        "shape": "rectangular",
-        "material": "合成樹脂化粧繊維版(メラミン樹脂)",
-        "provider": "yahoo_shopping",
-        "color_name": "ライトブラウン",
-        "estimated_axes": [],
-        "official_color": "ライトブラウン"
-      },
-      "checked_at": "2026-10-09T04:02:48Z"
+      "themes": [
+        "simple",
+        "natural"
+      ]
     },
     {
       "key": "ec:ikea:004.567.59:004.567.59",
@@ -1641,25 +1413,16 @@
         "h": 0.002,
         "w": 1.2
       },
+      "material": "綿",
       "price": 1999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/tiphede-rug-flatwoven-natural-black-00456759/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/tiphede-rug-flatwoven-natural-black__0772066_pe755879_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 1.8,
-          "h": 0.002,
-          "w": 1.2
-        },
-        "shape": "rectangular",
-        "material": "綿 100%",
-        "provider": "ikea",
-        "color_name": "ベージュ, ホワイト",
-        "estimated_axes": [],
-        "official_color": "ベージュ, ホワイト"
-      },
-      "checked_at": "2026-10-10T08:10:41Z"
+      "themes": [
+        "simple",
+        "natural",
+        "nordic"
+      ]
     },
     {
       "key": "ec:ikea:203.501.39:203.501.39",
@@ -1677,28 +1440,16 @@
         "h": 0.26,
         "w": 0.3
       },
+      "material": "ガラス、ステンレススチール",
       "price": 1999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/begavning-glass-dome-with-base-20350139/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/begavning-glass-dome-with-base__0904079_pe644670_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": null,
-          "h": 0.26,
-          "w": null
-        },
-        "shape": "round",
-        "material": "本体:ステンレススチール, スチール, ポリプロピレン ., 金属膜コーティング, エポキシ/ポリエステル粉体塗装基本素材:ガラス",
-        "provider": "ikea",
-        "color_name": "イエロー, ホワイト",
-        "estimated_axes": [
-          "w",
-          "d"
-        ],
-        "official_color": "イエロー, ホワイト"
-      },
-      "checked_at": "2026-10-09T15:56:43Z"
+      "themes": [
+        "simple",
+        "modern",
+        "oshi"
+      ]
     },
     {
       "key": "ec:ikea:206.054.28:206.054.28",
@@ -1716,25 +1467,15 @@
         "h": 0.77,
         "w": 0.39
       },
+      "material": "スチール、ポリプロピレン",
       "price": 2000,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-20605428/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/sandsberg-chair-white__1390727_pe965548_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.47,
-          "h": 0.77,
-          "w": 0.39
-        },
-        "shape": null,
-        "material": "脚フレーム/ クロスレール:スチール, エポキシ/ポリエステル粉体塗装シート/ 背もたれ:ポリプロピレン. ....バンパー:熱可塑性エラストマー",
-        "provider": "ikea",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T01:33:05Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:ikea:806.054.30:806.054.30",
@@ -1752,25 +1493,15 @@
         "h": 0.77,
         "w": 0.39
       },
+      "material": "スチール、ポリプロピレン",
       "price": 2000,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-black-80605430/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/sandsberg-chair-black__1390732_pe965553_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.47,
-          "h": 0.77,
-          "w": 0.39
-        },
-        "shape": null,
-        "material": "脚フレーム/ クロスレール:スチール, エポキシ/ポリエステル粉体塗装シート/ 背もたれ:ポリプロピレン. ....バンパー:熱可塑性エラストマー",
-        "provider": "ikea",
-        "color_name": "ブラック",
-        "estimated_axes": [],
-        "official_color": "ブラック"
-      },
-      "checked_at": "2026-10-09T01:30:47Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:ikea:802.177.98:802.177.98",
@@ -1788,25 +1519,15 @@
         "h": 0.78,
         "w": 0.41
       },
+      "material": "スチール、ポリプロピレン",
       "price": 2500,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/gunde-folding-chair-black-80217798/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/gunde-folding-chair-black__0728313_pe736184_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.45,
-          "h": 0.78,
-          "w": 0.41
-        },
-        "shape": null,
-        "material": "フレーム:スチール、亜鉛メッキシート及び背もたれ:ポリプロピレン .",
-        "provider": "ikea",
-        "color_name": "ブラック",
-        "estimated_axes": [],
-        "official_color": "ブラック"
-      },
-      "checked_at": "2026-10-09T01:30:43Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:ikea:104.984.19:104.984.19",
@@ -1824,25 +1545,15 @@
         "h": 0.9,
         "w": 0.4
       },
+      "material": "スチール、ポリプロピレン",
       "price": 2990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/stig-bar-stool-with-backrest-counter-height-black-black-10498419/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/stig-bar-stool-with-backrest-counter-height-black-black__0948110_pe798867_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.42,
-          "h": 0.9,
-          "w": 0.4
-        },
-        "shape": null,
-        "material": "フレーム:スチール, エポキシ/ポリエステル粉体塗装シート/ 背もたれ:ポリプロピレン...., ポリプロピレン. ....",
-        "provider": "ikea",
-        "color_name": "ブラック",
-        "estimated_axes": [],
-        "official_color": "ブラック"
-      },
-      "checked_at": "2026-10-09T01:30:51Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:ikea:804.200.40:804.200.40",
@@ -1860,25 +1571,16 @@
         "h": 0.45,
         "w": 0.42
       },
+      "material": "バーチ材（合板）",
       "price": 2990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/kyrre-stool-birch-80420040/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/kyrre-stool-birch__1488024_pe1003293_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.48,
-          "h": 0.45,
-          "w": 0.42
-        },
-        "shape": null,
-        "material": "シート:合板, バーチ材突き板, 着色クリアラッカー脚:積層合板, バーチ材突き板, 着色クリアラッカー",
-        "provider": "ikea",
-        "color_name": "ベージュ, ブラウン",
-        "estimated_axes": [],
-        "official_color": "ベージュ, ブラウン"
-      },
-      "checked_at": "2026-10-09T01:51:29Z"
+      "themes": [
+        "simple",
+        "natural",
+        "nordic"
+      ]
     },
     {
       "key": "ec:ikea:706.324.91:706.324.91",
@@ -1896,27 +1598,15 @@
         "h": 2.0,
         "w": 1.5
       },
+      "material": "綿",
       "price": 2999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/aengslilja-duvet-cover-and-pillowcase-light-brown__1599615_pe1042448_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": null,
-          "h": 2.0,
-          "w": 1.5
-        },
-        "shape": "rectangular",
-        "material": "綿 100%",
-        "provider": "ikea",
-        "color_name": "ブラウン",
-        "estimated_axes": [
-          "d"
-        ],
-        "official_color": "ブラウン"
-      },
-      "checked_at": "2026-10-09T04:03:04Z"
+      "themes": [
+        "simple",
+        "natural"
+      ]
     },
     {
       "key": "ec:ikea:805.927.34:805.927.34",
@@ -1934,25 +1624,15 @@
         "h": 0.79,
         "w": 0.45
       },
+      "material": "スチール、ポリプロピレン",
       "price": 3000,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/vihals-chair-white-80592734/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/vihals-chair-white__1370478_pe958751_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.47,
-          "h": 0.79,
-          "w": 0.45
-        },
-        "shape": null,
-        "material": "脚フレーム/ ピン/ クロスレール:スチール, エポキシ/ポリエステル粉体塗装シート/ 背もたれ:ポリプロピレン....",
-        "provider": "ikea",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T01:29:15Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:yahoo_shopping:shop-brain/20605428:shop-brain/20605428",
@@ -1970,25 +1650,15 @@
         "h": 0.77,
         "w": 0.39
       },
+      "material": "スチール、ポリプロピレン",
       "price": 3480,
       "shop": "SelectShop Brain（Yahoo!ショッピング）",
       "url": "https://store.shopping.yahoo.co.jp/shop-brain/20605428.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/shop-brain_20605428",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.47,
-          "h": 0.77,
-          "w": 0.39
-        },
-        "shape": null,
-        "material": "スチール, エポキシ/ポリエステル粉体塗装, ポリプロピレン, 熱可塑性エラストマー",
-        "provider": "yahoo_shopping",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T01:33:15Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:ikea:701.788.96:701.788.96",
@@ -2006,25 +1676,15 @@
         "h": 0.5,
         "w": 0.43
       },
+      "material": "アスペン無垢材",
       "price": 3499,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/bekvaem-step-stool-white-70178896/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/bekvaem-step-stool-white__0122140_pe278505_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.39,
-          "h": 0.5,
-          "w": 0.43
-        },
-        "shape": null,
-        "material": "アスペン無垢材, 粘着性, ステイン, 透明アクリルラッカー",
-        "provider": "ikea",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T01:32:53Z"
+      "themes": [
+        "simple",
+        "nordic"
+      ]
     },
     {
       "key": "ec:ikea:405.013.21:405.013.21",
@@ -2042,25 +1702,16 @@
         "h": 0.45,
         "w": 0.49
       },
+      "material": "パイン無垢材",
       "price": 3990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/perjohan-stool-with-storage-pine-40501321/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/perjohan-stool-with-storage-pine__1018243_pe831131_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.28,
-          "h": 0.45,
-          "w": 0.49
-        },
-        "shape": null,
-        "material": "パイン無垢材",
-        "provider": "ikea",
-        "color_name": "ベージュ",
-        "estimated_axes": [],
-        "official_color": "ベージュ"
-      },
-      "checked_at": "2026-10-09T01:30:49Z"
+      "themes": [
+        "simple",
+        "natural",
+        "nordic"
+      ]
     },
     {
       "key": "ec:ikea:704.838.82:704.838.82",
@@ -2078,25 +1729,14 @@
         "h": 0.8,
         "w": 0.5
       },
+      "material": "パーティクルボード",
       "price": 3999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/baggebo-cabinet-with-door-white-70483882/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/baggebo-cabinet-with-door-white__1016757_pe830615_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.3,
-          "h": 0.8,
-          "w": 0.5
-        },
-        "shape": null,
-        "material": "トップパネル/ 棚板/ 底板:パーティクルボード, ペーパーフォイル, ペーパーフォイルサイドパネル:パーティクルボード, ペーパーフォイル, ペーパーフォイル, プラスチックエッジバックパネル:繊維板, プリント・アクリル塗装仕上げパーティション/ 扉:パーティクルボード, ペーパーフォイル, プラスチックエッジ",
-        "provider": "ikea",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T04:02:56Z"
+      "themes": [
+        "simple"
+      ]
     },
     {
       "key": "ec:ikea:305.943.25:305.943.25",
@@ -2114,27 +1754,15 @@
         "h": 0.4,
         "w": 0.18
       },
+      "material": "スチール、ガラス",
       "price": 4499,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/nymane-table-lamp-white-30594325/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/nymane-table-lamp-white__1377229_pe960816_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.18,
-          "h": null,
-          "w": 0.18
-        },
-        "shape": null,
-        "material": "カバー/ チューブ:スチール, 粉体塗装重り:コンクリートシェード:ガラス, 塗料",
-        "provider": "ikea",
-        "color_name": "ホワイト",
-        "estimated_axes": [
-          "h"
-        ],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-10T08:17:18Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:ikea:605.343.30:605.343.30",
@@ -2152,25 +1780,15 @@
         "h": 0.77,
         "w": 0.44
       },
+      "material": "ビーチ無垢材",
       "price": 5000,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/froesvi-folding-chair-white-60534330/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/froesvi-folding-chair-white__1284073_pe932746_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.51,
-          "h": 0.77,
-          "w": 0.44
-        },
-        "shape": null,
-        "material": "ビーチ無垢材, 粘着性, ステイン, 透明アクリルラッカー",
-        "provider": "ikea",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T01:29:27Z"
+      "themes": [
+        "simple",
+        "nordic"
+      ]
     },
     {
       "key": "ec:ikea:706.351.78:706.351.78",
@@ -2188,25 +1806,16 @@
         "h": 0.9,
         "w": 0.42
       },
+      "material": "パイン無垢材",
       "price": 5000,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/pinntorp-chair-white-stained-pine-70635178/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/pinntorp-chair-white-stained-pine__1508780_pe1009581_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.49,
-          "h": 0.9,
-          "w": 0.42
-        },
-        "shape": null,
-        "material": "パイン無垢材, ステイン, クリアラッカー",
-        "provider": "ikea",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T01:29:26Z"
+      "themes": [
+        "simple",
+        "natural",
+        "nordic"
+      ]
     },
     {
       "key": "ec:ikea:594.454.67:594.454.67",
@@ -2224,25 +1833,15 @@
         "h": 0.9,
         "w": 0.67
       },
+      "material": "ポリプロピレン、スチール",
       "price": 5990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/loberget-malskaer-swivel-chair-white-s59445467/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/loberget-malskaer-swivel-chair-white__1078458_pe857202_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.67,
-          "h": 0.9,
-          "w": 0.67
-        },
-        "shape": null,
-        "material": "シートシェルシート:ポリプロピレン .ナット:スチール, 亜鉛メッキ",
-        "provider": "ikea",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T01:32:52Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:ikea:404.049.90:404.049.90",
@@ -2260,27 +1859,16 @@
         "h": 0.28,
         "w": 0.26
       },
+      "material": "ガラス",
       "price": 5999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/dejsa-table-lamp-beige-opal-white-glass-40404990/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/dejsa-table-lamp-beige-opal-white-glass__0967540_pe810183_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": null,
-          "h": 0.28,
-          "w": 0.26
-        },
-        "shape": "round",
-        "material": "ベース/ シェード:ガラス装飾:スチール, ニッケルメッキ",
-        "provider": "ikea",
-        "color_name": "ベージュ, ホワイト",
-        "estimated_axes": [
-          "d"
-        ],
-        "official_color": "ベージュ, ホワイト"
-      },
-      "checked_at": "2026-10-09T04:02:58Z"
+      "themes": [
+        "nordic",
+        "korean",
+        "cute"
+      ]
     },
     {
       "key": "ec:ikea:703.509.38:703.509.38",
@@ -2298,25 +1886,15 @@
         "h": 0.8,
         "w": 0.46
       },
+      "material": "スチール、ポリプロピレン",
       "price": 6000,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/teodores-chair-white-70350938/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/teodores-chair-white__0727344_pe735616_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.54,
-          "h": 0.8,
-          "w": 0.46
-        },
-        "shape": null,
-        "material": "脚フレーム/ クロスレール/ ラウンド バー:スチール, エポキシ/ポリエステル粉体塗装シート/ 背もたれ:ポリプロピレン .",
-        "provider": "ikea",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T01:33:07Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:yahoo_shopping:nitori-net/2113100020583:nitori-net/2113100020583",
@@ -2334,25 +1912,15 @@
         "h": 0.02,
         "w": 2.0
       },
+      "material": "ポリエステル",
       "price": 6490,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
       "url": "https://store.shopping.yahoo.co.jp/nitori-net/2113100020583.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_2113100020583",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 2.4,
-          "h": 0.02,
-          "w": 2.0
-        },
-        "shape": "rectangular",
-        "material": "ポリエステル",
-        "provider": "yahoo_shopping",
-        "color_name": "アイボリー",
-        "estimated_axes": [],
-        "official_color": "アイボリー"
-      },
-      "checked_at": "2026-10-09T04:02:59Z"
+      "themes": [
+        "simple",
+        "natural"
+      ]
     },
     {
       "key": "ec:yahoo_shopping:shop-brain/70635178:shop-brain/70635178",
@@ -2370,25 +1938,16 @@
         "h": 0.9,
         "w": 0.42
       },
+      "material": "パイン無垢材",
       "price": 6880,
       "shop": "SelectShop Brain（Yahoo!ショッピング）",
       "url": "https://store.shopping.yahoo.co.jp/shop-brain/70635178.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/shop-brain_70635178",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.49,
-          "h": 0.9,
-          "w": 0.42
-        },
-        "shape": null,
-        "material": "パイン無垢材, ステイン, クリアラッカー",
-        "provider": "yahoo_shopping",
-        "color_name": "ホワイトステイン/パイン材",
-        "estimated_axes": [],
-        "official_color": "ホワイトステイン/パイン材"
-      },
-      "checked_at": "2026-10-09T01:29:23Z"
+      "themes": [
+        "simple",
+        "natural",
+        "nordic"
+      ]
     },
     {
       "key": "ec:ikea:604.268.06:604.268.06",
@@ -2406,25 +1965,16 @@
         "h": 0.018,
         "w": 0.8
       },
+      "material": "ポリプロピレン",
       "price": 6999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-60426806/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/stoense-rug-low-pile-off-white__0624419_pe691827_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 1.5,
-          "h": 0.018,
-          "w": 0.8
-        },
-        "shape": "rectangular",
-        "material": "表面:ポリプロピレン 100%裏面:合成ゴム100%",
-        "provider": "ikea",
-        "color_name": "ベージュ, ホワイト",
-        "estimated_axes": [],
-        "official_color": "ベージュ, ホワイト"
-      },
-      "checked_at": "2026-10-09T04:02:57Z"
+      "themes": [
+        "simple",
+        "natural",
+        "nordic"
+      ]
     },
     {
       "key": "ec:francfranc:1108010008418:1108010008418",
@@ -2442,25 +1992,14 @@
         "h": 0.41,
         "w": 0.35
       },
+      "material": "ポリエステル（張地）、ステンレス",
       "price": 7800,
       "shop": "Francfranc",
       "url": "https://francfranc.com/products/1108010008418",
       "image_url": "https://francfranc.com/cdn/shop/products/1108010008418_d1_2000x.jpg?v=1612407231",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.35,
-          "h": 0.41,
-          "w": 0.35
-        },
-        "shape": null,
-        "material": "張地：ポリエステル100％、装飾：ステンレス チタンメッキ仕上げ",
-        "provider": "francfranc",
-        "color_name": "ジェム スツール ホワイト",
-        "estimated_axes": [],
-        "official_color": null
-      },
-      "checked_at": "2026-10-09T01:29:25Z"
+      "themes": [
+        "modern"
+      ]
     },
     {
       "key": "ec:ikea:804.486.09:804.486.09",
@@ -2478,25 +2017,15 @@
         "h": 0.67,
         "w": 0.21
       },
+      "material": "スチール、アルミニウム",
       "price": 7999,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/nymane-work-lamp-with-wireless-charging-white-80448609/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/nymane-work-lamp-with-wireless-charging-white__0991755_pe819570_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.21,
-          "h": 0.67,
-          "w": 0.21
-        },
-        "shape": null,
-        "material": "ベースカバー/ アーム:スチール, 粉体塗装重り:EVA樹脂..シェード:アルミニウム, 粉体塗装",
-        "provider": "ikea",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-10T08:17:18Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:yahoo_shopping:nitori-net/5692727:nitori-net/5692727",
@@ -2514,25 +2043,15 @@
         "h": 0.815,
         "w": 0.55
       },
+      "material": "スチール",
       "price": 8990,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
       "url": "https://store.shopping.yahoo.co.jp/nitori-net/5692727.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_5692727",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.55,
-          "h": 0.815,
-          "w": 0.55
-        },
-        "shape": null,
-        "material": "スチール",
-        "provider": "yahoo_shopping",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T01:33:02Z"
+      "themes": [
+        "korean",
+        "cute"
+      ]
     },
     {
       "key": "ec:ikea:206.179.59:206.179.59",
@@ -2550,25 +2069,15 @@
         "h": 0.76,
         "w": 0.45
       },
+      "material": "バーチ無垢材",
       "price": 10000,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/ikea-ps-2026-folding-chair-birch-blue-black-red-20617959/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/ikea-ps-2026-folding-chair-birch-blue-black-red__1481300_pe1000485_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.51,
-          "h": 0.76,
-          "w": 0.45
-        },
-        "shape": null,
-        "material": "背もたれ:バーチ無垢材, ステイン, 着色アクリルクリアラッカーシート:バーチ無垢材, バーチ材合板, 粘着性, バーチ材突き板, アクリル塗装後脚:バーチ無垢材, アクリル塗装前脚:バーチ無垢材, 着色アクリルクリアラッカー",
-        "provider": "ikea",
-        "color_name": "ベージュ, ブルー, レッド, ブラック",
-        "estimated_axes": [],
-        "official_color": "ベージュ, ブルー, レッド, ブラック"
-      },
-      "checked_at": "2026-10-09T01:51:25Z"
+      "themes": [
+        "nordic",
+        "modern"
+      ]
     },
     {
       "key": "ec:yahoo_shopping:nitori-net/2110700057643:nitori-net/2110700057643",
@@ -2586,25 +2095,16 @@
         "h": 1.16,
         "w": 0.34
       },
+      "material": "ガラス",
       "price": 11990,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
       "url": "https://store.shopping.yahoo.co.jp/nitori-net/2110700057643.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_2110700057643",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.3,
-          "h": 1.16,
-          "w": 0.34
-        },
-        "shape": "rectangular",
-        "material": "ガラス",
-        "provider": "yahoo_shopping",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T04:02:47Z"
+      "themes": [
+        "simple",
+        "modern",
+        "oshi"
+      ]
     },
     {
       "key": "ec:ikea:804.501.31:804.501.31",
@@ -2622,25 +2122,16 @@
         "h": 1.55,
         "w": 0.42
       },
+      "material": "スチール、ガラス",
       "price": 14990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/rudsta-glass-door-cabinet-anthracite-80450131/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/rudsta-glass-door-cabinet-anthracite__0938997_pe794381_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.37,
-          "h": 1.55,
-          "w": 0.42
-        },
-        "shape": null,
-        "material": "フレーム/ 上部パネル/ バックパネル/ 固定棚:スチール, エポキシ/ポリエステル粉体塗装ブラケット/ 差し込み式ネジ/ 取っ手:スチールサイドパネル/ 扉:アルミニウム, エポキシ/ポリエステル粉体塗装, 強化ガラスコネクター:スチール、亜鉛メッキ, スチール、亜鉛メッキ保護層:合成ゴム棚板:強化ガラスカバーキャップ:ポリプロピレン .",
-        "provider": "ikea",
-        "color_name": "グレー",
-        "estimated_axes": [],
-        "official_color": "グレー"
-      },
-      "checked_at": "2026-10-09T04:02:59Z"
+      "themes": [
+        "simple",
+        "modern",
+        "oshi"
+      ]
     },
     {
       "key": "ec:yahoo_shopping:nitori-net/6620805:nitori-net/6620805",
@@ -2658,25 +2149,15 @@
         "h": 0.72,
         "w": 0.62
       },
+      "material": "ポリエステル",
       "price": 14990,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
       "url": "https://store.shopping.yahoo.co.jp/nitori-net/6620805.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_6620805",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.63,
-          "h": 0.72,
-          "w": 0.62
-        },
-        "shape": null,
-        "material": "ポリエステル",
-        "provider": "yahoo_shopping",
-        "color_name": "ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト"
-      },
-      "checked_at": "2026-10-09T01:33:04Z"
+      "themes": [
+        "korean",
+        "cute"
+      ]
     },
     {
       "key": "ec:ikea:206.179.64:206.179.64",
@@ -2694,25 +2175,14 @@
         "h": 0.76,
         "w": 0.44
       },
+      "material": "綿・ポリエステル（布地）、無垢材",
       "price": 15000,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/ikea-ps-2026-chair-bright-blue-knaebaeck-bright-blue-20617964/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/ikea-ps-2026-chair-bright-blue-knaebaeck-bright-blue__1481301_pe1000486_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.55,
-          "h": 0.76,
-          "w": 0.44
-        },
-        "shape": null,
-        "material": "布地:綿 76%, ポリエステル 24%..後脚/ 前脚/ レール:無垢材, アクリル塗装シート:バーチ材合板, ポリウレタンフォーム 35kg/立方メートル背もたれ:スチール, ポリウレタンフォーム 35kg/立方メートル裏地/ 裏面:ポリプロピレン 100%耐くすぶり性に優れた裏地:ポリエステル...",
-        "provider": "ikea",
-        "color_name": "ブルー",
-        "estimated_axes": [],
-        "official_color": "ブルー"
-      },
-      "checked_at": "2026-10-09T01:51:28Z"
+      "themes": [
+        "oshi"
+      ]
     },
     {
       "key": "ec:ikea:304.573.14:304.573.14",
@@ -2730,25 +2200,15 @@
         "h": 0.81,
         "w": 0.45
       },
+      "material": "木材・プラスチック複合材",
       "price": 15000,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/odger-chair-anthracite-30457314/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/odger-chair-anthracite__0739669_pe741828_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.51,
-          "h": 0.81,
-          "w": 0.45
-        },
-        "shape": null,
-        "material": "シート/ 脚フレーム:木材・プラスチック複合材（WPC）ハンドル:ポリプロピレン .脚:熱可塑性エラストマー",
-        "provider": "ikea",
-        "color_name": "グレー",
-        "estimated_axes": [],
-        "official_color": "グレー"
-      },
-      "checked_at": "2026-10-09T01:51:25Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:yahoo_shopping:shop-brain/19240788:shop-brain/19240788",
@@ -2766,25 +2226,16 @@
         "h": 1.0,
         "w": 0.68
       },
+      "material": "バーチ材（積層合板）",
       "price": 15800,
       "shop": "SelectShop Brain（Yahoo!ショッピング）",
       "url": "https://store.shopping.yahoo.co.jp/shop-brain/19240788.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/shop-brain_19240788",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.82,
-          "h": 1.0,
-          "w": 0.68
-        },
-        "shape": null,
-        "material": "積層合板, バーチ材突き板, クリアラッカー",
-        "provider": "yahoo_shopping",
-        "color_name": "バーチ材突き板/クニーサ ライトベージュ",
-        "estimated_axes": [],
-        "official_color": "バーチ材突き板/クニーサ ライトベージュ"
-      },
-      "checked_at": "2026-10-09T01:51:31Z"
+      "themes": [
+        "simple",
+        "natural",
+        "nordic"
+      ]
     },
     {
       "key": "ec:ikea:603.496.72:603.496.72",
@@ -2802,25 +2253,15 @@
         "h": 0.82,
         "w": 0.55
       },
+      "material": "ポリカーボネート、スチール",
       "price": 16000,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/tobias-chair-transparent-chrome-plated-60349672/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/tobias-chair-transparent-chrome-plated__0727342_pe735614_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.56,
-          "h": 0.82,
-          "w": 0.55
-        },
-        "shape": null,
-        "material": "脚フレーム:スチール, クロムメッキシート:ポリカーボネート .足:ポリプロピレン .ナット:亜鉛, クロムメッキバンパー/ ワッシャー:合成ゴム",
-        "provider": "ikea",
-        "color_name": "グレー, ホワイト",
-        "estimated_axes": [],
-        "official_color": "グレー, ホワイト"
-      },
-      "checked_at": "2026-10-09T01:30:53Z"
+      "themes": [
+        "simple",
+        "modern"
+      ]
     },
     {
       "key": "ec:ikea:105.294.68:105.294.68",
@@ -2838,25 +2279,16 @@
         "h": 0.75,
         "w": 0.75
       },
+      "material": "パイン無垢材",
       "price": 17990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/pinntorp-table-light-brown-stained-white-stained-pine-10529468/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/pinntorp-table-light-brown-stained-white-stained-pine__1118109_pe872932_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 1.25,
-          "h": 0.75,
-          "w": 0.75
-        },
-        "shape": null,
-        "material": "テーブルトップ:パイン無垢材, 粘着性, ステイン, 透明アクリルラッカー, クリアラッカー下部フレーム:パイン無垢材, 粘着性, ステイン, 透明アクリルラッカー",
-        "provider": "ikea",
-        "color_name": "ブラウン, ホワイト",
-        "estimated_axes": [],
-        "official_color": "ブラウン, ホワイト"
-      },
-      "checked_at": "2026-10-09T01:33:03Z"
+      "themes": [
+        "simple",
+        "natural",
+        "nordic"
+      ]
     },
     {
       "key": "ec:ikea:004.255.36:004.255.36",
@@ -2874,25 +2306,16 @@
         "h": 0.018,
         "w": 1.7
       },
+      "material": "ポリプロピレン",
       "price": 24990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-00425536/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/stoense-rug-low-pile-off-white__0624386_pe691799_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 2.4,
-          "h": 0.018,
-          "w": 1.7
-        },
-        "shape": "rectangular",
-        "material": "表面:ポリプロピレン 100%裏面:合成ゴム100%",
-        "provider": "ikea",
-        "color_name": "ベージュ, ホワイト",
-        "estimated_axes": [],
-        "official_color": "ベージュ, ホワイト"
-      },
-      "checked_at": "2026-10-09T04:03:01Z"
+      "themes": [
+        "simple",
+        "natural",
+        "nordic"
+      ]
     },
     {
       "key": "ec:ikea:304.501.38:304.501.38",
@@ -2910,25 +2333,16 @@
         "h": 1.2,
         "w": 0.8
       },
+      "material": "スチール、ガラス",
       "price": 24990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/rudsta-glass-door-cabinet-anthracite-30450138/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/rudsta-glass-door-cabinet-anthracite__0939002_pe794384_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.37,
-          "h": 1.2,
-          "w": 0.8
-        },
-        "shape": null,
-        "material": "フレーム/ 上部パネル/ バックパネル/ 固定棚:スチール, エポキシ/ポリエステル粉体塗装ブラケット/ 差し込み式ネジ/ 取っ手:スチールサイドパネル/ 扉:アルミニウム, エポキシ/ポリエステル粉体塗装, 強化ガラスコネクター:スチール、亜鉛メッキ, スチール、亜鉛メッキ保護層:合成ゴム棚板:強化ガラスカバーキャップ:ポリプロピレン .",
-        "provider": "ikea",
-        "color_name": "グレー",
-        "estimated_axes": [],
-        "official_color": "グレー"
-      },
-      "checked_at": "2026-10-09T04:02:59Z"
+      "themes": [
+        "simple",
+        "modern",
+        "oshi"
+      ]
     },
     {
       "key": "ec:ikea:303.598.27:303.598.27",
@@ -2946,25 +2360,14 @@
         "h": 1.01,
         "w": 0.82
       },
+      "material": "ポリエステル（布地）、無垢材",
       "price": 29990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/strandmon-wing-chair-nordvalla-dark-grey-30359827/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/strandmon-wing-chair-nordvalla-dark-grey__0325432_pe517964_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.96,
-          "h": 1.01,
-          "w": 0.82
-        },
-        "shape": null,
-        "material": "布地:ポリエステル 100%... .フレーム:合板, パーティクルボード, 無垢材シートクッション:ポリウレタンフォーム 35kg/立方メートル脚:無垢材, 着色クリアラッカー",
-        "provider": "ikea",
-        "color_name": "グレー",
-        "estimated_axes": [],
-        "official_color": "グレー"
-      },
-      "checked_at": "2026-10-09T01:30:44Z"
+      "themes": [
+        "nordic"
+      ]
     },
     {
       "key": "ec:ikea:995.521.20:995.521.20",
@@ -2982,29 +2385,15 @@
         "h": 0.85,
         "w": 0.5
       },
+      "material": "布地、合板",
       "price": 34990,
       "shop": "IKEA",
       "url": "https://www.ikea.com/jp/ja/p/ektorp-armchair-kilanda-light-beige-s99552120/",
       "image_url": "https://www.ikea.com/jp/ja/images/products/ektorp-armchair-kilanda-light-beige__1242736_pe920364_s5.jpg",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": null,
-          "h": null,
-          "w": null
-        },
-        "shape": null,
-        "material": "パーソナルチェア フレーム背もたれ及び座面フレーム:合板, ポリウレタンフォーム 20kg/立方メートル, 単板積層材, パーティクルボード, 繊維板アームレスト:ポリウレタンフォーム 20kg/立方メートル, ポリウレタンフォーム 25kg/立方メートル, 単板積層材, パーティクルボード, 繊維板シートクッション:ポリウレタン 30%/ ポリエステル 70%, 高反発ポリウレタンフォーム（コールドフォーム） 35kg/立方メートル, ポリエステル ..背もたれクッション:ポリエステル ..裏地:ポリプロピレン 100%固定具:ポリプロピレン .",
-        "provider": "ikea",
-        "color_name": "キランダ ライトベージュ",
-        "estimated_axes": [
-          "w",
-          "h",
-          "d"
-        ],
-        "official_color": "キランダ ライトベージュ"
-      },
-      "checked_at": "2026-10-09T01:51:32Z"
+      "themes": [
+        "natural",
+        "nordic"
+      ]
     },
     {
       "key": "ec:yahoo_shopping:nitori-net/6620996:nitori-net/6620996",
@@ -3022,25 +2411,12 @@
         "h": 1.25,
         "w": 0.69
       },
+      "material": "合成皮革",
       "price": 34990,
       "shop": "ニトリ Yahoo!店（Yahoo!ショッピング）",
       "url": "https://store.shopping.yahoo.co.jp/nitori-net/6620996.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_6620996",
-      "themes": [],
-      "metadata": {
-        "size": {
-          "d": 0.66,
-          "h": 1.25,
-          "w": 0.69
-        },
-        "shape": null,
-        "material": "合成皮革",
-        "provider": "yahoo_shopping",
-        "color_name": "ホワイト/ホワイト",
-        "estimated_axes": [],
-        "official_color": "ホワイト/ホワイト"
-      },
-      "checked_at": "2026-10-09T01:29:35Z"
+      "themes": []
     }
   ]
 }

@@ -1,7 +1,7 @@
 class CoordinationSerializer
   include Alba::Resource
 
-  attributes :id, :room_id, :status, :prompt, :budget, :room_palette_id, :kept_object_ids,
+  attributes :id, :room_id, :status, :prompt, :room_palette_id, :kept_object_ids,
              :title, :comment, :items, :total_price, :planned_by, :base_coordination_id, :error_message, :furniture_operations, :additions
 
   attribute(:character_theme_id) { |coordination| coordination.character_theme_id }

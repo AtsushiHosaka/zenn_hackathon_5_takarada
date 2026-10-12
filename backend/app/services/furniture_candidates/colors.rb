@@ -9,7 +9,7 @@ module FurnitureCandidates
       "beige" => /ベージュ|ナチュラル|オーク|beige|natural|oak/i,
       "green" => /グリーン|緑|green/i,
       "blue" => /ブルー|青|blue/i,
-      "purple" => /パープル|紫|ラベンダー|purple|lavender/i,
+      "purple" => /パープル|紫|ラベンダー|ライラック|purple|lavender|lilac/i,
       "pink" => /ピンク|pink/i,
       "red" => /レッド|赤|red/i,
       "orange" => /オレンジ|orange/i,

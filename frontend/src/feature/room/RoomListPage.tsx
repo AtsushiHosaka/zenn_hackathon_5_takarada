@@ -77,11 +77,7 @@ function RoomHero({ rooms, snapshot }: { rooms: ReadyRoom[]; snapshot: (design: 
         <span className="room-hero-caption"><strong>{room.title}</strong><span>{roomDimensions(room.design)}</span></span>
       </Link>)}
     </div>
-    {rooms.length > 1 && <>
-      <button className="room-list-arrow is-previous motion-control" type="button" aria-label="前の部屋" aria-controls="room-hero-track" onClick={() => show(current - 1)}><span aria-hidden="true">‹</span></button>
-      <button className="room-list-arrow is-next motion-control" type="button" aria-label="次の部屋" aria-controls="room-hero-track" onClick={() => show(current + 1)}><span aria-hidden="true">›</span></button>
-      <p className="room-list-position" aria-live="polite" aria-atomic="true">{current + 1} / {rooms.length}<span className="room-list-sr-only"> · {rooms[current].title}</span></p>
-    </>}
+    {rooms.length > 1 && <p className="room-list-position" aria-live="polite" aria-atomic="true">{current + 1} / {rooms.length}<span className="room-list-sr-only"> · {rooms[current].title}</span></p>}
   </section>;
 }
 

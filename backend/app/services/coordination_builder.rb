@@ -1,5 +1,5 @@
-# コーデを組み立てる: 商品候補を選ぶ (CoordinationPlanner) → 枠に配置する (SlotLayout) → 予算内に収める。
-# 置き場所が無い商品・予算を超える商品は採用しないので、購入リンク一覧と 3D の表示は常に一致する。
+# コーデを組み立てる: 商品候補を選ぶ (CoordinationPlanner) → 枠に配置する (SlotLayout)。
+# 置き場所が無い商品は採用しないので、購入リンク一覧と 3D の表示は常に一致する。
 class CoordinationBuilder
   # kept_object_ids: 実際に活かした家具 (要望文で「いらない」と書かれた家具を除いたもの)
   Result = Data.define(:title, :comment, :after_scene, :items, :total_price, :planned_by, :analysis, :kept_object_ids, :furniture_operations)
@@ -25,9 +25,12 @@ class CoordinationBuilder
   def call
     kept = kept_objects
     client = FurnitureCandidates.client(selected: selected_product_items)
-    candidate_limit = GeminiClient.configured?(user_id: @coordination.room.user_id) ? CoordinationPlanner::Gemini::CANDIDATES_PER_GROUP : 3
-    floor_candidates = FurnitureOperationPlanner.call(@coordination, @scene, client:, candidate_limit:)
-    plan = CoordinationPlanner.call(prompt: @coordination.generation_prompt, budget: @coordination.budget, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id, client:, additional_candidates: floor_candidates, previous:,
+    gemini = GeminiClient.configured?(user_id: @coordination.room.user_id)
+    candidate_limit = gemini ? CoordinationPlanner::Gemini::CANDIDATES_PER_GROUP : 3
+    # 要望文から読み取った色・雰囲気・形。合う商品を先に候補へ入れる (モックは並び順のまま)
+    preference = FurnitureQuery.call(@coordination.generation_prompt, user_id: @coordination.room.user_id) if gemini
+    floor_candidates = FurnitureOperationPlanner.call(@coordination, @scene, client:, candidate_limit:, preference:)
+    plan = CoordinationPlanner.call(prompt: @coordination.generation_prompt, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id, client:, additional_candidates: floor_candidates, previous:, preference:,
                                     slots: SlotLayout.placeable_slots(@scene["room"], kept))
     removed, kept = kept.partition { |object| plan.removed_object_ids.include?(object["id"]) }
     # 従来の空配列は「全部活かす」。明示操作がある場合は、全置換・全除外も許可する。
@@ -37,17 +40,16 @@ class CoordinationBuilder
     coherent = plan.planned_by == "gemini"
     candidates = coherent ? plan.candidates : floor_candidates + plan.candidates.reject { |item| item.slot == "floor" }
     by_group = candidates.group_by { |item| item.metadata["group_id"] || item.slot }
-    chosen = coherent ? choose_planned_bundle(plan, by_group) : choose_within_budget(by_group)
+    chosen = coherent ? choose_planned_bundle(plan, by_group) : by_group.transform_values(&:first)
     floor_choices = chosen.select { |_, item| item.slot == "floor" }
-    decor_budget = chosen.values.reject { |item| item.slot == "floor" }.sum(&:price)
-    active, floor_placed = place_floor_choices(floor_choices, by_group, kept, coherent:, reserved_budget: decor_budget, removed_object_ids: removed.pluck("id"))
+    active, floor_placed = place_floor_choices(floor_choices, by_group, kept, removed_object_ids: removed.pluck("id"))
     anchors = active + floor_placed.map { |entry| entry[:placement].object }
     by_slot = by_group.reject { |_, items| items.first.slot == "floor" }
     chosen = chosen.reject { |_, item| item.slot == "floor" }
     placed = []
     loop do
       reserved_ids = chosen.values.map { |item| SlotLayout.object_id_for(item) }
-      placed = place_choices(chosen, by_slot, anchors, coherent:, reserved_budget: floor_placed.sum { |entry| entry[:item].price })
+      placed = place_choices(chosen, by_slot, anchors)
       newly_kept_edit = placed.any? do |entry|
         id = SlotLayout.object_id_for(entry[:item])
         @coordination.edited_objects.any? { |edit| edit["id"] == id } && !reserved_ids.include?(id)
@@ -57,7 +59,6 @@ class CoordinationBuilder
       chosen = placed.to_h { |entry| [ entry[:slot], entry[:item] ] }
     end
     placed = floor_placed + placed
-    raise ArgumentError, "商品合計が予算を超えています" if placed.sum { |entry| entry[:item].price } > @coordination.budget_limit
 
     placed.each.with_index(1) do |entry, marker|
       entry[:placement].object["marker"] = marker
@@ -67,8 +68,7 @@ class CoordinationBuilder
     items = placed.map.with_index(1) { |entry, marker| item_json(entry[:item], entry[:placement].note, marker) }
     appearance = FurnitureProductAppearance.call(scene:, items:)
     failures = operation_failures(floor_placed)
-    failures << "商品価格の合計を予算内に収めるため、提案の一部を調整しました。" if @budget_adjusted_groups&.any?
-    failures << "条件と配置に合う家具が登録されていませんでした。希望や予算を変更して再提案してください。" if placed.empty?
+    failures << "条件と配置に合う家具が登録されていませんでした。希望を変更して再提案してください。" if placed.empty?
 
     Result.new(
       title: result_title(plan),
@@ -78,7 +78,7 @@ class CoordinationBuilder
       total_price: placed.sum { |p| p[:item].price },
       planned_by: plan.planned_by,
       # 精度の確認用: Gemini の回答と、実際に採用した商品
-      analysis: (@coordination.analysis || {}).deep_merge(plan.analysis).deep_merge("placed_item_ids" => placed.map { |p| p[:item].id }, "base_coordination_id" => @coordination.base_coordination_id, "budget_adjusted_groups" => @budget_adjusted_groups || [], "meta" => { "product_source" => "db" }, "operation_failures" => failures),
+      analysis: (@coordination.analysis || {}).deep_merge(plan.analysis).deep_merge("placed_item_ids" => placed.map { |p| p[:item].id }, "base_coordination_id" => @coordination.base_coordination_id, "preference" => preference&.to_h&.stringify_keys, "meta" => { "product_source" => "db" }, "operation_failures" => failures),
       kept_object_ids: active.pluck("id"),
       furniture_operations: result_operations(active, removed)
     )
@@ -110,22 +110,17 @@ class CoordinationBuilder
     end
   end
 
-  def place_floor_choices(chosen, by_group, kept, coherent: false, reserved_budget: 0, removed_object_ids: [])
+  def place_floor_choices(chosen, by_group, kept, removed_object_ids: [])
     active = @coordination.furniture_operations.empty? ? kept.dup : @scene.fetch("objects").reject { |object| removed_object_ids.include?(object["id"]) }
     placed = []
-    remaining = @coordination.budget_limit - reserved_budget
-    entries = chosen.to_a
-    entries.each_with_index do |(group, item), index|
+    chosen.each do |group, item|
       original_id = item.metadata["replaces_object_id"]
       occupants = active.reject { |object| object["id"] == original_id } + placed.map { |entry| entry[:placement].object }
-      reserved = entries.drop(index + 1).sum { |_, candidate| candidate.price }
-      options = placement_options(item, by_group[group], coherent ? remaining - reserved : item.price)
-      options.each do |candidate|
+      placement_options(item, by_group[group]).each do |candidate|
         layout = SlotLayout.new(@scene, occupants, edited_objects: layout_edits)
         placement = layout.place(candidate) or next
         placement.object["replaces_object_id"] = original_id
         placed << { slot: group, item: candidate, placement: }
-        remaining -= candidate.price
         active.reject! { |object| object["id"] == original_id } if original_id
         break
       end
@@ -148,82 +143,41 @@ class CoordinationBuilder
   end
 
   def unavailable_reason(category)
-    FurnitureDetail.exists?(category:) ? "予算内で配置できる商品が見つからなかった" : "この種類の家具がまだ登録されていない"
+    FurnitureDetail.exists?(category:) ? "配置できる商品が見つからなかった" : "この種類の家具がまだ登録されていない"
   end
 
-  def place_choices(chosen, by_slot, kept, coherent: false, reserved_budget: 0)
+  def place_choices(chosen, by_slot, kept)
     candidates = by_slot.values.flatten.index_by { |item| SlotLayout.object_id_for(item) }
     edits = layout_edits.filter_map do |edit|
       item = candidates[edit["id"]]
       edit.merge("slot" => item.slot) if item
     end
     layout = SlotLayout.new(@scene, kept, edited_objects: edits, reserved_object_ids: chosen.values.map { |item| SlotLayout.object_id_for(item) })
-    remaining = @coordination.budget_limit - reserved_budget
-    entries = chosen.to_a
-    entries.each_with_index.filter_map do |(slot, item), index|
-      # Geminiが承認した同グループだけで代替し、後続商品の予算を予約する。
-      reserved = entries.drop(index + 1).sum { |_, candidate| candidate.price }
-      options = placement_options(item, by_slot[slot], coherent ? remaining - reserved : item.price)
-      options.each do |candidate|
+    chosen.filter_map do |slot, item|
+      # 置けなければ、同じグループの候補 (Gemini では承認済みの代替) を順に試す
+      placement_options(item, by_slot[slot]).each do |candidate|
         placement = layout.place(candidate) or next
-        remaining -= candidate.price
         break({ slot:, item: candidate, placement: })
       end.then { |entry| entry.is_a?(Hash) ? entry : nil }
     end
   end
 
-  def placement_options(item, candidates, max_price)
-    [ item, *candidates.reject { |candidate| candidate == item } ].select { |candidate| candidate.price <= max_price }
+  def placement_options(item, candidates)
+    [ item, *candidates.reject { |candidate| candidate == item } ]
   end
 
-  # Geminiの総合提案を尊重する。未採用グループを最安商品で勝手に埋めない。
-  # モデルが予算を誤った場合も、指定床家具を優先しRubyで上限を守る。
+  # Geminiの総合提案を尊重する。未採用グループを勝手に埋めない。指定された床家具を先に置く
   def choose_planned_bundle(plan, by_group)
     selections = plan.analysis["selection"]
     return {} unless selections.is_a?(Array)
 
-    selections = selections.select { |selection| selection.is_a?(Hash) }
+    selections.select { |selection| selection.is_a?(Hash) }
       .sort_by { |selection| Array(by_group[selection["group_id"]]).first&.slot == "floor" ? 0 : 1 }
-    remaining = @coordination.budget_limit
-    @budget_adjusted_groups = []
-    selections.each_with_object({}) do |selection, chosen|
-      group = selection["group_id"]
-      next if chosen.key?(group)
-
-      item = Array(by_group[group]).find { |candidate| candidate.id == selection["item_id"] }
-      next unless item
-
-      if item.price > remaining
-        @budget_adjusted_groups << group
-        item = by_group.fetch(group).find { |candidate| candidate.price <= remaining }
-        next unless item
+      .each_with_object({}) do |selection, chosen|
+        group = selection["group_id"]
+        item = Array(by_group[group]).find { |candidate| candidate.id == selection["item_id"] }
+        chosen[group] ||= item if item
       end
-      chosen[group] = item
-      remaining -= item.price
-    end
-  end
-
-  # 枠ごとに 1 商品を予算内で選ぶ。
-  # まず優先度の高い枠から各枠の最安値を入れてできるだけ多くの枠を埋め、
-  # 余った予算で優先度の高い枠から順に、よりおすすめの商品へ格上げする
-  def choose_within_budget(by_slot)
-    budget = @coordination.budget_limit
-    chosen = {}
-    total = 0
-    by_slot.each do |slot, items|
-      cheapest = items.min_by(&:price)
-      next if total + cheapest.price > budget
-
-      chosen[slot] = cheapest
-      total += cheapest.price
-    end
-
-    chosen.each_key do |slot|
-      better = by_slot[slot].find { |item| total - chosen[slot].price + item.price <= budget }
-      total += better.price - chosen[slot].price
-      chosen[slot] = better
-    end
-    chosen
   end
 
   def selected_product_items
@@ -293,7 +247,7 @@ class CoordinationBuilder
   end
 
   # コンセプト (Gemini) + 実際に置いた商品 + 活かした家具 + 断り書き (Gemini)。
-  # 商品の部分は置いた結果から組み立てるので、予算や置き場所で外れた商品には触れない
+  # 商品の部分は置いた結果から組み立てるので、置き場所で外れた商品には触れない
   def comment(plan, placed, kept, removed)
     added = placed.first(3).map { |p| "#{p[:item].name} (#{p[:placement].note})" }.join("、")
     kept_labels = kept.map { |o| o["label"] }.join("と")

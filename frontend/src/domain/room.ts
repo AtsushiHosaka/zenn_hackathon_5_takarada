@@ -149,7 +149,6 @@ export type RoomDesign = {
   before?: RoomSnapshot;
   backendRoomId?: string;
   prompt?: string;
-  budget?: number;
   keptObjectIds?: string[];
   furnitureOperations?: FurnitureOperation[];
   furnitureAdditions?: FurnitureAddition[];
@@ -179,7 +178,6 @@ export function isRoomDesign(value: unknown): value is RoomDesign {
   if (value.analysisInput !== undefined && (!isRecord(value.analysisInput) || !isTatami(value.analysisInput.tatami) || !isRoomShape(value.analysisInput.shape))) return false;
   if (value.backendRoomId !== undefined && (typeof value.backendRoomId !== "string" || !/^[1-9]\d*$/.test(value.backendRoomId))) return false;
   if (value.prompt !== undefined && (!nonemptyString(value.prompt) || value.prompt.length > 500)) return false;
-  if (value.budget !== undefined && (typeof value.budget !== "number" || !Number.isSafeInteger(value.budget) || value.budget <= 0)) return false;
   if (value.before !== undefined && !isRoomSnapshot(value.before)) return false;
   if (value.editedItems !== undefined && (!Array.isArray(value.editedItems) || !value.editedItems.every(isRoomItem) || new Set(value.editedItems.map(item => item.id)).size !== value.editedItems.length)) return false;
   if (value.generatedBy !== undefined && value.generatedBy !== "gemini" && value.generatedBy !== "mock") return false;

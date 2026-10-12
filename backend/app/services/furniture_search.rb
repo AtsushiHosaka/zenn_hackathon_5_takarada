@@ -22,20 +22,29 @@ class FurnitureSearch
     interpretation = category.blank? ? CharacterQuery.call(query, user_id:) : CharacterQuery::EMPTY
     return goods_search(color:, interpretation:) if interpretation.goods_search?
 
+    # 検索語から読み取った形・色・雰囲気 (FurnitureQuery)。画面で選んだ種類と色があればそちらを使う
+    parsed = FurnitureQuery.call(query, user_id:)
     categories = requested_categories(query, category)
-    scope = FurnitureDetail.available.joins(:furniture).merge(Furniture.available).includes(furniture: { characters: :franchise }).order(:position, :id)
+    categories = parsed.categories if categories.empty?
+    color = color.presence || parsed.color
+    scope = FurnitureDetail.available.joins(:furniture).merge(Furniture.available).includes(furniture: { characters: :franchise }).preload(furniture: :model).order(:position, :id)
     details = (categories.any? ? scope.where(category: categories) : scope.where(slot: "floor")).to_a
+    # 読み取った形の商品は、種類が違っても候補に入れる (「飾れる棚」でコレクションケースの形)
+    details |= scope.select { |detail| parsed.shapes.include?(detail.furniture.model&.shape) } if parsed.shapes.any?
     tokens = query.unicode_normalize(:nfkc).downcase.split(/[\s、,]+/).reject(&:blank?)
-    scored = details.map { |detail| [ detail, tokens.count { |token| detail.name.unicode_normalize(:nfkc).downcase.include?(token) } ] }
-    # No name contains the words (e.g. "白い椅子"): the category alone narrows the results.
+    scored = details.map do |detail|
+      name = detail.name.unicode_normalize(:nfkc).downcase
+      [ detail, tokens.count { |token| name.include?(token) } + (parsed.shapes.include?(detail.furniture.model&.shape) ? 2 : 0) + (detail.themes & parsed.themes).size ]
+    end
+    # 名前・形・雰囲気のどれも当たらなければ (例: "白い椅子")、種類と色だけで絞る
     scored = scored.select { |_, score| score.positive? } if scored.any? { |_, score| score.positive? }
     matches = scored.sort_by.with_index { |(_, score), index| [ -score, index ] }.map(&:first)
-    Result.new(products: products(matches, details, color), color: color.presence, interpretation:, models: [])
+    Result.new(products: products(matches, details, color), color:, interpretation:, models: [])
   end
 
   # 家具ごとに 1 件。色で絞り、同じ家具の detail を variants に入れる
   def self.products(matches, details, color)
-    matches = matches.select { |detail| FurnitureCandidates::Colors.matches?(detail.metadata["official_color"].presence || detail.color_name.presence || detail.name, color) }
+    matches = matches.select { |detail| FurnitureCandidates::Colors.matches?("#{detail.color_name} #{detail.name}", color) }
     siblings = details.group_by { |detail| [ detail.furniture_id, detail.category ] }
     matches.uniq { |detail| [ detail.furniture_id, detail.category ] }.first(MAX_RESULTS)
       .map { |detail| Product.new(detail:, variants: siblings.fetch([ detail.furniture_id, detail.category ])) }
