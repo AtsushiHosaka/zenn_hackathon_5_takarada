@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router';
 import { useRepositories } from '../../core/repositories';
 import { useSession } from '../../core/session';
-import { loadConnection } from '../../core/connection';
 import { isManualFurniture, isTemplateFurniture, type FurnitureAddition, type FurnitureOperation, type RoomDesign, type RoomItem, type RoomShape, type Style } from '../../domain/room';
 import type { RoomGenerationPhase } from '../../domain/roomRepository';
 import AccountMenu from './AccountMenu';
@@ -128,14 +127,14 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const [style,setStyle]=useState<Style>(isNew?'oshi':design.style);
   const [preset,setPreset]=useState<number|null>(null);
   const [stepIndex,setStepIndex]=useState(0);
-  const wantsPalette=canCoordinate||loadConnection()==='dummy';
+  const wantsPalette=canCoordinate;
   // 解析した部屋にコーディネートを頼める接続先では、第2部を部屋の3Dモデルができた後の画面で聞く。
   const asksRequestLater=analysisMode&&canCoordinate;
   const inputSteps: InputStep[]=capability.data?[...(analysisMode||acceptsPhotos?['room' as const]:[]),...(wantsPalette&&!asksRequestLater?['request' as const]:[])]:[];
   const progressSteps: InputStep[]=asksRequestLater?['room','request']:inputSteps;
   const inputStep=inputSteps[stepIndex];
   const lastInputStep=stepIndex===inputSteps.length-1;
-  const [photoEntries,setPhotoEntries]=useState<PhotoEntry[]>(()=>{const files=inputState?.photos?.filter(file=>file instanceof File)??[];return files.length?files.map(file=>({id:crypto.randomUUID(),file,removing:false})):loadConnection()==='dummy'?[0,1,2].map(sample=>({id:`sample-${sample}`,sample,removing:false})):[];});
+  const [photoEntries,setPhotoEntries]=useState<PhotoEntry[]>(()=>{const files=inputState?.photos?.filter(file=>file instanceof File)??[];return files.length?files.map(file=>({id:crypto.randomUUID(),file,removing:false})):[];});
   const photos=photoEntries.filter(entry=>!entry.removing&&entry.file).map(entry=>entry.file!);
   const samplePhotos=photoEntries.filter(entry=>!entry.removing&&entry.sample!==undefined).map(entry=>entry.sample!);
   const [photoDrop,setPhotoDrop]=useState(false);
@@ -197,7 +196,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
       // 追加の指示のときは前回のコーデを渡し、指示に関係ない商品を残してもらう
       const baseCoordinationId=!createNew&&(followup||design.editedItems?.some(item=>item.furnitureDetailId&&!item.existing))&&design.source==='api'&&design.kind==='coordination'?design.id.replace(/^api-coordination-/,''):undefined;
       const roomId=!createNew&&!isNew&&!id.startsWith('sample-')
-        ? design.backendRoomId??(loadConnection()==='dummy'&&design.id.startsWith('dummy-room-')?design.id:undefined)
+        ? design.backendRoomId
         : undefined;
       const useCurrentFurniture=selectsFurniture&&!createNew;
       const input={characterThemeId,roomPaletteId:suggestedRoomPaletteId(request,roomPaletteId)??roomPaletteId,onProgress:(phase:RoomGenerationPhase)=>{if(!controller.signal.aborted)setGenerationPhase(phase);},baseCoordinationId,photos:createNew?[]:photos,prompt:request,style:targetStyle??style,tatami,shape,roomId,keptObjectIds:useCurrentFurniture?existingFurniture.filter(item=>(furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep')==='keep').map(item=>item.id):undefined,furnitureOperations:useCurrentFurniture?existingFurniture.map(item=>({objectId:item.id,action:furnitureOperations.find(operation=>operation.objectId===item.id)?.action??'keep'})):undefined,furnitureAdditions:useCurrentFurniture?furnitureAdditions:undefined,editedItems:useCurrentFurniture?[...new Map([...existingFurniture,...(design.editedItems??[]).filter(item=>!item.existing&&design.items.some(current=>current.id===item.id))].map(item=>{const original=existingFurniture.find(value=>value.id===item.id);return [item.id,original&&isManualFurniture(original)&&!item.existing?{...original,position:item.position,size:item.size,rotation:item.rotation,color:item.color,replacementFurnitureDetailId:Number(item.furnitureDetailId)}:item] as const;})).values()]:undefined};
@@ -257,7 +256,6 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
     event.preventDefault();if(!message.trim()||!requireOwner())return;
     if(!canCoordinate){setNotice('コーディネートは利用できません。');return;}
     if(!capability.data?.generation){setNotice('コーディネートは利用できません。');return;}
-    if(loadConnection()==='dummy'&&!/落ち着いた紫|グリーン/.test(message)){setNotice('この変更はサンプルでは利用できません。');return;}
     generation.mutate({request:message.trim(),targetStyle:/グリーン/.test(message)?'botanical':style,followup:true,createNew:!canModify});
   }
   function coordinate(event:FormEvent) {
@@ -346,7 +344,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
     <header ref={header} className={`rc-studio-header${isNew?' motion-enter':''}`}><Link className="rc-back" to={isTemplate?'/room-templates':'/rooms'} aria-label={isTemplate?'テンプレート一覧に戻る':'ルーム一覧に戻る'} title={isTemplate?'テンプレート一覧':'ルーム一覧'}><ReferenceSvg page={3} index={0}/></Link><span className="rc-header-divider"/><div className={`rc-title${isNew?' is-new':''}`}>{isTemplate&&<span className="rc-template-badge">テンプレート</span>}<h1>{isNew?'新しいルーム':design.title}</h1>{!isNew&&<button type="button" aria-label="ルーム名を変更" onClick={()=>{setTitle(design.title);setRename(true);}}><ReferenceSvg page={5} index={1}/></button>}</div><nav className="rc-template-actions" aria-label="テンプレート"><Link className="rc-secondary" to="/room-templates">テンプレート一覧</Link></nav><AccountMenu onEditLayout={!isNew&&id!=='sample-game'?()=>{setEditing(true);setFocusPanel(true);setPanel(true);setBefore(false);}:undefined}/></header>
     <input ref={upload} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden aria-describedby="room-photo-requirements" onChange={event=>{addPhotos(Array.from(event.target.files??[]));event.target.value='';}}/>
     <div className={`rc-workspace${pending||id==='sample-game'?' is-generating':''}`}>
-      {pending||id==='sample-game'?<RoomGenerating design={isNew||id==='sample-game'?undefined:design} phase={generationPhase} prompt={generation.variables?.analyzeOnly?analysisPrompt:generation.variables?.request??(analysisMode?analysisPrompt:prompt)} photos={acceptsPhotos?photos:[]} sample={loadConnection()==='dummy'} dimensions={analysisMode} coordination={canCoordinate&&!generation.variables?.analyzeOnly} onCancel={()=>{if(pending){abort.current?.abort();generation.reset();setNotice('生成を停止しました。');}else navigate('/rooms');}}/>:<>
+      {pending||id==='sample-game'?<RoomGenerating design={isNew||id==='sample-game'?undefined:design} phase={generationPhase} prompt={generation.variables?.analyzeOnly?analysisPrompt:generation.variables?.request??(analysisMode?analysisPrompt:prompt)} photos={acceptsPhotos?photos:[]} sample={false} dimensions={analysisMode} coordination={canCoordinate&&!generation.variables?.analyzeOnly} onCancel={()=>{if(pending){abort.current?.abort();generation.reset();setNotice('生成を停止しました。');}else navigate('/rooms');}}/>:<>
         <section className="rc-chat" aria-label="チャット">
           {isNew?<>
             <div ref={messages} onScroll={event=>{const node=event.currentTarget;nearBottom.current=node.scrollHeight-node.scrollTop-node.clientHeight<64;}} className="rc-messages is-new">{stepIndex>0&&<div className="rc-input-summary">{inputSteps.slice(0,stepIndex).map(step=><p className="motion-enter" key={step}>{step==='room'?[analysisMode&&`${tatami}畳・${shapeLabel(shape)}`,acceptsPhotos&&`写真 ${photos.length||samplePhotos.length}枚`].filter(Boolean).join(' / '):prompt}</p>)}</div>}<Intro key={inputStep} step={inputStep}/></div>

@@ -1,5 +1,3 @@
-import type { Connection } from "./connection";
-
 export type TokenStore = {
   load(): string | null;
   // expectedToken を指定すると、別のログイン状態を上書きしない。
@@ -8,8 +6,11 @@ export type TokenStore = {
   subscribe(listener: () => void): () => void;
 };
 
-export function createTokenStore(connection: Connection): TokenStore {
-  const key = `hack.token.${connection}`;
+// 既存のログイン状態を保つため、キー名は従来の `hack.token.api` のまま。
+const TOKEN_KEY = "hack.token.api";
+
+export function createTokenStore(): TokenStore {
+  const key = TOKEN_KEY;
   const listeners = new Set<() => void>();
   let current = localStorage.getItem(key);
 

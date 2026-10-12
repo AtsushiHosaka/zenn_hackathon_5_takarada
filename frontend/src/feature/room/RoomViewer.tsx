@@ -918,13 +918,16 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
           object.receiveShadow = true;
           // Imported owned furniture uses a catalog approximation; keep its
           // measured dimensions and the product/edited color from the room item.
-          if (isManualFurniture(item)) {
+          // A color picked in the edit panel applies to every 3D model, not only owned furniture.
+          const tint = isManualFurniture(item) ? item.color : item.previewColor;
+          if (tint) {
             for (const surface of Array.isArray(object.material) ? object.material : [object.material]) {
-              if ("color" in surface && surface.color instanceof THREE.Color) surface.color.set(item.color);
+              if ("color" in surface && surface.color instanceof THREE.Color) surface.color.set(tint);
             }
           }
         });
-        if (!item.existing && item.materialOverrides) {
+        // 選んだ色を、商品の素材・画像の上書きで打ち消さない。
+        if (!item.existing && item.materialOverrides && !item.previewColor) {
           textureCleanups.push(applyMaterialOverrides(gltf.scene, item.materialOverrides, scale, () => {
             if (!disposed && textureNotice.current) textureNotice.current.hidden = false;
           }, loadingManager));

@@ -38,7 +38,7 @@ npm run dev
 
 [IKEAのルームプランナー](https://www.ikea.com/jp/ja/home-design/room/#-1/a002738a-c734-4f9d-94bc-bb6e983eb87c)を機能の参考に、配置編集を追加しています。右上のアカウントメニューで「家具の配置・色を編集」を選ぶと、商品パネルの位置に編集パネルが開きます。参照HTMLの配色・フォント・横並びの構成を維持します。
 
-- 編集中の家具を左ボタンでドラッグし、床に沿って移動できます。ボタンではX方向・Z方向へ10cmずつ移動、15度・90度ずつ回転できます。
+- 編集中の家具を左ボタンでドラッグし、床に沿って移動できます。ボタンでは左右へ90度ずつ回転できます。編集パネルは「家具を追加」「選んだ家具」「部屋」の3つのタブに分けています。
 - 家具と壁のプレビュー色を変更できます。商品そのものの色は変わりません。
 - 立体・真上・正面の視点と、選択した家具の寸法表示を切り替えられます。商品寸法は変更しません。
 - 編集履歴は50件まで戻す・やり直す操作に対応し、1回のドラッグを1件として扱います。「変更を保存」でブラウザに保存します。
@@ -64,13 +64,12 @@ APIの新規作成では、解析後に表示された既存家具から活か�
 
 ## 接続先を設定する
 
-`.env.example`を`.env`へコピーします。既定では同一オリジンの`/api`を使い、ViteまたはnginxからGCP APIへ中継します。GCP APIは確認したlocalhostのOriginにCORSヘッダーを返さず、ローカルのブラウザからの直接接続は失敗しました。GCP構成では本番WebのOriginを許可しています。開発時だけ、ログイン画面または右上のアカウントメニューからモックとAPIを切り替えられます。選択は`hack.connection.dev`に保存され、切り替えるとページを再読み込みします。未設定なら開発時はモックです。本番ビルドは保存済みの設定を無視し、`VITE_CONNECTION=dummy`を指定してもAPIへ接続します。Viteの環境変数を変えた後は開発サーバーを再起動、または再ビルドします。
+`.env.example`を`.env`へコピーします。既定では同一オリジンの`/api`を使い、ViteまたはnginxからGCP APIへ中継します。GCP APIは確認したlocalhostのOriginにCORSヘッダーを返さず、ローカルのブラウザからの直接接続は失敗しました。GCP構成では本番WebのOriginを許可しています。接続先は常にAPIで、切り替え画面はありません。Viteの環境変数を変えた後は開発サーバーを再起動、または再ビルドします。
 
 | 設定 | 意味 |
 | --- | --- |
 | `VITE_API_ENDPOINT` | 空欄なら同一オリジン。外部URLへの直接接続にはAPI側のCORS対応が必要 |
 | `API_UPSTREAM_ORIGIN` | Vite dev / preview・nginxの中継先。既定はGCP Cloud Run。ブラウザへ埋め込まない |
-| `VITE_CONNECTION` | 開発時だけ有効。空欄なら`dummy`、`api`で実API接続 |
 | `VITE_TERMS_URL` / `VITE_PRIVACY_URL` | 正式な公開文書のHTTPS URL、または同一オリジンのパス。ビルド時に埋め込む |
 | `VITE_ROOM_API_CONTRACT` | 既定は`coordination`。`analysis`は部屋解析のみ、`legacy`は将来の写真API向け提案形式 |
 | `VITE_ROOM_GENERATION_PATH` | 部屋作成POST先。既定は`/api/v1/rooms` |
@@ -90,21 +89,19 @@ APIの新規作成では、解析後に表示された既存家具から活か�
 
 ルーム画面右上のアカウントメニューから`/account`へ進みます。メールアドレスは表示のみ、ニックネームは50文字以内で変更できます。`PATCH /api/v1/users/:id`の成功後は画面とヘッダーの名前を更新します。退会は確認後に`DELETE /api/v1/users/:id`を呼び、成功時だけトークンとキャッシュを消します。他人のIDを指定した画面には編集フォームを出しません。
 
-部屋一覧・サンプル・新規入力・保存済みルームは、モック接続でも認証が必要です。未ログイン時はログイン画面へ移動し、ログイン・新規登録後に元の画面へ戻ります。認証APIの401はトークンを破棄し、通信失敗はトークンを保持して再試行を表示します。別タブのログイン・ログアウトにも追従します。パスワード再設定、メール変更、正式な利用規約・プライバシーポリシーはAPIまたは原稿が未提供です。
+部屋一覧・サンプル・新規入力・保存済みルームは、認証が必要です。未ログイン時はログイン画面へ移動し、ログイン・新規登録後に元の画面へ戻ります。認証APIの401はトークンを破棄し、通信失敗はトークンを保持して再試行を表示します。別タブのログイン・ログアウトにも追従します。パスワード再設定、メール変更、正式な利用規約・プライバシーポリシーはAPIまたは原稿が未提供です。
 
-開発は`VITE_CONNECTION=api`を指定するか、ログイン画面でAPIを選びます。本番ビルドは常にAPI接続です。`npm run preview`も同じ中継設定を使います。Dockerのruntimeでは`API_UPSTREAM_ORIGIN`を起動時に指定でき、nginxがTLS証明書を検証して中継します。`VITE_API_ENDPOINT`は空欄でビルドしてください。静的ホスティングでは別途同一オリジンの中継設定、またはAPI側のCORS対応が必要です。
+開発・本番ビルドとも常にAPIへ接続します。接続先を切り替える画面はありません。`npm run preview`も同じ中継設定を使います。Dockerのruntimeでは`API_UPSTREAM_ORIGIN`を起動時に指定でき、nginxがTLS証明書を検証して中継します。`VITE_API_ENDPOINT`は空欄でビルドしてください。静的ホスティングでは別途同一オリジンの中継設定、またはAPI側のCORS対応が必要です。
 
 ```bash
 # frontend/で実行。既定のGCP APIを使う
-VITE_CONNECTION=api npm run dev
+npm run dev
 npm run build
 npm run preview
 
 # ローカルAPIを中継する場合
-API_UPSTREAM_ORIGIN=http://127.0.0.1:13000 VITE_CONNECTION=api npm run dev
+API_UPSTREAM_ORIGIN=http://127.0.0.1:13000 npm run dev
 ```
-
-ダミー接続では初期ユーザー`user1@example.com`〜`user3@example.com`のパスワードは`password`です。登録・名前変更・削除は同じタブのsessionStorageに保存し、再読み込み後も復元します。タブを閉じると保存は消えます。パスワードはSHA-256値のみ保存しますが、ダミーは画面確認用です。実APIの認証基盤として使いません。HTTPSまたはlocalhostでアクセスしてください。
 
 公開APIには他人のユーザー情報を取得・更新・削除できる認可上の問題があります。今回の画面は本人のみ扱いますが、API担当によるサーバー側の本人認可が必要です。詳細と確認結果は`specs/users-auth/spec.md`に記録しています。
 
@@ -130,7 +127,6 @@ API_UPSTREAM_ORIGIN=http://127.0.0.1:13000 VITE_CONNECTION=api npm run dev
 docker compose -f compose.yaml -f compose.override.yaml -f /tmp/room-api-runtime.override.yaml up -d --no-build api worker
 # frontendの環境変数
 API_UPSTREAM_ORIGIN=http://127.0.0.1:13000
-VITE_CONNECTION=api
 ```
 
 PR #5を#6へマージした後、既存APIテスト23件・RuboCop・Swagger再生成・型生成、フロントのlint・ビルドが成功しました。PC画面では6畳・標準でデスクを外すと紫・3万円の提案が7点27,360円になりました。再読み込みで家具選択を復元し、2万円への追加指示で6点19,380円になることを確認しました。3D編集・保存・復元・CSV・オフライン作成も確認済みです。統合後の記録は`specs/room-coordinator/spec.md`、確認画像は`output/screenshots/pr6-integration-pc.png`です。GitHub Actionsは実行履歴がなく、CI成功とは扱いません。

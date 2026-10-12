@@ -2677,12 +2677,12 @@
     0.15,
     0.45
    ],
-   "triangles": 1196,
+   "triangles": 2496,
    "color_material_keys": [
     "tint"
    ],
-   "bytes": 35024,
-   "sha256": "2319c20835d8664d12ff3f370eefb30de8425be9554e4101773fd199fca63818",
+   "bytes": 62864,
+   "sha256": "74851bb7a3d46ca993470a9ac371d89e013fa329f472519a4a0e09bab7172dfe",
    "characters": [],
    "estimated_axes": [
     "h"
@@ -2701,12 +2701,12 @@
     0.15,
     0.45
    ],
-   "triangles": 1196,
+   "triangles": 2496,
    "color_material_keys": [
     "tint"
    ],
-   "bytes": 35036,
-   "sha256": "b706239c3bb65c7951e2eec0ace1c8929a43e38b38704922c2b6109df3b29773",
+   "bytes": 62876,
+   "sha256": "928486a7139cf8a011676aa85446d84973dccbd163fdb184c6285833913e3866",
    "characters": [],
    "estimated_axes": [
     "w",
@@ -2727,12 +2727,12 @@
     0.15,
     0.45
    ],
-   "triangles": 1196,
+   "triangles": 2496,
    "color_material_keys": [
     "tint"
    ],
-   "bytes": 35032,
-   "sha256": "8a4643c5c22962ad6e2ad0c074edb27ec42a38c5ce0830cb7ae0ce3997014a9d",
+   "bytes": 62872,
+   "sha256": "a7a1a00e2443eea7b1730169a8fc63e964acd5dc1ae0c4255164da94fb5f60c0",
    "characters": [],
    "estimated_axes": [
     "w",
@@ -2753,12 +2753,12 @@
     0.15,
     0.45
    ],
-   "triangles": 1196,
+   "triangles": 2496,
    "color_material_keys": [
     "tint"
    ],
-   "bytes": 35032,
-   "sha256": "395059e50b229a640deacf6b903c38c91641e74ea72ef62dedeee837e54d3a3f",
+   "bytes": 62872,
+   "sha256": "f6e37e9bfa44330ffb70daf5fe8b1359a18232172a569c7f9893524ba6e928e4",
    "characters": [],
    "estimated_axes": [
     "w",

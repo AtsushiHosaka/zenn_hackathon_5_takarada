@@ -35,13 +35,17 @@ export default function FurnitureSearchPanel({ design, disabled, onAddItem, repl
   const selected = search.data?.products.find(product => product.item.furnitureDetailId === selectedId);
   return <div className="rc-furniture-search">
     <form className="rc-furniture-link-form" onSubmit={event => { event.preventDefault(); setSelectedId(undefined); if (!disabled && query.trim()) search.mutate({ query: query.trim(), color: color || undefined, category: category || undefined }); }}>
-      <label htmlFor={`${formId}-query`}>家具を検索</label>
-      <input id={`${formId}-query`} value={query} onChange={event => setQuery(event.target.value)} maxLength={200} placeholder="例：丸いサイドテーブル" required disabled={disabled || search.isPending}/>
-      <label htmlFor={`${formId}-color`}>商品の色で絞り込む</label>
-      <select id={`${formId}-color`} value={color} onChange={event => setColor(event.target.value)} disabled={disabled || search.isPending}><option value="">すべての色</option>{colors.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select>
-      <label htmlFor={`${formId}-category`}>家具の種類</label>
-      <select id={`${formId}-category`} value={category} onChange={event => setCategory(event.target.value)} disabled={disabled || search.isPending || Boolean(replacementTarget)}>{replacementTarget && !furnitureCategories.some(value => value === targetCategory) && <option value={targetCategory}>{replacementTarget.name}と同じカテゴリ</option>}<option value="">すべての種類</option>{furnitureCategories.map((value,index) => <option key={value} value={value}>{categories[index]}</option>)}</select>
-      <button type="submit" disabled={disabled || search.isPending || !query.trim()}>{search.isPending ? '検索中…' : 'この条件で検索'}</button>
+      <div className="rc-furniture-search-row">
+        <label className="rc-sr-only" htmlFor={`${formId}-query`}>家具を検索</label>
+        <input id={`${formId}-query`} value={query} onChange={event => setQuery(event.target.value)} maxLength={200} placeholder="例：丸いサイドテーブル" required disabled={disabled || search.isPending}/>
+        <button type="submit" disabled={disabled || search.isPending || !query.trim()}>{search.isPending ? '検索中…' : '検索'}</button>
+      </div>
+      <div className="rc-furniture-search-filters">
+        <label className="rc-sr-only" htmlFor={`${formId}-color`}>商品の色で絞り込む</label>
+        <select id={`${formId}-color`} value={color} onChange={event => setColor(event.target.value)} disabled={disabled || search.isPending}><option value="">すべての色</option>{colors.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select>
+        <label className="rc-sr-only" htmlFor={`${formId}-category`}>家具の種類</label>
+        <select id={`${formId}-category`} value={category} onChange={event => setCategory(event.target.value)} disabled={disabled || search.isPending || Boolean(replacementTarget)}>{replacementTarget && !furnitureCategories.some(value => value === targetCategory) && <option value={targetCategory}>{replacementTarget.name}と同じカテゴリ</option>}<option value="">すべての種類</option>{furnitureCategories.map((value,index) => <option key={value} value={value}>{categories[index]}</option>)}</select>
+      </div>
     </form>
     {search.isError && <ErrorText error={search.error}/>}
     {search.data && currentResults && !search.isPending && <>

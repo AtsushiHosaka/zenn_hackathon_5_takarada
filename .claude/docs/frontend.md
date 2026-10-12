@@ -35,18 +35,10 @@ make front-sh       # web コンテナに入る
 
 ホストに node があるなら `cd frontend && npm install && npm run dev` でもよい。
 
-## 接続先 (ダミー / API)
+## 接続先
 
-| 接続先 | 中身 |
-| --- | --- |
-| `dummy` | ブラウザのlocalStorageに保存するダミーデータ (`data/dummy`)。**backend を立てなくても動く** |
-| `api` | 実際の API。URL は `VITE_API_ENDPOINT` |
-
-- **dev の既定は `dummy`**、本番ビルドは `api` (`core/config.ts` の `defaultConnection`)。
-- 切り替えはログイン画面 / ヘッダの「接続先」(dev のみ表示)。選択は localStorage に残り、
-  切り替えると**リロードして DI ごと作り直す**。JWT は接続先ごとに別のキーで持つ。
-- ダミーの登録ユーザーとルームはlocalStorageに保存し、再読み込み・再ログイン後も復元する。ルームは利用者IDで分ける。
-  パスワードはSHA-256の値で照合する。初期ユーザーのパスワードは `password`。実APIの認証とは異なる。
+**常に実際の API** (URL は `VITE_API_ENDPOINT`、空なら同一オリジンの `/api` を Vite / nginx が中継する)。
+ダミー接続と切り替え画面は無い。JWT は localStorage の `hack.token.api` に持つ。
 
 ## 設定 (環境変数)
 
@@ -57,12 +49,11 @@ make front-sh       # web コンテナに入る
 
 ## DI
 
-**登録は `app/container.ts` だけ**。ここ以外で `createApiClient` や `createDummy*` を呼ばない。
+**登録は `app/container.ts` だけ**。ここ以外で `createApiClient` を呼ばない。
 
 ```ts
-export function createRepositories(connection: Connection): Repositories {
-  const tokenStore = createTokenStore(connection);
-  if (connection === "dummy") return { tokenStore, auth: createDummyAuthRepository(tokenStore), ... };
+export function createRepositories(): Repositories {
+  const tokenStore = createTokenStore();
   const api = createApiClient(appConfig.apiEndpoint, tokenStore);
   return { tokenStore, auth: createApiAuthRepository(api), ... };
 }
@@ -99,9 +90,8 @@ backend に `posts` を足した場合:
 2. `domain/post.ts` にエンティティ、`domain/postRepository.ts` に型
 3. `data/records/post.ts` に `PostRecord` (生成物から引く) と `toPost`
 4. `data/repositories/apiPostRepository.ts` を `apiUserRepository` に倣って実装
-5. `data/dummy/dummyPostRepository.ts` も作る(**ダミーで動かないと接続先を切り替えた時に壊れる**)
-6. `core/repositories.ts` の `Repositories` に足し、`app/container.ts` で出し分けを登録
-7. `feature/posts/queries.ts` に `useQuery` / `useMutation` を置き、画面から呼ぶ
+5. `core/repositories.ts` の `Repositories` に足し、`app/container.ts` で登録
+6. `feature/posts/queries.ts` に `useQuery` / `useMutation` を置き、画面から呼ぶ
 
 一次情報は backend の Swagger UI (http://localhost:3000/api-docs)。
 
