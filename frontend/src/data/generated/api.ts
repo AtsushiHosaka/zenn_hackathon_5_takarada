@@ -1607,7 +1607,7 @@ export interface components {
              * @example floor
              * @enum {string}
              */
-            slot: "bed_cover" | "curtain" | "rug" | "wall_decor" | "light" | "display" | "cushion" | "desk_top" | "floor";
+            slot: "bed_cover" | "blanket" | "curtain" | "rug" | "wall_decor" | "light" | "display" | "cushion" | "desk_top" | "floor";
             /**
              * @description 使う 3D モデルの ID
              * @example chair_dining
@@ -1703,7 +1703,7 @@ export interface components {
                  * @example floor
                  * @enum {string}
                  */
-                slot?: "bed_cover" | "curtain" | "rug" | "wall_decor" | "light" | "display" | "cushion" | "desk_top" | "floor";
+                slot?: "bed_cover" | "blanket" | "curtain" | "rug" | "wall_decor" | "light" | "display" | "cushion" | "desk_top" | "floor";
                 /** @example chair_dining */
                 model_key?: string;
                 /** @example #f2efe8 */
@@ -2154,7 +2154,7 @@ export interface components {
              * @example null
              * @enum {string|null}
              */
-            slot: null | "bed_cover" | "curtain" | "rug" | "wall_decor" | "light" | "display" | "cushion" | "desk_top" | "floor";
+            slot: null | "bed_cover" | "blanket" | "curtain" | "rug" | "wall_decor" | "light" | "display" | "cushion" | "desk_top" | "floor";
             /**
              * @description 付けた先の家具・窓の id
              * @example null
@@ -2298,7 +2298,12 @@ export interface components {
              * @example chair
              * @enum {string}
              */
-            category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table" | "poster" | "acrylic_stand" | "mirror";
+            category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table" | "poster" | "acrylic_stand" | "mirror" | "cushion" | "blanket";
+            /**
+             * @description 小物を載せる家具・布団のSceneObject ID。クッション・ブランケットはbed/sofa/bed_coverに対応。nullは支持関係を解除
+             * @example bed-1
+             */
+            attach_to?: string | null;
             artwork?: components["schemas"]["ImageArtwork"];
             /**
              * @description 手動の所有家具を置き換える購入商品 (FurnitureDetail) のID。所有家具のfurniture_detail_idは変更しない
@@ -2345,7 +2350,7 @@ export interface components {
              * @example table
              * @enum {string}
              */
-            category?: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
+            category?: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "blanket" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
         };
         /** @description 部屋に置いた家具1つ。sizeはメートル */
         FurnitureReviewItem: {
@@ -2460,7 +2465,7 @@ export interface components {
              * @example chair
              * @enum {string}
              */
-            category: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
+            category: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "blanket" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
             /**
              * @description 代表色
              * @example #f2efe8

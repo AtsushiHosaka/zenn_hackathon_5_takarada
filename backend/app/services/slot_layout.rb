@@ -26,6 +26,7 @@ class SlotLayout
   def initialize(scene, kept_objects, edited_objects: [], reserved_object_ids: [])
     @room = scene.fetch("room")
     @objects = kept_objects
+    @surface_objects = kept_objects.dup
     @edited_objects = edited_objects.index_by { |edit| edit["id"] }
     @floor_rects = kept_objects.map { |o| footprint(o) } + doors.map { |door| door_floor_rect(door) }
     @wall_spans = Hash.new { |h, k| h[k] = [] }
@@ -53,7 +54,7 @@ class SlotLayout
     CoordinationPlanner::SLOT_PRIORITY.select do |slot|
       case slot
       when "bed_cover" then categories.include?("bed")
-      when "cushion" then (categories & %w[bed sofa]).any?
+      when "cushion", "blanket" then (categories & %w[bed sofa]).any?
       when "desk_top" then objects.any? { |object| top_anchor?(object) }
       when "curtain" then Array(room["windows"]).any?
       else true # 壁飾り・ラグ・照明・飾り棚は、家具が無くても空いた壁・床に置ける
@@ -69,6 +70,9 @@ class SlotLayout
     if (edit = @edited_objects[self.class.object_id_for(item)])
       size = ec_product?(item) ? item.size : edit["size"]
       attachment = nil
+      if %w[cushion blanket].include?(item.slot)
+        return place_soft_item(item, edit:)
+      end
       if ec_product?(item) && %w[bed_cover curtain].include?(item.slot)
         validated = item.slot == "bed_cover" ? place_bed_cover(item) : place_curtain(item)
         return unless validated
@@ -92,6 +96,7 @@ class SlotLayout
     case item.slot
     when "bed_cover" then place_bed_cover(item)
     when "cushion" then place_cushion(item)
+    when "blanket" then place_soft_item(item)
     when "curtain" then place_curtain(item)
     when "rug" then place_rug(item)
     when "wall_decor" then place_wall_decor(item)
@@ -209,21 +214,54 @@ class SlotLayout
     build(item, size, position, bed["rotation_y"], bed["id"], "ベッドに掛ける")
   end
 
-  # ベッドの枕元。ベッドが無ければソファの座面の奥
+  # ベッド/布団の上とソファの座面。編集で指定した支持家具を優先する。
   def place_cushion(item)
-    if (bed = find("bed"))
-      spot = free_top_spot(bed, 0, -(bed["size"]["d"] / 2 - 0.3), item.size) or return
-      x, z = local_to_world(bed, *spot)
-      position = { "x" => x, "y" => bed["size"]["h"] + 0.04, "z" => z }
-      return build(item, item.size, position, bed["rotation_y"], bed["id"], "ベッドの枕元")
-    end
+    place_soft_item(item)
+  end
 
-    sofa = find("sofa") or return
-    spot = free_top_spot(sofa, 0, -(sofa["size"]["d"] / 2 - item.size["d"] / 2 - 0.12), item.size) or return
-    x, z = local_to_world(sofa, *spot)
-    # 座面はソファの高さのおよそ半分
-    position = { "x" => x, "y" => sofa["size"]["h"] * 0.5, "z" => z }
-    build(item, item.size, position, sofa["rotation_y"], sofa["id"], "#{sofa['label']}の上")
+  def place_soft_item(item, edit: nil)
+    anchors = @surface_objects.select { |object| %w[bed sofa bed_cover].include?(object["category"]) }
+    if edit&.key?("attach_to")
+      anchors = anchors.select { |object| object["id"] == edit["attach_to"] }
+      if edit["attach_to"].nil?
+        return build(item, soft_size(item), edit["position"], edit["rotation_y"], nil, "調整した配置")
+      end
+    else
+      anchors = anchors.sort_by { |object| %w[bed_cover bed sofa].index(object["category"]) }
+    end
+    size = soft_size(item)
+    anchors.each do |anchor|
+      usable_depth = anchor["category"] == "sofa" ? anchor["size"]["d"] * 0.7 : anchor["size"]["d"]
+      next if size["w"] > anchor["size"]["w"] - 0.04 || size["d"] > usable_depth - 0.04
+
+      rotation = edit ? edit["rotation_y"] : anchor["rotation_y"]
+      if edit
+        position = edit["position"].dup
+        # レイキャストで求めた実モデルの座面高さは保持する。
+      else
+        lz = if item.slot == "blanket"
+          anchor["category"] == "sofa" ? 0 : usable_depth / 2 - size["d"] / 2 - 0.04
+        else
+          -(usable_depth / 2 - size["d"] / 2 - 0.04)
+        end
+        spot = free_top_spot(anchor, 0, lz, size) or next
+        x, z = local_to_world(anchor, *spot)
+        top = anchor["position"]["y"] + anchor["size"]["h"] * (anchor["category"] == "sofa" ? 0.5 : 1)
+        position = { "x" => x, "y" => top, "z" => z }
+      end
+      note = "#{anchor['label']}の上"
+      note += "（ブランケットは折り畳んだ配置。公開サイズは購入リストを参照）" if item.slot == "blanket"
+      placement = build(item, size, position, rotation, anchor["id"], note)
+      placement.object["color"] = edit["color"] if edit
+      return placement
+    end
+    nil
+  end
+
+  def soft_size(item)
+    return item.size unless item.slot == "blanket"
+
+    { "w" => item.size["w"] / 2, "h" => [ item.size["h"] * 4, 0.04 ].max, "d" => item.size["d"] / 4 }
   end
 
   # デスクの上。無ければテーブル・低い収納・テレビ台・低い棚の上 (天板に収まるものだけ)
@@ -627,6 +665,7 @@ class SlotLayout
       "item_id" => item.id,
       "marker" => nil
     }
+    @surface_objects << object if %w[bed_cover blanket].include?(item.category)
     Placement.new(object:, note:)
   end
 end

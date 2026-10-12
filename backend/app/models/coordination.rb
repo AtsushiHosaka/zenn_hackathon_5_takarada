@@ -4,7 +4,8 @@ class Coordination < ApplicationRecord
   FLOOR_CATEGORIES = %w[sofa bed desk chair shelf table].freeze
   REPLACEMENT_CATEGORIES = %w[sofa bed desk chair shelf table storage tv_stand wardrobe].freeze
   IMAGE_GOODS_CATEGORIES = %w[poster acrylic_stand].freeze
-  MANUAL_CATEGORIES = (FLOOR_CATEGORIES + IMAGE_GOODS_CATEGORIES + %w[mirror]).freeze
+  MANUAL_PRODUCT_CATEGORIES = (FLOOR_CATEGORIES + %w[cushion blanket]).freeze
+  MANUAL_CATEGORIES = (FLOOR_CATEGORIES + IMAGE_GOODS_CATEGORIES + %w[mirror cushion blanket]).freeze
   MANUAL_OBJECT_ID = /\Amanual-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i
 
   belongs_to :room
@@ -60,7 +61,7 @@ class Coordination < ApplicationRecord
       next unless edit.is_a?(Hash) && edit["id"].is_a?(String) && edit["id"].match?(MANUAL_OBJECT_ID)
       product_id = edit["furniture_detail_id"]
       product = find_furniture_detail(product_id)
-      next if product_id && (!product || !FLOOR_CATEGORIES.include?(product.category))
+      next if product_id && (!product || !MANUAL_PRODUCT_CATEGORIES.include?(product.category))
       next unless product || (MANUAL_CATEGORIES.include?(edit["category"]) && edit["label"].is_a?(String) && edit["label"].strip.present? && edit["label"].length <= 100)
 
       next if IMAGE_GOODS_CATEGORIES.include?(edit["category"]) && !ImageArtwork.valid?(edit["artwork"])
@@ -69,7 +70,7 @@ class Coordination < ApplicationRecord
       trusted = product ? product.scene_attributes.compact.merge(edit.slice("position", "size", "rotation_y", "color")) : edit.slice("label", "category", "position", "size", "rotation_y", "color", "artwork")
       trusted.merge(
         "id" => edit["id"],
-        "source" => "existing", "slot" => nil, "attach_to" => nil, "item_id" => nil, "marker" => nil, "model_url" => trusted["model_url"]
+        "source" => "existing", "slot" => nil, "attach_to" => edit["attach_to"], "item_id" => nil, "marker" => nil, "model_url" => trusted["model_url"]
       )
     end
   end
@@ -154,7 +155,16 @@ class Coordination < ApplicationRecord
         edit["replacement_furniture_detail_id"].nil? && original && product && product.category == original["category"]
       end
     end
-    unless ids.uniq == ids && linked_ids_valid && (ids - existing_ids - suggested_ids).empty? && edited_objects.all? { |edit| valid_edit?(edit, objects_by_id.fetch(edit["id"])) }
+    attachments_valid = edited_objects.all? do |edit|
+      support_id = edit["attach_to"]
+      next true if support_id.nil?
+
+      support = objects_by_id[support_id]
+      original = objects_by_id[edit["id"]]
+      support_id.is_a?(String) && support_id != edit["id"] && support &&
+        (!%w[cushion blanket].include?(original&.fetch("category", nil)) || %w[bed sofa bed_cover].include?(support["category"]))
+    end
+    unless ids.uniq == ids && linked_ids_valid && attachments_valid && (ids - existing_ids - suggested_ids).empty? && edited_objects.all? { |edit| valid_edit?(edit, objects_by_id.fetch(edit["id"])) }
       errors.add(:edited_objects, "家具の編集内容が正しくありません")
     end
   end

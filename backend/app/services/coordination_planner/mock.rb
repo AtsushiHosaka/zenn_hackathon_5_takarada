@@ -19,12 +19,18 @@ class CoordinationPlanner
 
     def plan
       theme = detect_theme
-      items = @client.search(prompt: @prompt, theme: @character_theme ? nil : theme, slots: @slots, preference: @preference, character_theme: @character_theme)
+      preference = FurnitureCandidates::ColorPreference.new(@prompt)
+      items = @client.search(prompt: @prompt, theme: @character_theme || preference.active? ? nil : theme, slots: @slots, preference: @preference, character_theme: @character_theme)
+      items = items.transform_values do |group|
+        preference.sort(keep_previous_first(group)).reject { |item| preference.active? && preference.rank(item) >= 3 && !item.metadata["selected_by_user"] && Array(item.metadata["characters"]).empty? }
+      end.reject { |_, group| group.empty? }
+      missing = items.filter_map { |slot, group| Gemini::SLOT_LABELS[slot] || slot if group.none? { |item| preference.rank(item).zero? } } if preference.active?
+      slots = @slots.sort_by { |slot| items.fetch(slot, []).map { |item| preference.rank(item) }.min || 4 }
       Plan.new(
-        title: THEMES.fetch(theme)[:title],
+        title: preference.active? ? "希望の色に合わせた部屋" : THEMES.fetch(theme)[:title],
         concept: nil,
-        note: nil,
-        candidates: @slots.flat_map { |slot| @character_theme ? character_choices(items.fetch(slot, []), slot) : keep_previous_first(items.fetch(slot, [])) },
+        note: missing&.any? ? "#{missing.join('・')}は候補に希望色がないため、近い色や白・グレーを候補にしました。" : nil,
+        candidates: slots.flat_map { |slot| @character_theme ? character_choices(items.fetch(slot, []), slot) : keep_previous_first(items.fetch(slot, [])) },
         removed_object_ids: [],
         planned_by: "mock",
         analysis: { "meta" => { "planner" => "mock", "theme" => theme } }

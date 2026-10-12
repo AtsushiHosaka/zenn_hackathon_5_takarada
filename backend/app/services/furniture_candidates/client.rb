@@ -22,7 +22,7 @@ module FurnitureCandidates
       @characters = characters
     end
 
-    def search(slots:, theme: nil, categories: nil, preference: nil, character_theme: nil, **)
+    def search(slots:, theme: nil, categories: nil, preference: nil, character_theme: nil, prompt: nil, **)
       slots = Array(slots).map(&:to_s)
       categories = Array(categories).map(&:to_s)
       scope = FurnitureDetail.available.joins(:furniture).merge(Furniture.available).preload(furniture: [ :model, :characters ]).includes(detail_textures: :furniture_texture)
@@ -39,6 +39,8 @@ module FurnitureCandidates
       items = scope.map { |detail| self.class.item(detail) }
       items = items.select { |item| FurnitureCandidates.compatible_character?(item, character_theme) }
       items = FurnitureCandidates.rank(items, preference:, character_theme:) if preference || character_theme
+      color_preference = ColorPreference.new(prompt)
+      items = color_preference.sort(items).reject { |item| color_preference.rank(item) == 4 }
       (selected + items).uniq { |item| [ item.metadata["group_id"], item.id ] }.group_by(&:slot)
     end
   end

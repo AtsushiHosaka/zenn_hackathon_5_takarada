@@ -160,6 +160,10 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean, manager?
     case "bed_cover":
       group.add(createBedCoverModel(item));
       break;
+    case "blanket":
+    case "cushion":
+      box(group, [w, h, d], [0, h / 2, 0], color, true);
+      break;
     case "wall_mirror":
     case "mirror":
       box(group, [w, h, d], [0, h / 2, 0], color, true);

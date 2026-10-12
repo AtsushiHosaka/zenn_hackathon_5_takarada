@@ -294,6 +294,7 @@ function sceneSnapshot(scene: components["schemas"]["Scene"], baseUrl: string): 
       name: item.label,
       category: item.category,
       existing: item.source === "existing",
+      supportObjectId: ['blanket', 'cushion', 'bed_cover', 'cover'].includes(item.category) ? item.attach_to ?? undefined : undefined,
       color: item.color,
       position: [item.position.x - room.width / 2, item.position.y + item.size.h / 2, item.position.z - room.depth / 2],
       size: [item.size.w, item.size.h, item.size.d],
@@ -540,6 +541,7 @@ export function toAnalyzedRoomDesign(value: unknown, baseUrl: string): RoomDesig
       name: item.label,
       category: item.category,
       existing: item.source === "existing",
+      supportObjectId: ['blanket', 'cushion', 'bed_cover', 'cover'].includes(item.category) ? item.attach_to ?? undefined : undefined,
       color: item.color,
       position: [item.position.x - room.width / 2, item.position.y + item.size.h / 2, item.position.z - room.depth / 2],
       size: [item.size.w, item.size.h, item.size.d],
@@ -588,7 +590,7 @@ function analysisObject(value: unknown): components["schemas"]["SceneObject"] {
   const position = object(record.position, "SceneObject.position");
   if (record.source !== "existing" && record.source !== "suggested") invalid("SceneObject.source");
   if (typeof record.rotation_y !== "number" || !Number.isFinite(record.rotation_y) || record.rotation_y < 0 || record.rotation_y >= 360) invalid("SceneObject.rotation_y");
-  if (record.slot !== null && record.slot !== "bed_cover" && record.slot !== "curtain" && record.slot !== "rug" && record.slot !== "wall_decor" && record.slot !== "light" && record.slot !== "display" && record.slot !== "cushion" && record.slot !== "desk_top" && record.slot !== "floor") invalid("SceneObject.slot");
+  if (record.slot !== null && record.slot !== "bed_cover" && record.slot !== "blanket" && record.slot !== "curtain" && record.slot !== "rug" && record.slot !== "wall_decor" && record.slot !== "light" && record.slot !== "display" && record.slot !== "cushion" && record.slot !== "desk_top" && record.slot !== "floor") invalid("SceneObject.slot");
   return {
     id: text(record.id, "SceneObject.id"),
     source: record.source,

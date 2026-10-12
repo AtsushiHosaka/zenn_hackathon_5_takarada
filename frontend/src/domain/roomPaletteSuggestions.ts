@@ -8,7 +8,11 @@ type Preference = {
   palettes: readonly string[];
   weight: number;
   color?: boolean;
+  genericBlue?: boolean;
 };
+
+const lightBlueTerms = ["light blue", "pale blue", "sky blue", "水色", "ライトブルー", "ペールブルー", "パステルブルー", "スカイブルー"];
+const darkBlueTerms = ["navy", "dark blue", "ネイビー", "紺", "濃い青", "ダークブルー"];
 
 // Explicit colors carry more weight than atmosphere. Ranked examples also keep
 // suggestions useful when a description mentions more than one preference.
@@ -19,7 +23,9 @@ const preferences: readonly Preference[] = [
   { terms: ["brown", "茶色", "ブラウン"], palettes: ["coffee-cream", "espresso-copper", "desert-sand", "oatmeal", "mushroom-taupe", "denim-wood"], weight: 12, color: true },
   { terms: ["green", "緑", "グリーン", "sage", "セージ", "olive", "オリーブ"], palettes: ["sage-clay", "celadon", "olive-linen", "moss-oak", "botanical-white", "forest-night", "mint-cloud", "seafoam"], weight: 12, color: true },
   { terms: ["cyan", "シアン", "teal", "turquoise", "ターコイズ", "ティール", "mint", "ミント"], palettes: ["seafoam", "mint-cloud", "teal-studio", "turquoise-pop", "lagoon-dusk", "mint-strawberry"], weight: 12, color: true },
-  { terms: ["blue", "navy", "青", "ブルー", "ネイビー", "水色"], palettes: ["sky-white", "powder-blue", "coastal-blue", "ice-navy", "denim-wood", "cobalt-gallery", "midnight-brass"], weight: 12, color: true },
+  { terms: lightBlueTerms, palettes: ["sky-white", "powder-blue", "mint-cloud", "seafoam"], weight: 13, color: true },
+  { terms: ["blue", "青", "ブルー"], palettes: ["sky-white", "powder-blue", "coastal-blue", "denim-wood", "cobalt-gallery"], weight: 12, color: true, genericBlue: true },
+  { terms: darkBlueTerms, palettes: ["midnight-brass", "ice-navy", "denim-wood"], weight: 13, color: true },
   { terms: ["purple", "lavender", "lilac", "紫", "パープル", "ラベンダー"], palettes: ["lavender-milk", "lilac-garden", "mauve-taupe", "amethyst", "orchid-gold", "violet-pop", "plum-velvet"], weight: 12, color: true },
   { terms: ["pink", "rose", "ピンク", "桃色"], palettes: ["blush-linen", "rose-quartz", "dusty-rose", "peach-pink", "cherry-blossom", "fuchsia-pop", "mint-strawberry"], weight: 12, color: true },
   { terms: ["red", "赤", "レッド", "burgundy", "ボルドー"], palettes: ["brick-cream", "scarlet-pop", "burgundy-lounge", "primary-play"], weight: 12, color: true },
@@ -87,11 +93,13 @@ export function suggestRoomPalettes(atmosphere: string, preferredId?: string, ch
   const excluded = new Set<string>();
   let hasPositivePreference = false;
   let hasColorPreference = false;
+  const specificBlueRanges = [...lightBlueTerms, ...darkBlueTerms].flatMap(term => termOccurrences(description, term).map(index => [index, index + term.length]));
   for (const preference of preferences) {
     let positive = false;
     let negative = false;
     for (const term of preference.terms) {
       for (const index of termOccurrences(description, term)) {
+        if (preference.genericBlue && specificBlueRanges.some(([start, end]) => index >= start && index + term.length <= end)) continue;
         if (isNegated(description, index, term.length)) negative = true;
         else positive = true;
       }

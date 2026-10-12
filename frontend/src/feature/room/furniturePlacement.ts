@@ -10,6 +10,8 @@ export const furnitureTemplates: { category: ManualFurnitureCategory; name: stri
   { category: 'shelf', name: '収納棚', size: [0.8, 1.2, 0.35], color: '#C5A582' },
   { category: 'table', name: 'テーブル', size: [1, 0.4, 0.6], color: '#C5A582' },
   { category: 'mirror', name: '鏡', size: [0.8, 1.7, 0.08], color: '#C5A582' },
+  { category: 'blanket', name: 'ブランケット', size: [1, 0.03, 0.75], color: '#ACD2EC' },
+  { category: 'cushion', name: 'クッション', size: [0.45, 0.12, 0.45], color: '#ACD2EC' },
 ];
 
 export function createFurnitureItem(category: ManualFurnitureCategory, size?: RoomItem['size']): RoomItem {

@@ -2417,6 +2417,355 @@
       "url": "https://store.shopping.yahoo.co.jp/nitori-net/6620996.html",
       "image_url": "https://item-shopping.c.yimg.jp/i/n/nitori-net_6620996",
       "themes": []
+    },
+    {
+      "key": "ec:ikea:006.359.97:006.359.97",
+      "name": "SANELA サネーラ クッションカバー ライトブルー 50×50cm",
+      "category": "cushion",
+      "slot": "cushion",
+      "model_key": "cushion",
+      "symbolic_color": "#9ec9de",
+      "color_materials": {
+        "tint": "#9ec9de"
+      },
+      "color_name": "ライトブルー",
+      "size": {
+        "w": 0.5,
+        "h": 0.15,
+        "d": 0.5
+      },
+      "price": 999,
+      "shop": "IKEA",
+      "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+      "image_url": "https://www.ikea.com/jp/ja/images/products/sanela-cushion-cover-light-blue__1509731_pe1009836_s5.jpg",
+      "themes": [
+        "oshi"
+      ],
+      "metadata": {
+        "size": {
+          "w": 0.5,
+          "h": null,
+          "d": 0.5
+        },
+        "shape": null,
+        "material": "綿 100%",
+        "provider": "ikea",
+        "color_name": "ライトブルー",
+        "official_color": "ライトブルー",
+        "estimated_axes": [
+          "h"
+        ],
+        "symbolic_color_source": "公式色名・商品写真に基づく描画用の近似色。メーカー公開の色コードではありません。",
+        "source_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+        "purchase_note": "インナークッションは別売りです。価格はカバーのみ。描画の厚みはインナー入りの推定値です。"
+      },
+      "checked_at": "2026-10-12",
+      "material": "綿 100%"
+    },
+    {
+      "key": "ec:ikea:505.430.14:505.430.14",
+      "name": "SVARTPOPPEL スヴァルトポッペル クッションカバー ペールブルー 50×50cm",
+      "category": "cushion",
+      "slot": "cushion",
+      "model_key": "cushion",
+      "symbolic_color": "#b7d8e5",
+      "color_materials": {
+        "tint": "#b7d8e5"
+      },
+      "color_name": "ペールブルー",
+      "size": {
+        "w": 0.5,
+        "h": 0.15,
+        "d": 0.5
+      },
+      "price": 999,
+      "shop": "IKEA",
+      "url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-pale-blue-50543014/",
+      "image_url": "https://www.ikea.com/jp/ja/images/products/svartpoppel-cushion-cover-pale-blue__1117915_pe872821_s5.jpg?f=l",
+      "themes": [
+        "oshi"
+      ],
+      "metadata": {
+        "size": {
+          "w": 0.5,
+          "h": null,
+          "d": 0.5
+        },
+        "shape": null,
+        "material": "ポリエステル 100%",
+        "provider": "ikea",
+        "color_name": "ペールブルー",
+        "official_color": "ペールブルー",
+        "estimated_axes": [
+          "h"
+        ],
+        "symbolic_color_source": "公式色名・商品写真に基づく描画用の近似色。メーカー公開の色コードではありません。",
+        "source_url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-pale-blue-50543014/",
+        "purchase_note": "インナークッションは別売りです。価格はカバーのみ。描画の厚みはインナー入りの推定値です。"
+      },
+      "checked_at": "2026-10-12",
+      "material": "ポリエステル 100%"
+    },
+    {
+      "key": "ec:ikea:106.237.72:106.237.72",
+      "name": "PILTANDVINGE ピルタンドヴィンゲ 掛け布団カバー＆枕カバー ライトブルー 150×200/50×60cm",
+      "category": "bed_cover",
+      "slot": "bed_cover",
+      "model_key": "bed_cover",
+      "symbolic_color": "#8ccce3",
+      "color_materials": {
+        "tint": "#8ccce3"
+      },
+      "color_name": "ライトブルー",
+      "size": {
+        "w": 1.5,
+        "h": 0.04,
+        "d": 2
+      },
+      "price": 1999,
+      "shop": "IKEA",
+      "url": "https://www.ikea.com/jp/ja/p/piltandvinge-duvet-cover-and-pillowcase-light-blue-10623772/",
+      "image_url": "https://www.ikea.com/jp/ja/images/products/piltandvinge-duvet-cover-and-pillowcase-light-blue__1495584_pe1005064_s5.jpg",
+      "themes": [
+        "oshi"
+      ],
+      "metadata": {
+        "size": {
+          "w": 1.5,
+          "h": null,
+          "d": 2
+        },
+        "shape": null,
+        "material": "ポリエステル 54%, レーヨン 46%",
+        "provider": "ikea",
+        "color_name": "ライトブルー",
+        "official_color": "ライトブルー",
+        "estimated_axes": [
+          "h"
+        ],
+        "symbolic_color_source": "公式色名・商品写真に基づく描画用の近似色。メーカー公開の色コードではありません。",
+        "source_url": "https://www.ikea.com/jp/ja/p/piltandvinge-duvet-cover-and-pillowcase-light-blue-10623772/",
+        "purchase_note": "掛け布団カバーと枕カバー1枚のセット。掛け布団本体は別売り。厚みは描画用の推定値です。"
+      },
+      "checked_at": "2026-10-12",
+      "material": "ポリエステル 54%, レーヨン 46%"
+    },
+    {
+      "key": "ec:francfranc:1102090107986:1102090107986",
+      "name": "デザインプリント ラグ スモールフラワー S 1400×1000 ライトブルー",
+      "category": "rug",
+      "slot": "rug",
+      "model_key": "rug_rect",
+      "symbolic_color": "#b9d8e8",
+      "color_materials": {
+        "tint": "#b9d8e8"
+      },
+      "color_name": "ライトブルー",
+      "size": {
+        "w": 1.4,
+        "h": 0.01,
+        "d": 1.0
+      },
+      "price": 7000,
+      "shop": "Francfranc",
+      "url": "https://francfranc.com/products/1102090107986",
+      "image_url": "https://francfranc.com/cdn/shop/files/1102090107986_d1_x600.jpg?v=1784878656",
+      "themes": [
+        "oshi"
+      ],
+      "metadata": {
+        "size": {
+          "w": 1.4,
+          "h": 0.01,
+          "d": 1.0
+        },
+        "shape": null,
+        "material": "パイル: ポリエステル100%、裏面: 不織布（滑り止め加工）",
+        "provider": "francfranc",
+        "color_name": "ライトブルー",
+        "official_color": "ライトブルー",
+        "estimated_axes": [],
+        "symbolic_color_source": "公式色名・商品写真に基づく描画用の近似色。メーカー公開の色コードではありません。",
+        "source_url": "https://francfranc.com/products/1102090107986",
+        "purchase_note": "小花柄のプリントは汎用ラグモデルでは再現せず、形と近似色で表示します。",
+        "pattern": "小花柄"
+      },
+      "checked_at": "2026-10-12",
+      "material": "パイル: ポリエステル100%、裏面: 不織布（滑り止め加工）"
+    },
+    {
+      "key": "ec:ikea:206.433.12:206.433.12",
+      "name": "SPETSBOJ スペッツボイ テーブルランプ 調光可能/ライトブルー 22cm",
+      "category": "table_lamp",
+      "slot": "desk_top",
+      "model_key": "table_lamp",
+      "symbolic_color": "#a8ccdf",
+      "color_materials": {
+        "tint": "#a8ccdf"
+      },
+      "color_name": "ライトブルー",
+      "size": {
+        "w": 0.12,
+        "h": 0.22,
+        "d": 0.12
+      },
+      "price": 1499,
+      "shop": "IKEA",
+      "url": "https://www.ikea.com/jp/ja/p/spetsboj-table-lamp-dimmable-light-blue-20643312/",
+      "image_url": "https://www.ikea.com/fr/fr/images/products/spetsboj-lampe-de-table-intensite-lumineuse-reglable-bleu-clair__1531238_pe1015571_s5.jpg",
+      "themes": [
+        "oshi"
+      ],
+      "metadata": {
+        "size": {
+          "w": 0.12,
+          "h": 0.22,
+          "d": 0.12
+        },
+        "shape": null,
+        "material": "カバー: スチール、粉体塗装。ディフューザー: ポリプロピレン。",
+        "provider": "ikea",
+        "color_name": "ライトブルー",
+        "official_color": "ライトブルー",
+        "estimated_axes": [],
+        "symbolic_color_source": "公式色名・商品写真に基づく描画用の近似色。メーカー公開の色コードではありません。",
+        "source_url": "https://www.ikea.com/jp/ja/p/spetsboj-table-lamp-dimmable-light-blue-20643312/",
+        "purchase_note": "電球は別売りです。LED電球 E17口金 球形 オパールホワイトを公式が推奨。円筒状の本体は汎用卓上ランプモデルによる近似表示です。",
+        "image_source": "同シリーズ・同色のIKEAフランス公式商品画像。日本商品とは電球口金仕様が異なります。"
+      },
+      "checked_at": "2026-10-12",
+      "material": "カバー: スチール、粉体塗装。ディフューザー: ポリプロピレン。"
+    },
+    {
+      "key": "ec:ikea:406.297.20:406.297.20",
+      "name": "RÅSKOG ロースコグ ワゴン ライトターコイズ 28×38×61cm",
+      "category": "storage",
+      "slot": "display",
+      "model_key": "wagon_cart",
+      "symbolic_color": "#9fd1cf",
+      "color_materials": {
+        "tint": "#9fd1cf"
+      },
+      "color_name": "ライトターコイズ",
+      "size": {
+        "w": 0.38,
+        "h": 0.61,
+        "d": 0.28
+      },
+      "price": 2999,
+      "shop": "IKEA",
+      "url": "https://www.ikea.com/jp/ja/p/raskog-trolley-light-turquoise-40629720/",
+      "image_url": "https://www.ikea.com/jp/en/images/products/raskog-trolley-light-turquoise__1495716_pe1005104_s5.jpg",
+      "themes": [
+        "oshi"
+      ],
+      "metadata": {
+        "size": {
+          "w": 0.38,
+          "h": 0.61,
+          "d": 0.28
+        },
+        "shape": null,
+        "material": "スチール、エポキシ粉体塗装",
+        "provider": "ikea",
+        "color_name": "ライトターコイズ",
+        "official_color": "ライトターコイズ",
+        "estimated_axes": [],
+        "symbolic_color_source": "公式色名・商品写真に基づく描画用の近似色。メーカー公開の色コードではありません。",
+        "source_url": "https://www.ikea.com/jp/ja/p/raskog-trolley-light-turquoise-40629720/",
+        "purchase_note": "3段の収納ワゴン。各段4kg、最大荷重12kg。棚のメッシュ等は汎用ワゴンモデルによる近似表示です。"
+      },
+      "checked_at": "2026-10-12",
+      "material": "スチール、エポキシ粉体塗装"
+    },
+    {
+      "key": "ec:ikea:205.715.36:205.715.36",
+      "name": "IBBARBO イッバルボー スツール ターコイズ",
+      "category": "chair",
+      "slot": "floor",
+      "model_key": "stool_round",
+      "symbolic_color": "#5fa9ae",
+      "color_materials": {
+        "tint": "#5fa9ae"
+      },
+      "color_name": "ターコイズ",
+      "size": {
+        "w": 0.39,
+        "h": 0.45,
+        "d": 0.39
+      },
+      "price": 1490,
+      "shop": "IKEA",
+      "url": "https://www.ikea.com/jp/ja/p/ibbarbo-stool-turquoise-20571536/",
+      "image_url": "https://www.ikea.com/jp/ja/images/products/ibbarbo-stool-turquoise__1367677_pe957381_s5.jpg",
+      "themes": [
+        "oshi"
+      ],
+      "metadata": {
+        "size": {
+          "w": 0.39,
+          "h": 0.45,
+          "d": null
+        },
+        "shape": null,
+        "material": "基本素材: ポリプロピレン。足: 熱可塑性エラストマー",
+        "provider": "ikea",
+        "color_name": "ターコイズ",
+        "official_color": "ターコイズ",
+        "estimated_axes": [
+          "d"
+        ],
+        "symbolic_color_source": "公式色名・商品写真に基づく描画用の近似色。メーカー公開の色コードではありません。",
+        "source_url": "https://www.ikea.com/jp/ja/p/ibbarbo-stool-turquoise-20571536/",
+        "purchase_note": "公式公開は幅39cm、高さ45cm、シート幅26cm。奥行は幅に基づく描画用推定。実物は3本脚で、汎用丸スツールモデルは正確な脚形状を再現しません。"
+      },
+      "checked_at": "2026-10-12",
+      "material": "基本素材: ポリプロピレン。足: 熱可塑性エラストマー"
+    },
+    {
+      "key": "ec:ikea:306.335.53:306.335.53",
+      "name": "KLIPPOXEL クリッポクセル ブランケット ライトブルー 130×170cm",
+      "category": "blanket",
+      "slot": "blanket",
+      "model_key": "blanket_folded",
+      "symbolic_color": "#a5cfe3",
+      "color_materials": {
+        "tint": "#a5cfe3"
+      },
+      "color_name": "ライトブルー",
+      "size": {
+        "w": 1.3,
+        "h": 0.02,
+        "d": 1.7
+      },
+      "price": 3999,
+      "shop": "IKEA",
+      "url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-light-blue-30633553/",
+      "image_url": "https://www.ikea.com/cz/en/images/products/klippoxel-throw-light-blue__1540036_pe1017716_s5.jpg?f=l",
+      "themes": [
+        "oshi"
+      ],
+      "metadata": {
+        "size": {
+          "w": 1.3,
+          "h": null,
+          "d": 1.7
+        },
+        "shape": null,
+        "material": "ポリエステル 100%（リサイクルポリエステル）",
+        "provider": "ikea",
+        "color_name": "ライトブルー",
+        "official_color": "ライトブルー",
+        "estimated_axes": [
+          "h"
+        ],
+        "symbolic_color_source": "公式色名・商品写真に基づく描画用の近似色。メーカー公開の色コードではありません。",
+        "source_url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-light-blue-30633553/",
+        "image_source": "同シリーズ・同色のIKEAチェコ公式商品画像。",
+        "purchase_note": "幅130cm・長さ170cmは広げた状態の公式寸法。厚みは描画用推定。配置時は汎用の折り畳んだブランケットモデルで近似表示します。"
+      },
+      "checked_at": "2026-10-12",
+      "material": "ポリエステル 100%（リサイクルポリエステル）"
     }
   ]
 }
