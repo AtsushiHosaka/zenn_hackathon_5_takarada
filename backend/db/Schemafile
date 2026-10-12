@@ -66,7 +66,7 @@ create_table "coordinations", force: :cascade do |t|
 end
 
 # 家具。detail (色・寸法・購入リンク) が指す。3D モデルは furniture_3d_models (1 : 1)。
-# db/furnitures.json から rails furniture:import で入れる
+# DB が正で、管理 API (PUT /api/v1/admin/furniture_models/:id) で登録・更新する。db/furnitures.json は空の DB に入れる初期データ (rails furniture:import)
 create_table "furnitures", force: :cascade do |t|
   t.string "name", null: false # 表示名 (例: 2人掛けソファ)
   t.string "category", null: false # 家具の種類 (sofa, chair, rug など)。推し活グッズはグッズ種別 (acrylic_stand など、config/goods_categories.json)
@@ -188,7 +188,7 @@ create_table "characters", force: :cascade do |t|
   t.index [ "character_key" ], unique: true
 end
 
-# キャラクターと、そのキャラクターのグッズである家具 (多対多)。db/furnitures.json の characters から rails furniture:import で作る
+# キャラクターと、そのキャラクターのグッズである家具 (多対多)。3D モデルの登録・取り込み (characters) で作る
 create_table "character_goods", force: :cascade do |t|
   t.references "character", null: false, foreign_key: true
   t.references "furniture", null: false, foreign_key: true

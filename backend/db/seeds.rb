@@ -20,7 +20,7 @@ characters = CharacterImporter.call
 puts "seeded #{characters.fetch(:franchises)} franchises and #{characters.fetch(:characters)} characters"
 
 furnitures = FurnitureImporter.call
-puts "seeded #{furnitures.fetch(:models)} furnitures"
+puts furnitures.fetch(:skipped) ? "kept #{Furniture.count} furnitures" : "seeded #{furnitures.fetch(:models)} furnitures"
 
 textures = FurnitureTextureImporter.call
 puts "seeded #{textures.fetch(:textures)} furniture textures"

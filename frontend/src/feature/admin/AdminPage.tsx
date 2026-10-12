@@ -348,7 +348,7 @@ function ModelsBoard({ models }: { models: AdminFurnitureModel[] }) {
         <label className="grow text-xs text-slate-600">検索<input className={field} type="search" placeholder="モデルID・名前・種類" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
         <label className="flex items-center gap-1 pb-1 text-sm"><input type="checkbox" checked={onlyUsed} onChange={(event) => setOnlyUsed(event.target.checked)} />商品で使っているものだけ</label>
       </div>
-      <p className="text-xs text-slate-600" role="status">{visible.length}件 / 全{models.length}件。GLBと寸法は backend/db/furnitures.json で管理します（ここでは有効・無効だけ切り替えられます）。</p>
+      <p className="text-xs text-slate-600" role="status">{visible.length}件 / 全{models.length}件。GLBと寸法は tools/furniture_models/publish.py で登録します（ここでは有効・無効だけ切り替えられます）。</p>
       <ErrorText error={toggle.error} />
       <div className="overflow-x-auto rounded-lg border border-[#E4E1EC] bg-white">
         <table className="w-full text-left text-sm">
