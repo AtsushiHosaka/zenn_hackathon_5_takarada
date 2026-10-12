@@ -24,3 +24,9 @@ The scanner reported 20 unsupported original shop rows, six source failures, 14 
 New installations receive the updated seed catalog. Existing databases need the Schemafile columns and the additive `furniture_detail:import_verified_colors` task; the ordinary seed importer intentionally skips a nonempty DB. Export the current DB before future scans to preserve its current geometry/model choices and unrelated/disabled records. Refresh verified source data within 30 days; expired checks stop automatic theme eligibility.
 
 Production was not deployed or modified. Native iOS, checkout, destination-specific delivery stock and live Gemini were not verified. Google Docs are unconfigured and were not updated.
+
+## Release preparation, 2026-10-12
+
+Integrated main `48b5f66` and checked its eight additional source entries. The combined catalog contains 180 source rows, including one retained alias, and 144 verified non-alias records. All source keys were preserved. The eight-row live scan verified seven original IKEA articles plus their sold color variants; the Francfranc source remains unsupported. Full integrated backend suite: 75 examples passed. Full Ruby lint: 142 files passed. Integrated frontend lint/build passed; Swagger and web types regenerated.
+
+The alias is resolved only by the initial DB importer. The additive importer skips aliases, matches existing URLs to preserve product IDs and rejects checks older than current DB evidence. The GitHub and local release paths now explicitly import verified colors on populated databases.

@@ -46,25 +46,25 @@ module FurnitureCandidates
       end
       items = scope.map { |detail| self.class.item(detail) }
       items = items.select { |item| FurnitureCandidates.compatible_character?(item, character_theme) }
+      color_preference = ColorPreference.new(prompt)
+      items = FurnitureCandidates.rank(items, preference:, character_theme:) if preference || character_theme
+      items = color_preference.sort(items).reject { |item| color_preference.rank(item) == 4 }
       if character_theme
         # Resolve the color within a proven retail family before comparing furniture.
         # Never infer a shop family from a shared 3D model or rewrite a SKU's color.
         selected = selected.filter_map do |item|
           family = item.metadata["retail_family_identity"]
           alternatives = family ? items.select { |candidate| candidate.metadata["retail_family_identity"] == family } : [ item ]
-          matching = alternatives.select { |candidate| FurnitureCandidates.theme_color_eligible?(candidate, preference, character_theme) }
-          choice = matching.find { |candidate| candidate.id == item.id } || FurnitureCandidates.rank(matching, preference:, character_theme:).first
+          matching = alternatives.select { |candidate| FurnitureCandidates.theme_color_eligible?(candidate, preference, character_theme) && color_preference.rank(candidate) < 4 }
+          choice = matching.find { |candidate| candidate.id == item.id } || color_preference.sort(FurnitureCandidates.rank(matching, preference:, character_theme:)).first
           choice = choice&.with(metadata: choice.metadata.merge(item.metadata.slice("group_id", "replaces_object_id", "preferred_position", "preferred_rotation", "target_size")).merge("selected_by_user" => true))
           @resolved_selected[[ item.id, item.metadata["group_id"] ]] = choice if choice
           choice
         end
         items = items.select { |item| FurnitureCandidates.theme_color_eligible?(item, preference, character_theme) }
         @unavailable_color_slots |= (slots - [ "floor" ]) - items.map(&:slot)
-        items = FurnitureCandidates.rank(items, preference:, character_theme:).uniq { |item| item.metadata["retail_family_identity"] || [ "detail", item.id ] }
+        items = items.uniq { |item| item.metadata["retail_family_identity"] || [ "detail", item.id ] }
       end
-      items = FurnitureCandidates.rank(items, preference:, character_theme:) if preference || character_theme
-      color_preference = ColorPreference.new(prompt)
-      items = color_preference.sort(items).reject { |item| color_preference.rank(item) == 4 }
       (selected + items).uniq { |item| [ item.metadata["group_id"], item.id ] }.group_by(&:slot)
     end
   end

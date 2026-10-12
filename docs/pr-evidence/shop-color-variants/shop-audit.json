@@ -1643,5 +1643,396 @@
     "url": "https://www.ikea.com/jp/ja/p/ektorp-armchair-kilanda-light-beige-s99552120/",
     "status": "failed",
     "reason": "selected_product_unverified"
+  },
+  {
+    "key": "ec:ikea:006.359.97:006.359.97",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+    "status": "variant_failed",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-yellow-60590892/",
+    "reason": "missing_variant_jpy_price"
+  },
+  {
+    "key": "ec:ikea:006.359.97:006.359.97",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+    "status": "added",
+    "variant_key": "ikea:70635989",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
+    "color_name": "イエローブラウン",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:006.359.97:006.359.97",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+    "status": "added",
+    "variant_key": "ikea:60636003",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-dark-green-60636003/",
+    "color_name": "ダークグリーン",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:006.359.97:006.359.97",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+    "status": "added",
+    "variant_key": "ikea:60590929",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-dark-grey-turquoise-60590929/",
+    "color_name": "ダークグレーターコイズ",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:006.359.97:006.359.97",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+    "status": "added",
+    "variant_key": "ikea:20636024",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-dark-brown-20636024/",
+    "color_name": "ダークブラウン",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:006.359.97:006.359.97",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+    "status": "added",
+    "variant_key": "ikea:10625889",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-dark-blue-10625889/",
+    "color_name": "ダークブルー",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:006.359.97:006.359.97",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+    "status": "added",
+    "variant_key": "ikea:10590922",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-bright-pink-10590922/",
+    "color_name": "ブライトピンク",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:006.359.97:006.359.97",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+    "status": "added",
+    "variant_key": "ikea:10591894",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-pale-pink-10591894/",
+    "color_name": "ペールピンク",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:006.359.97:006.359.97",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+    "status": "verified_existing",
+    "variant_key": "ikea:00635997",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+    "color_name": "ライトブルー",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:006.359.97:006.359.97",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+    "status": "added",
+    "variant_key": "ikea:30590898",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
+    "color_name": "ライトベージュ",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:505.430.14:505.430.14",
+    "url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-pale-blue-50543014/",
+    "status": "added",
+    "variant_key": "ikea:10543011",
+    "variant_url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-yellow-10543011/",
+    "color_name": "イエロー",
+    "family_key": "ikea:18d9ad4ce78c3776c9e07eb0"
+  },
+  {
+    "key": "ec:ikea:505.430.14:505.430.14",
+    "url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-pale-blue-50543014/",
+    "status": "added",
+    "variant_key": "ikea:30543005",
+    "variant_url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-off-white-30543005/",
+    "color_name": "オフホワイト",
+    "family_key": "ikea:18d9ad4ce78c3776c9e07eb0"
+  },
+  {
+    "key": "ec:ikea:505.430.14:505.430.14",
+    "url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-pale-blue-50543014/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-anthracite-50604700/",
+    "color_name": "チャコール"
+  },
+  {
+    "key": "ec:ikea:505.430.14:505.430.14",
+    "url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-pale-blue-50543014/",
+    "status": "verified_existing",
+    "variant_key": "ikea:50543014",
+    "variant_url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-pale-blue-50543014/",
+    "color_name": "ペールブルー",
+    "family_key": "ikea:18d9ad4ce78c3776c9e07eb0"
+  },
+  {
+    "key": "ec:ikea:505.430.14:505.430.14",
+    "url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-pale-blue-50543014/",
+    "status": "added",
+    "variant_key": "ikea:90610742",
+    "variant_url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-light-orange-90610742/",
+    "color_name": "ライトオレンジ",
+    "family_key": "ikea:18d9ad4ce78c3776c9e07eb0"
+  },
+  {
+    "key": "ec:ikea:505.430.14:505.430.14",
+    "url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-pale-blue-50543014/",
+    "status": "added",
+    "variant_key": "ikea:40604710",
+    "variant_url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-light-green-40604710/",
+    "color_name": "ライトグリーン",
+    "family_key": "ikea:18d9ad4ce78c3776c9e07eb0"
+  },
+  {
+    "key": "ec:ikea:505.430.14:505.430.14",
+    "url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-pale-blue-50543014/",
+    "status": "added",
+    "variant_key": "ikea:60542995",
+    "variant_url": "https://www.ikea.com/jp/ja/p/svartpoppel-cushion-cover-light-pink-60542995/",
+    "color_name": "ライトピンク",
+    "family_key": "ikea:18d9ad4ce78c3776c9e07eb0"
+  },
+  {
+    "key": "ec:ikea:106.237.72:106.237.72",
+    "url": "https://www.ikea.com/jp/ja/p/piltandvinge-duvet-cover-and-pillowcase-light-blue-10623772/",
+    "status": "added",
+    "variant_key": "ikea:30579099",
+    "variant_url": "https://www.ikea.com/jp/ja/p/piltandvinge-duvet-cover-and-pillowcase-grey-30579099/",
+    "color_name": "グレー",
+    "family_key": "ikea:588517e834e9d5c8aec4c27e"
+  },
+  {
+    "key": "ec:ikea:106.237.72:106.237.72",
+    "url": "https://www.ikea.com/jp/ja/p/piltandvinge-duvet-cover-and-pillowcase-light-blue-10623772/",
+    "status": "added",
+    "variant_key": "ikea:80579148",
+    "variant_url": "https://www.ikea.com/jp/ja/p/piltandvinge-duvet-cover-and-pillowcase-pink-80579148/",
+    "color_name": "ピンク",
+    "family_key": "ikea:588517e834e9d5c8aec4c27e"
+  },
+  {
+    "key": "ec:ikea:106.237.72:106.237.72",
+    "url": "https://www.ikea.com/jp/ja/p/piltandvinge-duvet-cover-and-pillowcase-light-blue-10623772/",
+    "status": "added",
+    "variant_key": "ikea:20582403",
+    "variant_url": "https://www.ikea.com/jp/ja/p/piltandvinge-duvet-cover-and-pillowcase-blue-20582403/",
+    "color_name": "ブルー",
+    "family_key": "ikea:588517e834e9d5c8aec4c27e"
+  },
+  {
+    "key": "ec:ikea:106.237.72:106.237.72",
+    "url": "https://www.ikea.com/jp/ja/p/piltandvinge-duvet-cover-and-pillowcase-light-blue-10623772/",
+    "status": "skipped_size_change",
+    "variant_url": "https://www.ikea.com/jp/ja/p/piltandvinge-duvet-cover-and-2-pillowcases-light-green-20579108/"
+  },
+  {
+    "key": "ec:ikea:106.237.72:106.237.72",
+    "url": "https://www.ikea.com/jp/ja/p/piltandvinge-duvet-cover-and-pillowcase-light-blue-10623772/",
+    "status": "verified_existing",
+    "variant_key": "ikea:10623772",
+    "variant_url": "https://www.ikea.com/jp/ja/p/piltandvinge-duvet-cover-and-pillowcase-light-blue-10623772/",
+    "color_name": "ライトブルー",
+    "family_key": "ikea:588517e834e9d5c8aec4c27e"
+  },
+  {
+    "key": "ec:francfranc:1102090107986:1102090107986",
+    "url": "https://francfranc.com/products/1102090107986",
+    "status": "failed",
+    "reason": "missing_name_or_color"
+  },
+  {
+    "key": "ec:ikea:206.433.12:206.433.12",
+    "url": "https://www.ikea.com/jp/ja/p/spetsboj-table-lamp-dimmable-light-blue-20643312/",
+    "status": "added",
+    "variant_key": "ikea:50583854",
+    "variant_url": "https://www.ikea.com/jp/ja/p/spetsboj-table-lamp-dimmable-yellow-50583854/",
+    "color_name": "調光可能/イエロー",
+    "family_key": "ikea:3a2436bd63b9650bb438b92a"
+  },
+  {
+    "key": "ec:ikea:206.433.12:206.433.12",
+    "url": "https://www.ikea.com/jp/ja/p/spetsboj-table-lamp-dimmable-light-blue-20643312/",
+    "status": "added",
+    "variant_key": "ikea:90643323",
+    "variant_url": "https://www.ikea.com/jp/ja/p/spetsboj-table-lamp-dimmable-orange-90643323/",
+    "color_name": "調光可能/オレンジ",
+    "family_key": "ikea:3a2436bd63b9650bb438b92a"
+  },
+  {
+    "key": "ec:ikea:206.433.12:206.433.12",
+    "url": "https://www.ikea.com/jp/ja/p/spetsboj-table-lamp-dimmable-light-blue-20643312/",
+    "status": "added",
+    "variant_key": "ikea:30589116",
+    "variant_url": "https://www.ikea.com/jp/ja/p/spetsboj-table-lamp-dimmable-white-30589116/",
+    "color_name": "調光可能/ホワイト",
+    "family_key": "ikea:3a2436bd63b9650bb438b92a"
+  },
+  {
+    "key": "ec:ikea:206.433.12:206.433.12",
+    "url": "https://www.ikea.com/jp/ja/p/spetsboj-table-lamp-dimmable-light-blue-20643312/",
+    "status": "verified_existing",
+    "variant_key": "ikea:20643312",
+    "variant_url": "https://www.ikea.com/jp/ja/p/spetsboj-table-lamp-dimmable-light-blue-20643312/",
+    "color_name": "調光可能/ライトブルー",
+    "family_key": "ikea:3a2436bd63b9650bb438b92a"
+  },
+  {
+    "key": "ec:ikea:406.297.20:406.297.20",
+    "url": "https://www.ikea.com/jp/ja/p/raskog-trolley-light-turquoise-40629720/",
+    "status": "added",
+    "variant_key": "ikea:30591770",
+    "variant_url": "https://www.ikea.com/jp/ja/p/raskog-trolley-beige-yellow-30591770/",
+    "color_name": "ベージュイエロー",
+    "family_key": "ikea:dfeabfbef245782a5d9e8c59"
+  },
+  {
+    "key": "ec:ikea:406.297.20:406.297.20",
+    "url": "https://www.ikea.com/jp/ja/p/raskog-trolley-light-turquoise-40629720/",
+    "status": "added",
+    "variant_key": "ikea:70591768",
+    "variant_url": "https://www.ikea.com/jp/ja/p/raskog-trolley-grey-green-70591768/",
+    "color_name": "グレーグリーン",
+    "family_key": "ikea:dfeabfbef245782a5d9e8c59"
+  },
+  {
+    "key": "ec:ikea:406.297.20:406.297.20",
+    "url": "https://www.ikea.com/jp/ja/p/raskog-trolley-light-turquoise-40629720/",
+    "status": "added",
+    "variant_key": "ikea:60629719",
+    "variant_url": "https://www.ikea.com/jp/ja/p/raskog-trolley-pink-60629719/",
+    "color_name": "ピンク",
+    "family_key": "ikea:dfeabfbef245782a5d9e8c59"
+  },
+  {
+    "key": "ec:ikea:406.297.20:406.297.20",
+    "url": "https://www.ikea.com/jp/ja/p/raskog-trolley-light-turquoise-40629720/",
+    "status": "added",
+    "variant_key": "ikea:60586791",
+    "variant_url": "https://www.ikea.com/jp/ja/p/raskog-trolley-black-60586791/",
+    "color_name": "ブラック",
+    "family_key": "ikea:dfeabfbef245782a5d9e8c59"
+  },
+  {
+    "key": "ec:ikea:406.297.20:406.297.20",
+    "url": "https://www.ikea.com/jp/ja/p/raskog-trolley-light-turquoise-40629720/",
+    "status": "added",
+    "variant_key": "ikea:80629718",
+    "variant_url": "https://www.ikea.com/jp/ja/p/raskog-trolley-beige-80629718/",
+    "color_name": "ベージュ",
+    "family_key": "ikea:dfeabfbef245782a5d9e8c59"
+  },
+  {
+    "key": "ec:ikea:406.297.20:406.297.20",
+    "url": "https://www.ikea.com/jp/ja/p/raskog-trolley-light-turquoise-40629720/",
+    "status": "added",
+    "variant_key": "ikea:40586792",
+    "variant_url": "https://www.ikea.com/jp/ja/p/raskog-trolley-white-40586792/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:dfeabfbef245782a5d9e8c59"
+  },
+  {
+    "key": "ec:ikea:406.297.20:406.297.20",
+    "url": "https://www.ikea.com/jp/ja/p/raskog-trolley-light-turquoise-40629720/",
+    "status": "verified_existing",
+    "variant_key": "ikea:40629720",
+    "variant_url": "https://www.ikea.com/jp/ja/p/raskog-trolley-light-turquoise-40629720/",
+    "color_name": "ライトターコイズ",
+    "family_key": "ikea:dfeabfbef245782a5d9e8c59"
+  },
+  {
+    "key": "ec:ikea:406.297.20:406.297.20",
+    "url": "https://www.ikea.com/jp/ja/p/raskog-trolley-light-turquoise-40629720/",
+    "status": "added",
+    "variant_key": "ikea:40637206",
+    "variant_url": "https://www.ikea.com/jp/ja/p/raskog-trolley-red-brown-40637206/",
+    "color_name": "レッドブラウン",
+    "family_key": "ikea:dfeabfbef245782a5d9e8c59"
+  },
+  {
+    "key": "ec:ikea:205.715.36:205.715.36",
+    "url": "https://www.ikea.com/jp/ja/p/ibbarbo-stool-turquoise-20571536/",
+    "status": "verified_existing",
+    "variant_key": "ikea:20571536",
+    "variant_url": "https://www.ikea.com/jp/ja/p/ibbarbo-stool-turquoise-20571536/",
+    "color_name": "ターコイズ",
+    "family_key": "ikea:b91f0c7c729144f81e96fc96"
+  },
+  {
+    "key": "ec:ikea:205.715.36:205.715.36",
+    "url": "https://www.ikea.com/jp/ja/p/ibbarbo-stool-turquoise-20571536/",
+    "status": "added",
+    "variant_key": "ikea:00571537",
+    "variant_url": "https://www.ikea.com/jp/ja/p/ibbarbo-stool-dark-grey-00571537/",
+    "color_name": "ダークグレー",
+    "family_key": "ikea:b91f0c7c729144f81e96fc96"
+  },
+  {
+    "key": "ec:ikea:205.715.36:205.715.36",
+    "url": "https://www.ikea.com/jp/ja/p/ibbarbo-stool-turquoise-20571536/",
+    "status": "added",
+    "variant_key": "ikea:30570174",
+    "variant_url": "https://www.ikea.com/jp/ja/p/ibbarbo-stool-beige-30570174/",
+    "color_name": "ベージュ",
+    "family_key": "ikea:b91f0c7c729144f81e96fc96"
+  },
+  {
+    "key": "ec:ikea:306.335.53:306.335.53",
+    "url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-light-blue-30633553/",
+    "status": "variant_failed",
+    "variant_url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-grey-turquoise-80584630/",
+    "reason": "missing_variant_jpy_price"
+  },
+  {
+    "key": "ec:ikea:306.335.53:306.335.53",
+    "url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-light-blue-30633553/",
+    "status": "variant_failed",
+    "variant_url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-beige-yellow-40584627/",
+    "reason": "missing_variant_jpy_price"
+  },
+  {
+    "key": "ec:ikea:306.335.53:306.335.53",
+    "url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-light-blue-30633553/",
+    "status": "added",
+    "variant_key": "ikea:50584622",
+    "variant_url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-off-white-50584622/",
+    "color_name": "オフホワイト",
+    "family_key": "ikea:99ed81cd375ca74ce64e2953"
+  },
+  {
+    "key": "ec:ikea:306.335.53:306.335.53",
+    "url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-light-blue-30633553/",
+    "status": "added",
+    "variant_key": "ikea:10584624",
+    "variant_url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-blue-10584624/",
+    "color_name": "ブルー",
+    "family_key": "ikea:99ed81cd375ca74ce64e2953"
+  },
+  {
+    "key": "ec:ikea:306.335.53:306.335.53",
+    "url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-light-blue-30633553/",
+    "status": "added",
+    "variant_key": "ikea:80591796",
+    "variant_url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-orange-bright-pink-80591796/",
+    "color_name": "オレンジ/ブライトピンク",
+    "family_key": "ikea:99ed81cd375ca74ce64e2953"
+  },
+  {
+    "key": "ec:ikea:306.335.53:306.335.53",
+    "url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-light-blue-30633553/",
+    "status": "added",
+    "variant_key": "ikea:70636700",
+    "variant_url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-dark-green-70636700/",
+    "color_name": "ダークグリーン",
+    "family_key": "ikea:99ed81cd375ca74ce64e2953"
+  },
+  {
+    "key": "ec:ikea:306.335.53:306.335.53",
+    "url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-light-blue-30633553/",
+    "status": "verified_existing",
+    "variant_key": "ikea:30633553",
+    "variant_url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-light-blue-30633553/",
+    "color_name": "ライトブルー",
+    "family_key": "ikea:99ed81cd375ca74ce64e2953"
   }
 ]

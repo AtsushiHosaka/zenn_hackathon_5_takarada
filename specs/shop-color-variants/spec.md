@@ -25,3 +25,9 @@ The additive import preserves unrelated/disabled products and performs no reset 
 The Web color chooser shows published sale colors, the source/check date and availability context. Miku suggestions are blue, mint, white and green. No new API fields are needed; existing product metadata fields carry the evidence. API grouping descriptions are updated through request specs, Swagger generation and frontend type generation.
 
 Verification results and live coverage are recorded in `docs/pr-evidence/shop-color-variants/verification.md`. Native iOS, production deployment, destination-specific stock and checkout are outside this local verification.
+
+## Release integration, 2026-10-12
+
+The user explicitly authorized deployment. Integrated current main `48b5f66`, retaining the new textile placement and light-blue preference logic. Color preference now ranks verified variants before a retail family is reduced to one candidate, so a darker sibling cannot hide its lighter sale color. The eight catalog entries added by that release were checked against shop pages; all seven IKEA originals qualified, while the Francfranc rug remained unverified. All original source rows are preserved; one overlapping SANELA source entry is an explicit alias of its checked article, so the initial import does not duplicate the database SKU.
+
+Both release paths run the additive verified-color import after schema application and before API replacement. Imports skip expired checks and preserve a newer/equal existing shop timestamp. URL matching keeps an existing database product ID even if its source key differs. Production schema reconciliation must be proven additive before release; do not reset the production catalog.

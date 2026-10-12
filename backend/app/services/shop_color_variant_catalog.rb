@@ -10,8 +10,9 @@ class ShopColorVariantCatalog
     updated = 0
     FurnitureDetail.transaction do
       rows.each do |row|
-        detail = FurnitureDetail.find_by(key: row.fetch("key"))
-        row_checked_at = Time.iso8601(row["retail_checked_at"]) if row["retail_checked_at"].present?
+        next if row["retail_alias_of"].present?
+        detail = FurnitureDetail.find_by(key: row.fetch("key")) || FurnitureDetail.find_by(url: row.fetch("url"), shop: row.fetch("shop"))
+        row_checked_at = row["retail_checked_at"].present? ? Time.iso8601(row["retail_checked_at"]) : nil
         if row_checked_at
           next unless row_checked_at.between?(30.days.ago, Time.current)
           next if detail&.retail_checked_at && detail.retail_checked_at >= row_checked_at
