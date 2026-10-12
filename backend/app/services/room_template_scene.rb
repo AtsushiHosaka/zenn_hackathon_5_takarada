@@ -28,6 +28,14 @@ class RoomTemplateScene
       "objects" => objects.map { |object| object(object, width, depth, height) }
     }
     invalid! if scene["room"]["windows"].pluck("id").uniq.length != windows.length || scene["objects"].pluck("id").uniq.length != objects.length
+    by_id = scene["objects"].index_by { |object| object["id"] }
+    scene["objects"].each do |object|
+      next unless object["attach_to"]
+
+      support = by_id[object["attach_to"]]
+      invalid! unless support && support["id"] != object["id"]
+      invalid! if %w[cushion blanket].include?(object["category"]) && !%w[bed sofa bed_cover].include?(support["category"])
+    end
     scene
   end
 
@@ -67,7 +75,7 @@ class RoomTemplateScene
     { "id" => identifier(value["id"]), "source" => "existing", "category" => category, "label" => label.strip,
       "position" => { "x" => x, "y" => y, "z" => z }, "size" => { "w" => w, "h" => h, "d" => d },
       "rotation_y" => rotation, "color" => color(value["color"]), "model_url" => nil,
-      "slot" => nil, "attach_to" => nil, "item_id" => nil, "marker" => nil }
+      "slot" => nil, "attach_to" => value["attach_to"].nil? ? nil : identifier(value["attach_to"]), "item_id" => nil, "marker" => nil }
   end
 
   def identifier(value)

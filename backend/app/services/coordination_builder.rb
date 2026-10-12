@@ -18,7 +18,7 @@ class CoordinationBuilder
     end
     @scene["objects"].map! do |object|
       edit = coordination.edited_objects.find { |value| value["id"] == object["id"] }
-      edit ? object.merge(edit.slice("position", "size", "rotation_y", "color")) : object
+      edit ? object.merge(edit.slice("position", "size", "rotation_y", "color", "attach_to")) : object
     end
   end
 

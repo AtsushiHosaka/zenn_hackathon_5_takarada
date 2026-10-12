@@ -1,6 +1,6 @@
-import { useRef, useState, type DragEvent } from 'react';
-import { isManualFurniture, isTemplateFurniture, productCategories, type ManualFurnitureCategory, type FurnitureAddition, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
-import FurnitureAdditionRows from './FurnitureAdditionRows';
+import { useState, type DragEvent } from 'react';
+import { isManualFurniture, productCategories, type ManualFurnitureCategory, type FurnitureAddition, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
+import PastelColorOptions from './PastelColorOptions';
 import { downloadShoppingCsv } from './exports';
 import { createFurnitureItem, FURNITURE_DRAG_TYPE, furnitureTemplates } from './furniturePlacement';
 import { canPlaceOnFurniture, getFurniturePlacementBounds, furniturePositionInRoom, snapFurnitureEditPosition } from './roomBounds';
@@ -53,19 +53,10 @@ type PlannerPanelProps = {
   placementHint?: string;
 };
 
-const itemColors = [
-  ['#F4F1EA', 'ホワイト'], ['#D8C2A0', 'ベージュ'], ['#C08F5B', 'ナチュラルウッド'], ['#6F4A2C', 'ブラウン'],
-  ['#9A9CA3', 'グレー'], ['#2B2C31', 'ブラック'], ['#2F4E86', 'ネイビー'], ['#3C86E0', 'ブルー'],
-  ['#4C9A62', 'グリーン'], ['#F0BE3C', 'イエロー'], ['#D6423A', 'レッド'], ['#E78BA3', 'ピンク'],
-] as const;
-const wallColors = [
-  ['#D5CCDF', 'ラベンダー'], ['#F0ECE5', 'アイボリー'], ['#CCD7C8', '淡いグリーン'],
-  ['#E5D2D7', '淡いピンク'], ['#C7D4E0', '淡いブルー'],
-] as const;
 const viewChoices = [['perspective', '立体'], ['top', '真上'], ['front', '正面']] as const;
 const cm = (meters: number) => `${Math.round(meters * 1000) / 10}`;
 const furnitureSources = [['search', '登録家具から探す'], ['manual', '種類と寸法で選ぶ'], ['library', '取り込んだ家具'], ['photo', '画像から家具'], ['image', '画像から推しグッズ']] as const;
-const plannerTabs = [['add', '家具を追加'], ['item', '選んだ家具'], ['room', '部屋']] as const;
+const plannerTabs = [['item', '選んだ家具'], ['room', '部屋'], ['add', '家具を追加']] as const;
 type PlannerTab = typeof plannerTabs[number][0];
 
 function ArrowIcon({ redo = false }: { redo?: boolean }) {
@@ -82,6 +73,8 @@ function RotateIcon({ clockwise = false }: { clockwise?: boolean }) {
 
 function FurnitureIcon({ category }: { category: ManualFurnitureCategory }) {
   const paths: Record<ManualFurnitureCategory, string> = {
+    blanket: 'M4 5h16v16H4V5m0 4h16M7 21v3m5-3v3m5-3v3',
+    cushion: 'M5 6Q12 3 19 6Q22 13 19 20Q12 23 5 20Q2 13 5 6Z',
     mirror: 'M5 2h14v21H5V2m3 3h8v15H8V5m1 12 5-8m-5 3 3-5',
     sofa: 'M5 13V7h14v6M3 12h4v7h10v-7h4v9H3v-9M6 21v2m12-2v2M7 16h10',
     bed: 'M3 21V5m18 16V10H3m0 7h18M6 7h5v3H6V7m15 10v4',
@@ -171,6 +164,7 @@ function FurniturePalette({ design, disabled, hint, onAddItem, onDragItem, onVie
     </fieldset>
     {inputError && !disabled && <p className="rc-planner-input-error" role="status">{inputError}</p>}
     {category === 'mirror' && <p className="rc-planner-note">鏡は正面の部屋を反射します。反射したい方向へ回転してください。</p>}
+    {(category === 'blanket' || category === 'cushion') && <p className="rc-planner-note">上面表示でベッドの布団やソファの座面へドラッグして追加できます。面に収まる寸法に調整してください。</p>}
     <button className="rc-furniture-add motion-control" type="button" disabled={disabled || !valid} onClick={() => onAddItem(createFurnitureItem(category, size))}>＋ 部屋の中央に追加</button>
     </>}
     {hint && <p className="rc-planner-warning" role="status">{hint}</p>}
@@ -206,7 +200,6 @@ function FurnitureSizeEditor({ item, design, onChange }: { item: RoomItem; desig
 }
 
 export default function PlannerPanel({ design, templateEditing=false, selectedId, onSelect, furnitureRequests, onChange, onUndo, onRedo, canUndo, canRedo, dirty, onSave, onClose, onProducts, view, onView, dimensions, onDimensions, onAddItem, onDragItem, onRemoveItem, placementDisabled, placementHint }: PlannerPanelProps) {
-  const additionButton = useRef<HTMLButtonElement>(null);
   const [tab, setTab] = useState<PlannerTab>(selectedId ? 'item' : 'add');
   const [seenSelectedId, setSeenSelectedId] = useState(selectedId);
   if (seenSelectedId !== selectedId) {
@@ -216,7 +209,15 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
   const paletteScope = useRoomPlanScope();
   const selectableItems = [...design.items, ...(furnitureRequests?.existingItems ?? []).filter(item => !design.items.some(current => current.id === item.id))];
   const selected = selectableItems.find(item => item.id === selectedId);
-  const detectedItems = furnitureRequests?.existingItems.filter(item => !isManualFurniture(item) && !isTemplateFurniture(item)) ?? [];
+  function itemNumber(item: RoomItem): number | undefined {
+    if (item.marker !== undefined) return item.marker;
+    const index = design.items.filter(candidate => !candidate.existing).findIndex(candidate => candidate.id === item.id);
+    return index >= 0 ? index + 1 : undefined;
+  }
+  function itemLabel(item: RoomItem): string {
+    const number = itemNumber(item);
+    return `${number === undefined ? '' : `${number}. `}${item.name}${item.existing ? '（今ある家具）' : ''}`;
+  }
   const selectedProductLink = furnitureLink(selected?.productUrl);
   const completeModel = Boolean(design.modelUrl && design.modelKind !== 'shell');
   const itemDisabled = !selected || !design.items.some(item => item.id === selected.id) || completeModel;
@@ -266,13 +267,14 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
           <label className="rc-planner-label" htmlFor="planner-item">編集する家具</label>
           <select id="planner-item" value={selected?.id ?? ''} onChange={event => onSelect(event.target.value)}>
             <option value="" disabled>家具を選択してください</option>
-            {selectableItems.map(item => <option key={item.id} value={item.id}>{item.name}{item.existing ? '（今ある家具）' : ''}</option>)}
+            {selectableItems.map(item => <option key={item.id} value={item.id}>{itemLabel(item)}</option>)}
           </select>
           {!selected && <p className="rc-planner-note rc-planner-hint">部屋の中の家具をクリックするか、上の一覧から選んでください。</p>}
         </section>
         {completeModel && <p className="rc-planner-warning">家具を含む完成モデルのため、個別の移動・回転・色変更には対応していません。視点の切り替えは「部屋」から使えます。</p>}
         {selected && <>
           <div className="rc-planner-summary">
+            <p className="rc-planner-selected-name">{itemLabel(selected)}</p>
             {(selected.imageUrl || selected.referenceImage) && <FurniturePhoto key={selected.imageUrl ?? selected.referenceImage?.dataUrl} item={selected} compact />}
             <p className="rc-planner-size">幅 {cm(selected.size[0])} × 高さ {cm(selected.size[1])} × 奥行き {cm(selected.size[2])} cm</p>
             {selectedProductLink && <a className="rc-furniture-product-link" href={selectedProductLink} target="_blank" rel="noopener noreferrer">商品ページを見る</a>}
@@ -287,10 +289,7 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
           </fieldset>
           <fieldset className="rc-planner-section" disabled={itemDisabled}>
             <legend>色（3Dプレビュー）</legend>
-            <div className="rc-planner-swatches" role="group" aria-label="家具の色を選ぶ">
-              {itemColors.map(([color, label]) => <button className="motion-control" key={color} type="button" aria-label={`家具を${label}にする`} title={label} aria-pressed={selected.color.toUpperCase() === color.toUpperCase()} style={{ backgroundColor: color }} onClick={() => changeItem({ color, previewColor: color })} />)}
-            </div>
-            <label className="rc-planner-floor-color">自由に選ぶ<input type="color" aria-label="家具の色を自由に選ぶ" value={selected.previewColor ?? selected.color} onChange={event => changeItem({ color: event.target.value, previewColor: event.target.value })} /></label>
+            <PastelColorOptions target="家具" value={selected.previewColor ?? selected.color} onChange={color => changeItem({ color, previewColor: color })}/>
             {selected.productUrl && <p className="rc-planner-note">色を変えるのはプレビューだけです。商品の色違いは「商品を置き換える」で選べます。</p>}
           </fieldset>
           {selected.artwork && !itemDisabled && <label className="rc-image-goods-height">床からの高さ（cm）<input type="number" min="0" max={Math.floor((getFurniturePlacementBounds(design).max[1] - getFurniturePlacementBounds(design).floor - selected.size[1]) * 100)} step="1" value={Math.round((selected.position[1] - selected.size[1] / 2 - getFurniturePlacementBounds(design).floor) * 100)} onChange={event => {
@@ -332,40 +331,13 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
         </section>
         <fieldset className="rc-planner-section" disabled={completeModel}>
           <legend>壁の色</legend>
-          <div className="rc-planner-swatches" role="group" aria-label="壁の色を選ぶ">
-            {wallColors.map(([color, label]) => <button className="motion-control" key={color} type="button" aria-label={`壁を${label}にする`} title={label} aria-pressed={design.wallColor?.toUpperCase() === color.toUpperCase()} style={{ backgroundColor: color }} onClick={() => onChange({ ...design, wallColor: color })} />)}
-          </div>
+          <PastelColorOptions target="壁" value={design.wallColor ?? '#F0ECE5'} onChange={wallColor => onChange({ ...design, wallColor })}/>
         </fieldset>
         <fieldset className="rc-planner-section" disabled={completeModel}>
           <legend>床の色</legend>
-          <div className="rc-planner-swatches" role="group" aria-label="床の色を選ぶ">
-            {wallColors.map(([color, label]) => <button className="motion-control" key={color} type="button" aria-label={`床を${label}にする`} title={label} aria-pressed={(design.floorColor ?? design.room?.floorColor)?.toUpperCase() === color.toUpperCase()} style={{ backgroundColor: color }} onClick={() => onChange({ ...design, floorColor: color })} />)}
-          </div>
-          <label className="rc-planner-floor-color">自由に選ぶ<input type="color" aria-label="床の色を自由に選ぶ" value={design.floorColor ?? design.room?.floorColor ?? '#D9BF99'} onChange={event => onChange({ ...design, floorColor: event.target.value })} /></label>
+          <PastelColorOptions target="床" value={design.floorColor ?? design.room?.floorColor ?? '#D9BF99'} onChange={floorColor => onChange({ ...design, floorColor })}/>
         </fieldset>
-        {furnitureRequests && <section className="rc-planner-section" aria-labelledby="planner-detected-label">
-          <h3 id="planner-detected-label">写真から検出した家具</h3>
-          <p className="rc-planner-note" id="planner-detected-help">正しく検出された家具にチェックを入れると、次の部屋に残します。</p>
-          {detectedItems.length === 0
-            ? <p className="rc-planner-note">検出された家具はありません。</p>
-            : <ul className="rc-planner-detected-list">
-              {detectedItems.map(item => {
-                const action = furnitureRequests.operations.find(operation => operation.objectId === item.id)?.action ?? 'keep';
-                return <li key={item.id}>
-                  <label className="rc-planner-check">
-                    <input type="checkbox" checked={action === 'keep'} aria-describedby="planner-detected-help" onChange={event => furnitureRequests.onOperationChange(item.id, event.target.checked ? 'keep' : 'remove')} />
-                    <span>{item.name}{action === 'replace' && <small>入れ替える家具</small>}</span>
-                  </label>
-                </li>;
-              })}
-            </ul>}
-        </section>}
-        {furnitureRequests && <details className="rc-planner-fold">
-          <summary>AIに提案してほしい家具{furnitureRequests.additions.length > 0 && `（${furnitureRequests.additions.length}点）`}</summary>
-          <p className="rc-planner-note">次のコーディネートで提案する家具を、最大6点指定できます。</p>
-          <FurnitureAdditionRows values={furnitureRequests.additions} onChange={furnitureRequests.onAdditionsChange} emptyFocusTarget={additionButton}/>
-          <button ref={additionButton} type="button" className="rc-secondary" disabled={furnitureRequests.additions.length >= 6} onClick={() => furnitureRequests.onAdditionsChange([...furnitureRequests.additions, { category: 'sofa', uiId: crypto.randomUUID() }])}>家具を追加</button>
-        </details>}
+
       </div>
     </div>
     <div className="rc-planner-footer">

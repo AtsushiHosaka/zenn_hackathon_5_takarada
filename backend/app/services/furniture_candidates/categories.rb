@@ -12,6 +12,7 @@ module FurnitureCandidates
     [ "wall_shelf", "wall_decor", /ウォール\s?(?:シェルフ|ラック)|壁(?:掛け|付け)(?:棚|ラック|シェルフ)/ ],
     [ "bed_cover", "bed_cover", /掛け?布団カバー|掛ふとんカバー|ベッドカバー|掛けふとんカバー/ ],
     [ "curtain", "curtain", /カーテン/ ], [ "rug", "rug", /ラグ|カーペット|じゅうたん/ ],
+    [ "blanket", "blanket", /ブランケット|ひざ掛け|膝掛け|毛布/ ],
     [ "cushion", "cushion", /クッション/ ], [ "floor_lamp", "light", /フロアランプ|フロアライト|スタンドライト/ ],
     [ "desk_lamp", "desk_top", /デスクライト|テーブルランプ|卓上ライト|クリップライト/ ],
     [ "candle", "desk_top", /キャンドル(?!ホルダー|スタンド)/ ],

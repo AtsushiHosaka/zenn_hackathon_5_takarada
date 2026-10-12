@@ -1,0 +1,8 @@
+.rc-pastel-options {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0}
+.rc-pastel-options button,.rc-pastel-custom {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:76px;padding:10px 4px;border:1px solid #e4e1ec;border-radius:10px;background:#fff;color:#292533;font-size:12px;cursor:pointer}
+.rc-pastel-options button[aria-pressed=true],.rc-pastel-custom.is-selected {border-color:#6a3cd6;box-shadow:0 0 0 1px #6a3cd6;background:#f8f5fe}
+.rc-pastel-chip {width:28px;height:28px;border:1px solid #d9d4df;border-radius:50%}
+.rc-pastel-custom input {width:32px;height:28px;padding:0;border:0;background:transparent;cursor:pointer}
+.rc-pastel-options button:focus-visible,.rc-pastel-custom:focus-within {outline:2px solid #6a3cd6;outline-offset:2px}
+fieldset:disabled .rc-pastel-options {opacity:.5}
+fieldset:disabled .rc-pastel-options button,fieldset:disabled .rc-pastel-custom {cursor:default}

@@ -16,7 +16,7 @@ import RoomGenerating from './RoomGenerating';
 import RoomPalettePicker from './RoomPalettePicker';
 import { hasExplicitRoomColorPreference, suggestedRoomPaletteId } from '../../domain/roomPaletteSuggestions';
 import PlannerPanel, { type PlannerView } from './PlannerPanel';
-import { furniturePositionInRoom, getFurniturePlacementBounds, furnitureSurfaceHeight, snapFurnitureEditPosition } from './roomBounds';
+import { furniturePositionInRoom, getFurniturePlacementBounds, furnitureSurfaceHeight, snapFurnitureEditPosition, followFurnitureSupport } from './roomBounds';
 import { roomDescription } from './roomDescription';
 import { roomPlanKeys as sharedRoomPlanKeys, scopedRoomPlanKeys, useRoomPlanScope, saveRoomPlan, useRoomPlan, isApiRoomAlias } from './plans';
 import ErrorText from '../shared/ErrorText';
@@ -294,15 +294,27 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   }
   function changeTitle(event:FormEvent) {event.preventDefault();if(!requireOwner())return;const value=title.trim();if(!value)return;try{const next={...design,title:value};if(isTemplate)saveRoomTemplate(client,scope,next);else saveRoomPlan(client,next,scope);setSavedFingerprint(JSON.stringify(next));setRename(false);}catch{setNotice('ルーム名を保存できませんでした。');}}
   function editDesign(next:RoomDesign) {
-    next={...next,items:next.items.map(item=>{
-      if(!item.supportObjectId)return item;
+    const resolved=new Map<string,RoomItem>();
+    const resolving=new Set<string>();
+    const resolveSupport=(original:RoomItem):RoomItem=>{
+      const cached=resolved.get(original.id);if(cached)return cached;
+      if(!original.supportObjectId||resolving.has(original.id))return original;
+      resolving.add(original.id);
+      let item=original;
       const previousSupport=design.items.find(support=>support.id===item.supportObjectId);
-      const support=next.items.find(support=>support.id===item.supportObjectId);
+      const requestedSupport=next.items.find(support=>support.id===item.supportObjectId);
+      const support=requestedSupport?resolveSupport(requestedSupport):undefined;
       // Same-ID product replacement can change the mesh without changing its bounds.
       const geometryIdentity=(value:RoomItem|undefined)=>value&&[value.category,value.modelUrl,value.modelSize,value.modelFit];
       const geometryChanged=JSON.stringify(geometryIdentity(previousSupport))!==JSON.stringify(geometryIdentity(support));
-      return geometryChanged||furnitureSurfaceHeight(item,item.position,next)===null?{...item,supportObjectId:undefined,supportSurface:undefined,position:[item.position[0],getFurniturePlacementBounds(next).floor+item.size[1]/2,item.position[2]]}:item;
-    })};
+      const supportMoved=previousSupport&&support&&JSON.stringify([previousSupport.position,previousSupport.size,previousSupport.rotation??0])!==JSON.stringify([support.position,support.size,support.rotation??0]);
+      const followsSupport=Boolean(supportMoved&&!geometryChanged&&previousSupport&&support&&['blanket','cushion','bed_cover','cover'].includes(item.category)&&JSON.stringify(previousSupport.size)===JSON.stringify(support.size));
+      if(followsSupport&&previousSupport&&support)item=followFurnitureSupport(item,previousSupport,support);
+      const supportedDesign={...next,items:next.items.map(value=>resolved.get(value.id)??value)};
+      if(geometryChanged||(supportMoved&&!followsSupport)||furnitureSurfaceHeight(item,item.position,supportedDesign)===null)item={...item,supportObjectId:undefined,supportSurface:undefined,position:[item.position[0],getFurniturePlacementBounds(next).floor+item.size[1]/2,item.position[2]]};
+      resolving.delete(original.id);resolved.set(item.id,item);return item;
+    };
+    next={...next,items:next.items.map(resolveSupport)};
     if(JSON.stringify(next)===JSON.stringify(design))return;
     // Preserve the rendered floor before any original furniture can move.
     if(!design.room)next={...next,inferredRoomBounds:getFurniturePlacementBounds(design)};

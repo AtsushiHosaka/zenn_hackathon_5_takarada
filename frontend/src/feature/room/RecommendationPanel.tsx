@@ -4,7 +4,7 @@ import ReferenceSvg from './ReferenceSvg';
 import { categoryOf } from './itemCategory';
 import { motionScrollIntoView, motionStaggerStyle, prefersReducedMotion, useReducedMotion } from '../../core/motion';
 const money=(value:number)=>`¥${value.toLocaleString('ja-JP')}`;
-const illustrations:Record<string,number>={led:21,shelf:23,display:23,rug:25,artwork:27,wall_decor:27,cushion:29,lamp:31,light:31,plant:33,cover:35,bed_cover:35};
+const illustrations:Record<string,number>={led:21,shelf:23,display:23,rug:25,artwork:27,wall_decor:27,cushion:29,lamp:31,light:31,table_lamp:31,desk_lamp:31,floor_lamp:31,plant:33,cover:35,bed_cover:35,blanket:35};
 const labels=[['all','すべて'],['light','照明'],['storage','収納'],['fabric','ファブリック'],['goods','雑貨']];
 function productLink(value?:string) {try { const url=new URL(value??'');return ['https:','http:'].includes(url.protocol)?url.href:null; }catch{return null;} }
 const dimensionLabel = (value:number|null) => value === null ? '不明' : `${Math.round(value*1000)/10}cm`;

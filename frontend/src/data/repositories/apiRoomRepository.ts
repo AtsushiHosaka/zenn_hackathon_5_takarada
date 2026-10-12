@@ -191,6 +191,7 @@ function editedObjects(input: GenerateRoomInput, record: components["schemas"]["
     size: { w: item.size[0], h: item.size[1], d: item.size[2] },
     rotation_y: item.rotation ?? 0,
     color: item.color,
+    ...(['blanket', 'cushion', 'bed_cover', 'cover'].includes(item.category) || item.supportObjectId ? { attach_to: item.supportObjectId ?? null } : {}),
     ...(item.artwork && isManualFurniture(item) ? { artwork: { data_url: item.artwork.dataUrl } } : {}),
     ...(isManualFurniture(item) ? { category: item.category as components["schemas"]["FurnitureEdit"]["category"], ...(!item.furnitureDetailId ? { label: item.name } : {}) } : {}),
     ...(item.furnitureDetailId ? { furniture_detail_id: Number(item.furnitureDetailId) } : {}),
@@ -275,6 +276,6 @@ function templateRequest(template: import("../../domain/room").RoomDesign): comp
     room: {width: room.width, depth: room.depth, height: room.height, wall_color: template.wallColor ?? "#F0ECE5", floor_color: template.floorColor ?? room.floorColor, windows: room.windows},
     objects: template.items.map(item => ({id: item.id, source: "existing", category: item.category, label: item.name,
       size: {w: item.size[0], h: item.size[1], d: item.size[2]}, position: {x: item.position[0] + room.width / 2, y: item.position[1] - item.size[1] / 2, z: item.position[2] + room.depth / 2},
-      rotation_y: item.rotation ?? 0, color: item.color, model_url: null, slot: null, attach_to: null, item_id: null, marker: null}))
+      rotation_y: item.rotation ?? 0, color: item.color, model_url: null, slot: null, attach_to: item.supportObjectId ?? null, item_id: null, marker: null}))
   }}};
 }

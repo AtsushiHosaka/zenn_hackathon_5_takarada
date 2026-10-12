@@ -15,7 +15,7 @@ class CoordinationPlanner
   Previous = Data.define(:prompt, :title, :items)
 
   # 雰囲気が大きく変わる順 (色の面積が大きい布もの → 壁 → 照明 → 小物)
-  SLOT_PRIORITY = %w[bed_cover curtain rug wall_decor light display cushion desk_top].freeze
+  SLOT_PRIORITY = %w[bed_cover blanket curtain rug wall_decor light display cushion desk_top].freeze
 
   # 1 つの枠で採用できる商品の上限。何点にするかは AI が決める。無い枠 (ベッドカバー・カーテン・ラグ・床の家具の各操作) は 1 点。
   # floor は、利用者が指定していない大型家具を AI が自分から足すときの上限

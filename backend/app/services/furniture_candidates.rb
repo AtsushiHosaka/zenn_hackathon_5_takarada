@@ -7,7 +7,7 @@
 # preference (要望から読み取った色・雰囲気・形) を渡すと、合う商品を先にする (同点は並び順)。
 # 選ぶ・置くのは呼び出し側 (CoordinationBuilder)。
 module FurnitureCandidates
-  SLOTS = %w[bed_cover curtain rug wall_decor light display cushion desk_top floor].freeze
+  SLOTS = %w[bed_cover blanket curtain rug wall_decor light display cushion desk_top floor].freeze
   FLOOR_CATEGORIES = %w[sofa bed desk chair shelf table storage tv_stand wardrobe].freeze
 
   # カテゴリごとの標準寸法 (メートル)。寸法の無い候補に使う (Item.build)
