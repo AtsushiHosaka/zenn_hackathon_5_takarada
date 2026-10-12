@@ -2,7 +2,7 @@ class CoordinationPlanner
   # AI を使わないモック。要望文のキーワードで 3 つのテーマのどれかに決める
   class Mock
     THEMES = {
-      "oshi" => { title: "ラベンダーの推し活ルーム", keywords: %w[推し 紫 パープル ラベンダー アクスタ ぬい] },
+      "oshi" => { title: "水色の推し活ルーム", keywords: %w[推し ミク 水色 ミント 紫 パープル ラベンダー アクスタ ぬい] },
       "botanical" => { title: "グリーンが映えるボタニカルルーム", keywords: %w[ボタニカル 植物 グリーン 緑 観葉] },
       "korean" => { title: "くすみベージュの韓国風ルーム", keywords: %w[韓国 ベージュ くすみ アイボリー ナチュラル] }
     }.freeze
