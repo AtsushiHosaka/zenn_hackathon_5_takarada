@@ -1,6 +1,6 @@
 .room-list-page{min-width:0;min-height:100vh;background:#16141C;color:#EDEAF4;font-family:'Zen Kaku Gothic New','Hiragino Sans','Noto Sans JP',sans-serif}
 .room-list-header{height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 clamp(16px,3vw,32px);background:#FFF;color:#1D1B26;border-bottom:1px solid #E4E1EC}
-.room-list-brand{display:flex;align-items:center;gap:10px;color:#1D1B26;text-decoration:none}
+.room-list-brand{display:flex;align-items:center;gap:10px;margin-right:auto;color:#1D1B26;text-decoration:none}
 .room-list-brand img{display:block}
 .room-list-brand span{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.01em}
 .room-list-main{max-width:1320px;margin:0 auto;padding:28px clamp(16px,3vw,40px) 48px;display:flex;flex-direction:column;gap:24px}

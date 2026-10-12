@@ -62,16 +62,16 @@ function PhotoTile({entry,index,onRemove,onExit}:{entry:PhotoEntry;index:number;
 }
 // 第1部で今の部屋を、第2部で作りたい部屋を聞く。
 type InputStep = 'room' | 'request';
-const stepLabels: Record<InputStep,string> = {room:'今の部屋',request:'作りたい部屋'};
 const stepQuestions: Record<InputStep,string> = {room:'現在のあなたの部屋を教えてください。',request:'どんな部屋にしたいですか？'};
 function Intro({step}:{step:InputStep|undefined}) {
   return <div className="rc-assistant motion-enter"><span className="rc-assistant-icon"><ReferenceSvg page={3} index={2}/></span><div className="rc-assistant-body" aria-live="polite"><span className="rc-assistant-name">へやいろ</span>
     <p>{step?stepQuestions[step]:'入力できる項目を確認しています。'}</p>
   </div></div>;
 }
-function InputProgress({steps,current}:{steps:InputStep[];current:InputStep}) {
-  const index=steps.indexOf(current);
-  return <ol className="rc-input-progress" aria-label="部屋の入力手順">{steps.map((step,position)=><li key={step} aria-current={position===index?'step':undefined} className={`motion-control${position<index?' is-complete':''}`}><span>{position+1}</span>{stepLabels[step]}</li>)}</ol>;
+// 全体の流れ。今どこにいるかを画面の上にいつも出す。
+const flowLabels=['今の部屋','どんな部屋がいい？','完成'];
+function FlowSteps({current}:{current:number}) {
+  return <ol className="rc-flow" aria-label="部屋づくりの流れ">{flowLabels.map((label,position)=><li key={label} aria-current={position===current?'step':undefined} className={position<current?'is-complete':undefined}><span>{position+1}</span><b>{label}</b></li>)}</ol>;
 }
 function EmptyScene() {return <section className="rc-stage is-empty" aria-label="3Dプレビュー"><span className="rc-stage-tag"><ReferenceSvg page={3} index={11}/>3Dプレビュー</span><div className="rc-empty-art"><ReferenceSvg page={3} index={12}/></div></section>;}
 function sampleDesign(base:RoomDesign,id:string):RoomDesign {
@@ -131,8 +131,9 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   // 解析した部屋にコーディネートを頼める接続先では、第2部を部屋の3Dモデルができた後の画面で聞く。
   const asksRequestLater=analysisMode&&canCoordinate;
   const inputSteps: InputStep[]=capability.data?[...(analysisMode||acceptsPhotos?['room' as const]:[]),...(wantsPalette&&!asksRequestLater?['request' as const]:[])]:[];
-  const progressSteps: InputStep[]=asksRequestLater?['room','request']:inputSteps;
   const inputStep=inputSteps[stepIndex];
+  // 今の部屋を入力中・部屋だけできた段階は 0、要望を聞いている段階は 1、提案ができたら 2。
+  const flowStep=isNew?(inputStep==='request'?1:0):analyzed?(canCoordinate?1:0):2;
   const lastInputStep=stepIndex===inputSteps.length-1;
   const [photoEntries,setPhotoEntries]=useState<PhotoEntry[]>(()=>{const files=inputState?.photos?.filter(file=>file instanceof File)??[];return files.length?files.map(file=>({id:crypto.randomUUID(),file,removing:false})):[];});
   const photos=photoEntries.filter(entry=>!entry.removing&&entry.file).map(entry=>entry.file!);
@@ -341,7 +342,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
     catch(error){setNotice(error instanceof Error?error.message:'テンプレートを保存できませんでした。');}
   }
   return <div className="rc-studio">
-    <header ref={header} className={`rc-studio-header${isNew?' motion-enter':''}`}><Link className="rc-back" to={isTemplate?'/room-templates':'/rooms'} aria-label={isTemplate?'テンプレート一覧に戻る':'ルーム一覧に戻る'} title={isTemplate?'テンプレート一覧':'ルーム一覧'}><ReferenceSvg page={3} index={0}/></Link><span className="rc-header-divider"/><div className={`rc-title${isNew?' is-new':''}`}>{isTemplate&&<span className="rc-template-badge">テンプレート</span>}<h1>{isNew?'新しいルーム':design.title}</h1>{!isNew&&<button type="button" aria-label="ルーム名を変更" onClick={()=>{setTitle(design.title);setRename(true);}}><ReferenceSvg page={5} index={1}/></button>}</div><nav className="rc-template-actions" aria-label="テンプレート"><Link className="rc-secondary" to="/room-templates">テンプレート一覧</Link></nav><AccountMenu onEditLayout={!isNew&&id!=='sample-game'?()=>{setEditing(true);setFocusPanel(true);setPanel(true);setBefore(false);}:undefined}/></header>
+    <header ref={header} className={`rc-studio-header${isNew?' motion-enter':''}`}><Link className="rc-back" to={isTemplate?'/room-templates':'/rooms'} aria-label={isTemplate?'テンプレート一覧に戻る':'ルーム一覧に戻る'} title={isTemplate?'テンプレート一覧':'ルーム一覧'}><ReferenceSvg page={3} index={0}/></Link><span className="rc-header-divider"/><div className={`rc-title${isNew?' is-new':''}`}>{isTemplate&&<span className="rc-template-badge">テンプレート</span>}<h1>{isNew?'新しい部屋':design.title}</h1>{!isNew&&<button type="button" aria-label="ルーム名を変更" onClick={()=>{setTitle(design.title);setRename(true);}}><ReferenceSvg page={5} index={1}/></button>}</div>{!isTemplate&&id!=='sample-game'&&<FlowSteps current={flowStep}/>}<nav className="rc-template-actions" aria-label="テンプレート"><Link className="rc-secondary" to="/room-templates">テンプレート一覧</Link></nav><AccountMenu onEditLayout={!isNew&&id!=='sample-game'?()=>{setEditing(true);setFocusPanel(true);setPanel(true);setBefore(false);}:undefined}/></header>
     <input ref={upload} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden aria-describedby="room-photo-requirements" onChange={event=>{addPhotos(Array.from(event.target.files??[]));event.target.value='';}}/>
     <div className={`rc-workspace${pending||id==='sample-game'?' is-generating':''}`}>
       {pending||id==='sample-game'?<RoomGenerating design={isNew||id==='sample-game'?undefined:design} phase={generationPhase} prompt={generation.variables?.analyzeOnly?analysisPrompt:generation.variables?.request??(analysisMode?analysisPrompt:prompt)} photos={acceptsPhotos?photos:[]} sample={false} dimensions={analysisMode} coordination={canCoordinate&&!generation.variables?.analyzeOnly} onCancel={()=>{if(pending){abort.current?.abort();generation.reset();setNotice('生成を停止しました。');}else navigate('/rooms');}}/>:<>
@@ -349,7 +350,6 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
           {isNew?<>
             <div ref={messages} onScroll={event=>{const node=event.currentTarget;nearBottom.current=node.scrollHeight-node.scrollTop-node.clientHeight<64;}} className="rc-messages is-new">{stepIndex>0&&<div className="rc-input-summary">{inputSteps.slice(0,stepIndex).map(step=><p className="motion-enter" key={step}>{step==='room'?[analysisMode&&`${tatami}畳・${shapeLabel(shape)}`,acceptsPhotos&&`写真 ${photos.length||samplePhotos.length}枚`].filter(Boolean).join(' / '):prompt}</p>)}</div>}<Intro key={inputStep} step={inputStep}/></div>
             <form ref={composer} className={`rc-new-composer${photoDrop?' is-photo-drop':''}`} onSubmit={start} onDragOver={event=>{event.preventDefault();if(inputStep==='room'&&acceptsPhotos&&event.dataTransfer.types.includes('Files'))setPhotoDrop(true);}} onDragLeave={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null))setPhotoDrop(false);}} onDrop={event=>{event.preventDefault();setPhotoDrop(false);if(inputStep==='room'&&acceptsPhotos)addPhotos(Array.from(event.dataTransfer.files));}}>
-              {inputStep&&progressSteps.length>1&&<InputProgress steps={progressSteps} current={inputStep}/>}
               <div key={inputStep} className="rc-setup-step motion-enter">{inputStep==='room'&&<>
               {analysisMode&&<div className="rc-analysis-settings"><label className="rc-setting" htmlFor="room-tatami">部屋の広さ<span className="rc-tatami-input"><input id="room-tatami" type="number" min={3} max={30} step="0.5" value={Number.isNaN(tatami)?'':tatami} onChange={event=>setTatami(event.target.valueAsNumber)} required/>畳</span></label>
               <fieldset><legend>部屋の形</legend><div className="rc-shape-options">{roomShapes.map(item=><button key={item.value} type="button" className="motion-control" aria-pressed={shape===item.value} onClick={()=>setShape(item.value)}>{item.label}</button>)}</div></fieldset></div>}
@@ -379,7 +379,6 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
               {canCoordinate&&!analyzed&&<div className="rc-followups">{['もう少し落ち着いた紫に','グリーンも足したい'].map(text=><button type="button" className="motion-control" key={text} onClick={()=>setMessage(text)}>{text}</button>)}</div>}
               {canCoordinate&&analyzed&&<div key={`request-${design.id}`} className="rc-assistant motion-enter"><span className="rc-assistant-icon"><ReferenceSvg page={5} index={7}/></span><div className="rc-assistant-body"><span className="rc-assistant-name">へやいろ</span><p>{stepQuestions.request}</p></div></div>}
               {canCoordinate&&analyzed&&<form className="rc-coordinate-form" onSubmit={coordinate}>
-                <InputProgress steps={['room','request']} current="request"/>
                 <div className="rc-presets">{presets.map((item,index)=><button type="button" className="motion-control" key={item.label} aria-pressed={preset===index} onClick={()=>{setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</div>
                 <label className="rc-setting" htmlFor="coordinate-request">作りたい部屋の雰囲気<textarea id="coordinate-request" rows={3} value={prompt} maxLength={500} onChange={event=>setPrompt(event.target.value)} required/></label>
                 <RoomPalettePicker atmosphere={prompt} value={roomPaletteId} onChange={setRoomPaletteId}/>
