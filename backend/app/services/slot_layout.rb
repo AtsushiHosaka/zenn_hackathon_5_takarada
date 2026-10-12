@@ -121,6 +121,11 @@ class SlotLayout
     rotation = item.metadata["preferred_rotation"] || 0
     if preferred && floor_pose_available?(item.size, preferred, rotation)
       x, z = preferred.values_at("x", "z")
+    elsif preferred.nil? && (pose = desk_front_pose(item) || wall_side_pose(item))
+      x, z, rotation, note = pose
+    elsif preferred.nil? && item.metadata["group_id"].nil? && item.category != "table"
+      # AI が自分から足す家具は、壁際に置けなければ採用しない (利用者が指定した追加は、下の空きに置く)
+      return
     else
       center = preferred || { "x" => @room["width"] / 2, "z" => @room["depth"] / 2 }
       x, z, rotation = best_floor_spot(item.size, [ rotation, (rotation + 90) % 360 ].uniq) do |cx, cz, _|
@@ -130,9 +135,36 @@ class SlotLayout
     return unless x
 
     occupy_floor(x, z, item.size, rotation)
-    placement = build(item, item.size, { "x" => x, "y" => 0.0, "z" => z }, rotation, nil, preferred ? "元家具の位置を優先し、空き領域に配置" : "床の空き領域に配置")
+    placement = build(item, item.size, { "x" => x, "y" => 0.0, "z" => z }, rotation, nil, note || (preferred ? "元家具の位置を優先し、空き領域に配置" : "床の空き領域に配置"))
     placement.object["replaces_object_id"] = item.metadata["replaces_object_id"]
     placement
+  end
+
+  # 椅子はデスクの前に、デスクを向けて置く
+  def desk_front_pose(item)
+    return unless item.category == "chair" && (desk = find("desk"))
+
+    x, z = local_to_world(desk, 0, desk["size"]["d"] / 2 + item.size["d"] / 2 + 0.05)
+    rotation = (desk["rotation_y"] + 180) % 360
+    [ x, z, rotation, "#{desk['label']}の前" ] if floor_pose_available?(item.size, { "x" => x, "y" => 0.0, "z" => z }, rotation)
+  end
+
+  # 壁を背にして置く (テーブルは部屋の中ほどに置くので除く)。窓をふさがない位置のうち、今ある家具に近いところ
+  def wall_side_pose(item)
+    return if item.category == "table"
+
+    half = item.size["w"] / 2
+    poses = BACK_WALL.values.flat_map do |wall|
+      grid(half + MARGIN, wall_length(wall) - half - MARGIN).filter_map do |along|
+        next if windows_on(wall).any? { |left, right, bottom, _| item.size["h"] > bottom && along - half < right && along + half > left }
+
+        x, z, rotation = wall_pose(wall, along, item.size["d"] / 2 + MARGIN)
+        next unless floor_pose_available?(item.size, { "x" => x, "y" => 0.0, "z" => z }, rotation)
+
+        [ @objects.map { |object| Math.hypot(x - object["position"]["x"], z - object["position"]["z"]) }.min || 0, x, z, rotation ]
+      end
+    end
+    poses.min_by(&:first)&.drop(1)&.push("壁際")
   end
 
   def reserve_edit(edit)
@@ -196,11 +228,9 @@ class SlotLayout
 
   # デスクの上。無ければテーブル・低い収納・テレビ台・低い棚の上 (天板に収まるものだけ)
   def place_desk_top(item)
-    TOP_ANCHORS.each do |category|
-      next unless top_anchor_fits?(category, item)
-
-      # 天板がふさがっていたら、次の家具の上にする
-      anchor = find(category)
+    # 小物が少ない家具から順に置いて、1 つの天板に偏らせない。天板がふさがっていたら、次の家具の上にする
+    anchors = TOP_ANCHORS.select { |category| top_anchor_fits?(category, item) }.map { |category| find(category) }
+    anchors.sort_by.with_index { |anchor, index| [ @top_rects[anchor["id"]].size, index ] }.each do |anchor|
       spot = free_top_spot(anchor, anchor["size"]["w"] / 2 - item.size["w"] / 2 - 0.08, -(anchor["size"]["d"] / 2 - item.size["d"] / 2 - 0.05), item.size) or next
       x, z = local_to_world(anchor, *spot)
       return build(item, item.size, { "x" => x, "y" => anchor["size"]["h"], "z" => z }, anchor["rotation_y"], anchor["id"], "#{anchor['label']}の上")
