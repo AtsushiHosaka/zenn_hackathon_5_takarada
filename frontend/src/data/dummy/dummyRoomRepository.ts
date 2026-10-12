@@ -77,6 +77,9 @@ export function createDummyRoomRepository(tokenStore: TokenStore): RoomRepositor
     async searchFurniture() {
       throw new DomainError("登録された家具の検索にはAPI接続が必要です。接続設定をAPIに切り替えてください。");
     },
+    async reviewFurniture() {
+      throw new DomainError("AIに聞くにはAPI接続が必要です。接続設定をAPIに切り替えてください。");
+    },
     persistenceWarning() {
       if (!tokenStore.load()) return undefined;
       try {

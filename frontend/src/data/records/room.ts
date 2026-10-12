@@ -4,7 +4,7 @@ import { DomainError } from "../../domain/error";
 import { normalizeBedCover, normalizeRoomBedding } from "../../domain/bedding";
 import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
 import { productCategories, furnitureCategories, isManualFurniture, isImageArtwork, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
-import type { FurnitureDetailChoice, FurnitureSearchInterpretation, FurnitureSearchResult, ModelCredit, SavedRoom, SearchModel } from "../../domain/roomRepository";
+import type { FurnitureDetailChoice, FurnitureReview, FurnitureReviewInput, FurnitureSearchInterpretation, FurnitureSearchResult, ModelCredit, SavedRoom, SearchModel } from "../../domain/roomRepository";
 import type { components } from "../generated/api";
 
 export type AnalysisRoomRecord = components["schemas"]["Room"];
@@ -16,6 +16,42 @@ export function toRoomPaletteId(value: unknown): NonNullable<CoordinationRecord[
 }
 
 export type UploadRecord = components["schemas"]["Upload"];
+
+const HEX_COLOR = /^#[0-9a-f]{6}$/i;
+
+// 対象の家具はそのまま送る (おかしければ API が理由を返す)。ほかの家具は、色や寸法を送れる形のものだけにする
+export function furnitureReviewRequest(input: FurnitureReviewInput): components["schemas"]["FurnitureReviewInput"] {
+  const item = (source: RoomItem) => ({
+    name: source.name.slice(0, 100), category: source.category, color: source.color, existing: source.existing,
+    size: { w: source.size[0], h: source.size[1], d: source.size[2] },
+    // 家具の上に載せたものや、底が床から浮いているもの (壁掛け) は床の面積に数えない
+    on_floor: !source.supportObjectId && source.position[1] - source.size[1] / 2 <= input.floor + 0.05,
+  });
+  const sendable = (source: RoomItem) => Boolean(source.name.trim()) && HEX_COLOR.test(source.color) && source.size.every(value => Number.isFinite(value) && value > 0 && value <= 10);
+  const detailId = Number(input.target.furnitureDetailId);
+  return {
+    target: { ...item(input.target), ...(Number.isInteger(detailId) && detailId > 0 ? { furniture_detail_id: detailId } : {}) },
+    others: input.others.filter(sendable).slice(0, 100).map(item),
+    room: {
+      width: input.room.width, depth: input.room.depth,
+      ...(input.room.wallColor && HEX_COLOR.test(input.room.wallColor) ? { wall_color: input.room.wallColor } : {}),
+      ...(input.room.floorColor && HEX_COLOR.test(input.room.floorColor) ? { floor_color: input.room.floorColor } : {}),
+    },
+    ...(input.prompt?.trim() ? { prompt: input.prompt.trim().slice(0, 500) } : {}),
+  };
+}
+
+export function toFurnitureReview(value: unknown): FurnitureReview {
+  const record = object(value, "FurnitureReview");
+  if (record.verdict !== "good" && record.verdict !== "fair" && record.verdict !== "poor") invalid("FurnitureReview.verdict");
+  if (record.reviewed_by !== "gemini" && record.reviewed_by !== "mock") invalid("FurnitureReview.reviewed_by");
+  return {
+    verdict: record.verdict, reviewedBy: record.reviewed_by,
+    summary: text(record.summary, "FurnitureReview.summary"), color: text(record.color, "FurnitureReview.color"),
+    size: text(record.size, "FurnitureReview.size"), mood: text(record.mood, "FurnitureReview.mood"),
+    suggestion: typeof record.suggestion === "string" ? record.suggestion.trim() : "",
+  };
+}
 
 export function toFurnitureSearch(value: unknown, baseUrl: string): FurnitureSearchResult {
   const record = object(value, "FurnitureSearch");

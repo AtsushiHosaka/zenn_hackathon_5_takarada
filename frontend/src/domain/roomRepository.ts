@@ -53,6 +53,22 @@ export type FurnitureSearchInterpretation = {
 export type SearchModel = { id: string; name: string; category: string; size: { w: number; h: number; d: number }; modelUrl?: string; characters: string[]; credits: ModelCredit[] };
 export type FurnitureSearchResult = { products: FurnitureSearchProduct[]; color: string | null; interpretation: FurnitureSearchInterpretation; models: SearchModel[] };
 
+// 「この家具、似合ってる？」。今の配置 (保存前の入れ替えを含む) について聞く。sizeや部屋の広さはメートル。
+export type FurnitureReviewInput = {
+  target: RoomItem;
+  others: RoomItem[];
+  room: { width: number; depth: number; wallColor?: string; floorColor?: string };
+  // 床の高さ (positionと同じ座標)。床に置いた家具かどうかの判定に使う
+  floor: number;
+  prompt?: string;
+};
+// reviewedBy: mock はAIにつながっていないときの、色と大きさだけからの答え。suggestionは直す点が無ければ空。
+export type FurnitureReview = {
+  verdict: "good" | "fair" | "poor";
+  summary: string; color: string; size: string; mood: string; suggestion: string;
+  reviewedBy: "gemini" | "mock";
+};
+
 export type RoomRepository = {
   demo(style?: Style): RoomDesign;
   // Non-fatal persistence status for the current owner, when supported.
@@ -64,5 +80,6 @@ export type RoomRepository = {
   analyze(input: GenerateRoomInput, signal?: AbortSignal): Promise<RoomDesign>;
   generate(input: GenerateRoomInput, signal?: AbortSignal): Promise<RoomDesign>;
   searchFurniture(input: FurnitureSearchInput, signal?: AbortSignal): Promise<FurnitureSearchResult>;
+  reviewFurniture(input: FurnitureReviewInput, signal?: AbortSignal): Promise<FurnitureReview>;
   capabilities(): Promise<RoomCapabilities>;
 };

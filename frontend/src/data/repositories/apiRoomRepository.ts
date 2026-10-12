@@ -6,7 +6,7 @@ import { manualFurnitureCategories, imageGoodsCategories, isFurnitureAdditions, 
 import type { GenerateRoomInput, RoomRepository } from "../../domain/roomRepository";
 import type { ApiClient } from "../apiClient";
 import { createDemoRoom } from "../dummy/dummyRoomRepository";
-import { toRoomPaletteId, toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toFurnitureSearch, toRoomDesign, toSavedRoom, toSavedRooms, toUploadRecords } from "../records/room";
+import { toRoomPaletteId, toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toFurnitureSearch, furnitureReviewRequest, toFurnitureReview, toRoomDesign, toSavedRoom, toSavedRooms, toUploadRecords } from "../records/room";
 import type { components } from "../generated/api";
 
 export type RoomApiConfig = {
@@ -31,6 +31,11 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
       return toFurnitureSearch(await api.send<unknown>("/api/v1/furniture_searches", {
         method: "POST", body: input, signal,
       }), baseUrl);
+    },
+    async reviewFurniture(input, signal) {
+      return toFurnitureReview(await api.send<unknown>("/api/v1/furniture_reviews", {
+        method: "POST", body: furnitureReviewRequest(input), signal,
+      }));
     },
     async list(signal) {
       if (config.contract === "legacy") throw new DomainError("この接続先では保存した部屋を取得できません");
