@@ -5,6 +5,8 @@
 ## ホーム画面
 2026-10-12 user update (supersedes the arrow-button requirement below): remove both visible left/right chevron buttons from `/rooms`, including their unused styles. Keep native horizontal scrolling/swiping, Left/Right keyboard navigation, autoplay and the position indicator. Source: this chat and the attached screenshot. Google Docs remain unverified and unmodified because their URL is unset.
 
+2026-10-12 user update: hovering a room carousel slide must preserve its white title and existing dimension-text color. A scoped `.room-hero-slide:hover` rule prevents the global link hover color from overriding the title. Source: this chat and the attached Warm Ivory screenshot; shared Google Docs remain unverified and unmodified because their URL is unset.
+
 - 保存した部屋を横長の大きな写真で見せ、5秒ごとに自動で横へ流す。マウスを乗せている間・フォーカスがある間・動きを減らす設定のときは流さない。左右の矢印とキーでも送れる。
 - その下に全部屋をカードで並べる（写真、部屋名、広さ・形、買い足しの合計）。カードを押すとその部屋を開く。
 - 写真は、部屋の3Dモデルの読み込みが済んだ最初の描画を撮ったもの。画面の外で1部屋ずつ描いて撮り、このブラウザのIndexedDBに置いて次回から使い回す。部屋の内容が変わると撮り直す。一覧で部屋の数だけ3Dを同時に描かないための仕組みで、写真が消えても撮り直せる。
