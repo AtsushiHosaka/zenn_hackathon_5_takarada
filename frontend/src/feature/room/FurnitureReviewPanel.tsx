@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRepositories } from '../../core/repositories';
 import type { RoomDesign, RoomItem } from '../../domain/room';
-import type { FurnitureReview } from '../../domain/roomRepository';
+import type { FurnitureReview, FurnitureReviewInput } from '../../domain/roomRepository';
 import ErrorText from '../shared/ErrorText';
 import { getFurniturePlacementBounds } from './roomBounds';
 
@@ -10,22 +10,30 @@ const verdictLabels: Record<FurnitureReview['verdict'], string> = { good: '似�
 
 // 選んだ家具が今の部屋に合うかをAIに聞く。答えは保存せず、家具や配置を変えたら聞き直す
 export default function FurnitureReviewPanel({ item, design }: { item: RoomItem; design: RoomDesign }) {
+  const bounds = getFurniturePlacementBounds(design);
+  const input: FurnitureReviewInput = {
+    target: item,
+    others: design.items.filter(other => other.id !== item.id),
+    room: {
+      width: design.room?.width ?? bounds.max[0] - bounds.min[0], depth: design.room?.depth ?? bounds.max[2] - bounds.min[2],
+      wallColor: design.wallColor, floorColor: design.floorColor ?? design.room?.floorColor,
+    },
+    floor: bounds.floor,
+    prompt: design.prompt,
+  };
+  const version = ({ id, name, category, color, size, position, supportObjectId, furnitureDetailId }: RoomItem) =>
+    ({ id, name, category, color, size, position, supportObjectId, furnitureDetailId });
+  const key = JSON.stringify({ ...input, target: version(input.target), others: input.others.map(version) });
+  return <CurrentFurnitureReviewPanel key={key} input={input}/>;
+}
+
+function CurrentFurnitureReviewPanel({ input }: { input: FurnitureReviewInput }) {
   const { rooms } = useRepositories();
   const abort = useRef<AbortController | null>(null);
   useEffect(() => () => abort.current?.abort(), []);
   const review = useMutation({ mutationFn: () => {
     abort.current?.abort(); const controller = new AbortController(); abort.current = controller;
-    const bounds = getFurniturePlacementBounds(design);
-    return rooms.reviewFurniture({
-      target: item,
-      others: design.items.filter(other => other.id !== item.id),
-      room: {
-        width: design.room?.width ?? bounds.max[0] - bounds.min[0], depth: design.room?.depth ?? bounds.max[2] - bounds.min[2],
-        wallColor: design.wallColor, floorColor: design.floorColor ?? design.room?.floorColor,
-      },
-      floor: bounds.floor,
-      prompt: design.prompt,
-    }, controller.signal);
+    return rooms.reviewFurniture(input, controller.signal);
   } });
   const answer = review.data;
   return <section className="rc-review" aria-label="AIに聞く">

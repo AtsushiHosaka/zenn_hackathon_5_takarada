@@ -1,4 +1,7 @@
 require "net/http"
+require "ipaddr"
+require "resolv"
+require "timeout"
 
 # 部屋に置いた家具 1 つが、その部屋に合っているかを答える (「この家具、似合ってる？」)。
 # 画面が今の配置 (保存前の入れ替えを含む) を送り、結果は保存しない。
@@ -12,6 +15,10 @@ class FurnitureReview
   PHOTO_MAX_BYTES = 5 * 1024 * 1024
   PHOTO_ORIGINAL_MAX_BYTES = 1024 * 1024
   PHOTO_FORMATS = %w[image/jpeg image/png image/webp].freeze
+  PHOTO_FETCH_SECONDS = 10
+  PHOTO_NONPUBLIC_IPV4 = %w[0.0.0.0/8 10.0.0.0/8 100.64.0.0/10 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.0.0.0/24 192.0.2.0/24 192.88.99.0/24 192.168.0.0/16 198.18.0.0/15 198.51.100.0/24 203.0.113.0/24 224.0.0.0/3].map { |range| IPAddr.new(range) }.freeze
+  PHOTO_PUBLIC_IPV6 = IPAddr.new("2000::/3").freeze
+  PHOTO_NONPUBLIC_IPV6 = %w[2001::/23 2001:db8::/32 2002::/16 3fff::/20].map { |range| IPAddr.new(range) }.freeze
   HEX = /\A#[0-9a-f]{6}\z/i
 
   class Error < StandardError; end
@@ -125,16 +132,52 @@ class FurnitureReview
   # 登録された商品の写真 (furniture_details.image_url) を取りに行く。取れなければ写真なしで聞く
   def product_photo
     uri = URI.parse(@detail&.image_url.to_s)
-    return unless uri.is_a?(URI::HTTPS) && uri.host.present?
+    return unless uri.is_a?(URI::HTTPS) && uri.host.present? && uri.port == 443 && uri.userinfo.nil?
 
-    response = Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: 4, read_timeout: 6) { |http| http.get(uri.request_uri, "User-Agent" => "heyairo/1.0") }
-    return unless response.is_a?(Net::HTTPSuccess) && response.content_type.to_s.start_with?("image/") && response.body.bytesize <= PHOTO_MAX_BYTES
+    bytes, mime_type = Timeout.timeout(PHOTO_FETCH_SECONDS) do
+      addresses = Resolv.getaddresses(uri.hostname)
+      return if addresses.empty? || addresses.any? { |address| !public_photo_address?(address) }
 
-    shrink(response.body) || original(response)
+      # Disable environment proxies and pin the validated IP; the hostname remains the TLS peer name.
+      http = Net::HTTP.new(uri.hostname, uri.port, nil)
+      http.ipaddr = addresses.first
+      http.use_ssl = true
+      http.open_timeout = 4
+      http.read_timeout = 6
+      http.write_timeout = 4
+      body = +"".b
+      content_type = nil
+      http.start do |connection|
+        connection.request(Net::HTTP::Get.new(uri.request_uri, "User-Agent" => "heyairo/1.0")) do |response|
+          return unless response.is_a?(Net::HTTPSuccess) && PHOTO_FORMATS.include?(response.content_type)
+          return if response["Content-Length"].to_i > PHOTO_MAX_BYTES
+
+          content_type = response.content_type
+          response.read_body do |chunk|
+            raise Error, "Product photo exceeds the download limit" if body.bytesize + chunk.bytesize > PHOTO_MAX_BYTES
+
+            body << chunk
+          end
+        end
+      end
+      [ body, content_type ]
+    end
+    shrink(bytes) || original(bytes, mime_type)
   # 写真は無くても答えられるので、通信や画像の変換が失敗しても写真なしで続ける
   rescue StandardError => error
     Rails.logger.info("FurnitureReview: 商品写真を使えません (#{error.class})")
     nil
+  end
+
+  def public_photo_address?(address)
+    ip = IPAddr.new(address)
+    if ip.ipv4?
+      PHOTO_NONPUBLIC_IPV4.none? { |range| range.include?(ip) }
+    else
+      PHOTO_PUBLIC_IPV6.include?(ip) && PHOTO_NONPUBLIC_IPV6.none? { |range| range.include?(ip) }
+    end
+  rescue IPAddr::InvalidAddressError
+    false
   end
 
   # 長辺を PHOTO_MAX_SIDE までに縮めて JPEG にする。libvips が無い環境では nil
@@ -149,10 +192,10 @@ class FurnitureReview
   end
 
   # 縮められないときは、Gemini が読める形式で小さいものだけ元のまま送る
-  def original(response)
-    return unless PHOTO_FORMATS.include?(response.content_type) && response.body.bytesize <= PHOTO_ORIGINAL_MAX_BYTES
+  def original(bytes, mime_type)
+    return unless PHOTO_FORMATS.include?(mime_type) && bytes.bytesize <= PHOTO_ORIGINAL_MAX_BYTES
 
-    { mime_type: response.content_type, data: response.body }
+    { mime_type:, data: bytes }
   end
 
   # Gemini を使えないときの答え。色の近さと床に占める割合だけで決める
