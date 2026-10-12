@@ -210,6 +210,40 @@ RSpec.configure do |config|
             },
             required: %w[furniture_model]
           },
+          AdminFurnitureModelUpsert: {
+            type: :object,
+            description: "3D モデルの登録・更新。GLB は先に公開バケットの models/furniture/v1/<id>.glb へ置く。db/furnitures.json の models[] から id・format・object_key を除いた形",
+            properties: {
+              furniture_model: {
+                type: :object,
+                properties: {
+                  name: { type: :string, example: "クッション" },
+                  category: { type: :string, example: "cushion" },
+                  shape: { type: :string, example: "cushion" },
+                  variant: { type: :string, nullable: true, example: nil },
+                  size: { type: :array, items: { type: :number }, minItems: 3, maxItems: 3, description: "[幅, 高さ, 奥行き] (m)", example: [ 0.45, 0.15, 0.45 ] },
+                  triangles: { type: :integer, minimum: 0, example: 2496 },
+                  bytes: { type: :integer, minimum: 1, description: "GLB のバイト数", example: 62864 },
+                  sha256: { type: :string, description: "GLB の SHA256 (小文字 16 進)", example: "74851bb7a3d46ca993470a9ac371d89e013fa329f472519a4a0e09bab7172dfe" },
+                  color_material_keys: { type: :array, items: { type: :string }, example: [ "tint" ] },
+                  characters: { type: :array, items: { type: :string }, description: "推し活グッズのキャラクター (db/characters.json のキー)", example: [] },
+                  estimated_axes: { type: :array, items: { type: :string, enum: Furniture3DModel::SIZE_AXES }, description: "このモデルを使う商品の寸法のうち推定した辺。省略すると今の値のまま (新規は空)", example: [] }
+                },
+                required: %w[name category shape size triangles bytes sha256 color_material_keys]
+              }
+            },
+            required: %w[furniture_model]
+          },
+          AdminFurnitureModelExport: {
+            type: :object,
+            description: "db/furnitures.json と同じ形。無効な家具も含む",
+            properties: {
+              unit: { type: :string, example: "meter" },
+              axes: { type: :string, example: "+Y up, +Z front, origin bottom center" },
+              models: { type: :array, items: { type: :object, additionalProperties: true } }
+            },
+            required: %w[unit axes models]
+          },
           NotFound: {
             type: :object,
             properties: {

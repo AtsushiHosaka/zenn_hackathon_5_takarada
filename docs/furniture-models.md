@@ -4,7 +4,7 @@
 
 ## DBには寸法と用途、GCSの保存先を持つ
 
-`furnitures`にモデルごとの情報を保存する（家具1件＝モデル1つ）。家具の色・寸法・購入リンクは`furniture_details`に持ち、こちらはDBが正で管理画面から編集する（後述）。
+`furnitures`にモデルごとの情報を保存する（家具1件＝モデル1つ）。3DモデルはDBが正で、GLBを置いたあと管理API（`PUT /api/v1/admin/furniture_models/{id}`）で1件ずつ登録・更新する。`backend/db/furnitures.json`は空のDBへ入れる初期データ。家具の色・寸法・購入リンクは`furniture_details`に持ち、こちらもDBが正で管理画面から編集する（後述）。
 
 | 項目 | 意味 |
 | --- | --- |
@@ -25,25 +25,31 @@
 - 一致するモデルが無ければ割り当てず、簡易形状のままにする。
 - 実装は`FurnitureModelMatcher`（`fill_by_category`）。
 
-## 生成したGLBを公開バケットへ置く
+## GLBを公開バケットへ置き、DBへ登録する
 
-既存GLBは`output/furniture_models/furniture/`へ移してある。このディレクトリはGit管理外で、Webの配信物には含めない。新しいチェックアウトでGLBが必要な場合は、Blenderで生成する。
+GLBの生成先`output/furniture_models/furniture/`はGit管理外で、Webの配信物には含めない。変えたモデルだけをBlenderで書き出す（手順は[tools/furniture_models/README.md](../tools/furniture_models/README.md)）。
 
-```bash
-/Applications/Blender.app/Contents/MacOS/Blender -b \
-  --python tools/furniture_models/build.py
-python3 tools/furniture_models/manifest.py
-```
-
-生成したJSONは`backend/db/furnitures.json`に保存する。モデル定義やGLBを変更したときは、このJSONも更新して変更に含める。
-
-GCPにログイン済みの環境で、生成済みのGLBをアップロードする。`infra/gcp/bin/models-publish.sh`は台帳に載ったGLBだけを一時ディレクトリへ複製し、その内容を検証して`gs://<bucket>/models/furniture/v1/`へ配置する。生成先に余分なGLBがあっても公開しない。バケット名は`MODELS_BUCKET`、未設定ならTerraformの`models_bucket`出力から取得する。
+GCPにログイン済みの環境で、モデルIDを指定して公開と登録をまとめて行う。ベース名を渡すと色・サイズ違いも含める。
 
 ```bash
-make infra-models-publish
+make infra-models-publish K="cushion bed_cover__101"
 
 # Terraform出力を使わず、既存バケットを指定する場合
-MODELS_BUCKET=BUCKET_NAME make infra-models-publish
+MODELS_BUCKET=BUCKET_NAME make infra-models-publish K=cushion
+```
+
+`tools/furniture_models/publish.py`が次の順に処理する。
+
+1. `build_report.json`の記録と書き出したGLBを照合し、寸法・三角形数・素材名・SHA256を測る（`manifest.py`）。1件でも合わなければ何もしない。
+2. GLBを`gs://<bucket>/models/furniture/v1/`へ置き、バケット上の大きさとMD5が手元と同じことを確かめる。
+3. 管理者でログインし、`PUT /api/v1/admin/furniture_models/{id}`で1件ずつ登録・更新する。無いモデルは作り、あるモデルは上書きする。有効・無効は変えない。
+
+管理者のメールアドレスとパスワードは`ADMIN_EMAIL`・`ADMIN_PASSWORD`、無ければ入力を求める。バケット名は`MODELS_BUCKET`、未設定ならTerraformの`models_bucket`出力を使う。デプロイは要らず、登録した時点でAPIが新しい情報を返す。
+
+手元のDBへは、バケットに置き済みのGLBを登録だけする（ローカルの管理者`admin@example.com`を使う）。
+
+```bash
+make models-publish K=cushion
 ```
 
 公開モデル用のバケットは`infra/gcp/storage.tf`で定義する。名前は`${project_id}-models`で、`allUsers`に読み取り権限を付与する。ブラウザ向けの公開URLには`https://storage.googleapis.com/BUCKET_NAME`を使う。部屋写真用の非公開バケットへGLBを置かない。
@@ -69,21 +75,31 @@ MODELS_BUCKET=BUCKET_NAME
 docker compose up -d --no-deps api worker
 ```
 
-本番ではモデルのアップロード後に`make infra-release`、またはmainのデプロイCIで反映する。GCSへのアップロードはデプロイと別の操作で、CIがGLBを生成・配置することはない。
+CIがGLBを生成・配置したり、DBの3Dモデルを書き換えたりすることはない。
 
-## DBへの取り込みは繰り返し実行できる
+## 初期データは空のDBにだけ入れる
 
-ローカルの起動時はseedで台帳を取り込む。稼働中の開発コンテナには、スキーマを適用してから取り込む。
+`furniture:import`は`furnitures`に1件でもあれば何もしない。デプロイのたびに実行しても、登録したモデルは消えない。ローカルの起動時もseedで同じく空のときだけ入れる。
 
 ```bash
 make db-dry-run
 make db-apply
-make furniture-models-import
+make furniture-import
 ```
 
-本番ではデプロイCIと`make infra-release`が、Cloud Runジョブで`db:apply`・`furniture:import`・`furniture_detail:import`を順に実行する。`furniture_detail:import`は商品が空のときだけ初期データを入れる。その後、APIとWebのサービスを新しいイメージへ更新する。
+本番ではデプロイCIと`make infra-release`が、Cloud Runジョブで`db:apply`・`furniture:import`・`furniture_detail:import`を順に実行する（どちらも空のときだけ入れる）。その後、APIとWebのサービスを新しいイメージへ更新する。
 
-取り込みはJSON全体を検証してからトランザクション内で更新する。同じモデルIDや対応IDを再取り込みしても行は増えない。入力から外した対応関係はDBから削除する。入力にないモデルは削除せず、手動で無効にしたモデルは無効のまま保つ。
+取り込みはJSON全体を検証してからトランザクション内で入れる。手元のDBを初期データで上書きするには`FORCE=1`を付ける。JSONにないモデルは削除せず、無効にしたモデルは無効のまま保つ。
+
+```bash
+docker compose exec -e FORCE=1 api bin/rails furniture:import
+```
+
+初期データを本番の内容へ合わせるときは、本番DBから書き出してコミットする（`GET /api/v1/admin/furniture_models/export`）。
+
+```bash
+make infra-models-export
+```
 
 DBの一覧は公開API`GET /api/v1/furniture_models`、単体は`GET /api/v1/furniture_models/{id}`で取得する。`{id}`には`bed_single`などのモデルIDを指定する。API契約は[Swaggerの生成元](../backend/spec/swagger_helper.rb)で管理する。
 
@@ -95,7 +111,7 @@ Webが取得した台帳はブラウザのセッション中にキャッシュ�
 
 ## 管理画面で商品を編集する
 
-Webの`/admin`を直接開くと（画面内に入口のリンクは置いていない）、商品（`furniture_details`）のリンク・画像・価格・寸法・置き場所の枠・並び順・色を編集し、3Dで見た目を確かめられる。3Dモデルは有効・無効だけを切り替えられる。GLBと寸法は従来どおり`backend/db/furnitures.json`で管理する。
+Webの`/admin`を直接開くと（画面内に入口のリンクは置いていない）、商品（`furniture_details`）のリンク・画像・価格・寸法・置き場所の枠・並び順・色を編集し、3Dで見た目を確かめられる。3Dモデルは有効・無効だけを切り替えられる。GLBと寸法は`publish.py`で登録する（前述）。
 
 使えるのは管理者（`users.admin`が`true`の人）だけで、`/api/v1/admin/*`が403を返す。管理者かどうかはユーザー情報の応答には出さず、画面はこの403で判断する。APIからは管理者を変えられず、メールアドレスを指定してタスクで付け外しする。ローカルではseedが管理者`admin@example.com`（パスワード`password`）を作る。このアカウントは開発環境にだけ作り、本番には作らない。
 
@@ -119,11 +135,11 @@ make infra-task T='admin:revoke[you@example.com]'
 docker compose exec -e FORCE=1 api bin/rails furniture_detail:import
 ```
 
-## 更新時はファイルと台帳をそろえる
+## 更新時はファイルとDBをそろえる
 
-GLBを生成して台帳JSONを更新し、GCSへアップロードしてからDBへ取り込む。同じパスのファイルを置き換えると最大1時間キャッシュされる設定なので、即時に切り替えたい更新では新しいモデルIDを使う。旧オブジェクトを参照する保存シーンがある場合は、旧ファイルも残す。
+GLBを生成し、`make infra-models-publish`でGCSへ置いてからDBへ登録する。同じパスのファイルを置き換えると最大1時間キャッシュされる設定なので、即時に切り替えたい更新では新しいモデルIDを使う。旧オブジェクトを参照する保存シーンがある場合は、旧ファイルも残す。
 
-アップロード済みファイルを自動で列挙したり、用途を推定したりする仕組みは含めない。外部制作モデルを追加する場合も、用途・寸法・保存先をJSONへ記入して取り込む。ブラウザで読めない場合は、公開権限、CORS、`object_key`、APIの`model_url`を確認する。
+アップロード済みファイルを自動で列挙したり、用途を推定したりする仕組みは含めない。外部制作モデルを追加する場合も、用途・寸法を管理APIで登録する。ブラウザで読めない場合は、公開権限、CORS、`object_key`、APIの`model_url`を確認する。
 
 アップロード先は`zenn-hackathon-takarada-models`。2026-10-04にユーザーの承認後、87個のGLBを`models/furniture/v1/`へ配置した。全ファイルを認証なしで取得し、CORS、MIME、バイト数、SHA256が台帳と一致することを確認した。本番APIの`MODELS_BUCKET`も同じバケット名だった。今回のコードの本番DB反映、マージ、デプロイは未実施。
 

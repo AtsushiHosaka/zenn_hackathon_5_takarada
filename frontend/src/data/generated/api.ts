@@ -253,7 +253,44 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put?: never;
+        /**
+         * 3D モデルを登録・更新する
+         * @description GLB は先に公開バケットへ置く。無ければ作り、あれば上書きする。有効・無効は変えない。
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description モデルの安定 ID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["AdminFurnitureModelUpsert"];
+                };
+            };
+            responses: {
+                /** @description 登録・更新に成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminFurnitureModel"];
+                    };
+                };
+                /** @description 内容が不正 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         post?: never;
         delete?: never;
         options?: never;
@@ -286,6 +323,45 @@ export interface paths {
                 };
             };
         };
+        trace?: never;
+    };
+    "/api/v1/admin/furniture_models/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 3D モデルを db/furnitures.json の形で書き出す
+         * @description 控えを取るときと、初期データ (db/furnitures.json) を今の DB に合わせるときに使う。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description db/furnitures.json と同じ形 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminFurnitureModelExport"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/signup": {
@@ -1419,6 +1495,66 @@ export interface components {
                 /** @example false */
                 enabled: boolean;
             };
+        };
+        /** @description 3D モデルの登録・更新。GLB は先に公開バケットの models/furniture/v1/<id>.glb へ置く。db/furnitures.json の models[] から id・format・object_key を除いた形 */
+        AdminFurnitureModelUpsert: {
+            furniture_model: {
+                /** @example クッション */
+                name: string;
+                /** @example cushion */
+                category: string;
+                /** @example cushion */
+                shape: string;
+                /** @example null */
+                variant?: string | null;
+                /**
+                 * @description [幅, 高さ, 奥行き] (m)
+                 * @example [
+                 *       0.45,
+                 *       0.15,
+                 *       0.45
+                 *     ]
+                 */
+                size: number[];
+                /** @example 2496 */
+                triangles: number;
+                /**
+                 * @description GLB のバイト数
+                 * @example 62864
+                 */
+                bytes: number;
+                /**
+                 * @description GLB の SHA256 (小文字 16 進)
+                 * @example 74851bb7a3d46ca993470a9ac371d89e013fa329f472519a4a0e09bab7172dfe
+                 */
+                sha256: string;
+                /**
+                 * @example [
+                 *       "tint"
+                 *     ]
+                 */
+                color_material_keys: string[];
+                /**
+                 * @description 推し活グッズのキャラクター (db/characters.json のキー)
+                 * @example []
+                 */
+                characters?: string[];
+                /**
+                 * @description このモデルを使う商品の寸法のうち推定した辺。省略すると今の値のまま (新規は空)
+                 * @example []
+                 */
+                estimated_axes?: ("w" | "h" | "d")[];
+            };
+        };
+        /** @description db/furnitures.json と同じ形。無効な家具も含む */
+        AdminFurnitureModelExport: {
+            /** @example meter */
+            unit: string;
+            /** @example +Y up, +Z front, origin bottom center */
+            axes: string;
+            models: {
+                [key: string]: unknown;
+            }[];
         };
         NotFound: {
             /** @example Couldn't find User with 'id'=999 */
