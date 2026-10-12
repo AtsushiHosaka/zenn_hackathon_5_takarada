@@ -243,7 +243,7 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean, manager?
           box(group, [w, tierHeight, d / 3], [0, tierHeight / 2, z], color, true);
           for (let figure = 0; figure < 3; figure += 1) {
             const x = w * (figure - 1) * 0.27;
-            const figureColor = ["#b49cf0", "#7d5ce6", "#d9cbff"][(figure + tier) % 3];
+            const figureColor = ["#9cf0e9", "#5ce6db", "#cbfffb"][(figure + tier) % 3];
             cylinder(group, w * 0.055, w * 0.055, 0.018, [x, tierHeight + 0.009, z], "#eee8ff");
             box(group, [w * 0.095, h * 0.14, 0.016], [x, tierHeight + h * 0.09, z], figureColor, true);
             const head = new THREE.Mesh(new THREE.SphereGeometry(w * 0.042, 12, 8), material("#efddcf"));
@@ -410,8 +410,8 @@ function buildRoom(scene: THREE.Scene, accent: string, bounds: THREE.Box3, oshi:
     led.userData.afterAccent = true;
     architecture.add(led);
     const strips = [
-      box(led, [0.025, 0.035, depth - 0.2], [left + 0.08, height - 0.16, 0], "#e2d6ff"),
-      box(led, [width - 0.2, 0.035, 0.025], [0, height - 0.16, back + 0.08], "#e2d6ff"),
+      box(led, [0.025, 0.035, depth - 0.2], [left + 0.08, height - 0.16, 0], "#d6fffc"),
+      box(led, [width - 0.2, 0.035, 0.025], [0, height - 0.16, back + 0.08], "#d6fffc"),
     ];
     for (const strip of strips) {
       const surface = strip.material as THREE.MeshStandardMaterial;
@@ -627,7 +627,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     scene.add(sun.target);
     const theme = characterTheme(design.characterThemeId);
     const oshi = design.style === "oshi" && !theme;
-    const accent = roomPalette(design.roomPaletteId)?.accent ?? theme?.accent ?? (oshi ? "#bba5ee" : design.style === "natural" ? "#c2a07f" : "#819274");
+    const accent = roomPalette(design.roomPaletteId)?.accent ?? theme?.accent ?? (oshi ? "#a5eee8" : design.style === "natural" ? "#c2a07f" : "#819274");
     if (design.room) {
       roomBounds.current = {
         id: design.id,

@@ -33,10 +33,10 @@ import { templateKeys } from './templateStorage';
 import './room-studio.css';
 import './room-templates.css';
 
-const initialPrompt='紫色の推し活ルームにしたい。ベッドとデスクはそのまま使いたいです。';
+const initialPrompt='初音ミクの水色の推し活ルームにしたい。ベッドとデスクはそのまま使いたいです。';
 const samplePrompt=`${initialPrompt}アクスタを飾れる場所もほしい！`;
 const money=(value:number)=>`¥${value.toLocaleString('ja-JP')}`;
-const presets=[{label:'紫色の推し活ルーム',style:'oshi',prompt:initialPrompt},{label:'ボタニカル',style:'botanical',prompt:'ボタニカルにしたい。ベッドとデスクはそのまま使いたいです。'},{label:'韓国風の白×ベージュ',style:'natural',prompt:'白とベージュを合わせた韓国風のお部屋にしたい。'},{label:'在宅ワークしやすく',style:'natural',prompt:'在宅ワークしやすく、落ち着いた部屋にしたい。'}] as const;
+const presets=[{label:'初音ミクの水色推し活ルーム',style:'oshi',prompt:initialPrompt},{label:'ボタニカル',style:'botanical',prompt:'ボタニカルにしたい。ベッドとデスクはそのまま使いたいです。'},{label:'韓国風の白×ベージュ',style:'natural',prompt:'白とベージュを合わせた韓国風のお部屋にしたい。'},{label:'在宅ワークしやすく',style:'natural',prompt:'在宅ワークしやすく、落ち着いた部屋にしたい。'}] as const;
 const roomShapes: {value:RoomShape;label:string}[]=[{value:'square',label:'正方形に近い'},{value:'standard',label:'やや縦長'},{value:'long',label:'細長い'}];
 const shapeLabel=(shape:RoomShape)=>roomShapes.find(item=>item.value===shape)?.label??shape;
 function existingItems(design:RoomDesign):RoomItem[] {
@@ -77,7 +77,7 @@ function FlowSteps({current}:{current:number}) {
 function EmptyScene() {return <section className="rc-stage is-empty" aria-label="3Dプレビュー"><span className="rc-stage-tag"><ReferenceSvg page={3} index={11}/>3Dプレビュー</span><div className="rc-empty-art"><ReferenceSvg page={3} index={12}/></div></section>;}
 function sampleDesign(base:RoomDesign,id:string):RoomDesign {
   const style:Style=id==='sample-botanical'?'botanical':id==='sample-natural'?'natural':'oshi';
-  return {...base,id,style,title:style==='botanical'?'ボタニカルなワンルーム':style==='natural'?'白×木目のナチュラル':'紫の推し活ルーム',items:base.items};
+  return {...base,id,style,title:style==='botanical'?'ボタニカルなワンルーム':style==='natural'?'白×木目のナチュラル':'初音ミクの水色推し活ルーム',items:base.items};
 }
 export default function RoomStudioPage() {
   const {id='new'}=useParams();
@@ -228,7 +228,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   });
   const additions=design.items.filter(item=>!item.existing);
   const total=additions.reduce((sum,item)=>sum+(item.price??0),0);
-  const referenceStory=design.source==='demo'&&design.style==='oshi'&&additions.length===8&&additions.find(item=>item.id==='3')?.color==='#bba5ee';
+  const referenceStory=design.source==='demo'&&design.style==='oshi'&&additions.length===8&&additions.find(item=>item.id==='3')?.color==='#a5eee8';
   const referenceBase=rooms.demo('oshi');
   const referenceLayout=design.source==='demo'&&design.style==='oshi'&&additions.length===8&&!design.wallColor&&design.items.every(item=>{const original=referenceBase.items.find(base=>base.id===item.id);return original&&JSON.stringify(item.position)===JSON.stringify(original.position)&&JSON.stringify(item.size)===JSON.stringify(original.size)&&item.color===original.color&&!(item.rotation??0);});
   const pending=generation.isPending;
@@ -392,12 +392,12 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
           </>:<>
             <div ref={messages} onScroll={event=>{const node=event.currentTarget;nearBottom.current=node.scrollHeight-node.scrollTop-node.clientHeight<64;}} className="rc-messages">
               <div key={`user-${design.id}`} className="rc-user-message motion-enter">{!design.analysisInput&&<div className="rc-user-photos">{photos.length?photos.map(file=><div key={`${file.name}-${file.size}-${file.lastModified}`}><PhotoImage file={file}/></div>):[3,4,5,6].map(index=><div key={index}><ReferenceSvg page={5} index={index}/></div>)}</div>}<p>{design.kind==='analysis'&&design.analysisInput?`${design.analysisInput.tatami}畳・${shapeLabel(design.analysisInput.shape)}の部屋を3Dで確認したい。`:prompt}</p></div>
-              <div key={`result-${design.id}`} className="rc-assistant motion-enter"><span className="rc-assistant-icon"><ReferenceSvg page={5} index={7}/></span><div className="rc-assistant-body"><span className="rc-assistant-name">へやいろ</span><span className="rc-complete"><ReferenceSvg page={5} index={8}/>{isTemplate?'テンプレート':design.description==='保存したテンプレートから作成した部屋です。'?'作成完了':design.source==='demo'?'サンプル':analyzed?'解析完了':'コーディネート完了'}</span><p>{referenceStory?'今あるベッドとデスクはそのままに、紫をアクセントにした推し活ルームにしました。':roomDescription(design.description)}</p>
+              <div key={`result-${design.id}`} className="rc-assistant motion-enter"><span className="rc-assistant-icon"><ReferenceSvg page={5} index={7}/></span><div className="rc-assistant-body"><span className="rc-assistant-name">へやいろ</span><span className="rc-complete"><ReferenceSvg page={5} index={8}/>{isTemplate?'テンプレート':design.description==='保存したテンプレートから作成した部屋です。'?'作成完了':design.source==='demo'?'サンプル':analyzed?'解析完了':'コーディネート完了'}</span><p>{referenceStory?'今あるベッドとデスクはそのままに、水色をアクセントにした推し活ルームにしました。':roomDescription(design.description)}</p>
                 {analyzed&&!isTemplate&&<button type="button" className="rc-template-save" onClick={()=>setTemplateName(design.title)}>この部屋をテンプレートに保存</button>}
-                {referenceStory&&<ul className="rc-bullets"><li>壁の上部にLEDテープを回して、夜は紫の間接照明に</li><li>ベッドの足元に、アクスタを飾れるひな壇シェルフ</li><li>ラグ・クッション・ベッドカバーをラベンダー系で統一</li></ul>}
+                {referenceStory&&<ul className="rc-bullets"><li>壁の上部にLEDテープを回して、夜は水色の間接照明に</li><li>ベッドの足元に、アクスタを飾れるひな壇シェルフ</li><li>ラグ・クッション・ベッドカバーを水色系で統一</li></ul>}
                 {!analyzed&&<div className="rc-summary motion-fade"><div className="rc-summary-heading"><span>コーディネート案</span><span>{additions.length}アイテム · <span className="rc-money">{money(total)}</span></span></div><div className="rc-summary-actions"><button type="button" className="rc-primary" onClick={()=>{setEditing(false);setFocusPanel(true);setPanel(true);}}><ReferenceSvg page={5} index={9}/>アイテム一覧</button><button type="button" className="rc-secondary" onClick={()=>setBefore(old=>!old)}>Before / After</button></div></div>}
               </div></div>
-              {canCoordinate&&!analyzed&&<div className="rc-followups">{['もう少し落ち着いた紫に','グリーンも足したい'].map(text=><button type="button" className="motion-control" key={text} onClick={()=>{autoThemeBrief.current=null;setMessage(text);}}>{text}</button>)}</div>}
+              {canCoordinate&&!analyzed&&<div className="rc-followups">{['もう少し落ち着いた水色に','グリーンも足したい'].map(text=><button type="button" className="motion-control" key={text} onClick={()=>{autoThemeBrief.current=null;setMessage(text);}}>{text}</button>)}</div>}
               {canCoordinate&&analyzed&&<div key={`request-${design.id}`} className="rc-assistant motion-enter"><span className="rc-assistant-icon"><ReferenceSvg page={5} index={7}/></span><div className="rc-assistant-body"><span className="rc-assistant-name">へやいろ</span><p>{stepQuestions.request}</p></div></div>}
               {canCoordinate&&analyzed&&<form className="rc-coordinate-form" onSubmit={coordinate}>
                 <RoomThemeTags value={characterThemeId} onChange={value=>selectCharacterTheme(value,'prompt')}>{presets.map((item,index)=><button type="button" className="motion-control" key={item.label} aria-pressed={preset===index} onClick={()=>{autoThemeBrief.current=null;setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</RoomThemeTags>

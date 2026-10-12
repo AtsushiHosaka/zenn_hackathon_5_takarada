@@ -2821,7 +2821,7 @@ components:
               example: hatsune-miku
             prompt:
               type: string
-              example: 紫色の推し活ルームにしたい
+              example: 初音ミクの水色推し活ルームにしたい
             kept_object_ids:
               type: array
               items:
@@ -2962,7 +2962,7 @@ components:
           example: hatsune-miku
         prompt:
           type: string
-          example: 紫色の推し活ルームにしたい
+          example: 初音ミクの水色推し活ルームにしたい
         kept_object_ids:
           type: array
           items:
@@ -3000,11 +3000,11 @@ components:
         title:
           type: string
           nullable: true
-          example: ラベンダーの推し活ルーム
+          example: 初音ミクの水色推し活ルーム
         comment:
           type: string
           nullable: true
-          example: ラベンダー 布団カバー3点セット シングル (ベッドに掛ける) などを追加しました。今のベッドとデスクと本棚はそのまま活かしています。
+          example: 水色の掛け布団カバー シングル (ベッドに掛ける) などを追加しました。今のベッドとデスクと本棚はそのまま活かしています。
         before_scene:
           allOf:
           - "$ref": "#/components/schemas/Scene"

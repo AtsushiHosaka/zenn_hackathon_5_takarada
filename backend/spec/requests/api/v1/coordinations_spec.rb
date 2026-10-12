@@ -53,14 +53,14 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
         schema "$ref" => "#/components/schemas/Unauthorized"
         let(:Authorization) { "" }
         let(:room_id) { room.id }
-        let(:params) { { coordination: { prompt: "紫色の部屋" } } }
+        let(:params) { { coordination: { prompt: "水色の部屋" } } }
         run_test!
       end
 
       response "404", "本人の部屋ではない" do
         schema "$ref" => "#/components/schemas/NotFound"
         let(:room_id) { create(:user).rooms.create!(tatami: 6, shape: "standard").id }
-        let(:params) { { coordination: { prompt: "紫色の部屋" } } }
+        let(:params) { { coordination: { prompt: "水色の部屋" } } }
         run_test!
       end
 
@@ -68,7 +68,7 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
         schema "$ref" => "#/components/schemas/ValidationErrors"
 
         let(:room_id) { current.rooms.create!(tatami: 6, shape: "standard").id }
-        let(:params) { { coordination: { prompt: "紫色の推し活ルームにしたい" } } }
+        let(:params) { { coordination: { prompt: "初音ミクの水色推し活ルームにしたい" } } }
 
         run_test!
       end
@@ -87,7 +87,7 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
         schema "$ref" => "#/components/schemas/Coordination"
 
         let(:coordination) do
-          room.coordinations.create!(room_palette_id: "warm-ivory", prompt: "紫色の推し活ルームにしたい").tap do |c|
+          room.coordinations.create!(room_palette_id: "warm-ivory", prompt: "初音ミクの水色推し活ルームにしたい").tap do |c|
             c.update!(status: "done", **CoordinationBuilder.call(c).to_h)
           end
         end
@@ -103,7 +103,7 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
 
       response "404", "本人のコーデではない" do
         schema "$ref" => "#/components/schemas/NotFound"
-        let(:id) { create(:user).rooms.create!(tatami: 6, shape: "standard").coordinations.create!(prompt: "紫色の部屋").id }
+        let(:id) { create(:user).rooms.create!(tatami: 6, shape: "standard").coordinations.create!(prompt: "水色の部屋").id }
         run_test!
       end
     end
