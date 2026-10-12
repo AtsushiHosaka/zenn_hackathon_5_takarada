@@ -32,8 +32,10 @@ class FurnitureDetailImporter
         furniture = furnitures[row["model_key"]] or raise InvalidDetails, "details[#{index}].model_key #{row["model_key"].inspect} is not imported"
         size = row["size"].to_h
         detail = FurnitureDetail.find_or_initialize_by(key: row["key"])
+        retail = %w[retail_family_key retail_variant_key retail_source_url retail_checked_at retail_availability].to_h { |field| [ field.to_sym, row[field] ] }
         detail.update!(
           furniture:, position: index,
+          **retail,
           **row.slice("name", "category", "slot", "symbolic_color", "color_materials", "color_name", "price", "shop", "url", "image_url", "themes", "material").symbolize_keys,
           width: size["w"], height: size["h"], depth: size["d"]
         )

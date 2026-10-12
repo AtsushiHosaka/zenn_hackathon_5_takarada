@@ -1,0 +1,1647 @@
+[
+  {
+    "key": "static:115",
+    "url": "https://search.rakuten.co.jp/search/mall/%E3%83%A9%E3%83%99%E3%83%B3%E3%83%80%E3%83%BC%20%E3%83%AC%E3%83%BC%E3%82%B9%E3%82%AB%E3%83%BC%E3%83%86%E3%83%B3/",
+    "status": "unsupported"
+  },
+  {
+    "key": "static:114",
+    "url": "https://search.rakuten.co.jp/search/mall/%E3%82%BF%E3%83%9A%E3%82%B9%E3%83%88%E3%83%AA%E3%83%BC%20%E3%83%A9%E3%83%99%E3%83%B3%E3%83%80%E3%83%BC%20%E7%84%A1%E5%9C%B0/",
+    "status": "unsupported"
+  },
+  {
+    "key": "static:108",
+    "url": "https://www.muji.com/jp/ja/store/cmdty/detail/4550002856120",
+    "status": "unsupported"
+  },
+  {
+    "key": "static:202",
+    "url": "https://store.shopping.yahoo.co.jp/nitori-net/2114100125179.html",
+    "status": "unsupported"
+  },
+  {
+    "key": "static:205",
+    "url": "https://www.kaja-online.jp/view/item/000000000206",
+    "status": "unsupported"
+  },
+  {
+    "key": "static:303",
+    "url": "https://search.rakuten.co.jp/search/mall/%E3%82%A6%E3%82%A7%E3%83%BC%E3%83%96%20%E3%83%A9%E3%82%B0%20%E3%83%99%E3%83%BC%E3%82%B8%E3%83%A5%20%E9%9F%93%E5%9B%BD/",
+    "status": "unsupported"
+  },
+  {
+    "key": "static:304",
+    "url": "https://www.nitori-net.jp/ec/product/2117100013088s/",
+    "status": "unsupported"
+  },
+  {
+    "key": "ec:yahoo_shopping:shop-brain/30358494:shop-brain/30358494",
+    "url": "https://store.shopping.yahoo.co.jp/shop-brain/30358494.html",
+    "status": "unsupported"
+  },
+  {
+    "key": "ec:yahoo_shopping:nitori-net/8700458:nitori-net/8700458",
+    "url": "https://store.shopping.yahoo.co.jp/nitori-net/8700458.html",
+    "status": "unsupported"
+  },
+  {
+    "key": "ec:yahoo_shopping:shop-brain/90586940:shop-brain/90586940",
+    "url": "https://store.shopping.yahoo.co.jp/shop-brain/90586940.html",
+    "status": "unsupported"
+  },
+  {
+    "key": "ec:yahoo_shopping:nitori-net/2115100099156:nitori-net/2115100099156",
+    "url": "https://store.shopping.yahoo.co.jp/nitori-net/2115100099156.html",
+    "status": "unsupported"
+  },
+  {
+    "key": "ec:yahoo_shopping:nitori-net/2117100002310:nitori-net/2117100002310",
+    "url": "https://store.shopping.yahoo.co.jp/nitori-net/2117100002310.html",
+    "status": "unsupported"
+  },
+  {
+    "key": "ec:yahoo_shopping:shop-brain/20605428:shop-brain/20605428",
+    "url": "https://store.shopping.yahoo.co.jp/shop-brain/20605428.html",
+    "status": "unsupported"
+  },
+  {
+    "key": "ec:yahoo_shopping:nitori-net/2113100020583:nitori-net/2113100020583",
+    "url": "https://store.shopping.yahoo.co.jp/nitori-net/2113100020583.html",
+    "status": "unsupported"
+  },
+  {
+    "key": "ec:yahoo_shopping:shop-brain/70635178:shop-brain/70635178",
+    "url": "https://store.shopping.yahoo.co.jp/shop-brain/70635178.html",
+    "status": "unsupported"
+  },
+  {
+    "key": "ec:yahoo_shopping:nitori-net/5692727:nitori-net/5692727",
+    "url": "https://store.shopping.yahoo.co.jp/nitori-net/5692727.html",
+    "status": "unsupported"
+  },
+  {
+    "key": "ec:yahoo_shopping:nitori-net/2110700057643:nitori-net/2110700057643",
+    "url": "https://store.shopping.yahoo.co.jp/nitori-net/2110700057643.html",
+    "status": "unsupported"
+  },
+  {
+    "key": "ec:yahoo_shopping:nitori-net/6620805:nitori-net/6620805",
+    "url": "https://store.shopping.yahoo.co.jp/nitori-net/6620805.html",
+    "status": "unsupported"
+  },
+  {
+    "key": "ec:yahoo_shopping:shop-brain/19240788:shop-brain/19240788",
+    "url": "https://store.shopping.yahoo.co.jp/shop-brain/19240788.html",
+    "status": "unsupported"
+  },
+  {
+    "key": "ec:yahoo_shopping:nitori-net/6620996:nitori-net/6620996",
+    "url": "https://store.shopping.yahoo.co.jp/nitori-net/6620996.html",
+    "status": "unsupported"
+  },
+  {
+    "key": "static:101",
+    "url": "https://francfranc.com/products/1102030047044",
+    "status": "failed",
+    "reason": "selected_product_unverified"
+  },
+  {
+    "key": "static:102",
+    "url": "https://www.ikea.com/jp/ja/p/merete-room-darkening-curtains-1-pair-white-with-heading-tape-60364747/",
+    "status": "verified_existing",
+    "variant_key": "ikea:60364747",
+    "variant_url": "https://www.ikea.com/jp/ja/p/merete-room-darkening-curtains-1-pair-white-with-heading-tape-60364747/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:87014f192d5ec939d7af24b7"
+  },
+  {
+    "key": "ec:ikea:904.255.27:904.255.27",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-90425527/",
+    "status": "verified_existing",
+    "variant_key": "ikea:90425527",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-90425527/",
+    "color_name": "オフホワイト",
+    "family_key": "ikea:ca1f75b8ad829bae6cd95c70"
+  },
+  {
+    "key": "ec:ikea:904.255.27:904.255.27",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-90425527/",
+    "status": "skipped_size_change",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-green-30628858/"
+  },
+  {
+    "key": "ec:ikea:904.255.27:904.255.27",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-90425527/",
+    "status": "skipped_size_change",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-beige-20607682/"
+  },
+  {
+    "key": "ec:ikea:904.255.27:904.255.27",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-90425527/",
+    "status": "skipped_size_change",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-pale-green-80629148/"
+  },
+  {
+    "key": "ec:ikea:904.255.27:904.255.27",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-90425527/",
+    "status": "skipped_size_change",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-pale-pink-60629149/"
+  },
+  {
+    "key": "ec:ikea:904.255.27:904.255.27",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-90425527/",
+    "status": "added",
+    "variant_key": "ikea:20427006",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-medium-grey-20427006/",
+    "color_name": "ミディアムグレー",
+    "family_key": "ikea:ca1f75b8ad829bae6cd95c70"
+  },
+  {
+    "key": "static:104",
+    "url": "https://www.ikea.com/jp/ja/p/lack-wall-shelf-white-70282181/",
+    "status": "added",
+    "variant_key": "ikea:90595421",
+    "variant_url": "https://www.ikea.com/jp/ja/p/lack-wall-shelf-black-blue-90595421/",
+    "color_name": "ブラックブルー",
+    "family_key": "ikea:70b07c01935fd52950aebb4d"
+  },
+  {
+    "key": "static:104",
+    "url": "https://www.ikea.com/jp/ja/p/lack-wall-shelf-white-70282181/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70282181",
+    "variant_url": "https://www.ikea.com/jp/ja/p/lack-wall-shelf-white-70282181/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:70b07c01935fd52950aebb4d"
+  },
+  {
+    "key": "static:104",
+    "url": "https://www.ikea.com/jp/ja/p/lack-wall-shelf-white-70282181/",
+    "status": "skipped_size_change",
+    "variant_url": "https://www.ikea.com/jp/ja/p/lack-wall-shelf-white-stained-oak-effect-50418213/"
+  },
+  {
+    "key": "static:105",
+    "url": "https://francfranc.com/products/1109040028100",
+    "status": "failed",
+    "reason": "missing_name_or_color"
+  },
+  {
+    "key": "static:112",
+    "url": "https://www.ikea.com/jp/ja/p/pilskott-led-floor-lamp-smart-black-00478129/",
+    "status": "verified_existing",
+    "variant_key": "ikea:00478129",
+    "variant_url": "https://www.ikea.com/jp/ja/p/pilskott-led-floor-lamp-smart-black-00478129/",
+    "color_name": "ブラック",
+    "family_key": "ikea:06d9d765cc8a79d70928cc84"
+  },
+  {
+    "key": "ec:ikea:105.029.92:105.029.92",
+    "url": "https://www.ikea.com/jp/ja/p/baggebo-glass-door-cabinet-metal-white-10502992/",
+    "status": "verified_existing",
+    "variant_key": "ikea:10502992",
+    "variant_url": "https://www.ikea.com/jp/ja/p/baggebo-glass-door-cabinet-metal-white-10502992/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:477cbea7ff3d76fecdf4d210"
+  },
+  {
+    "key": "ec:ikea:405.012.60:405.012.60",
+    "url": "https://www.ikea.com/jp/ja/p/blaliden-glass-door-cabinet-white-40501260/",
+    "status": "added",
+    "variant_key": "ikea:80520520",
+    "variant_url": "https://www.ikea.com/jp/ja/p/blaliden-glass-door-cabinet-black-80520520/",
+    "color_name": "ブラック",
+    "family_key": "ikea:18d38d73c0fa438ed39147ce"
+  },
+  {
+    "key": "ec:ikea:405.012.60:405.012.60",
+    "url": "https://www.ikea.com/jp/ja/p/blaliden-glass-door-cabinet-white-40501260/",
+    "status": "verified_existing",
+    "variant_key": "ikea:40501260",
+    "variant_url": "https://www.ikea.com/jp/ja/p/blaliden-glass-door-cabinet-white-40501260/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:18d38d73c0fa438ed39147ce"
+  },
+  {
+    "key": "static:107",
+    "url": "https://francfranc.com/products/1102130131612",
+    "status": "failed",
+    "reason": "missing_name_or_color"
+  },
+  {
+    "key": "static:201",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-pale-grey-green-20632455/",
+    "status": "added",
+    "variant_key": "ikea:10318668",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-grey-10318668/",
+    "color_name": "グレー",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "static:201",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-pale-grey-green-20632455/",
+    "status": "added",
+    "variant_key": "ikea:10537637",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-dark-pink-10537637/",
+    "color_name": "ダークピンク",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "static:201",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-pale-grey-green-20632455/",
+    "status": "added",
+    "variant_key": "ikea:30636622",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-dark-blue-30636622/",
+    "color_name": "ダークブルー",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "static:201",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-pale-grey-green-20632455/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-natural-40591982/",
+    "color_name": "ナチュラル"
+  },
+  {
+    "key": "static:201",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-pale-grey-green-20632455/",
+    "status": "added",
+    "variant_key": "ikea:50585221",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-blue-grey-50585221/",
+    "color_name": "ブルーグレー",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "static:201",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-pale-grey-green-20632455/",
+    "status": "verified_existing",
+    "variant_key": "ikea:20632455",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-pale-grey-green-20632455/",
+    "color_name": "ペールグレーグリーン",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "static:201",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-pale-grey-green-20632455/",
+    "status": "added",
+    "variant_key": "ikea:20318564",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-white-20318564/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "static:201",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-pale-grey-green-20632455/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70632491",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
+    "color_name": "ライトブラウン",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "static:203",
+    "url": "https://www.ikea.com/jp/ja/p/lohals-rug-flatwoven-natural-50511287/",
+    "status": "verified_existing",
+    "variant_key": "ikea:50511287",
+    "variant_url": "https://www.ikea.com/jp/ja/p/lohals-rug-flatwoven-natural-50511287/",
+    "color_name": "ベージュ",
+    "family_key": "ikea:9d737a53bbc7adc08adcfb70"
+  },
+  {
+    "key": "static:211",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-medium-grey-60426830/",
+    "status": "skipped_size_change",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-80426805/"
+  },
+  {
+    "key": "static:211",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-medium-grey-60426830/",
+    "status": "verified_existing",
+    "variant_key": "ikea:60426830",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-medium-grey-60426830/",
+    "color_name": "ミディアムグレー",
+    "family_key": "ikea:92c948fb1fc65a27fb3d4f1b"
+  },
+  {
+    "key": "static:204",
+    "url": "https://www.ikea.com/jp/ja/p/fejka-artificial-potted-plant-in-outdoor-hanging-monstera-00608404/",
+    "status": "verified_existing",
+    "variant_key": "ikea:00608404",
+    "variant_url": "https://www.ikea.com/jp/ja/p/fejka-artificial-potted-plant-in-outdoor-hanging-monstera-00608404/",
+    "color_name": "グリーン",
+    "family_key": "ikea:eae7691f500c654eb248b502"
+  },
+  {
+    "key": "static:214",
+    "url": "https://www.ikea.com/jp/ja/p/knoppaeng-frame-with-poster-garden-20465772/",
+    "status": "verified_existing",
+    "variant_key": "ikea:20465772",
+    "variant_url": "https://www.ikea.com/jp/ja/p/knoppaeng-frame-with-poster-garden-20465772/",
+    "color_name": "ベージュ, グレー, ブラック",
+    "family_key": "ikea:597863d876eb93243e4324d5"
+  },
+  {
+    "key": "static:212",
+    "url": "https://www.ikea.com/jp/ja/p/lauters-floor-lamp-ash-white-00405053/",
+    "status": "verified_existing",
+    "variant_key": "ikea:00405053",
+    "variant_url": "https://www.ikea.com/jp/ja/p/lauters-floor-lamp-ash-white-00405053/",
+    "color_name": "アッシュ/ホワイト",
+    "family_key": "ikea:3d642445fac1fffbb6eabaaa"
+  },
+  {
+    "key": "static:212",
+    "url": "https://www.ikea.com/jp/ja/p/lauters-floor-lamp-ash-white-00405053/",
+    "status": "added",
+    "variant_key": "ikea:50484854",
+    "variant_url": "https://www.ikea.com/jp/ja/p/lauters-floor-lamp-brown-ash-white-50484854/",
+    "color_name": "ブラウン アッシュ/ホワイト",
+    "family_key": "ikea:3d642445fac1fffbb6eabaaa"
+  },
+  {
+    "key": "static:206",
+    "url": "https://www.ikea.com/jp/ja/p/fejka-artificial-potted-plant-in-outdoor-monstera-60615246/",
+    "status": "verified_existing",
+    "variant_key": "ikea:60615246",
+    "variant_url": "https://www.ikea.com/jp/ja/p/fejka-artificial-potted-plant-in-outdoor-monstera-60615246/",
+    "color_name": "グリーン",
+    "family_key": "ikea:aaef3e9966d7a63af586acd3"
+  },
+  {
+    "key": "static:213",
+    "url": "https://www.ikea.com/jp/ja/p/fejka-artificial-potted-plant-in-outdoor-eucalyptus-90600875/",
+    "status": "verified_existing",
+    "variant_key": "ikea:90600875",
+    "variant_url": "https://www.ikea.com/jp/ja/p/fejka-artificial-potted-plant-in-outdoor-eucalyptus-90600875/",
+    "color_name": "グリーン",
+    "family_key": "ikea:8e0084f72290cc8162fb849f"
+  },
+  {
+    "key": "static:207",
+    "url": "https://www.ikea.com/jp/ja/p/hallonbuske-cushion-cover-green-floral-pattern-60636734/",
+    "status": "verified_existing",
+    "variant_key": "ikea:60636734",
+    "variant_url": "https://www.ikea.com/jp/ja/p/hallonbuske-cushion-cover-green-floral-pattern-60636734/",
+    "color_name": "グリーン/フローラルパターン",
+    "family_key": "ikea:879c97a32b8b1a12743da8c4"
+  },
+  {
+    "key": "static:207",
+    "url": "https://www.ikea.com/jp/ja/p/hallonbuske-cushion-cover-green-floral-pattern-60636734/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/hallonbuske-cushion-cover-unbleached-floral-pattern-00625286/",
+    "color_name": "生成り/フローラルパターン"
+  },
+  {
+    "key": "static:208",
+    "url": "https://www.ikea.com/jp/ja/p/fejka-artificial-potted-plant-in-outdoor-plantain-lily-00610746/",
+    "status": "verified_existing",
+    "variant_key": "ikea:00610746",
+    "variant_url": "https://www.ikea.com/jp/ja/p/fejka-artificial-potted-plant-in-outdoor-plantain-lily-00610746/",
+    "color_name": "グリーン",
+    "family_key": "ikea:c807da9e4cec21d3144985ac"
+  },
+  {
+    "key": "static:301",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-natural-40591982/",
+    "status": "verified_existing",
+    "variant_key": "ikea:10318668",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-grey-10318668/",
+    "color_name": "グレー",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "static:301",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-natural-40591982/",
+    "status": "verified_existing",
+    "variant_key": "ikea:10537637",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-dark-pink-10537637/",
+    "color_name": "ダークピンク",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "static:301",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-natural-40591982/",
+    "status": "verified_existing",
+    "variant_key": "ikea:30636622",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-dark-blue-30636622/",
+    "color_name": "ダークブルー",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "static:301",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-natural-40591982/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-natural-40591982/",
+    "color_name": "ナチュラル"
+  },
+  {
+    "key": "static:301",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-natural-40591982/",
+    "status": "verified_existing",
+    "variant_key": "ikea:50585221",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-blue-grey-50585221/",
+    "color_name": "ブルーグレー",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "static:301",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-natural-40591982/",
+    "status": "verified_existing",
+    "variant_key": "ikea:20632455",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-pale-grey-green-20632455/",
+    "color_name": "ペールグレーグリーン",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "static:301",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-natural-40591982/",
+    "status": "verified_existing",
+    "variant_key": "ikea:20318564",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-white-20318564/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "static:301",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-natural-40591982/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70632491",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
+    "color_name": "ライトブラウン",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "static:302",
+    "url": "https://www.ikea.com/jp/ja/p/silverloenn-sheer-curtains-1-pair-beige-with-heading-tape-30493977/",
+    "status": "verified_existing",
+    "variant_key": "ikea:30493977",
+    "variant_url": "https://www.ikea.com/jp/ja/p/silverloenn-sheer-curtains-1-pair-beige-with-heading-tape-30493977/",
+    "color_name": "ベージュ/ヘディングテープ付き",
+    "family_key": "ikea:63c66a55d5d92f257d6f69d5"
+  },
+  {
+    "key": "static:302",
+    "url": "https://www.ikea.com/jp/ja/p/silverloenn-sheer-curtains-1-pair-beige-with-heading-tape-30493977/",
+    "status": "added",
+    "variant_key": "ikea:40491039",
+    "variant_url": "https://www.ikea.com/jp/ja/p/silverloenn-sheer-curtains-1-pair-white-with-heading-tape-40491039/",
+    "color_name": "ホワイト/ヘディングテープ付き",
+    "family_key": "ikea:63c66a55d5d92f257d6f69d5"
+  },
+  {
+    "key": "ec:ikea:804.268.05:804.268.05",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-80426805/",
+    "status": "verified_existing",
+    "variant_key": "ikea:80426805",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-80426805/",
+    "color_name": "オフホワイト",
+    "family_key": "ikea:92c948fb1fc65a27fb3d4f1b"
+  },
+  {
+    "key": "ec:ikea:804.268.05:804.268.05",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-80426805/",
+    "status": "skipped_size_change",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-medium-grey-60426830/"
+  },
+  {
+    "key": "static:305",
+    "url": "https://www.ikea.com/jp/ja/p/vindkast-floor-lamp-white-30539094/",
+    "status": "verified_existing",
+    "variant_key": "ikea:30539094",
+    "variant_url": "https://www.ikea.com/jp/ja/p/vindkast-floor-lamp-white-30539094/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:7acaf03760945fd421de0455"
+  },
+  {
+    "key": "static:312",
+    "url": "https://www.ikea.com/jp/ja/p/arstid-floor-lamp-nickel-plated-white-70163866/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70163866",
+    "variant_url": "https://www.ikea.com/jp/ja/p/arstid-floor-lamp-nickel-plated-white-70163866/",
+    "color_name": "ニッケルメッキ/ホワイト",
+    "family_key": "ikea:60b8baeda75dd08ce3a59ddf"
+  },
+  {
+    "key": "static:312",
+    "url": "https://www.ikea.com/jp/ja/p/arstid-floor-lamp-nickel-plated-white-70163866/",
+    "status": "added",
+    "variant_key": "ikea:00321322",
+    "variant_url": "https://www.ikea.com/jp/ja/p/arstid-floor-lamp-brass-white-00321322/",
+    "color_name": "真ちゅう/ホワイト",
+    "family_key": "ikea:60b8baeda75dd08ce3a59ddf"
+  },
+  {
+    "key": "static:306",
+    "url": "https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/",
+    "status": "added",
+    "variant_key": "ikea:50578452",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gladom-tray-table-dark-grey-green-50578452/",
+    "color_name": "ダークグレーグリーン",
+    "family_key": "ikea:d3eb5a4289174aeded17bcbb"
+  },
+  {
+    "key": "static:306",
+    "url": "https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/",
+    "status": "added",
+    "variant_key": "ikea:00411997",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gladom-tray-table-black-00411997/",
+    "color_name": "ブラック",
+    "family_key": "ikea:d3eb5a4289174aeded17bcbb"
+  },
+  {
+    "key": "static:306",
+    "url": "https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/",
+    "status": "verified_existing",
+    "variant_key": "ikea:50337820",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:d3eb5a4289174aeded17bcbb"
+  },
+  {
+    "key": "static:306",
+    "url": "https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/",
+    "status": "added",
+    "variant_key": "ikea:90534003",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gladom-tray-table-light-blue-90534003/",
+    "color_name": "ライトブルー",
+    "family_key": "ikea:d3eb5a4289174aeded17bcbb"
+  },
+  {
+    "key": "static:307",
+    "url": "https://www.ikea.com/jp/ja/p/profetblomma-cushion-light-beige-70614208/",
+    "status": "added",
+    "variant_key": "ikea:00614202",
+    "variant_url": "https://www.ikea.com/jp/ja/p/profetblomma-cushion-yellow-00614202/",
+    "color_name": "イエロー",
+    "family_key": "ikea:b1c95e74881de73b3e05dfcc"
+  },
+  {
+    "key": "static:307",
+    "url": "https://www.ikea.com/jp/ja/p/profetblomma-cushion-light-beige-70614208/",
+    "status": "added",
+    "variant_key": "ikea:60614204",
+    "variant_url": "https://www.ikea.com/jp/ja/p/profetblomma-cushion-grey-blue-60614204/",
+    "color_name": "グレーブルー",
+    "family_key": "ikea:b1c95e74881de73b3e05dfcc"
+  },
+  {
+    "key": "static:307",
+    "url": "https://www.ikea.com/jp/ja/p/profetblomma-cushion-light-beige-70614208/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/profetblomma-cushion-anthracite-10614206/",
+    "color_name": "チャコール"
+  },
+  {
+    "key": "static:307",
+    "url": "https://www.ikea.com/jp/ja/p/profetblomma-cushion-light-beige-70614208/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70614208",
+    "variant_url": "https://www.ikea.com/jp/ja/p/profetblomma-cushion-light-beige-70614208/",
+    "color_name": "ライトベージュ",
+    "family_key": "ikea:b1c95e74881de73b3e05dfcc"
+  },
+  {
+    "key": "static:308",
+    "url": "https://www.ikea.com/jp/ja/p/hemsjoe-unscented-block-candle-natural-00176117/",
+    "status": "added",
+    "variant_key": "ikea:00176117",
+    "variant_url": "https://www.ikea.com/jp/ja/p/hemsjoe-unscented-pillar-candle-natural-00176117/",
+    "color_name": "ベージュ",
+    "family_key": "ikea:264b7eb9d1665f0e7efc68f3"
+  },
+  {
+    "key": "static:901",
+    "url": "https://www.ikea.com/jp/ja/p/lill-net-curtains-1-pair-white-with-rod-pocket-70171927/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70171927",
+    "variant_url": "https://www.ikea.com/jp/ja/p/lill-net-curtains-1-pair-white-with-rod-pocket-70171927/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:9cdc9956e5bbda16ef4b33a7"
+  },
+  {
+    "key": "static:902",
+    "url": "https://www.ikea.com/jp/ja/p/naevlinge-led-clamp-spotlight-white-70449893/",
+    "status": "added",
+    "variant_key": "ikea:90640254",
+    "variant_url": "https://www.ikea.com/jp/ja/p/naevlinge-led-clamp-spotlight-dark-red-90640254/",
+    "color_name": "ダークレッド",
+    "family_key": "ikea:996ab737b515e216da79b707"
+  },
+  {
+    "key": "static:902",
+    "url": "https://www.ikea.com/jp/ja/p/naevlinge-led-clamp-spotlight-white-70449893/",
+    "status": "added",
+    "variant_key": "ikea:80449883",
+    "variant_url": "https://www.ikea.com/jp/ja/p/naevlinge-led-clamp-spotlight-black-80449883/",
+    "color_name": "ブラック",
+    "family_key": "ikea:996ab737b515e216da79b707"
+  },
+  {
+    "key": "static:902",
+    "url": "https://www.ikea.com/jp/ja/p/naevlinge-led-clamp-spotlight-white-70449893/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70449893",
+    "variant_url": "https://www.ikea.com/jp/ja/p/naevlinge-led-clamp-spotlight-white-70449893/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:996ab737b515e216da79b707"
+  },
+  {
+    "key": "static:902",
+    "url": "https://www.ikea.com/jp/ja/p/naevlinge-led-clamp-spotlight-white-70449893/",
+    "status": "added",
+    "variant_key": "ikea:60511215",
+    "variant_url": "https://www.ikea.com/jp/ja/p/naevlinge-led-clamp-spotlight-light-pink-60511215/",
+    "color_name": "ライトピンク",
+    "family_key": "ikea:996ab737b515e216da79b707"
+  },
+  {
+    "key": "static:902",
+    "url": "https://www.ikea.com/jp/ja/p/naevlinge-led-clamp-spotlight-white-70449893/",
+    "status": "added",
+    "variant_key": "ikea:50574784",
+    "variant_url": "https://www.ikea.com/jp/ja/p/naevlinge-led-clamp-spotlight-lilac-dark-green-50574784/",
+    "color_name": "ライラック/ダークグリーン",
+    "family_key": "ikea:996ab737b515e216da79b707"
+  },
+  {
+    "key": "ec:ikea:005.987.30:005.987.30",
+    "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-00598730/",
+    "status": "added",
+    "variant_key": "ikea:40598752",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-yellow-40598752/",
+    "color_name": "イエロー",
+    "family_key": "ikea:071c9b8f98fa1889d44b83ef"
+  },
+  {
+    "key": "ec:ikea:005.987.30:005.987.30",
+    "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-00598730/",
+    "status": "added",
+    "variant_key": "ikea:10598758",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-green-10598758/",
+    "color_name": "グリーン",
+    "family_key": "ikea:071c9b8f98fa1889d44b83ef"
+  },
+  {
+    "key": "ec:ikea:005.987.30:005.987.30",
+    "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-00598730/",
+    "status": "added",
+    "variant_key": "ikea:00598754",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-pink-00598754/",
+    "color_name": "ピンク",
+    "family_key": "ikea:071c9b8f98fa1889d44b83ef"
+  },
+  {
+    "key": "ec:ikea:005.987.30:005.987.30",
+    "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-00598730/",
+    "status": "added",
+    "variant_key": "ikea:70598736",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-dark-grey-70598736/",
+    "color_name": "ダークグレー",
+    "family_key": "ikea:071c9b8f98fa1889d44b83ef"
+  },
+  {
+    "key": "ec:ikea:005.987.30:005.987.30",
+    "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-00598730/",
+    "status": "added",
+    "variant_key": "ikea:30598762",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-black-30598762/",
+    "color_name": "ブラック",
+    "family_key": "ikea:071c9b8f98fa1889d44b83ef"
+  },
+  {
+    "key": "ec:ikea:005.987.30:005.987.30",
+    "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-00598730/",
+    "status": "added",
+    "variant_key": "ikea:40598728",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-white-40598728/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:071c9b8f98fa1889d44b83ef"
+  },
+  {
+    "key": "ec:ikea:005.987.30:005.987.30",
+    "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-00598730/",
+    "status": "added",
+    "variant_key": "ikea:60598770",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-red-60598770/",
+    "color_name": "レッド",
+    "family_key": "ikea:071c9b8f98fa1889d44b83ef"
+  },
+  {
+    "key": "ec:ikea:005.987.30:005.987.30",
+    "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-00598730/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-00598730/",
+    "color_name": "生成り"
+  },
+  {
+    "key": "ec:ikea:303.584.94:303.584.94",
+    "url": "https://www.ikea.com/jp/ja/p/svallet-work-lamp-dark-grey-white-30358494/",
+    "status": "verified_existing",
+    "variant_key": "ikea:30358494",
+    "variant_url": "https://www.ikea.com/jp/ja/p/svallet-work-lamp-dark-grey-white-30358494/",
+    "color_name": "グレー, ホワイト",
+    "family_key": "ikea:257eaf3cd4fbdefc9ed48387"
+  },
+  {
+    "key": "ec:ikea:001.623.80:001.623.80",
+    "url": "https://www.ikea.com/jp/ja/p/marius-stool-black-00162380/",
+    "status": "verified_existing",
+    "variant_key": "ikea:00162380",
+    "variant_url": "https://www.ikea.com/jp/ja/p/marius-stool-black-00162380/",
+    "color_name": "ブラック",
+    "family_key": "ikea:b7c665f19112fcf0aecb423c"
+  },
+  {
+    "key": "ec:ikea:001.623.80:001.623.80",
+    "url": "https://www.ikea.com/jp/ja/p/marius-stool-black-00162380/",
+    "status": "added",
+    "variant_key": "ikea:30605239",
+    "variant_url": "https://www.ikea.com/jp/ja/p/marius-stool-blue-30605239/",
+    "color_name": "ブルー",
+    "family_key": "ikea:b7c665f19112fcf0aecb423c"
+  },
+  {
+    "key": "ec:ikea:001.623.80:001.623.80",
+    "url": "https://www.ikea.com/jp/ja/p/marius-stool-black-00162380/",
+    "status": "verified_existing",
+    "variant_key": "ikea:30184050",
+    "variant_url": "https://www.ikea.com/jp/ja/p/marius-stool-white-30184050/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:b7c665f19112fcf0aecb423c"
+  },
+  {
+    "key": "ec:ikea:001.623.80:001.623.80",
+    "url": "https://www.ikea.com/jp/ja/p/marius-stool-black-00162380/",
+    "status": "added",
+    "variant_key": "ikea:00605250",
+    "variant_url": "https://www.ikea.com/jp/ja/p/marius-stool-red-brown-00605250/",
+    "color_name": "レッドブラウン",
+    "family_key": "ikea:b7c665f19112fcf0aecb423c"
+  },
+  {
+    "key": "ec:ikea:301.840.50:301.840.50",
+    "url": "https://www.ikea.com/jp/ja/p/marius-stool-white-30184050/",
+    "status": "verified_existing",
+    "variant_key": "ikea:00162380",
+    "variant_url": "https://www.ikea.com/jp/ja/p/marius-stool-black-00162380/",
+    "color_name": "ブラック",
+    "family_key": "ikea:b7c665f19112fcf0aecb423c"
+  },
+  {
+    "key": "ec:ikea:301.840.50:301.840.50",
+    "url": "https://www.ikea.com/jp/ja/p/marius-stool-white-30184050/",
+    "status": "verified_existing",
+    "variant_key": "ikea:30605239",
+    "variant_url": "https://www.ikea.com/jp/ja/p/marius-stool-blue-30605239/",
+    "color_name": "ブルー",
+    "family_key": "ikea:b7c665f19112fcf0aecb423c"
+  },
+  {
+    "key": "ec:ikea:301.840.50:301.840.50",
+    "url": "https://www.ikea.com/jp/ja/p/marius-stool-white-30184050/",
+    "status": "verified_existing",
+    "variant_key": "ikea:30184050",
+    "variant_url": "https://www.ikea.com/jp/ja/p/marius-stool-white-30184050/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:b7c665f19112fcf0aecb423c"
+  },
+  {
+    "key": "ec:ikea:301.840.50:301.840.50",
+    "url": "https://www.ikea.com/jp/ja/p/marius-stool-white-30184050/",
+    "status": "verified_existing",
+    "variant_key": "ikea:00605250",
+    "variant_url": "https://www.ikea.com/jp/ja/p/marius-stool-red-brown-00605250/",
+    "color_name": "レッドブラウン",
+    "family_key": "ikea:b7c665f19112fcf0aecb423c"
+  },
+  {
+    "key": "ec:ikea:205.695.19:205.695.19",
+    "url": "https://www.ikea.com/jp/ja/p/blaskata-cushion-cover-purple-patterned-20569519/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/blaskata-cushion-cover-purple-patterned-20569519/",
+    "color_name": "ライラック"
+  },
+  {
+    "key": "ec:ikea:305.908.98:305.908.98",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
+    "status": "variant_failed",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-yellow-60590892/",
+    "reason": "missing_variant_jpy_price"
+  },
+  {
+    "key": "ec:ikea:305.908.98:305.908.98",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70635989",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
+    "color_name": "イエローブラウン",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:305.908.98:305.908.98",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
+    "status": "added",
+    "variant_key": "ikea:60636003",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-dark-green-60636003/",
+    "color_name": "ダークグリーン",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:305.908.98:305.908.98",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
+    "status": "added",
+    "variant_key": "ikea:60590929",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-dark-grey-turquoise-60590929/",
+    "color_name": "ダークグレーターコイズ",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:305.908.98:305.908.98",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
+    "status": "added",
+    "variant_key": "ikea:20636024",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-dark-brown-20636024/",
+    "color_name": "ダークブラウン",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:305.908.98:305.908.98",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
+    "status": "added",
+    "variant_key": "ikea:10625889",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-dark-blue-10625889/",
+    "color_name": "ダークブルー",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:305.908.98:305.908.98",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
+    "status": "added",
+    "variant_key": "ikea:10590922",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-bright-pink-10590922/",
+    "color_name": "ブライトピンク",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:305.908.98:305.908.98",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
+    "status": "added",
+    "variant_key": "ikea:10591894",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-pale-pink-10591894/",
+    "color_name": "ペールピンク",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:305.908.98:305.908.98",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
+    "status": "added",
+    "variant_key": "ikea:00635997",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+    "color_name": "ライトブルー",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:305.908.98:305.908.98",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
+    "status": "verified_existing",
+    "variant_key": "ikea:30590898",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
+    "color_name": "ライトベージュ",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:706.359.89:706.359.89",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
+    "status": "variant_failed",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-yellow-60590892/",
+    "reason": "missing_variant_jpy_price"
+  },
+  {
+    "key": "ec:ikea:706.359.89:706.359.89",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70635989",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
+    "color_name": "イエローブラウン",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:706.359.89:706.359.89",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
+    "status": "verified_existing",
+    "variant_key": "ikea:60636003",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-dark-green-60636003/",
+    "color_name": "ダークグリーン",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:706.359.89:706.359.89",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
+    "status": "verified_existing",
+    "variant_key": "ikea:60590929",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-dark-grey-turquoise-60590929/",
+    "color_name": "ダークグレーターコイズ",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:706.359.89:706.359.89",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
+    "status": "verified_existing",
+    "variant_key": "ikea:20636024",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-dark-brown-20636024/",
+    "color_name": "ダークブラウン",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:706.359.89:706.359.89",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
+    "status": "verified_existing",
+    "variant_key": "ikea:10625889",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-dark-blue-10625889/",
+    "color_name": "ダークブルー",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:706.359.89:706.359.89",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
+    "status": "verified_existing",
+    "variant_key": "ikea:10590922",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-bright-pink-10590922/",
+    "color_name": "ブライトピンク",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:706.359.89:706.359.89",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
+    "status": "verified_existing",
+    "variant_key": "ikea:10591894",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-pale-pink-10591894/",
+    "color_name": "ペールピンク",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:706.359.89:706.359.89",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
+    "status": "verified_existing",
+    "variant_key": "ikea:00635997",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-blue-00635997/",
+    "color_name": "ライトブルー",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:706.359.89:706.359.89",
+    "url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-yellow-brown-70635989/",
+    "status": "verified_existing",
+    "variant_key": "ikea:30590898",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sanela-cushion-cover-light-beige-30590898/",
+    "color_name": "ライトベージュ",
+    "family_key": "ikea:89d308c7632de5051c0f8e11"
+  },
+  {
+    "key": "ec:ikea:905.987.78:905.987.78",
+    "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-90598778/",
+    "status": "added",
+    "variant_key": "ikea:80598788",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-yellow-80598788/",
+    "color_name": "イエロー",
+    "family_key": "ikea:3180f1a684e19f8d6262bd7c"
+  },
+  {
+    "key": "ec:ikea:905.987.78:905.987.78",
+    "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-90598778/",
+    "status": "added",
+    "variant_key": "ikea:10598782",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-dark-grey-10598782/",
+    "color_name": "ダークグレー",
+    "family_key": "ikea:3180f1a684e19f8d6262bd7c"
+  },
+  {
+    "key": "ec:ikea:905.987.78:905.987.78",
+    "url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-90598778/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gurli-cushion-cover-unbleached-90598778/",
+    "color_name": "生成り"
+  },
+  {
+    "key": "ec:ikea:705.704.07:705.704.07",
+    "url": "https://www.ikea.com/jp/ja/p/gunde-folding-stool-black-70570407/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70570407",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gunde-folding-stool-black-70570407/",
+    "color_name": "ブラック",
+    "family_key": "ikea:95f9245f4897a9563d2e7d48"
+  },
+  {
+    "key": "ec:ikea:606.264.19:606.264.19",
+    "url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-grey-brown-60626419/",
+    "status": "verified_existing",
+    "variant_key": "ikea:60626419",
+    "variant_url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-grey-brown-60626419/",
+    "color_name": "グレーブラウン",
+    "family_key": "ikea:f968c42a6fdc8b2dae4bcd3f"
+  },
+  {
+    "key": "ec:ikea:606.264.19:606.264.19",
+    "url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-grey-brown-60626419/",
+    "status": "added",
+    "variant_key": "ikea:20626416",
+    "variant_url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-dark-green-20626416/",
+    "color_name": "ダークグリーン",
+    "family_key": "ikea:f968c42a6fdc8b2dae4bcd3f"
+  },
+  {
+    "key": "ec:ikea:606.264.19:606.264.19",
+    "url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-grey-brown-60626419/",
+    "status": "added",
+    "variant_key": "ikea:00626417",
+    "variant_url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-light-pink-00626417/",
+    "color_name": "ライトピンク",
+    "family_key": "ikea:f968c42a6fdc8b2dae4bcd3f"
+  },
+  {
+    "key": "ec:ikea:606.264.19:606.264.19",
+    "url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-grey-brown-60626419/",
+    "status": "added",
+    "variant_key": "ikea:40626420",
+    "variant_url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-light-beige-40626420/",
+    "color_name": "ライトベージュ",
+    "family_key": "ikea:f968c42a6fdc8b2dae4bcd3f"
+  },
+  {
+    "key": "ec:ikea:805.724.20:805.724.20",
+    "url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-light-beige-80572420/",
+    "status": "variant_failed",
+    "variant_url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-grey-brown-40572422/",
+    "reason": "missing_variant_jpy_price"
+  },
+  {
+    "key": "ec:ikea:805.724.20:805.724.20",
+    "url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-light-beige-80572420/",
+    "status": "verified_existing",
+    "variant_key": "ikea:80572420",
+    "variant_url": "https://www.ikea.com/jp/ja/p/asveig-cushion-cover-light-beige-80572420/",
+    "color_name": "ライトベージュ",
+    "family_key": "ikea:1da3c09187f16049cfa54acf"
+  },
+  {
+    "key": "ec:ikea:902.553.08:902.553.08",
+    "url": "https://www.ikea.com/jp/ja/p/fejan-chair-outdoor-foldable-white-90255308/",
+    "status": "verified_existing",
+    "variant_key": "ikea:90255308",
+    "variant_url": "https://www.ikea.com/jp/ja/p/fejan-chair-outdoor-foldable-white-90255308/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:4994d67c38030fb98cffff5d"
+  },
+  {
+    "key": "ec:ikea:004.567.59:004.567.59",
+    "url": "https://www.ikea.com/jp/ja/p/tiphede-rug-flatwoven-natural-black-00456759/",
+    "status": "verified_existing",
+    "variant_key": "ikea:00456759",
+    "variant_url": "https://www.ikea.com/jp/ja/p/tiphede-rug-flatwoven-natural-black-00456759/",
+    "color_name": "ナチュラル/ブラック",
+    "family_key": "ikea:8df231ab320f42d4502899a4"
+  },
+  {
+    "key": "ec:ikea:004.567.59:004.567.59",
+    "url": "https://www.ikea.com/jp/ja/p/tiphede-rug-flatwoven-natural-black-00456759/",
+    "status": "skipped_size_change",
+    "variant_url": "https://www.ikea.com/jp/ja/p/tiphede-rug-flatwoven-black-natural-60470045/"
+  },
+  {
+    "key": "ec:ikea:203.501.39:203.501.39",
+    "url": "https://www.ikea.com/jp/ja/p/begavning-glass-dome-with-base-20350139/",
+    "status": "verified_existing",
+    "variant_key": "ikea:20350139",
+    "variant_url": "https://www.ikea.com/jp/ja/p/begavning-glass-dome-with-base-20350139/",
+    "color_name": "イエロー, ホワイト",
+    "family_key": "ikea:d91198b0c5e5d5709c71fd2f"
+  },
+  {
+    "key": "ec:ikea:206.054.28:206.054.28",
+    "url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-20605428/",
+    "status": "verified_existing",
+    "variant_key": "ikea:80605430",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-black-80605430/",
+    "color_name": "ブラック",
+    "family_key": "ikea:3bd96db7d2d37d2f8edad9f0"
+  },
+  {
+    "key": "ec:ikea:206.054.28:206.054.28",
+    "url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-20605428/",
+    "status": "added",
+    "variant_key": "ikea:40605427",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-blue-40605427/",
+    "color_name": "ブルー",
+    "family_key": "ikea:3bd96db7d2d37d2f8edad9f0"
+  },
+  {
+    "key": "ec:ikea:206.054.28:206.054.28",
+    "url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-20605428/",
+    "status": "verified_existing",
+    "variant_key": "ikea:20605428",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-20605428/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:3bd96db7d2d37d2f8edad9f0"
+  },
+  {
+    "key": "ec:ikea:206.054.28:206.054.28",
+    "url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-20605428/",
+    "status": "added",
+    "variant_key": "ikea:00605429",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-red-brown-00605429/",
+    "color_name": "レッドブラウン",
+    "family_key": "ikea:3bd96db7d2d37d2f8edad9f0"
+  },
+  {
+    "key": "ec:ikea:806.054.30:806.054.30",
+    "url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-black-80605430/",
+    "status": "verified_existing",
+    "variant_key": "ikea:80605430",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-black-80605430/",
+    "color_name": "ブラック",
+    "family_key": "ikea:3bd96db7d2d37d2f8edad9f0"
+  },
+  {
+    "key": "ec:ikea:806.054.30:806.054.30",
+    "url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-black-80605430/",
+    "status": "verified_existing",
+    "variant_key": "ikea:40605427",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-blue-40605427/",
+    "color_name": "ブルー",
+    "family_key": "ikea:3bd96db7d2d37d2f8edad9f0"
+  },
+  {
+    "key": "ec:ikea:806.054.30:806.054.30",
+    "url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-black-80605430/",
+    "status": "verified_existing",
+    "variant_key": "ikea:20605428",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-20605428/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:3bd96db7d2d37d2f8edad9f0"
+  },
+  {
+    "key": "ec:ikea:806.054.30:806.054.30",
+    "url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-black-80605430/",
+    "status": "verified_existing",
+    "variant_key": "ikea:00605429",
+    "variant_url": "https://www.ikea.com/jp/ja/p/sandsberg-chair-red-brown-00605429/",
+    "color_name": "レッドブラウン",
+    "family_key": "ikea:3bd96db7d2d37d2f8edad9f0"
+  },
+  {
+    "key": "ec:ikea:802.177.98:802.177.98",
+    "url": "https://www.ikea.com/jp/ja/p/gunde-folding-chair-black-80217798/",
+    "status": "verified_existing",
+    "variant_key": "ikea:80217798",
+    "variant_url": "https://www.ikea.com/jp/ja/p/gunde-folding-chair-black-80217798/",
+    "color_name": "ブラック",
+    "family_key": "ikea:39ad6cae1a98160ba5c9985d"
+  },
+  {
+    "key": "ec:ikea:104.984.19:104.984.19",
+    "url": "https://www.ikea.com/jp/ja/p/stig-bar-stool-with-backrest-counter-height-black-black-10498419/",
+    "status": "verified_existing",
+    "variant_key": "ikea:10498419",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stig-bar-stool-with-backrest-counter-height-black-black-10498419/",
+    "color_name": "ブラック",
+    "family_key": "ikea:4d45b0a7a54b9d62501c5da4"
+  },
+  {
+    "key": "ec:ikea:804.200.40:804.200.40",
+    "url": "https://www.ikea.com/jp/ja/p/kyrre-stool-birch-80420040/",
+    "status": "added",
+    "variant_key": "ikea:50608133",
+    "variant_url": "https://www.ikea.com/jp/ja/p/kyrre-stool-off-white-50608133/",
+    "color_name": "オフホワイト",
+    "family_key": "ikea:dd8fb1d3c4b935f286c7eeab"
+  },
+  {
+    "key": "ec:ikea:804.200.40:804.200.40",
+    "url": "https://www.ikea.com/jp/ja/p/kyrre-stool-birch-80420040/",
+    "status": "added",
+    "variant_key": "ikea:70608132",
+    "variant_url": "https://www.ikea.com/jp/ja/p/kyrre-stool-green-70608132/",
+    "color_name": "グリーン",
+    "family_key": "ikea:dd8fb1d3c4b935f286c7eeab"
+  },
+  {
+    "key": "ec:ikea:804.200.40:804.200.40",
+    "url": "https://www.ikea.com/jp/ja/p/kyrre-stool-birch-80420040/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/kyrre-stool-birch-80420040/",
+    "color_name": "バーチ"
+  },
+  {
+    "key": "ec:ikea:706.324.91:706.324.91",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
+    "status": "verified_existing",
+    "variant_key": "ikea:10318668",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-grey-10318668/",
+    "color_name": "グレー",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "ec:ikea:706.324.91:706.324.91",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
+    "status": "verified_existing",
+    "variant_key": "ikea:10537637",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-dark-pink-10537637/",
+    "color_name": "ダークピンク",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "ec:ikea:706.324.91:706.324.91",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
+    "status": "verified_existing",
+    "variant_key": "ikea:30636622",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-dark-blue-30636622/",
+    "color_name": "ダークブルー",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "ec:ikea:706.324.91:706.324.91",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-natural-40591982/",
+    "color_name": "ナチュラル"
+  },
+  {
+    "key": "ec:ikea:706.324.91:706.324.91",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
+    "status": "verified_existing",
+    "variant_key": "ikea:50585221",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-blue-grey-50585221/",
+    "color_name": "ブルーグレー",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "ec:ikea:706.324.91:706.324.91",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
+    "status": "verified_existing",
+    "variant_key": "ikea:20632455",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-pale-grey-green-20632455/",
+    "color_name": "ペールグレーグリーン",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "ec:ikea:706.324.91:706.324.91",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
+    "status": "verified_existing",
+    "variant_key": "ikea:20318564",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-white-20318564/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "ec:ikea:706.324.91:706.324.91",
+    "url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70632491",
+    "variant_url": "https://www.ikea.com/jp/ja/p/aengslilja-duvet-cover-and-pillowcase-light-brown-70632491/",
+    "color_name": "ライトブラウン",
+    "family_key": "ikea:53b556526c01fc70ad6db34c"
+  },
+  {
+    "key": "ec:ikea:805.927.34:805.927.34",
+    "url": "https://www.ikea.com/jp/ja/p/vihals-chair-white-80592734/",
+    "status": "verified_existing",
+    "variant_key": "ikea:80592734",
+    "variant_url": "https://www.ikea.com/jp/ja/p/vihals-chair-white-80592734/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:d616e39bcbdb209e07237227"
+  },
+  {
+    "key": "ec:ikea:701.788.96:701.788.96",
+    "url": "https://www.ikea.com/jp/ja/p/bekvaem-step-stool-white-70178896/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/bekvaem-step-stool-aspen-50225592/",
+    "color_name": "アスペン"
+  },
+  {
+    "key": "ec:ikea:701.788.96:701.788.96",
+    "url": "https://www.ikea.com/jp/ja/p/bekvaem-step-stool-white-70178896/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70178896",
+    "variant_url": "https://www.ikea.com/jp/ja/p/bekvaem-step-stool-white-70178896/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:f15f25f73ff8466cac07d283"
+  },
+  {
+    "key": "ec:ikea:405.013.21:405.013.21",
+    "url": "https://www.ikea.com/jp/ja/p/perjohan-stool-with-storage-pine-40501321/",
+    "status": "verified_existing",
+    "variant_key": "ikea:40501321",
+    "variant_url": "https://www.ikea.com/jp/ja/p/perjohan-stool-with-storage-pine-40501321/",
+    "color_name": "ベージュ",
+    "family_key": "ikea:264c5ed2c314b81cf6865871"
+  },
+  {
+    "key": "ec:ikea:704.838.82:704.838.82",
+    "url": "https://www.ikea.com/jp/ja/p/baggebo-cabinet-with-door-white-70483882/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70483882",
+    "variant_url": "https://www.ikea.com/jp/ja/p/baggebo-cabinet-with-door-white-70483882/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:e68fdd10f8b3587a57d149e2"
+  },
+  {
+    "key": "ec:ikea:305.943.25:305.943.25",
+    "url": "https://www.ikea.com/jp/ja/p/nymane-table-lamp-white-30594325/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/nymane-table-lamp-anthracite-90595633/",
+    "color_name": "チャコール"
+  },
+  {
+    "key": "ec:ikea:305.943.25:305.943.25",
+    "url": "https://www.ikea.com/jp/ja/p/nymane-table-lamp-white-30594325/",
+    "status": "verified_existing",
+    "variant_key": "ikea:30594325",
+    "variant_url": "https://www.ikea.com/jp/ja/p/nymane-table-lamp-white-30594325/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:d3c2f495ed6d0f4d2c723145"
+  },
+  {
+    "key": "ec:ikea:605.343.30:605.343.30",
+    "url": "https://www.ikea.com/jp/ja/p/froesvi-folding-chair-white-60534330/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/froesvi-folding-chair-beech-50534316/",
+    "color_name": "ビーチ"
+  },
+  {
+    "key": "ec:ikea:605.343.30:605.343.30",
+    "url": "https://www.ikea.com/jp/ja/p/froesvi-folding-chair-white-60534330/",
+    "status": "verified_existing",
+    "variant_key": "ikea:60534330",
+    "variant_url": "https://www.ikea.com/jp/ja/p/froesvi-folding-chair-white-60534330/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:254dcade1bf5e6443f179d98"
+  },
+  {
+    "key": "ec:ikea:706.351.78:706.351.78",
+    "url": "https://www.ikea.com/jp/ja/p/pinntorp-chair-white-stained-pine-70635178/",
+    "status": "added",
+    "variant_key": "ikea:80635168",
+    "variant_url": "https://www.ikea.com/jp/ja/p/pinntorp-chair-black-stained-pine-80635168/",
+    "color_name": "ブラックステイン/パイン材",
+    "family_key": "ikea:67f5076b04e0c0c2ec187bc8"
+  },
+  {
+    "key": "ec:ikea:706.351.78:706.351.78",
+    "url": "https://www.ikea.com/jp/ja/p/pinntorp-chair-white-stained-pine-70635178/",
+    "status": "added",
+    "variant_key": "ikea:10635176",
+    "variant_url": "https://www.ikea.com/jp/ja/p/pinntorp-chair-blue-stained-pine-10635176/",
+    "color_name": "ブルーステイン/パイン材",
+    "family_key": "ikea:67f5076b04e0c0c2ec187bc8"
+  },
+  {
+    "key": "ec:ikea:706.351.78:706.351.78",
+    "url": "https://www.ikea.com/jp/ja/p/pinntorp-chair-white-stained-pine-70635178/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70635178",
+    "variant_url": "https://www.ikea.com/jp/ja/p/pinntorp-chair-white-stained-pine-70635178/",
+    "color_name": "ホワイトステイン/パイン材",
+    "family_key": "ikea:67f5076b04e0c0c2ec187bc8"
+  },
+  {
+    "key": "ec:ikea:706.351.78:706.351.78",
+    "url": "https://www.ikea.com/jp/ja/p/pinntorp-chair-white-stained-pine-70635178/",
+    "status": "added",
+    "variant_key": "ikea:80590481",
+    "variant_url": "https://www.ikea.com/jp/ja/p/pinntorp-chair-light-brown-stained-pine-80590481/",
+    "color_name": "ライトブラウンステイン/パイン材",
+    "family_key": "ikea:67f5076b04e0c0c2ec187bc8"
+  },
+  {
+    "key": "ec:ikea:594.454.67:594.454.67",
+    "url": "https://www.ikea.com/jp/ja/p/loberget-malskaer-swivel-chair-white-s59445467/",
+    "status": "failed",
+    "reason": "selected_product_unverified"
+  },
+  {
+    "key": "ec:ikea:404.049.90:404.049.90",
+    "url": "https://www.ikea.com/jp/ja/p/dejsa-table-lamp-beige-opal-white-glass-40404990/",
+    "status": "verified_existing",
+    "variant_key": "ikea:40404990",
+    "variant_url": "https://www.ikea.com/jp/ja/p/dejsa-table-lamp-beige-opal-white-glass-40404990/",
+    "color_name": "ベージュ, ホワイト",
+    "family_key": "ikea:cffffc76dd79a645133c8af3"
+  },
+  {
+    "key": "ec:ikea:703.509.38:703.509.38",
+    "url": "https://www.ikea.com/jp/ja/p/teodores-chair-white-70350938/",
+    "status": "added",
+    "variant_key": "ikea:70530628",
+    "variant_url": "https://www.ikea.com/jp/ja/p/teodores-chair-blue-70530628/",
+    "color_name": "ブルー",
+    "family_key": "ikea:59356d76addfdd954a2287e7"
+  },
+  {
+    "key": "ec:ikea:703.509.38:703.509.38",
+    "url": "https://www.ikea.com/jp/ja/p/teodores-chair-white-70350938/",
+    "status": "verified_existing",
+    "variant_key": "ikea:70350938",
+    "variant_url": "https://www.ikea.com/jp/ja/p/teodores-chair-white-70350938/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:59356d76addfdd954a2287e7"
+  },
+  {
+    "key": "ec:ikea:604.268.06:604.268.06",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-60426806/",
+    "status": "verified_existing",
+    "variant_key": "ikea:60426806",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-60426806/",
+    "color_name": "オフホワイト",
+    "family_key": "ikea:577357f3daddface6185ac9b"
+  },
+  {
+    "key": "ec:ikea:604.268.06:604.268.06",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-60426806/",
+    "status": "skipped_size_change",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-medium-grey-80427008/"
+  },
+  {
+    "key": "ec:francfranc:1108010008418:1108010008418",
+    "url": "https://francfranc.com/products/1108010008418",
+    "status": "failed",
+    "reason": "missing_name_or_color"
+  },
+  {
+    "key": "ec:ikea:804.486.09:804.486.09",
+    "url": "https://www.ikea.com/jp/ja/p/nymane-work-lamp-with-wireless-charging-white-80448609/",
+    "status": "verified_existing",
+    "variant_key": "ikea:80448609",
+    "variant_url": "https://www.ikea.com/jp/ja/p/nymane-work-lamp-with-wireless-charging-white-80448609/",
+    "color_name": "ホワイト",
+    "family_key": "ikea:c4dc1754869299266630117c"
+  },
+  {
+    "key": "ec:ikea:206.179.59:206.179.59",
+    "url": "https://www.ikea.com/jp/ja/p/ikea-ps-2026-folding-chair-birch-blue-black-red-20617959/",
+    "status": "verified_existing",
+    "variant_key": "ikea:20617959",
+    "variant_url": "https://www.ikea.com/jp/ja/p/ikea-ps-2026-folding-chair-birch-blue-black-red-20617959/",
+    "color_name": "ベージュ, ブルー, レッド, ブラック",
+    "family_key": "ikea:92e03985b05202627be3664a"
+  },
+  {
+    "key": "ec:ikea:804.501.31:804.501.31",
+    "url": "https://www.ikea.com/jp/ja/p/rudsta-glass-door-cabinet-anthracite-80450131/",
+    "status": "verified_existing",
+    "variant_key": "ikea:80450131",
+    "variant_url": "https://www.ikea.com/jp/ja/p/rudsta-glass-door-cabinet-anthracite-80450131/",
+    "color_name": "グレー",
+    "family_key": "ikea:07a62327a7738bb8cd73ec04"
+  },
+  {
+    "key": "ec:ikea:206.179.64:206.179.64",
+    "url": "https://www.ikea.com/jp/ja/p/ikea-ps-2026-chair-bright-blue-knaebaeck-bright-blue-20617964/",
+    "status": "added",
+    "variant_key": "ikea:30617968",
+    "variant_url": "https://www.ikea.com/jp/ja/p/ikea-ps-2026-chair-bright-green-knaebaeck-bright-green-30617968/",
+    "color_name": "ブライトグリーン/クネーベック ブライトグリーン",
+    "family_key": "ikea:83e2c28d1fb1472f4dbd6017"
+  },
+  {
+    "key": "ec:ikea:206.179.64:206.179.64",
+    "url": "https://www.ikea.com/jp/ja/p/ikea-ps-2026-chair-bright-blue-knaebaeck-bright-blue-20617964/",
+    "status": "verified_existing",
+    "variant_key": "ikea:20617964",
+    "variant_url": "https://www.ikea.com/jp/ja/p/ikea-ps-2026-chair-bright-blue-knaebaeck-bright-blue-20617964/",
+    "color_name": "ブライトブルー/クネーベック ブライトブルー",
+    "family_key": "ikea:83e2c28d1fb1472f4dbd6017"
+  },
+  {
+    "key": "ec:ikea:304.573.14:304.573.14",
+    "url": "https://www.ikea.com/jp/ja/p/odger-chair-anthracite-30457314/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/odger-chair-anthracite-30457314/",
+    "color_name": "チャコール"
+  },
+  {
+    "key": "ec:ikea:304.573.14:304.573.14",
+    "url": "https://www.ikea.com/jp/ja/p/odger-chair-anthracite-30457314/",
+    "status": "added",
+    "variant_key": "ikea:50516553",
+    "variant_url": "https://www.ikea.com/jp/ja/p/odger-chair-red-50516553/",
+    "color_name": "レッド",
+    "family_key": "ikea:7dd8ae48b53bd20f286f437a"
+  },
+  {
+    "key": "ec:ikea:603.496.72:603.496.72",
+    "url": "https://www.ikea.com/jp/ja/p/tobias-chair-transparent-chrome-plated-60349672/",
+    "status": "skipped_unavailable",
+    "variant_url": "https://www.ikea.com/jp/ja/p/tobias-chair-brown-red-chrome-plated-70532590/",
+    "availability": "out_of_stock"
+  },
+  {
+    "key": "ec:ikea:603.496.72:603.496.72",
+    "url": "https://www.ikea.com/jp/ja/p/tobias-chair-transparent-chrome-plated-60349672/",
+    "status": "added",
+    "variant_key": "ikea:10635124",
+    "variant_url": "https://www.ikea.com/jp/ja/p/tobias-chair-black-grey-black-10635124/",
+    "color_name": "ブラック/グレー/ブラック",
+    "family_key": "ikea:90427d660f9e9d32f159261b"
+  },
+  {
+    "key": "ec:ikea:603.496.72:603.496.72",
+    "url": "https://www.ikea.com/jp/ja/p/tobias-chair-transparent-chrome-plated-60349672/",
+    "status": "unsupported_color",
+    "variant_url": "https://www.ikea.com/jp/ja/p/tobias-chair-transparent-chrome-plated-60349672/",
+    "color_name": "透明/クロムメッキ"
+  },
+  {
+    "key": "ec:ikea:105.294.68:105.294.68",
+    "url": "https://www.ikea.com/jp/ja/p/pinntorp-table-light-brown-stained-white-stained-pine-10529468/",
+    "status": "added",
+    "variant_key": "ikea:20639268",
+    "variant_url": "https://www.ikea.com/jp/ja/p/pinntorp-table-light-brown-stained-black-stained-pine-20639268/",
+    "color_name": "ライトブラウンステイン/ブラックステイン パイン材",
+    "family_key": "ikea:03401684336987cecabea193"
+  },
+  {
+    "key": "ec:ikea:105.294.68:105.294.68",
+    "url": "https://www.ikea.com/jp/ja/p/pinntorp-table-light-brown-stained-white-stained-pine-10529468/",
+    "status": "added",
+    "variant_key": "ikea:00635172",
+    "variant_url": "https://www.ikea.com/jp/ja/p/pinntorp-table-light-brown-stained-blue-stained-pine-00635172/",
+    "color_name": "ライトブラウンステイン/ブルーステイン パイン材",
+    "family_key": "ikea:03401684336987cecabea193"
+  },
+  {
+    "key": "ec:ikea:105.294.68:105.294.68",
+    "url": "https://www.ikea.com/jp/ja/p/pinntorp-table-light-brown-stained-white-stained-pine-10529468/",
+    "status": "verified_existing",
+    "variant_key": "ikea:10529468",
+    "variant_url": "https://www.ikea.com/jp/ja/p/pinntorp-table-light-brown-stained-white-stained-pine-10529468/",
+    "color_name": "ライトブラウンステイン/ホワイトステイン パイン材",
+    "family_key": "ikea:03401684336987cecabea193"
+  },
+  {
+    "key": "ec:ikea:004.255.36:004.255.36",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-00425536/",
+    "status": "verified_existing",
+    "variant_key": "ikea:00425536",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-00425536/",
+    "color_name": "オフホワイト",
+    "family_key": "ikea:127cdc3469d19bfc6f3d88b1"
+  },
+  {
+    "key": "ec:ikea:004.255.36:004.255.36",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-00425536/",
+    "status": "skipped_size_change",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-green-40607695/"
+  },
+  {
+    "key": "ec:ikea:004.255.36:004.255.36",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-00425536/",
+    "status": "skipped_size_change",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-beige-90607669/"
+  },
+  {
+    "key": "ec:ikea:004.255.36:004.255.36",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-00425536/",
+    "status": "skipped_size_change",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-pale-green-10629156/"
+  },
+  {
+    "key": "ec:ikea:004.255.36:004.255.36",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-00425536/",
+    "status": "skipped_size_change",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-pale-pink-90629157/"
+  },
+  {
+    "key": "ec:ikea:004.255.36:004.255.36",
+    "url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-off-white-00425536/",
+    "status": "added",
+    "variant_key": "ikea:00426833",
+    "variant_url": "https://www.ikea.com/jp/ja/p/stoense-rug-low-pile-medium-grey-00426833/",
+    "color_name": "ミディアムグレー",
+    "family_key": "ikea:127cdc3469d19bfc6f3d88b1"
+  },
+  {
+    "key": "ec:ikea:304.501.38:304.501.38",
+    "url": "https://www.ikea.com/jp/ja/p/rudsta-glass-door-cabinet-anthracite-30450138/",
+    "status": "verified_existing",
+    "variant_key": "ikea:30450138",
+    "variant_url": "https://www.ikea.com/jp/ja/p/rudsta-glass-door-cabinet-anthracite-30450138/",
+    "color_name": "グレー",
+    "family_key": "ikea:b57c572707c77d80d9a6c680"
+  },
+  {
+    "key": "ec:ikea:303.598.27:303.598.27",
+    "url": "https://www.ikea.com/jp/ja/p/strandmon-wing-chair-nordvalla-dark-grey-30359827/",
+    "status": "verified_existing",
+    "variant_key": "ikea:30359827",
+    "variant_url": "https://www.ikea.com/jp/ja/p/strandmon-wing-chair-nordvalla-dark-grey-30359827/",
+    "color_name": "グレー",
+    "family_key": "ikea:baedb6d2361b550cd813038d"
+  },
+  {
+    "key": "ec:ikea:995.521.20:995.521.20",
+    "url": "https://www.ikea.com/jp/ja/p/ektorp-armchair-kilanda-light-beige-s99552120/",
+    "status": "failed",
+    "reason": "selected_product_unverified"
+  }
+]

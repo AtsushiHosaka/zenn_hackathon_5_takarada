@@ -566,7 +566,7 @@ RSpec.configure do |config|
           FurnitureSearchResult: {
             type: :object,
             properties: {
-              products: { type: :array, maxItems: 24, description: "家具ごとに1件。同じ家具の他の色・寸法・購入先はvariants", items: { "$ref" => "#/components/schemas/FurnitureSearchProduct" } },
+              products: { type: :array, maxItems: 24, description: "商品ごとに1件。ショップで確認した同じ商品の色違いはvariants。未確認の商品は個別に返す", items: { "$ref" => "#/components/schemas/FurnitureSearchProduct" } },
               color: { type: :string, nullable: true, example: "blue" },
               interpretation: { "$ref" => "#/components/schemas/SearchInterpretation" },
               models: { type: :array, maxItems: 24, description: "推し活グッズの 3D モデル。家具検索では空", items: { "$ref" => "#/components/schemas/FurnitureModel" } }
@@ -635,7 +635,7 @@ RSpec.configure do |config|
               { "$ref" => "#/components/schemas/FurnitureDetail" },
               {
                 type: :object,
-                properties: { variants: { type: :array, description: "同じ家具の全detail (自身を含む)", items: { "$ref" => "#/components/schemas/FurnitureDetail" } } },
+                properties: { variants: { type: :array, description: "同じショップ・商品・寸法の確認済み販売色 (自身を含む)。3Dモデルの一致だけではまとめない", items: { "$ref" => "#/components/schemas/FurnitureDetail" } } },
                 required: %w[variants]
               }
             ]

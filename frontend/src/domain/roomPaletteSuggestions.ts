@@ -42,7 +42,7 @@ const fallbackIds = ["warm-ivory", "snow-graphite", "sage-clay", "sky-white"];
 
 // Use the existing selectable colors so the suggested swatch and API palette agree.
 const themePaletteIds: Readonly<Record<string, readonly string[]>> = {
-  "hatsune-miku": ["sky-white", "mint-cloud", "snow-graphite", "charcoal-silver"],
+  "hatsune-miku": ["sky-white", "mint-cloud", "snow-graphite", "sage-clay"],
   sanrio: ["blush-linen", "sky-white", "lavender-milk", "snow-graphite"],
   "hello-kitty": ["brick-cream", "snow-graphite", "blush-linen", "warm-ivory"],
   "my-melody": ["blush-linen", "snow-graphite", "lavender-milk", "warm-ivory"],

@@ -1093,7 +1093,7 @@ export interface paths {
         put?: never;
         /**
          * 登録された家具を検索し色で絞り込む
-         * @description DBに登録された家具 (furniture_details) を検索する。外部ECは検索しない。商品名に検索語を含むものを優先し、無ければ推定したカテゴリ (なければ床置き家具) 全体を返す。色は公式の色名・商品名で絞り込む。家具ごとに1件で最大24件。同じ家具の他の色・寸法・購入先はvariantsに入る。
+         * @description DBに登録された家具を検索する。検索中に外部ECは検索しない。商品名に検索語を含むものを優先し、無ければカテゴリ全体を返す。色は公式の色名・商品名で絞り込む。最大24件。同じショップ・商品・寸法の確認済み販売色をvariantsにまとめる。未確認の商品は個別に返す。
          */
         post: {
             parameters: {
@@ -2427,7 +2427,7 @@ export interface components {
             reviewed_by: "gemini" | "mock";
         };
         FurnitureSearchResult: {
-            /** @description 家具ごとに1件。同じ家具の他の色・寸法・購入先はvariants */
+            /** @description 商品ごとに1件。ショップで確認した同じ商品の色違いはvariants。未確認の商品は個別に返す */
             products: components["schemas"]["FurnitureSearchProduct"][];
             /** @example blue */
             color: string | null;
@@ -2542,7 +2542,7 @@ export interface components {
             source: "dictionary" | "llm" | "none";
         };
         FurnitureSearchProduct: components["schemas"]["FurnitureDetail"] & {
-            /** @description 同じ家具の全detail (自身を含む) */
+            /** @description 同じショップ・商品・寸法の確認済み販売色 (自身を含む)。3Dモデルの一致だけではまとめない */
             variants: components["schemas"]["FurnitureDetail"][];
         };
         MaterialOverride: {
