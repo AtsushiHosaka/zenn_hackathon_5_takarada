@@ -1332,6 +1332,11 @@ export interface components {
             color_name: string | null;
             size: components["schemas"]["Size"];
             /**
+             * @description 主な素材
+             * @example スチール
+             */
+            material: string | null;
+            /**
              * @description リンク先の参考価格 (税込)
              * @example 2000
              */
@@ -1360,8 +1365,6 @@ export interface components {
              * @example true
              */
             enabled: boolean;
-            /** Format: date-time */
-            checked_at: string | null;
         };
         AdminFurnitureDetailList: {
             details: components["schemas"]["AdminFurnitureDetail"][];
@@ -1397,6 +1400,8 @@ export interface components {
                 /** @example ホワイト */
                 color_name?: string | null;
                 size?: components["schemas"]["Size"];
+                /** @example スチール */
+                material?: string | null;
                 /** @example 2000 */
                 price?: number;
                 /** @example IKEA */
@@ -1443,6 +1448,11 @@ export interface components {
              *     ]
              */
             color_material_keys: string[];
+            /**
+             * @description このモデルを使う商品の寸法のうち、公開されておらず推定した辺
+             * @example []
+             */
+            estimated_axes: ("w" | "h" | "d")[];
             /**
              * @description バケット内の GLB のパス。モデル ID から決まる
              * @example models/furniture/v1/chair_dining.glb
@@ -1510,6 +1520,11 @@ export interface components {
                  * @example []
                  */
                 characters?: string[];
+                /**
+                 * @description このモデルを使う商品の寸法のうち推定した辺。省略すると今の値のまま (新規は空)
+                 * @example []
+                 */
+                estimated_axes?: ("w" | "h" | "d")[];
             };
         };
         /** @description db/furnitures.json と同じ形。無効な家具も含む */

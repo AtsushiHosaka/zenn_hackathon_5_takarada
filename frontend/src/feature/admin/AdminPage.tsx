@@ -179,7 +179,10 @@ type Draft = {
   name: string; url: string; imageUrl: string; shop: string; price: string; category: string; slot: string; position: string;
   themes: string; colorName: string; w: string; h: string; d: string; modelKey: string; symbolicColor: string;
   colorMaterials: Record<string, string>; enabled: boolean;
+  material: string;
 };
+
+const AXES = ["w", "h", "d"] as const;
 
 function draftOf(detail: AdminFurnitureDetail | null, catalog: FurnitureAdminCatalog): Draft {
   if (!detail) {
@@ -187,6 +190,7 @@ function draftOf(detail: AdminFurnitureDetail | null, catalog: FurnitureAdminCat
       name: "", url: "", imageUrl: "", shop: "", price: "", category: "", slot: catalog.slots.includes("floor") ? "floor" : catalog.slots[0] ?? "",
       position: String(Math.max(-1, ...catalog.details.map((existing) => existing.position)) + 1),
       themes: "", colorName: "", w: "", h: "", d: "", modelKey: "", symbolicColor: "#cccccc", colorMaterials: {}, enabled: true,
+      material: "",
     };
   }
   return {
@@ -194,6 +198,7 @@ function draftOf(detail: AdminFurnitureDetail | null, catalog: FurnitureAdminCat
     slot: detail.slot, position: String(detail.position), themes: detail.themes.join(", "), colorName: detail.colorName ?? "",
     w: centimeters(detail.size.w), h: centimeters(detail.size.h), d: centimeters(detail.size.d), modelKey: detail.modelKey ?? "",
     symbolicColor: detail.symbolicColor, colorMaterials: detail.colorMaterials, enabled: detail.enabled,
+    material: detail.material ?? "",
   };
 }
 
@@ -238,7 +243,8 @@ function DetailEditor({ detail, catalog, models, onCreated, onClose }: {
     if (!Object.keys(draft.colorMaterials).length) return setValidation("色を塗る部位を1つ以上選んでください");
     const input: AdminFurnitureDetailInput = {
       name: draft.name.trim(), category: draft.category.trim(), slot: draft.slot, modelKey: model.id, symbolicColor: draft.symbolicColor,
-      colorMaterials: draft.colorMaterials, colorName: draft.colorName.trim() || null, size, price, shop: draft.shop.trim(), url: draft.url.trim(),
+      colorMaterials: draft.colorMaterials, colorName: draft.colorName.trim() || null, size,
+      material: draft.material.trim() || null, price, shop: draft.shop.trim(), url: draft.url.trim(),
       imageUrl: draft.imageUrl.trim() || null, themes: draft.themes.split(/[\s,、]+/).filter(Boolean), position, enabled: draft.enabled,
     };
     save.mutate({ id: detail?.id ?? null, input }, { onSuccess: (result) => { setSaved(true); if (!detail) onCreated(result); } });
@@ -265,8 +271,10 @@ function DetailEditor({ detail, catalog, models, onCreated, onClose }: {
     </div>
     <datalist id="admin-categories">{catalog.categories.map((value) => <option key={value} value={value} />)}</datalist>
     <fieldset className="grid grid-cols-3 gap-2"><legend className="text-xs text-slate-600">寸法（cm）</legend>
-      {(["w", "h", "d"] as const).map((axis) => <label key={axis} className="text-xs text-slate-600">{{ w: "幅", h: "高さ", d: "奥行き" }[axis]}<input className={field} type="number" min={0.1} step={0.1} required value={draft[axis]} onChange={(event) => set({ [axis]: event.target.value })} /></label>)}
+      {AXES.map((axis) => <label key={axis} className="text-xs text-slate-600">{{ w: "幅", h: "高さ", d: "奥行き" }[axis]}<input className={field} type="number" min={0.1} step={0.1} required value={draft[axis]} onChange={(event) => set({ [axis]: event.target.value })} /></label>)}
     </fieldset>
+    {model && model.estimatedAxes.length > 0 && <p className="text-xs text-slate-500">この3Dモデルの商品は、{model.estimatedAxes.map((axis) => ({ w: "幅", h: "高さ", d: "奥行き" })[axis]).join("・")}を推定の寸法として扱います（公開寸法として表示しません）。</p>}
+    <Field label="主な素材"><input className={field} placeholder="例: 綿、スチール" value={draft.material} onChange={(event) => set({ material: event.target.value })} /></Field>
 
     <Field label="3Dモデル" hint={model ? `${model.name}・${sizeText(model.size)}cm${model.enabled ? "" : "・無効"}` : "モデルIDを入力して選ぶ"}>
       <input className={field} required list="admin-models" value={draft.modelKey} onChange={(event) => selectModel(event.target.value)} />

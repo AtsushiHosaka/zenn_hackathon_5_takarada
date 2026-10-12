@@ -198,4 +198,4 @@ Cloud Run がゼロまで縮んでいるためのコールドスタート。常�
 
 模様（質感の画像）は静的に用意し、`MODELS_BUCKET`の`textures/v1/<texture_key>.png`に置く。一覧は`backend/db/furniture_textures.json`が正で、detailの部位ごとの模様は初期データ`furniture_details.json`の`texture_materials`で入れる（管理画面からの模様の変更は未対応）。表示では模様に部位の色を掛ける（`tinted: false`の柄物は掛けない）。APIは画像を生成・保存しない。
 
-リリース時のタスクは`furniture_texture:clear_legacy`→`db:apply`→`furniture:import`→`furniture_texture:import`→`furniture_detail:import`の順（`furniture:import`と`furniture_detail:import`は空のときだけ入れる）。`db:apply`はSchemafileにないテーブルを削除する（`--drop-table`）。
+リリース時のタスクは`furniture_texture:clear_legacy`→`furniture_detail:migrate_fields`→`db:apply`→`furniture:import`→`furniture_texture:import`→`furniture_detail:import`の順（`furniture:import`と`furniture_detail:import`は空のときだけ入れる）。`db:apply`はSchemafileにないテーブルを削除する（`--drop-table`）。

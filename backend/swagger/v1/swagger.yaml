@@ -831,6 +831,11 @@ components:
           example: ホワイト
         size:
           "$ref": "#/components/schemas/Size"
+        material:
+          type: string
+          nullable: true
+          description: 主な素材
+          example: スチール
         price:
           type: integer
           minimum: 1
@@ -861,10 +866,6 @@ components:
           type: boolean
           description: false なら提案・検索に出さない
           example: true
-        checked_at:
-          type: string
-          format: date-time
-          nullable: true
       required:
       - id
       - key
@@ -877,6 +878,7 @@ components:
       - texture_materials
       - color_name
       - size
+      - material
       - price
       - shop
       - url
@@ -884,7 +886,6 @@ components:
       - themes
       - position
       - enabled
-      - checked_at
     AdminFurnitureDetailList:
       type: object
       properties:
@@ -953,6 +954,10 @@ components:
               example: ホワイト
             size:
               "$ref": "#/components/schemas/Size"
+            material:
+              type: string
+              nullable: true
+              example: スチール
             price:
               type: integer
               minimum: 1
@@ -1022,6 +1027,16 @@ components:
           example:
           - tint
           - wood
+        estimated_axes:
+          type: array
+          items:
+            type: string
+            enum:
+            - w
+            - h
+            - d
+          description: このモデルを使う商品の寸法のうち、公開されておらず推定した辺
+          example: []
         object_key:
           type: string
           description: バケット内の GLB のパス。モデル ID から決まる
@@ -1047,6 +1062,7 @@ components:
       - variant
       - size
       - color_material_keys
+      - estimated_axes
       - object_key
       - model_url
       - enabled
@@ -1120,6 +1136,16 @@ components:
               items:
                 type: string
               description: 推し活グッズのキャラクター (db/characters.json のキー)
+              example: []
+            estimated_axes:
+              type: array
+              items:
+                type: string
+                enum:
+                - w
+                - h
+                - d
+              description: このモデルを使う商品の寸法のうち推定した辺。省略すると今の値のまま (新規は空)
               example: []
           required:
           - name

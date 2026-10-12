@@ -19,6 +19,7 @@ export function toAdminFurnitureDetail(record: AdminFurnitureDetailRecord): Admi
     colorMaterials: record.color_materials,
     colorName: record.color_name,
     size: record.size,
+    material: record.material,
     price: record.price,
     shop: record.shop,
     url: record.url,
@@ -26,7 +27,6 @@ export function toAdminFurnitureDetail(record: AdminFurnitureDetailRecord): Admi
     themes: record.themes,
     position: record.position,
     enabled: record.enabled,
-    checkedAt: record.checked_at ? new Date(record.checked_at) : null,
   };
 }
 
@@ -45,6 +45,7 @@ export function toAdminFurnitureDetailInputRecord(input: AdminFurnitureDetailInp
       color_materials: input.colorMaterials,
       color_name: input.colorName,
       size: input.size,
+      material: input.material,
       price: input.price,
       shop: input.shop,
       url: input.url,
@@ -65,6 +66,7 @@ export function toAdminFurnitureModel(record: AdminFurnitureModelRecord): AdminF
     variant: record.variant,
     size: record.size,
     colorMaterialKeys: record.color_material_keys,
+    estimatedAxes: record.estimated_axes,
     objectKey: record.object_key,
     modelUrl: record.model_url,
     enabled: record.enabled,

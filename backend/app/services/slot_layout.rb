@@ -228,8 +228,9 @@ class SlotLayout
     build(item, size, { "x" => x, "y" => bottom, "z" => z }, rotation, window["id"], "窓")
   end
 
+  # 公開されている寸法がある商品は、その寸法のまま置く。3 辺とも推定の商品は部屋 (窓・ベッド) に合わせた大きさで置く
   def ec_product?(item)
-    item.metadata["provider"].present? && item.metadata["source"] != "mock"
+    item.metadata["size"].present?
   end
 
   def preview_render_size(item, axes)
