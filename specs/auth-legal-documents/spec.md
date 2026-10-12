@@ -37,7 +37,7 @@ At the 2026-10-08 checkpoint, official documents and their URLs remained unpubli
 The user requested publication of Terms and Privacy pages on the app's existing domain, delegated their contents, and supplied `hosaka2917@gmail.com` as the private contact address to list. This supersedes the earlier absence of approved publication content. The Google Docs URL remains unset; this request and implementation decision remain unreflected in Docs.
 
 - Publish Japanese static HTML at `/terms.html` and `/privacy.html`, accessible without login or JavaScript. Share responsive, printable styling through `/legal.css`.
-- Identify the operator using the repository owner's verified public profile name, Atsushi Hosaka. Include the supplied email for private data requests.
+- Identify the operator as チーム「takarada」, as explicitly corrected by the user on 2026-10-12. This supersedes the initial individual-operator attribution. Include the supplied email for private data requests.
 - Describe account information, room photos, prompts/budgets/layouts, imported images, browser storage, operational logs, Google Cloud/Vertex AI processing, external shop links, and account deletion according to current code.
 - Disclose that original room photos are private and become eligible for lifecycle deletion after seven days; withdrawal does not immediately remove photo objects, logs, or browser data. Distinguish public catalog models/textures from private room data.
 - Avoid claims of guaranteed accuracy, immediate deletion of all information, Japan-only AI processing, or universal no-retention. Keep statutory rights and liability that cannot be waived intact.
