@@ -28,4 +28,8 @@ Playwright intercepted the production-build RoomViewer request with a 404 on `/r
 
 Two synthetic preload-error events on a recovered screen preserved the unsaved message value and the same textarea/canvas DOM nodes, produced one notice, and did not reload. At a 375 by 812 viewport, the notice and reload button fit on screen. Screenshots are in `output/playwright/asset-recovery-{404,restored,mobile}.png`.
 
-API responses were mocked and all API requests intercepted in this local browser check. It does not establish authenticated production behavior. No new test suite, API contract, or production deployment is included. Existing tabs running code from before this fix need a manual refresh because they do not contain the new recovery listener.
+API responses were mocked and all API requests intercepted in this local browser check. It does not establish authenticated production behavior. No new test suite or API contract is included. Existing tabs running code from before this fix need a manual refresh because they do not contain the new recovery listener.
+
+## Release
+
+The user authorized deployment on 2026-10-12. The release branch integrates main `a858a8a` to preserve the newer preview UI. Lint, build, generated API-type freshness, and the injected-404/reload/ready-canvas browser check passed again on that integrated source. Review screenshots are in `docs/pr-evidence/web-asset-recovery/`. The release uses the existing main CI and Deploy workflow; production verification follows deployment.
