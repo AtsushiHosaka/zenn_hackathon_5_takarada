@@ -8,13 +8,15 @@ import { isRoomTemplate, type RoomTemplate } from '../../domain/roomTemplate';
 import { saveRoomPlan, scopedRoomPlanKeys, useRoomPlanScope } from './plans';
 import { getFurniturePlacementBounds } from './roomBounds';
 import { readRoomTemplates, templateKeys, templateStorageKey } from './templateStorage';
+import { defaultRoomTemplates } from './defaultTemplates';
 
 export function useRoomTemplates() {
   const scope = useRoomPlanScope();
   const keys = templateKeys(scope);
   const query = useQuery({ queryKey: keys.list, queryFn: () => readRoomTemplates(scope), staleTime: Infinity });
   const warning = useQuery({ queryKey: keys.warning, queryFn: () => '', initialData: '', staleTime: Infinity }).data;
-  return { ...query, data: query.data ?? [], warning };
+  // 自分で保存したテンプレートの後に、最初から使えるテンプレートを並べる。
+  return { ...query, data: [...(query.data ?? []), ...defaultRoomTemplates], warning };
 }
 // テンプレートから部屋を作り、その部屋の画面へ進む。
 export function useCreateRoomFromTemplate() {
