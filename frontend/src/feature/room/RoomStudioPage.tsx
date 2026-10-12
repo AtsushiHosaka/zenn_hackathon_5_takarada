@@ -136,7 +136,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const [style,setStyle]=useState<Style>(isNew||inputState?.characterThemeId?'oshi':design.style);
   const [preset,setPreset]=useState<number|null>(null);
   const [stepIndex,setStepIndex]=useState(0);
-  const [personalEntry,setPersonalEntry]=useState(false);
+  const [personalEntry,setPersonalEntry]=useState(true);
   const wantsPalette=canCoordinate;
   // 解析した部屋にコーディネートを頼める接続先では、第2部を部屋の3Dモデルができた後の画面で聞く。
   const asksRequestLater=analysisMode&&canCoordinate;

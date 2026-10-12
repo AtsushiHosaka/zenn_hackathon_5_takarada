@@ -1,0 +1,7 @@
+.rc-template-options {width:100%;min-width:0}
+.rc-template-chooser .rc-template-cards {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:12px}
+.rc-template-chooser .rc-template-cards li {min-width:0}
+.rc-template-chooser .rc-template-cards li button {height:100%;padding:10px;gap:8px}
+.rc-template-chooser .rc-template-thumbnail {display:grid;place-items:center;aspect-ratio:16/9;width:100%;overflow:hidden;border-radius:8px;background:#25202f;color:#e4dcef;text-align:center}
+.rc-template-thumbnail img {width:100%;height:100%;object-fit:cover}
+.rc-template-chooser .rc-template-thumbnail span {padding:12px;color:#e4dcef;font-size:12px}
