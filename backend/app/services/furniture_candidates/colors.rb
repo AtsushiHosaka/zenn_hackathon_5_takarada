@@ -19,5 +19,28 @@ module FurnitureCandidates
     def self.matches?(name, color)
       color.blank? || PATTERNS.fetch(color).match?(name.to_s)
     end
+
+    # 色相 (度) の上限と色名。明るい・暗いときの呼び名は LIGHT / DARK
+    HUES = [ [ 15, "赤" ], [ 45, "オレンジ" ], [ 70, "黄" ], [ 165, "緑" ], [ 200, "青緑" ], [ 250, "青" ], [ 290, "紫" ], [ 345, "ピンク" ], [ 360, "赤" ] ].freeze
+    LIGHT = { "赤" => "ピンク", "オレンジ" => "薄いオレンジ", "黄" => "クリーム", "緑" => "薄緑", "青緑" => "水色", "青" => "水色", "紫" => "薄紫", "ピンク" => "薄ピンク" }.freeze
+    DARK = { "赤" => "えんじ", "オレンジ" => "茶", "黄" => "カーキ", "緑" => "深緑", "青緑" => "深緑", "青" => "紺", "紫" => "濃い紫", "ピンク" => "赤紫" }.freeze
+
+    # 代表色 (#rrggbb) のおおよその色名。AI は 16 進の色を読み違えやすいので、商品・壁・床の色を言葉でも渡す
+    def self.word(hex)
+      return unless hex.to_s.match?(/\A#\h{6}\z/)
+
+      r, g, b = hex[1..].scan(/../).map { |value| value.hex / 255.0 }
+      max, min = [ r, g, b ].max, [ r, g, b ].min
+      lightness = (max + min) / 2
+      spread = max - min # 色みの強さ
+      return lightness > 0.88 ? "白" : lightness < 0.2 ? "黒" : lightness > 0.65 ? "ライトグレー" : "グレー" if spread < 0.06
+
+      hue = (60 * (max == r ? (g - b) / spread % 6 : max == g ? (b - r) / spread + 2 : (r - g) / spread + 4)) % 360
+      # くすんだ暖色は、木や生成りの色として呼ぶ
+      return lightness > 0.85 ? "アイボリー" : lightness > 0.6 ? "ベージュ" : lightness > 0.3 ? "茶" : "こげ茶" if spread < 0.5 && hue.between?(15, 65)
+
+      name = HUES.find { |limit, _| hue < limit }.last
+      lightness > 0.72 ? LIGHT.fetch(name) : max < 0.52 ? DARK.fetch(name) : name
+    end
   end
 end
