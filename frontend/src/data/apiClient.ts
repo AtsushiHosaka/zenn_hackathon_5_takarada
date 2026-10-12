@@ -14,6 +14,8 @@ type RequestOptions = {
 
 export type ApiClient = {
   send<T>(path: string, options?: RequestOptions): Promise<T>;
+  // 画像・GLB など、JSON ではない本体を認証つきで取得する (<img> は Authorization を付けられないため)
+  sendForBlob(path: string, options?: RequestOptions): Promise<Blob>;
   // ログイン系はトークンがレスポンスヘッダで返るのでこちら
   sendReceivingToken<T>(path: string, options?: RequestOptions): Promise<{ data: T; token: string }>;
   // 署名付きURLへ直接PUTする (部屋写真はAPIを経由せずGCSへ送る)
@@ -68,6 +70,15 @@ export function createApiClient(baseUrl: string, tokenStore: TokenStore): ApiCli
     async send<T>(path: string, options: RequestOptions = {}) {
       const { response, signal } = await call(path, options);
       return decode<T>(response, signal);
+    },
+
+    async sendForBlob(path: string, options: RequestOptions = {}) {
+      const { response, signal } = await call(path, options);
+      try {
+        return await response.blob();
+      } catch (error) {
+        throw requestInterruption(error, signal) ?? new DomainError("ファイルを受け取れませんでした");
+      }
     },
 
     // baseUrlもAuthorizationも付けない。署名したContent-Type以外のヘッダを足すと

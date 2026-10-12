@@ -1,11 +1,12 @@
 import type { components } from "../generated/api";
-import type { AdminFurnitureDetail, AdminFurnitureDetailInput, AdminFurnitureModel, FurnitureAdminCatalog } from "../../domain/furnitureAdmin";
+import type { AdminFurnitureDetail, AdminFurnitureDetailInput, AdminFurnitureModel, FurnitureAdminCatalog, ModelGeneration } from "../../domain/furnitureAdmin";
 
 export type AdminFurnitureDetailRecord = components["schemas"]["AdminFurnitureDetail"];
 export type AdminFurnitureDetailListRecord = components["schemas"]["AdminFurnitureDetailList"];
 export type AdminFurnitureDetailInputRecord = components["schemas"]["AdminFurnitureDetailInput"];
 export type AdminFurnitureModelRecord = components["schemas"]["AdminFurnitureModel"];
 export type AdminFurnitureModelInputRecord = components["schemas"]["AdminFurnitureModelInput"];
+export type AdminModelGenerationRecord = components["schemas"]["AdminModelGeneration"];
 
 export function toAdminFurnitureDetail(record: AdminFurnitureDetailRecord): AdminFurnitureDetail {
   return {
@@ -71,5 +72,23 @@ export function toAdminFurnitureModel(record: AdminFurnitureModelRecord): AdminF
     modelUrl: record.model_url,
     enabled: record.enabled,
     detailsCount: record.details_count,
+  };
+}
+
+export function toModelGeneration(record: AdminModelGenerationRecord): ModelGeneration {
+  const stats = record.stats;
+  return {
+    id: record.id,
+    furnitureDetailId: record.furniture_detail_id,
+    modelKey: record.model_key,
+    status: record.status,
+    errorMessage: record.error_message,
+    notes: record.notes,
+    checks: record.checks,
+    stats: stats?.triangles != null && stats.size ? { triangles: stats.triangles, materials: stats.materials ?? [], bytes: stats.bytes ?? 0, size: stats.size } : null,
+    ai: record.ai?.model != null ? { model: record.ai.model, calls: record.ai.calls ?? 0, seconds: record.ai.seconds ?? 0 } : null,
+    files: record.files,
+    createdAt: new Date(record.created_at),
+    finishedAt: record.finished_at ? new Date(record.finished_at) : null,
   };
 }

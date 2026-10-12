@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { toDomainError } from "../../domain/error";
 import type { AdminFurnitureDetail, AdminFurnitureDetailInput, AdminFurnitureModel, FurnitureAdminCatalog, FurnitureSize } from "../../domain/furnitureAdmin";
 import ErrorText from "../shared/ErrorText";
+import ModelGenerationPanel from "./ModelGenerationPanel";
 import ModelPreview from "./ModelPreview";
 import ModelThumbnail from "./ModelThumbnail";
 import { useAdminFurnitureDetails, useAdminFurnitureModels, useDeleteFurnitureDetail, useExportFurnitureDetails, useSaveFurnitureDetail, useSetFurnitureModelEnabled } from "./queries";
@@ -159,7 +160,7 @@ function DetailsBoard({ catalog, models }: { catalog: FurnitureAdminCatalog; mod
     <aside className="order-first md:sticky md:top-4 md:order-none md:max-h-[calc(100dvh-2rem)] md:overflow-y-auto" aria-label="商品の編集" ref={panel}>
       {selected === null
         ? <p className="rounded-lg border border-dashed border-slate-300 p-6 text-sm text-slate-500">一覧から商品を選ぶと、リンク・画像・寸法・色を編集して3Dで見た目を確かめられます。</p>
-        : <DetailEditor key={selected} detail={editing} catalog={catalog} models={models} onCreated={(detail) => setSelected(detail.id)} onClose={() => setSelected(null)} />}
+        : <DetailEditor key={`${selected}:${editing?.modelKey ?? ""}`} detail={editing} catalog={catalog} models={models} onCreated={(detail) => setSelected(detail.id)} onClose={() => setSelected(null)} />}
     </aside>
   </div>;
 }
@@ -293,6 +294,8 @@ function DetailEditor({ detail, catalog, models, onCreated, onClose }: {
       </div>)}
       {model.colorMaterialKeys.length === 0 && <p className="text-xs text-slate-500">このモデルには色を変えられる部位がありません。</p>}
     </fieldset>}
+
+    {detail && <ModelGenerationPanel detailId={detail.id} size={detail.size} color={detail.symbolicColor} />}
 
     <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={draft.enabled} onChange={(event) => set({ enabled: event.target.checked })} />提案・検索に出す（外すと非表示）</label>
     {validation && <p role="alert" className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{validation}</p>}

@@ -199,6 +199,40 @@ RSpec.configure do |config|
             },
             required: %w[id name category shape variant size color_material_keys estimated_axes object_key model_url enabled details_count]
           },
+          AdminModelGeneration: {
+            type: :object,
+            description: "AI による 3D モデルの生成 1 回分。running のあいだは数秒おきに取得し直す",
+            properties: {
+              id: { type: :integer, minimum: 1, example: 1 },
+              furniture_detail_id: { type: :integer, minimum: 1, description: "もとにした商品", example: 39 },
+              model_key: { type: :string, description: "作るモデルの ID。採用すると 3D モデルの ID になる", example: "ai_39_1a2b3c4d" },
+              status: { type: :string, enum: FurnitureModelGeneration::STATUSES, description: "running: 生成中 / succeeded: 検査に合格し採用待ち / failed: 失敗 / adopted: 採用した / rejected: 不採用にした", example: "succeeded" },
+              error_message: { type: :string, nullable: true, example: nil },
+              notes: { type: :string, nullable: true, description: "AI が書いた、形の捉え方のメモ", example: "扉と取っ手を箱で表現" },
+              checks: {
+                type: :array, description: "検査の一覧",
+                items: { type: :object, properties: { name: { type: :string, example: "connected" }, ok: { type: :boolean, example: true }, detail: { type: :string, example: "すべての部品がつながっています" } }, required: %w[name ok detail] }
+              },
+              stats: {
+                type: :object, nullable: true, description: "組み立てられたときだけ入る",
+                properties: {
+                  triangles: { type: :integer, example: 860 }, materials: { type: :array, items: { type: :string }, example: %w[tint metal] },
+                  bytes: { type: :integer, example: 33_212 }, sha256: { type: :string }, size: { "$ref" => "#/components/schemas/Size" }
+                }
+              },
+              ai: {
+                type: :object, nullable: true,
+                properties: {
+                  model: { type: :string, example: "gemini-3.1-pro-preview" }, calls: { type: :integer, example: 1 }, seconds: { type: :integer, example: 95 },
+                  input_tokens: { type: :integer, example: 23_563 }, output_tokens: { type: :integer, example: 10_965 }
+                }
+              },
+              files: { type: :array, items: { type: :string, enum: FurnitureModelGeneration::FILES.keys }, description: "取得できるファイル名 (files/{name})", example: %w[front.png side.png model.glb] },
+              created_at: { type: :string, format: "date-time" },
+              finished_at: { type: :string, format: "date-time", nullable: true }
+            },
+            required: %w[id furniture_detail_id model_key status error_message notes checks stats ai files created_at finished_at]
+          },
           AdminFurnitureModelInput: {
             type: :object,
             properties: {
