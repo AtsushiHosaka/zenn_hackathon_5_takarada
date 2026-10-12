@@ -1,10 +1,10 @@
 # コーデの商品候補 (furniture_details) を出す。
 #
-#   FurnitureCandidates.client(selected: []).search(theme:, slots:, max_price:, categories:)
+#   FurnitureCandidates.client(selected: []).search(theme:, slots:, categories:)
 #     => { "curtain" => [FurnitureCandidates::Item, ...], ... }
 #
-# 枠 (slot) ごとに並び順どおりの候補を返す。価格は max_price 以下。theme が nil ならテーマで絞らない。
-# 選ぶ・置く・予算に収めるのは呼び出し側 (CoordinationBuilder)。
+# 枠 (slot) ごとに並び順どおりの候補を返す。theme が nil ならテーマで絞らない。
+# 選ぶ・置くのは呼び出し側 (CoordinationBuilder)。
 module FurnitureCandidates
   SLOTS = %w[bed_cover curtain rug wall_decor light display cushion desk_top floor].freeze
   FLOOR_CATEGORIES = %w[sofa bed desk chair shelf table storage tv_stand wardrobe].freeze
@@ -27,7 +27,7 @@ module FurnitureCandidates
     (0...shapes.map(&:size).max.to_i).flat_map { |round| shapes.filter_map { |shape| shape[round] } }.first(limit)
   end
 
-  # selected: ユーザーが選んだ detail の候補。枠・予算・カテゴリが合えば先頭に混ぜる
+  # selected: ユーザーが選んだ detail の候補。枠・カテゴリが合えば先頭に混ぜる
   def self.client(selected: [])
     Client.new(selected:)
   end

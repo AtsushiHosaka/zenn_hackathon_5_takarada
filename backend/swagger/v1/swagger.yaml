@@ -2365,11 +2365,6 @@ components:
             prompt:
               type: string
               example: 紫色の推し活ルームにしたい
-            budget:
-              type: integer
-              nullable: true
-              description: 追加・入れ替え商品の予算 (円・送料別)。省略すると上限なしで選ぶ
-              example: 30000
             kept_object_ids:
               type: array
               items:
@@ -2511,11 +2506,6 @@ components:
         prompt:
           type: string
           example: 紫色の推し活ルームにしたい
-        budget:
-          type: integer
-          nullable: true
-          description: 省略したコーデでは null
-          example: 30000
         kept_object_ids:
           type: array
           items:
@@ -2668,7 +2658,6 @@ components:
       - room_id
       - status
       - prompt
-      - budget
       - kept_object_ids
       - title
       - comment

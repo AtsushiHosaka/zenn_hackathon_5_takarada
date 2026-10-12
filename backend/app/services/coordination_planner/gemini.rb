@@ -1,6 +1,6 @@
 class CoordinationPlanner
-  # 操作ごとの候補を保持して、予算内で色・素材・用途が合う一式と代替順位を選ぶ。
-  # id/group/slotと合計金額、置き場所はRubyで再確認する。
+  # 操作ごとの候補を保持して、色・素材・用途が合う一式と代替順位を選ぶ。
+  # id/group/slotと置き場所はRubyで再確認する。
   class Gemini
     CANDIDATES_PER_GROUP = 12
     RANKED_PER_GROUP = 6
@@ -37,8 +37,8 @@ class CoordinationPlanner
     }.freeze
 
     PROMPT = <<~TEXT.freeze
-      あなたはインテリアコーディネーターです。複数の商品候補から、要望・テンプレートの雰囲気と予算に合う一式を選びます。
-      残す家具は維持します。寸法と用途も確認しますが、最終的な配置と合計価格は別の処理で判定します。
+      あなたはインテリアコーディネーターです。複数の商品候補から、要望・テンプレートの雰囲気に合う一式を選びます。
+      残す家具は維持します。寸法と用途も確認しますが、最終的な配置は別の処理で判定します。
 
       # 要望
       %<prompt>s
@@ -47,7 +47,6 @@ class CoordinationPlanner
       - 壁の色: %<wall_color>s / 床の色: %<floor_color>s
       - 寸法 (m): %<room_size>s
       - 今ある家具 (id・名前・寸法・配置): %<kept>s
-      - 商品価格の合計予算: %<budget>s
 
       # 商品候補 (JSON。寸法はm)
       sizeは配置する寸法、published_sizeは公開寸法 (nullは不明)、estimated_axesは描画用の推定軸です。推定値を公式寸法として説明しないでください。
@@ -55,11 +54,11 @@ class CoordinationPlanner
       %<items>s
 
       # 選び方
-      - 各group_idで最大1商品をselected_item_idに指定し、採用する商品の合計を必ず予算以下にする。全グループの最安商品を埋めることを目的にしない。
-      - 要望・テンプレートの色調、素材、形、用途と、壁・床・残す家具との相性を一式として評価する。高価な1点への偏りを避け、用途の重要度と相性に応じて予算を配分する。
-      - replace:<家具ID>とadd:<番号>はユーザーが指定した床家具の用途。これらを優先し、同じSKUでも別group_idなら別の購入点数として価格を加算する。
+      - 各group_idで最大1商品をselected_item_idに指定する。全グループを埋めることを目的にしない。
+      - 要望・テンプレートの色調、素材、形、用途と、壁・床・残す家具との相性を一式として評価する。
+      - replace:<家具ID>とadd:<番号>はユーザーが指定した床家具の用途。これらを優先し、同じSKUでも別group_idなら別の購入点数として扱う。
       - 床家具の候補はcategoryとgroup_idを必ず一致させる。交換はtarget_size/元の位置を参照し、部屋に対して大きすぎる候補は避ける。
-      - 各グループのitem_idsは、この一式と素材・色・用途が合う代替候補をおすすめ順に最大6件指定する。合わない商品を価格だけで候補へ加えない。
+      - 各グループのitem_idsは、この一式と素材・色・用途が合う代替候補をおすすめ順に最大6件指定する。合わない商品を候補へ加えない。
       - 候補にあるgroup_id/slot/idの組だけを使う。採用しないグループはselected_item_idを0にするかpicksから省く。無理に埋めない。
       - picksは指定された床家具を先に、その後はこの提案で重要なグループの順に並べる。
       - 要望の色や雰囲気そのものの商品が無いときは、近い色・雰囲気の商品を選び、unavailable_note で
@@ -81,14 +80,13 @@ class CoordinationPlanner
       要望の最後の行が、今回の追加の指示。
       - 追加の指示に関係しないグループは、候補にある前回の商品をselected_item_idに指定し、item_idsの先頭にも入れて残す。
       - 追加の指示に関係するグループだけを選び直す。group_id・slot・idは今回の商品候補の組を使う。
-      - 前回の商品が候補に無い、予算が減った、配置できない場合は無理に残さず、変更理由をunavailable_noteに書く。
+      - 前回の商品が候補に無い、配置できない場合は無理に残さず、変更理由をunavailable_noteに書く。
       - title と concept は、前回からの変化が分かるように書く。
     TEXT
 
-    def initialize(prompt:, budget:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil, slots: SLOT_PRIORITY)
+    def initialize(prompt:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil, slots: SLOT_PRIORITY)
       @slots = slots
       @prompt = prompt
-      @budget = budget
       @room = room
       @kept_objects = kept_objects
       @previous = previous
@@ -98,7 +96,7 @@ class CoordinationPlanner
     end
 
     def plan
-      items = (@client.search(prompt: @prompt, theme: nil, slots: @slots, max_price: @budget).values.flatten + @additional_candidates)
+      items = (@client.search(prompt: @prompt, theme: nil, slots: @slots).values.flatten + @additional_candidates)
         .uniq { |item| [ group_id(item), item.id ] }.group_by { |item| group_id(item) }.values.flat_map { |group| FurnitureCandidates.spread(group, CANDIDATES_PER_GROUP) }
       response = GeminiClient.new.generate_json(prompt: prompt_for(items), schema: SCHEMA)
       json = response.json.is_a?(Hash) ? response.json : {}
@@ -130,7 +128,6 @@ class CoordinationPlanner
         room_size: @room.slice("width", "depth", "height").to_json,
         kept: @kept_objects.map { |o| o.slice("id", "label", "category", "color", "size", "position") }.to_json,
         previous: previous_section,
-        budget: @budget ? "#{@budget.to_fs(:delimited)} 円 (送料と追加部品は別)" : "指定なし (上限なし。要望に合う範囲で選ぶ)",
         items: items.map { |item| candidate_json(item) }.to_json
       )
     end

@@ -17,7 +17,7 @@ const palettes: Record<Style, { color: string; title: string; description: strin
   natural: { color: "#c9b899", title: "木のぬくもりで、ほっとする部屋", description: "ベージュと木目を合わせ、今ある家具がなじむ空間のサンプルです。" },
 };
 
-export function createDemoRoom(style: Style = "oshi", budget = Infinity): RoomDesign {
+export function createDemoRoom(style: Style = "oshi"): RoomDesign {
   const palette = palettes[style];
   const items: RoomItem[] = [
     { id: "bed", name: "今あるベッド", category: "bed", existing: true, color: "#d9c3a4", position: [-1.27968, 0.48, -0.92057], size: [1.4415, 0.96, 2.15885] },
@@ -32,19 +32,13 @@ export function createDemoRoom(style: Style = "oshi", budget = Infinity): RoomDe
     { id: "7", category: "plant", existing: false, color: "#7aa36a", position: [1.64055, 0.51, 1.52046], size: [0.32101, 1.02, 0.32101], ...demoProductReference("7", style) },
     { id: "8", category: "cover", existing: false, color: style === "oshi" ? "#9d82e3" : palette.color, position: [-1.27973, 0.504, -0.54996], size: [1.44107, 0.288, 1.45954], ...demoProductReference("8", style) },
   ];
-  let remaining = budget;
   return {
-    id: `demo-${style}-${Number.isFinite(budget) ? budget : "all"}`,
+    id: `demo-${style}-all`,
     source: "demo",
     title: palette.title,
     description: palette.description,
     style,
-    items: items.filter(item => {
-      if (item.existing) return true;
-      if ((item.price ?? 0) > remaining) return false;
-      remaining -= item.price ?? 0;
-      return true;
-    }),
+    items,
   };
 }
 

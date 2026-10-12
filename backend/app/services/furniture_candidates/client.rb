@@ -20,16 +20,15 @@ module FurnitureCandidates
       @selected = selected
     end
 
-    def search(slots:, max_price:, theme: nil, categories: nil, **)
+    def search(slots:, theme: nil, categories: nil, **)
       slots = Array(slots).map(&:to_s)
       categories = Array(categories).map(&:to_s)
-      max_price ||= Float::INFINITY
       scope = FurnitureDetail.available.joins(:furniture).merge(Furniture.available).preload(furniture: :model).includes(detail_textures: :furniture_texture)
-        .where(slot: slots).where(price: ..max_price).order(:position, :id)
+        .where(slot: slots).order(:position, :id)
       scope = scope.where("furniture_details.themes @> ?", [ theme ].to_json) if theme
       scope = scope.where.not(slot: "floor").or(scope.where(category: categories)) if categories.any?
       selected = @selected.select do |item|
-        slots.include?(item.slot) && item.price <= max_price && (item.slot != "floor" || categories.empty? || categories.include?(item.category))
+        slots.include?(item.slot) && (item.slot != "floor" || categories.empty? || categories.include?(item.category))
       end
       (selected + scope.map { |detail| self.class.item(detail) }).uniq { |item| [ item.metadata["group_id"], item.id ] }.group_by(&:slot)
     end
