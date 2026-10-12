@@ -1,6 +1,5 @@
 import { Link, Outlet } from "react-router";
 import { useLogout, useSession } from "../../core/session";
-import ConnectionSwitch from "./ConnectionSwitch";
 
 export default function AppLayout() {
   const session = useSession();
@@ -14,7 +13,6 @@ export default function AppLayout() {
             へやいろ
           </Link>
           <div className="ml-auto flex items-center gap-4">
-            <ConnectionSwitch />
             <Link to="/rooms" className="motion-control text-sm text-violet-700">ルーム一覧</Link>
             {session.user && (
               <span className="text-sm text-slate-500 dark:text-slate-400">{session.user.name}</span>

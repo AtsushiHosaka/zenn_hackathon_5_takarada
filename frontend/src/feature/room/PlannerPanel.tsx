@@ -1,8 +1,7 @@
 import { useRef, useState, type DragEvent } from 'react';
-import { isManualFurniture, isTemplateFurniture, replacementFurnitureCategories, productCategories, type ManualFurnitureCategory, type FurnitureAddition, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
+import { isManualFurniture, isTemplateFurniture, productCategories, type ManualFurnitureCategory, type FurnitureAddition, type FurnitureOperation, type RoomDesign, type RoomItem } from '../../domain/room';
 import FurnitureAdditionRows from './FurnitureAdditionRows';
 import { downloadShoppingCsv } from './exports';
-import { LAYOUT_GRID_STEP, snapToLayoutGrid } from './layoutGrid';
 import { createFurnitureItem, FURNITURE_DRAG_TYPE, furnitureTemplates } from './furniturePlacement';
 import { canPlaceOnFurniture, getFurniturePlacementBounds, furniturePositionInRoom, snapFurnitureEditPosition } from './roomBounds';
 import ImageGoodsPalette from './ImageGoodsPalette';
@@ -54,8 +53,9 @@ type PlannerPanelProps = {
 };
 
 const itemColors = [
-  ['#BBA5EE', 'ラベンダー'], ['#8A77B0', '落ち着いた紫'], ['#F4EFE6', 'アイボリー'],
-  ['#73966C', 'グリーン'], ['#595163', 'チャコール'],
+  ['#F4F1EA', 'ホワイト'], ['#D8C2A0', 'ベージュ'], ['#C08F5B', 'ナチュラルウッド'], ['#6F4A2C', 'ブラウン'],
+  ['#9A9CA3', 'グレー'], ['#2B2C31', 'ブラック'], ['#2F4E86', 'ネイビー'], ['#3C86E0', 'ブルー'],
+  ['#4C9A62', 'グリーン'], ['#F0BE3C', 'イエロー'], ['#D6423A', 'レッド'], ['#E78BA3', 'ピンク'],
 ] as const;
 const wallColors = [
   ['#D5CCDF', 'ラベンダー'], ['#F0ECE5', 'アイボリー'], ['#CCD7C8', '淡いグリーン'],
@@ -63,11 +63,19 @@ const wallColors = [
 ] as const;
 const viewChoices = [['perspective', '立体'], ['top', '真上'], ['front', '正面']] as const;
 const cm = (meters: number) => `${Math.round(meters * 1000) / 10}`;
-const furnitureActions = [['keep', '残す'], ['replace', '入れ替える'], ['remove', '外す']] as const;
+const furnitureSources = [['search', '登録家具から探す'], ['manual', '種類と寸法で選ぶ'], ['library', '取り込んだ家具'], ['photo', '画像から家具'], ['image', '画像から推しグッズ']] as const;
+const plannerTabs = [['add', '家具を追加'], ['item', '選んだ家具'], ['room', '部屋']] as const;
+type PlannerTab = typeof plannerTabs[number][0];
 
 function ArrowIcon({ redo = false }: { redo?: boolean }) {
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={redo ? { transform: 'scaleX(-1)' } : undefined}>
     <path d="M8 5 3 10l5 5M3 10h10a7 7 0 0 1 7 7v2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>;
+}
+
+function RotateIcon({ clockwise = false }: { clockwise?: boolean }) {
+  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" style={clockwise ? { transform: 'scaleX(-1)' } : undefined}>
+    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8M3 3v5h5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
   </svg>;
 }
 
@@ -139,17 +147,13 @@ function FurniturePalette({ design, disabled, hint, onAddItem, onDragItem, onVie
     onDragItem(item);
   }
 
-  return <section className="rc-planner-section rc-furniture-palette" aria-labelledby="planner-add-label">
-    <h3 id="planner-add-label">家具を追加</h3>
+  return <section className="rc-planner-section rc-furniture-palette" aria-label="家具を追加">
     {source === 'photo' && !library.authenticated && <p className="rc-planner-note" role="status">画像から家具を取り込むにはログインしてください。</p>}
     {libraryError && <p className="rc-planner-input-error" role="alert">{libraryError}</p>}
-    <div className="rc-planner-segments rc-furniture-source" role="group" aria-label="家具の追加方法">
-      <button className="motion-control" type="button" aria-pressed={source === 'photo'} onClick={() => setSource('photo')}>画像から家具</button>
-      <button className="motion-control" type="button" aria-pressed={source === 'library'} onClick={() => setSource('library')}>取り込んだ家具</button>
-      <button className="motion-control" type="button" aria-pressed={source === 'search'} onClick={() => setSource('search')}>登録家具から探す</button>
-      <button className="motion-control" type="button" aria-pressed={source === 'manual'} onClick={() => setSource('manual')}>種類と寸法で選ぶ</button>
-      <button className="motion-control" type="button" aria-pressed={source === 'image'} onClick={() => setSource('image')}>画像から推しグッズ</button>
-    </div>
+    <label className="rc-planner-label" htmlFor="planner-add-source">追加の方法</label>
+    <select id="planner-add-source" value={source} onChange={event => setSource(event.target.value as typeof source)}>
+      {furnitureSources.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+    </select>
     {source === 'search' ? <FurnitureSearchPanel design={design} disabled={disabled} onAddItem={onAddItem}/> : source === 'photo' ? <ImageFurniturePalette disabled={disabled || !library.authenticated} onImport={item => { library.register(item); setSource('library'); setLibraryError(''); }} /> : source === 'library' ? <ImportedFurniturePalette key={library.scope} design={design} disabled={disabled} library={library} onAddItem={onAddItem} onDragStart={startItemDrag} onDragEnd={() => onDragItem(null)} /> : source === 'image' ? <ImageGoodsPalette design={design} disabled={disabled} onAddItem={onAddItem} onDragStart={startItemDrag} onDragEnd={() => onDragItem(null)} /> : <>
     <div className="rc-furniture-cards motion-control" role="group" aria-label="追加する家具を選ぶ">
       {furnitureTemplates.map(candidate => <button key={candidate.category} type="button" className="rc-furniture-card motion-control"
@@ -202,6 +206,12 @@ function FurnitureSizeEditor({ item, design, onChange }: { item: RoomItem; desig
 
 export default function PlannerPanel({ design, templateEditing=false, selectedId, onSelect, furnitureRequests, onChange, onUndo, onRedo, canUndo, canRedo, dirty, onSave, onClose, onProducts, view, onView, dimensions, onDimensions, onAddItem, onDragItem, onRemoveItem, placementDisabled, placementHint }: PlannerPanelProps) {
   const additionButton = useRef<HTMLButtonElement>(null);
+  const [tab, setTab] = useState<PlannerTab>(selectedId ? 'item' : 'add');
+  const [seenSelectedId, setSeenSelectedId] = useState(selectedId);
+  if (seenSelectedId !== selectedId) {
+    setSeenSelectedId(selectedId);
+    if (selectedId) setTab('item');
+  }
   const paletteScope = useRoomPlanScope();
   const selectableItems = [...design.items, ...(furnitureRequests?.existingItems ?? []).filter(item => !design.items.some(current => current.id === item.id))];
   const selected = selectableItems.find(item => item.id === selectedId);
@@ -213,14 +223,6 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
   function changeItem(change: Partial<RoomItem>) {
     if (itemDisabled || !selected) return;
     onChange({ ...design, items: design.items.map(item => item.id === selected.id ? { ...item, ...change } : item) });
-  }
-
-  function move(axis: 0 | 2, step: number) {
-    if (!selected) return;
-    const position: RoomItem['position'] = [...selected.position];
-    position[axis] = snapToLayoutGrid(position[axis]) + step;
-    const bounded = snapFurnitureEditPosition(selected, position, [axis], design);
-    if (bounded) changeItem({ position: bounded });
   }
 
   function canRotate(degrees: number) {
@@ -242,121 +244,126 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
 
   return <aside className="rc-panel rc-planner" aria-label="配置を編集">
     <div className="rc-planner-heading">
-      <div><h2>配置を編集</h2></div>
-      <button className="rc-planner-close motion-control" type="button" aria-label="編集パネルを閉じる" onClick={onClose}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>
-      </button>
+      <h2>配置を編集</h2>
+      <div className="rc-planner-heading-actions">
+        <button className="rc-planner-icon motion-control" type="button" aria-label="元に戻す" title="元に戻す" onClick={onUndo} disabled={!canUndo}><ArrowIcon /></button>
+        <button className="rc-planner-icon motion-control" type="button" aria-label="やり直す" title="やり直す" onClick={onRedo} disabled={!canRedo}><ArrowIcon redo /></button>
+        <button className="rc-planner-icon motion-control" type="button" aria-label="編集パネルを閉じる" title="閉じる" onClick={onClose}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>
+        </button>
+      </div>
+    </div>
+    <div className="rc-planner-tabs" role="tablist" aria-label="編集メニュー">
+      {plannerTabs.map(([key, label]) => <button key={key} id={`planner-tab-${key}`} type="button" role="tab" aria-selected={tab === key} aria-controls={`planner-tabpanel-${key}`} onClick={() => setTab(key)}>{label}</button>)}
     </div>
     <div className="rc-planner-content">
-      <div className="rc-planner-history">
-        <button className="motion-control" type="button" onClick={onUndo} disabled={!canUndo}><ArrowIcon />元に戻す</button>
-        <button className="motion-control" type="button" onClick={onRedo} disabled={!canRedo}><ArrowIcon redo />やり直す</button>
+      <div role="tabpanel" id="planner-tabpanel-add" aria-labelledby="planner-tab-add" hidden={tab !== 'add'}>
+        <FurniturePalette key={paletteScope} design={design} disabled={placementDisabled || completeModel} hint={placementHint} onAddItem={onAddItem} onDragItem={onDragItem} view={view} onView={onView} />
       </div>
-      <FurniturePalette key={paletteScope} design={design} disabled={placementDisabled || completeModel} hint={placementHint} onAddItem={onAddItem} onDragItem={onDragItem} view={view} onView={onView} />
-      {furnitureRequests && <section className="rc-planner-section" aria-labelledby="planner-detected-label">
-        <h3 id="planner-detected-label">写真から検出した家具</h3>
-        <p className="rc-planner-note" id="planner-detected-help">正しく検出された家具にチェックを入れると、次の部屋に残します。</p>
-        {detectedItems.length === 0
-          ? <p className="rc-planner-note">検出された家具はありません。</p>
-          : <ul className="rc-planner-detected-list">
-            {detectedItems.map(item => {
-              const action = furnitureRequests.operations.find(operation => operation.objectId === item.id)?.action ?? 'keep';
-              return <li key={item.id}>
-                <label className="rc-planner-check">
-                  <input type="checkbox" checked={action === 'keep'} aria-describedby="planner-detected-help" onChange={event => furnitureRequests.onOperationChange(item.id, event.target.checked ? 'keep' : 'remove')} />
-                  <span>{item.name}{action === 'replace' && <small>入れ替える家具</small>}</span>
-                </label>
-              </li>;
-            })}
-          </ul>}
-      </section>}
-      <section className="rc-planner-section" aria-labelledby="planner-view-label">
-        <h3 id="planner-view-label">見え方</h3>
-        <div className="rc-planner-segments" role="group" aria-label="視点を切り替える">
-          {viewChoices.map(([key, label]) => <button className="motion-control" key={key} type="button" aria-pressed={view === key} onClick={() => onView(key)}>{label}</button>)}
-        </div>
-        <label className="rc-planner-check"><input type="checkbox" checked={dimensions} onChange={event => onDimensions(event.target.checked)} />選択した家具の寸法を表示</label>
-      </section>
-      <section className="rc-planner-section" aria-labelledby="planner-item-label">
-        <label id="planner-item-label" className="rc-planner-label" htmlFor="planner-item">編集する家具</label>
-        <select id="planner-item" value={selected?.id ?? ''} onChange={event => onSelect(event.target.value)}>
-          <option value="" disabled>家具を選択してください</option>
-          {selectableItems.map(item => <option key={item.id} value={item.id}>{item.name}{item.existing ? '（今ある家具）' : ''}</option>)}
-        </select>
+      <div role="tabpanel" id="planner-tabpanel-item" aria-labelledby="planner-tab-item" hidden={tab !== 'item'}>
+        <section className="rc-planner-section">
+          <label className="rc-planner-label" htmlFor="planner-item">編集する家具</label>
+          <select id="planner-item" value={selected?.id ?? ''} onChange={event => onSelect(event.target.value)}>
+            <option value="" disabled>家具を選択してください</option>
+            {selectableItems.map(item => <option key={item.id} value={item.id}>{item.name}{item.existing ? '（今ある家具）' : ''}</option>)}
+          </select>
+          {!selected && <p className="rc-planner-note rc-planner-hint">部屋の中の家具をクリックするか、上の一覧から選んでください。</p>}
+        </section>
+        {completeModel && <p className="rc-planner-warning">家具を含む完成モデルのため、個別の移動・回転・色変更には対応していません。視点の切り替えは「部屋」から使えます。</p>}
         {selected && <>
-          {isProductCategory(selected.category) && <FurnitureSearchPanel key={`${selected.id}:${selected.productMetadata?.variantId ?? selected.productUrl ?? selected.name}`} replacementTarget={selected} design={design} disabled={itemDisabled} onAddItem={product => {
-            const position = productReplacementPosition(product, selected, design);
-            if (!position) return;
-            const { furnitureDetailId, ...details } = product;
-            const replacement: RoomItem = { ...details, id: selected.id, existing: false, position, rotation: selected.rotation, marker: selected.marker, ...((selected.replacesObjectId || selected.existing) ? { replacesObjectId: selected.replacesObjectId ?? selected.id } : {}), furnitureDetailId, ...(!isManualFurniture(selected) ? { productId: String(1_000_000_000 + Number(furnitureDetailId)) } : {}) };
-            const originalId = selected.replacesObjectId ?? (selected.existing ? selected.id : undefined);
-            if (originalId && furnitureRequests) furnitureRequests.onOperationChange(originalId, 'replace');
-            const operations = design.furnitureOperations ?? furnitureRequests?.operations ?? (design.before?.items ?? design.items).filter(item => item.existing).map(item => ({ objectId: item.id, action: 'keep' as const }));
-            const nextOperations: FurnitureOperation[] = originalId ? [...operations.filter(operation => operation.objectId !== originalId), { objectId: originalId, action: 'replace' }] : operations;
-            onChange({ ...design, ...(selected.existing && !design.before && design.room ? { before: { room: design.room, items: design.items, wallColor: design.wallColor } } : {}), items: design.items.map(item => item.id === selected.id ? replacement : item), ...(originalId ? { furnitureOperations: nextOperations, keptObjectIds: nextOperations.filter(operation => operation.action === 'keep').map(operation => operation.objectId) } : {}) });
-          }} />}
-          {(selected.imageUrl || selected.referenceImage) && <FurniturePhoto key={selected.imageUrl ?? selected.referenceImage?.dataUrl} item={selected} compact />}
-          {selected.existing && furnitureRequests && <div className="rc-planner-operation">
-            <div className="rc-planner-segments" role="group" aria-label={`${selected.name}の操作`}>
-              {furnitureActions.map(([action, label]) => <button className="motion-control" key={action} type="button" aria-pressed={(furnitureRequests.operations.find(operation => operation.objectId === selected.id)?.action ?? 'keep') === action} disabled={action === 'replace' && !replacementFurnitureCategories.some(category => category === selected.category)} onClick={() => furnitureRequests.onOperationChange(selected.id, action)}>{label}</button>)}
+          <div className="rc-planner-summary">
+            {(selected.imageUrl || selected.referenceImage) && <FurniturePhoto key={selected.imageUrl ?? selected.referenceImage?.dataUrl} item={selected} compact />}
+            <p className="rc-planner-size">幅 {cm(selected.size[0])} × 高さ {cm(selected.size[1])} × 奥行き {cm(selected.size[2])} cm</p>
+            {selectedProductLink && <a className="rc-furniture-product-link" href={selectedProductLink} target="_blank" rel="noopener noreferrer">商品ページを見る</a>}
+          </div>
+          <fieldset className="rc-planner-section" disabled={itemDisabled}>
+            <legend>向き（90°ずつ）<small>現在 {selected.rotation ?? 0}°</small></legend>
+            <div className="rc-planner-rotation">
+              <button className="motion-control" type="button" onClick={() => rotate(90)} disabled={!canRotate(90)} aria-label="家具を左へ90度回転"><RotateIcon />左へ90°</button>
+              <button className="motion-control" type="button" onClick={() => rotate(-90)} disabled={!canRotate(-90)} aria-label="家具を右へ90度回転"><RotateIcon clockwise />右へ90°</button>
             </div>
-          </div>}
-          <dl className="rc-planner-size">
-            {([['幅', 0], ['高さ', 1], ['奥行き', 2]] as const).map(([label, index]) => <div key={label}><dt>{label}</dt><dd>{cm(selected.size[index])}<span>cm</span></dd></div>)}
-          </dl>
+          </fieldset>
+          <fieldset className="rc-planner-section" disabled={itemDisabled}>
+            <legend>色（3Dプレビュー）</legend>
+            <div className="rc-planner-swatches" role="group" aria-label="家具の色を選ぶ">
+              {itemColors.map(([color, label]) => <button className="motion-control" key={color} type="button" aria-label={`家具を${label}にする`} title={label} aria-pressed={selected.color.toUpperCase() === color.toUpperCase()} style={{ backgroundColor: color }} onClick={() => changeItem({ color, previewColor: color })} />)}
+            </div>
+            {selected.productUrl && <p className="rc-planner-note">色を変えるのはプレビューだけです。商品の色違いは「商品を置き換える」で選べます。</p>}
+          </fieldset>
           {selected.artwork && !itemDisabled && <label className="rc-image-goods-height">床からの高さ（cm）<input type="number" min="0" max={Math.floor((getFurniturePlacementBounds(design).max[1] - getFurniturePlacementBounds(design).floor - selected.size[1]) * 100)} step="1" value={Math.round((selected.position[1] - selected.size[1] / 2 - getFurniturePlacementBounds(design).floor) * 100)} onChange={event => {
             const bottom = Number(event.target.value) / 100;
             const bounds = getFurniturePlacementBounds(design);
             if (!Number.isFinite(bottom) || bottom < 0 || bounds.floor + bottom + selected.size[1] > bounds.max[1]) return;
             changeItem({ supportObjectId: undefined, supportSurface: undefined, position: [selected.position[0], bounds.floor + bottom + selected.size[1] / 2, selected.position[2]] });
           }} /></label>}
-          {selectedProductLink && <a className="rc-furniture-product-link" href={selectedProductLink} target="_blank" rel="noopener noreferrer">商品ページを見る</a>}
+          {isProductCategory(selected.category) && <details className="rc-planner-fold">
+            <summary>商品を置き換える</summary>
+            <FurnitureSearchPanel key={`${selected.id}:${selected.productMetadata?.variantId ?? selected.productUrl ?? selected.name}`} replacementTarget={selected} design={design} disabled={itemDisabled} onAddItem={product => {
+              const position = productReplacementPosition(product, selected, design);
+              if (!position) return;
+              const { furnitureDetailId, ...details } = product;
+              const replacement: RoomItem = { ...details, id: selected.id, existing: false, position, rotation: selected.rotation, marker: selected.marker, ...((selected.replacesObjectId || selected.existing) ? { replacesObjectId: selected.replacesObjectId ?? selected.id } : {}), furnitureDetailId, ...(!isManualFurniture(selected) ? { productId: String(1_000_000_000 + Number(furnitureDetailId)) } : {}) };
+              const originalId = selected.replacesObjectId ?? (selected.existing ? selected.id : undefined);
+              if (originalId && furnitureRequests) furnitureRequests.onOperationChange(originalId, 'replace');
+              const operations = design.furnitureOperations ?? furnitureRequests?.operations ?? (design.before?.items ?? design.items).filter(item => item.existing).map(item => ({ objectId: item.id, action: 'keep' as const }));
+              const nextOperations: FurnitureOperation[] = originalId ? [...operations.filter(operation => operation.objectId !== originalId), { objectId: originalId, action: 'replace' }] : operations;
+              onChange({ ...design, ...(selected.existing && !design.before && design.room ? { before: { room: design.room, items: design.items, wallColor: design.wallColor } } : {}), items: design.items.map(item => item.id === selected.id ? replacement : item), ...(originalId ? { furnitureOperations: nextOperations, keptObjectIds: nextOperations.filter(operation => operation.action === 'keep').map(operation => operation.objectId) } : {}) });
+            }} />
+          </details>}
           {(selected.id.startsWith('manual-') || templateEditing) && !completeModel && <>
-            {!itemDisabled && <FurnitureSizeEditor key={`${selected.id}:${selected.size.join(',')}`} item={selected} design={design} onChange={changeItem} />}
-            <button className="rc-furniture-remove motion-control" type="button" onClick={() => onRemoveItem(selected.id)}>{templateEditing?'家具を削除':'追加した家具を削除'}</button>
+            {!itemDisabled && <details className="rc-planner-fold">
+              <summary>寸法を変える</summary>
+              <FurnitureSizeEditor key={`${selected.id}:${selected.size.join(',')}`} item={selected} design={design} onChange={changeItem} />
+            </details>}
+            <button className="rc-furniture-remove motion-control" type="button" onClick={() => onRemoveItem(selected.id)}>{templateEditing ? '家具を削除' : '追加した家具を削除'}</button>
           </>}
         </>}
-        {completeModel && <p className="rc-planner-warning">家具を含む完成モデルのため、個別の移動・回転・色変更には対応していません。視点の切り替えは利用できます。</p>}
-      </section>
-      <fieldset className="rc-planner-section" disabled={itemDisabled}>
-        <legend>位置を調整</legend>
-        <div className="rc-planner-move">
-          <span>左右（X）</span><button className="motion-control" type="button" aria-label="X方向にマイナス10cm移動" onClick={() => move(0, -LAYOUT_GRID_STEP)}>−10cm</button><button className="motion-control" type="button" aria-label="X方向にプラス10cm移動" onClick={() => move(0, LAYOUT_GRID_STEP)}>＋10cm</button>
-          <span>前後（Z）</span><button className="motion-control" type="button" aria-label="Z方向にマイナス10cm移動" onClick={() => move(2, -LAYOUT_GRID_STEP)}>−10cm</button><button className="motion-control" type="button" aria-label="Z方向にプラス10cm移動" onClick={() => move(2, LAYOUT_GRID_STEP)}>＋10cm</button>
-        </div>
-        {selected && <p className="rc-planner-coordinate">X {cm(selected.position[0])}cm / Z {cm(selected.position[2])}cm</p>}
-      </fieldset>
-      <fieldset className="rc-planner-section" disabled={itemDisabled}>
-        <legend>向きを調整</legend>
-        <div className="rc-planner-rotation"><button className="motion-control" type="button" onClick={() => rotate(-15)} disabled={!canRotate(-15)} aria-label="家具をマイナス15度回転">−15°</button><button className="motion-control" type="button" onClick={() => rotate(15)} disabled={!canRotate(15)} aria-label="家具をプラス15度回転">＋15°</button><button className="motion-control" type="button" onClick={() => rotate(90)} disabled={!canRotate(90)} aria-label="家具を90度回転">90°</button></div>
-        {selected && <p className="rc-planner-coordinate">現在の角度 {selected.rotation ?? 0}°</p>}
-      </fieldset>
-      <fieldset className="rc-planner-section" disabled={itemDisabled}>
-        <legend>3Dプレビューの家具の色</legend>
-        <div className="rc-planner-swatches" role="group" aria-label="家具の色を選ぶ">
-          {itemColors.map(([color, label]) => <button className="motion-control" key={color} type="button" aria-label={`家具を${label}にする`} title={label} aria-pressed={selected?.color.toUpperCase() === color.toUpperCase()} style={{ backgroundColor: color }} onClick={() => changeItem({ color })} />)}
-        </div>
-      </fieldset>
-      {selected?.productUrl && <p className="rc-planner-note">プレビューの色変更は販売中の色違いを選ぶ操作ではありません。商品の色違いは上の検索で選んでください。</p>}
-      <fieldset className="rc-planner-section" disabled={completeModel}>
-        <legend>壁の色</legend>
-        <div className="rc-planner-swatches" role="group" aria-label="壁の色を選ぶ">
-          {wallColors.map(([color, label]) => <button className="motion-control" key={color} type="button" aria-label={`壁を${label}にする`} title={label} aria-pressed={design.wallColor?.toUpperCase() === color.toUpperCase()} style={{ backgroundColor: color }} onClick={() => onChange({ ...design, wallColor: color })} />)}
-        </div>
-      </fieldset>
-      <fieldset className="rc-planner-section" disabled={completeModel}>
-        <legend>床の色</legend>
-        <div className="rc-planner-swatches" role="group" aria-label="床の色を選ぶ">
-          {wallColors.map(([color, label]) => <button key={color} type="button" aria-label={`床を${label}にする`} title={label} aria-pressed={(design.floorColor ?? design.room?.floorColor)?.toUpperCase() === color.toUpperCase()} style={{ backgroundColor: color }} onClick={() => onChange({ ...design, floorColor: color })} />)}
-        </div>
-        <label className="rc-planner-floor-color">自由に選ぶ<input type="color" aria-label="床の色を自由に選ぶ" value={design.floorColor ?? design.room?.floorColor ?? '#D9BF99'} onChange={event => onChange({ ...design, floorColor: event.target.value })} /></label>
-      </fieldset>
-      {furnitureRequests && <details className="rc-planner-section rc-planner-additions">
-        <summary>家具を追加{furnitureRequests.additions.length > 0 && `（${furnitureRequests.additions.length}点）`}</summary>
-        <p className="rc-planner-note">次のコーディネートで提案する家具を、最大6点指定できます。</p>
-        <FurnitureAdditionRows values={furnitureRequests.additions} onChange={furnitureRequests.onAdditionsChange} emptyFocusTarget={additionButton}/>
-        <button ref={additionButton} type="button" className="rc-secondary" disabled={furnitureRequests.additions.length >= 6} onClick={() => furnitureRequests.onAdditionsChange([...furnitureRequests.additions, { category: 'sofa', uiId: crypto.randomUUID() }])}>家具を追加</button>
-      </details>}
+      </div>
+      <div role="tabpanel" id="planner-tabpanel-room" aria-labelledby="planner-tab-room" hidden={tab !== 'room'}>
+        <section className="rc-planner-section" aria-labelledby="planner-view-label">
+          <h3 id="planner-view-label">見え方</h3>
+          <div className="rc-planner-segments" role="group" aria-label="視点を切り替える">
+            {viewChoices.map(([key, label]) => <button className="motion-control" key={key} type="button" aria-pressed={view === key} onClick={() => onView(key)}>{label}</button>)}
+          </div>
+          <label className="rc-planner-check"><input type="checkbox" checked={dimensions} onChange={event => onDimensions(event.target.checked)} />選んだ家具の寸法を表示</label>
+        </section>
+        <fieldset className="rc-planner-section" disabled={completeModel}>
+          <legend>壁の色</legend>
+          <div className="rc-planner-swatches" role="group" aria-label="壁の色を選ぶ">
+            {wallColors.map(([color, label]) => <button className="motion-control" key={color} type="button" aria-label={`壁を${label}にする`} title={label} aria-pressed={design.wallColor?.toUpperCase() === color.toUpperCase()} style={{ backgroundColor: color }} onClick={() => onChange({ ...design, wallColor: color })} />)}
+          </div>
+        </fieldset>
+        <fieldset className="rc-planner-section" disabled={completeModel}>
+          <legend>床の色</legend>
+          <div className="rc-planner-swatches" role="group" aria-label="床の色を選ぶ">
+            {wallColors.map(([color, label]) => <button className="motion-control" key={color} type="button" aria-label={`床を${label}にする`} title={label} aria-pressed={(design.floorColor ?? design.room?.floorColor)?.toUpperCase() === color.toUpperCase()} style={{ backgroundColor: color }} onClick={() => onChange({ ...design, floorColor: color })} />)}
+          </div>
+          <label className="rc-planner-floor-color">自由に選ぶ<input type="color" aria-label="床の色を自由に選ぶ" value={design.floorColor ?? design.room?.floorColor ?? '#D9BF99'} onChange={event => onChange({ ...design, floorColor: event.target.value })} /></label>
+        </fieldset>
+        {furnitureRequests && <section className="rc-planner-section" aria-labelledby="planner-detected-label">
+          <h3 id="planner-detected-label">写真から検出した家具</h3>
+          <p className="rc-planner-note" id="planner-detected-help">正しく検出された家具にチェックを入れると、次の部屋に残します。</p>
+          {detectedItems.length === 0
+            ? <p className="rc-planner-note">検出された家具はありません。</p>
+            : <ul className="rc-planner-detected-list">
+              {detectedItems.map(item => {
+                const action = furnitureRequests.operations.find(operation => operation.objectId === item.id)?.action ?? 'keep';
+                return <li key={item.id}>
+                  <label className="rc-planner-check">
+                    <input type="checkbox" checked={action === 'keep'} aria-describedby="planner-detected-help" onChange={event => furnitureRequests.onOperationChange(item.id, event.target.checked ? 'keep' : 'remove')} />
+                    <span>{item.name}{action === 'replace' && <small>入れ替える家具</small>}</span>
+                  </label>
+                </li>;
+              })}
+            </ul>}
+        </section>}
+        {furnitureRequests && <details className="rc-planner-fold">
+          <summary>AIに提案してほしい家具{furnitureRequests.additions.length > 0 && `（${furnitureRequests.additions.length}点）`}</summary>
+          <p className="rc-planner-note">次のコーディネートで提案する家具を、最大6点指定できます。</p>
+          <FurnitureAdditionRows values={furnitureRequests.additions} onChange={furnitureRequests.onAdditionsChange} emptyFocusTarget={additionButton}/>
+          <button ref={additionButton} type="button" className="rc-secondary" disabled={furnitureRequests.additions.length >= 6} onClick={() => furnitureRequests.onAdditionsChange([...furnitureRequests.additions, { category: 'sofa', uiId: crypto.randomUUID() }])}>家具を追加</button>
+        </details>}
+      </div>
     </div>
     <div className="rc-planner-footer">
       <button type="button" className="rc-primary" disabled={!dirty} onClick={onSave}>変更を保存</button>

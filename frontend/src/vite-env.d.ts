@@ -5,7 +5,6 @@ interface ImportMetaEnv {
   readonly VITE_TERMS_URL?: string;
   readonly VITE_PRIVACY_URL?: string;
   readonly VITE_API_ENDPOINT?: string;
-  readonly VITE_CONNECTION?: "dummy" | "api";
   readonly VITE_ROOM_API_CONTRACT?: "analysis" | "coordination" | "legacy";
   readonly VITE_ROOM_COORDINATION_PATH?: string;
   readonly VITE_ROOM_COORDINATION_JOB_PATH?: string;

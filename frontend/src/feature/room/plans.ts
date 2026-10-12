@@ -3,7 +3,6 @@ import { isRoomDesign, type RoomDesign } from '../../domain/room';
 import type { SavedRoom } from '../../domain/roomRepository';
 import { useSession } from '../../core/session';
 import { useRepositories } from '../../core/repositories';
-import { loadConnection } from '../../core/connection';
 import { DomainError } from '../../domain/error';
 import { isTemplateId } from '../../domain/roomTemplate';
 import { readRoomTemplates } from './templateStorage';
@@ -17,7 +16,8 @@ export const scopedRoomPlanKeys = (scope: string) => ({
 });
 export function useRoomPlanScope(): string {
   const session = useSession();
-  return JSON.stringify([loadConnection(), appConfig.apiEndpoint, session.user?.id ?? 'guest']);
+  // 先頭の 'api' は、保存済みの下書きのキーを変えないために残す。
+  return JSON.stringify(['api', appConfig.apiEndpoint, session.user?.id ?? 'guest']);
 }
 const storageKey = (scope: string) => `room-coordinator.plans.v2:${scope}`;
 function readPlans(scope: string): RoomDesign[] {
@@ -60,7 +60,7 @@ export function useRoomPlans(): RoomDesign[] {
   return useSavedRooms().data.flatMap(room => room.design ? [room.design] : []);
 }
 export function isApiRoomAlias(id: string): boolean {
-  return loadConnection() === 'api' && /^(?:api-room-)?[1-9]\d*$/.test(id);
+  return /^(?:api-room-)?[1-9]\d*$/.test(id);
 }
 export function useRoomPlan(id: string, enabled: boolean, initialDesign?: () => RoomDesign) {
   const scope = useRoomPlanScope();
