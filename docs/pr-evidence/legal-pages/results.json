@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-12",
+  "origin": "https://zenn-hackathon-web-55ceumihtq-an.a.run.app",
+  "pages": {
+    "/terms.html": {
+      "status": 200,
+      "matches_source": true
+    },
+    "/privacy.html": {
+      "status": 200,
+      "matches_source": true
+    },
+    "/legal.css": {
+      "status": 200,
+      "matches_source": true
+    }
+  },
+  "web_revision": "zenn-hackathon-web-00050-klv",
+  "api_revision": "zenn-hackathon-api-00049-25z",
+  "web_image_digest": "sha256:9564fd5c2f1df95a02f3ec0398d1fc932f8e73e7f4aff21bdf4c12fdf9819758",
+  "legal_paths": {
+    "VITE_TERMS_URL": "/terms.html",
+    "VITE_PRIVACY_URL": "/privacy.html"
+  },
+  "frontend_checks": {
+    "lint": "passed",
+    "build": "passed",
+    "375px_privacy_horizontal_overflow": false,
+    "signup_fields_enabled": true,
+    "consent_required": true,
+    "terms_link_preserves_nickname": true
+  },
+  "api_smoke": {
+    "health_status": 200,
+    "empty_signup_status": 422,
+    "jwt_issued": false,
+    "successful_signup_tested": false
+  },
+  "new_tests_added": false
+}
