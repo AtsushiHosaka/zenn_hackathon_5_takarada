@@ -30,4 +30,20 @@ The existing Rails suite passed 45 examples, including 9 authentication examples
 
 ## Remaining configuration
 
-Official documents and their URLs remain unpublished or unspecified. Under the user-selected policy this keeps API signup paused; it no longer blocks implementing and merging the policy. No legal text is fabricated.
+At the 2026-10-08 checkpoint, official documents and their URLs remained unpublished or unspecified, keeping API signup paused.
+
+## Same-domain publication approved on 2026-10-12
+
+The user requested publication of Terms and Privacy pages on the app's existing domain, delegated their contents, and supplied `hosaka2917@gmail.com` as the private contact address to list. This supersedes the earlier absence of approved publication content. The Google Docs URL remains unset; this request and implementation decision remain unreflected in Docs.
+
+- Publish Japanese static HTML at `/terms.html` and `/privacy.html`, accessible without login or JavaScript. Share responsive, printable styling through `/legal.css`.
+- Identify the operator using the repository owner's verified public profile name, Atsushi Hosaka. Include the supplied email for private data requests.
+- Describe account information, room photos, prompts/budgets/layouts, imported images, browser storage, operational logs, Google Cloud/Vertex AI processing, external shop links, and account deletion according to current code.
+- Disclose that original room photos are private and become eligible for lifecycle deletion after seven days; withdrawal does not immediately remove photo objects, logs, or browser data. Distinguish public catalog models/textures from private room data.
+- Avoid claims of guaranteed accuracy, immediate deletion of all information, Japan-only AI processing, or universal no-retention. Keep statutory rights and liability that cannot be waived intact.
+- Configure Web build and API runtime legal paths together, keeping `SignupPolicy` and the signup consent checkbox. Ship matching defaults through Docker, Compose, Actions, manual release, environment examples, and Terraform so later releases do not silently re-disable registration.
+- Deploy the Web documents first, verify their contents, then update the existing API environment without changing its image or running database/seed jobs. Persist the repository variables for future deployments.
+
+Sources checked on 2026-10-12: current application code and schema; deployed API `GEMINI_PROVIDER=vertex` and `GOOGLE_CLOUD_LOCATION=global`; deployed uploads-bucket lifecycle age of seven days; [PPC general guidelines](https://www.ppc.go.jp/personalinfo/legal/guidelines_tsusoku/), [Ministry of Justice contract rules](https://www.moj.go.jp/content/001289629), and [Google Vertex AI data handling](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/vertex-ai-zero-data-retention). Publication does not constitute independent legal certification.
+
+Verification and deployment results will be recorded below after execution.

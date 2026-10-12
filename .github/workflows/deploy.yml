@@ -67,8 +67,8 @@ jobs:
             VITE_API_ENDPOINT=
             API_UPSTREAM_ORIGIN=${{ secrets.GCP_API_URL }}
             VITE_CONNECTION=api
-            VITE_TERMS_URL=${{ vars.VITE_TERMS_URL }}
-            VITE_PRIVACY_URL=${{ vars.VITE_PRIVACY_URL }}
+            VITE_TERMS_URL=${{ vars.VITE_TERMS_URL || '/terms.html' }}
+            VITE_PRIVACY_URL=${{ vars.VITE_PRIVACY_URL || '/privacy.html' }}
           tags: |
             ${{ secrets.GCP_WEB_IMAGE_REPO }}:${{ github.event.workflow_run.head_sha }}
             ${{ secrets.GCP_WEB_IMAGE_REPO }}:latest
@@ -89,8 +89,8 @@ jobs:
 
       - name: Cloud Run を更新
         env:
-          VITE_TERMS_URL: ${{ vars.VITE_TERMS_URL }}
-          VITE_PRIVACY_URL: ${{ vars.VITE_PRIVACY_URL }}
+          VITE_TERMS_URL: ${{ vars.VITE_TERMS_URL || '/terms.html' }}
+          VITE_PRIVACY_URL: ${{ vars.VITE_PRIVACY_URL || '/privacy.html' }}
         run: |
           legal_separator="__LEGAL_DOCUMENTS__"
           while [[ "$VITE_TERMS_URL$VITE_PRIVACY_URL" == *"$legal_separator"* ]]; do
