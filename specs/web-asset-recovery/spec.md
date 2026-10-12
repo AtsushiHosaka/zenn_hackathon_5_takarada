@@ -32,4 +32,4 @@ API responses were mocked and all API requests intercepted in this local browser
 
 ## Release
 
-The user authorized deployment on 2026-10-12. The release branch integrates main `a858a8a` to preserve the newer preview UI. Lint, build, generated API-type freshness, and the injected-404/reload/ready-canvas browser check passed again on that integrated source. Review screenshots are in `docs/pr-evidence/web-asset-recovery/`. The release uses the existing main CI and Deploy workflow; production verification follows deployment.
+The user authorized deployment on 2026-10-12. The release branch integrates main `b734172`, including preview UI `a858a8a` and the subsequent backend-only recommendation change. Lint, build, generated API-type freshness, and the injected-404/reload/ready-canvas browser check passed again on the integrated frontend source, which is unchanged by `b734172`. Review screenshots are in `docs/pr-evidence/web-asset-recovery/`. The release uses the existing main CI and Deploy workflow; production verification follows deployment.
