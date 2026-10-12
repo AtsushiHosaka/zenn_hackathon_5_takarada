@@ -13,10 +13,22 @@
   background: #fff;
 }
 
-.app-error-card h1 {
+.app-error-card h1,
+.app-error-card h2 {
   margin: 0 0 20px;
   font-size: 22px;
   line-height: 1.5;
+}
+
+.app-load-error {
+  position: fixed;
+  z-index: 2000;
+  top: 16px;
+  right: 16px;
+  width: min(480px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  box-shadow: 0 8px 32px #211b3433;
 }
 
 .app-error-card p {
