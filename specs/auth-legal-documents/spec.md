@@ -46,4 +46,12 @@ The user requested publication of Terms and Privacy pages on the app's existing 
 
 Sources checked on 2026-10-12: current application code and schema; deployed API `GEMINI_PROVIDER=vertex` and `GOOGLE_CLOUD_LOCATION=global`; deployed uploads-bucket lifecycle age of seven days; [PPC general guidelines](https://www.ppc.go.jp/personalinfo/legal/guidelines_tsusoku/), [Ministry of Justice contract rules](https://www.moj.go.jp/content/001289629), and [Google Vertex AI data handling](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/vertex-ai-zero-data-retention). Publication does not constitute independent legal certification.
 
-Verification and deployment results will be recorded below after execution.
+### Verification and production release
+
+On 2026-10-12, frontend ESLint and TypeScript/Vite build passed. The existing bundle-size warning remains. Release shell syntax, Terraform format/validation, resolved Compose configuration, and whitespace checks passed. Japanese static and diff checks were reviewed; repeated polite endings were retained where natural for rules and policy text. No new automated tests were added.
+
+Browser checks confirmed public legal content, working contents anchors, a 375px Privacy layout without horizontal overflow, enabled signup fields/button and required consent, and Terms opening in a separate tab while retaining a typed nickname. Production Terms, Privacy, and CSS each returned HTTP 200 and exactly matched reviewed source.
+
+Targeted publication used Web image digest `sha256:9564fd5c2f1df95a02f3ec0398d1fc932f8e73e7f4aff21bdf4c12fdf9819758` on revision `zenn-hackathon-web-00050-klv`. API revision `zenn-hackathon-api-00049-25z` retained the existing code image and changed only the two legal environment values. Both repository deployment variables were saved. API health returned HTTP 200. A same-origin POST to signup with empty required fields returned HTTP 422 validation errors without a JWT, confirming registration reaches validation instead of the document-policy HTTP 503. No real account was created and successful account creation was not exercised.
+
+Screenshots are saved in `docs/pr-evidence/legal-pages/`. The targeted release did not run database, seed, or provider-generation jobs.
