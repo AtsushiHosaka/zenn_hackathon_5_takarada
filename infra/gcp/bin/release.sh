@@ -20,6 +20,8 @@ api_service="$(tfout api_service)"
 web_service="$(tfout web_service)"
 
 tag="${IMAGE_TAG:-$(date +%Y%m%d%H%M%S)}"
+terms_url="${VITE_TERMS_URL:-/terms.html}"
+privacy_url="${VITE_PRIVACY_URL:-/privacy.html}"
 # Cloud Run は x86_64 なので、Apple Silicon からはクロスビルドする
 platform="${IMAGE_PLATFORM:-linux/amd64}"
 
@@ -42,8 +44,8 @@ docker buildx build \
   --build-arg "VITE_API_ENDPOINT=" \
   --build-arg "API_UPSTREAM_ORIGIN=$api_url" \
   --build-arg "VITE_CONNECTION=api" \
-  --build-arg "VITE_TERMS_URL=${VITE_TERMS_URL:-}" \
-  --build-arg "VITE_PRIVACY_URL=${VITE_PRIVACY_URL:-}" \
+  --build-arg "VITE_TERMS_URL=$terms_url" \
+  --build-arg "VITE_PRIVACY_URL=$privacy_url" \
   -t "$web_repo:$tag" -t "$web_repo:latest" \
   --push \
   "$ROOT/frontend"
@@ -69,10 +71,10 @@ echo
 echo "== 3/3 Cloud Run を更新します"
 # Use a separator absent from the values so URL query commas remain intact.
 legal_separator="__LEGAL_DOCUMENTS__"
-while [[ "${VITE_TERMS_URL:-}${VITE_PRIVACY_URL:-}" == *"$legal_separator"* ]]; do
+while [[ "$terms_url$privacy_url" == *"$legal_separator"* ]]; do
   legal_separator="${legal_separator}_"
 done
-legal_env="^${legal_separator}^VITE_TERMS_URL=${VITE_TERMS_URL:-}${legal_separator}VITE_PRIVACY_URL=${VITE_PRIVACY_URL:-}"
+legal_env="^${legal_separator}^VITE_TERMS_URL=${terms_url}${legal_separator}VITE_PRIVACY_URL=${privacy_url}"
 gcloud run services update "$api_service" \
   --update-env-vars "$legal_env" \
   --image "$api_repo:$tag" \

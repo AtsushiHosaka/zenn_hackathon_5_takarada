@@ -138,6 +138,16 @@ resource "google_cloud_run_v2_service" "api" {
         value = local.cors_origins
       }
 
+      env {
+        name  = "VITE_TERMS_URL"
+        value = "/terms.html"
+      }
+
+      env {
+        name  = "VITE_PRIVACY_URL"
+        value = "/privacy.html"
+      }
+
       dynamic "env" {
         for_each = local.gemini_env
 
