@@ -25,9 +25,12 @@ class CoordinationBuilder
   def call
     kept = kept_objects
     client = FurnitureCandidates.client(selected: selected_product_items)
-    candidate_limit = GeminiClient.configured?(user_id: @coordination.room.user_id) ? CoordinationPlanner::Gemini::CANDIDATES_PER_GROUP : 3
-    floor_candidates = FurnitureOperationPlanner.call(@coordination, @scene, client:, candidate_limit:)
-    plan = CoordinationPlanner.call(prompt: @coordination.generation_prompt, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id, client:, additional_candidates: floor_candidates, previous:,
+    gemini = GeminiClient.configured?(user_id: @coordination.room.user_id)
+    candidate_limit = gemini ? CoordinationPlanner::Gemini::CANDIDATES_PER_GROUP : 3
+    # 要望文から読み取った色・雰囲気・形。合う商品を先に候補へ入れる (モックは並び順のまま)
+    preference = FurnitureQuery.call(@coordination.generation_prompt, user_id: @coordination.room.user_id) if gemini
+    floor_candidates = FurnitureOperationPlanner.call(@coordination, @scene, client:, candidate_limit:, preference:)
+    plan = CoordinationPlanner.call(prompt: @coordination.generation_prompt, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id, client:, additional_candidates: floor_candidates, previous:, preference:,
                                     slots: SlotLayout.placeable_slots(@scene["room"], kept))
     removed, kept = kept.partition { |object| plan.removed_object_ids.include?(object["id"]) }
     # 従来の空配列は「全部活かす」。明示操作がある場合は、全置換・全除外も許可する。
@@ -75,7 +78,7 @@ class CoordinationBuilder
       total_price: placed.sum { |p| p[:item].price },
       planned_by: plan.planned_by,
       # 精度の確認用: Gemini の回答と、実際に採用した商品
-      analysis: (@coordination.analysis || {}).deep_merge(plan.analysis).deep_merge("placed_item_ids" => placed.map { |p| p[:item].id }, "base_coordination_id" => @coordination.base_coordination_id, "meta" => { "product_source" => "db" }, "operation_failures" => failures),
+      analysis: (@coordination.analysis || {}).deep_merge(plan.analysis).deep_merge("placed_item_ids" => placed.map { |p| p[:item].id }, "base_coordination_id" => @coordination.base_coordination_id, "preference" => preference&.to_h&.stringify_keys, "meta" => { "product_source" => "db" }, "operation_failures" => failures),
       kept_object_ids: active.pluck("id"),
       furniture_operations: result_operations(active, removed)
     )

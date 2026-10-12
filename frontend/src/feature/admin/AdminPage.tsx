@@ -177,7 +177,7 @@ function Badge({ children }: { children: ReactNode }) {
 
 type Draft = {
   name: string; url: string; imageUrl: string; shop: string; price: string; category: string; slot: string; position: string;
-  themes: string; colorName: string; w: string; h: string; d: string; modelKey: string; symbolicColor: string;
+  themes: string[]; colorName: string; w: string; h: string; d: string; modelKey: string; symbolicColor: string;
   colorMaterials: Record<string, string>; enabled: boolean;
   material: string;
 };
@@ -189,13 +189,13 @@ function draftOf(detail: AdminFurnitureDetail | null, catalog: FurnitureAdminCat
     return {
       name: "", url: "", imageUrl: "", shop: "", price: "", category: "", slot: catalog.slots.includes("floor") ? "floor" : catalog.slots[0] ?? "",
       position: String(Math.max(-1, ...catalog.details.map((existing) => existing.position)) + 1),
-      themes: "", colorName: "", w: "", h: "", d: "", modelKey: "", symbolicColor: "#cccccc", colorMaterials: {}, enabled: true,
+      themes: [], colorName: "", w: "", h: "", d: "", modelKey: "", symbolicColor: "#cccccc", colorMaterials: {}, enabled: true,
       material: "",
     };
   }
   return {
     name: detail.name, url: detail.url, imageUrl: detail.imageUrl ?? "", shop: detail.shop, price: String(detail.price), category: detail.category,
-    slot: detail.slot, position: String(detail.position), themes: detail.themes.join(", "), colorName: detail.colorName ?? "",
+    slot: detail.slot, position: String(detail.position), themes: detail.themes, colorName: detail.colorName ?? "",
     w: centimeters(detail.size.w), h: centimeters(detail.size.h), d: centimeters(detail.size.d), modelKey: detail.modelKey ?? "",
     symbolicColor: detail.symbolicColor, colorMaterials: detail.colorMaterials, enabled: detail.enabled,
     material: detail.material ?? "",
@@ -245,7 +245,7 @@ function DetailEditor({ detail, catalog, models, onCreated, onClose }: {
       name: draft.name.trim(), category: draft.category.trim(), slot: draft.slot, modelKey: model.id, symbolicColor: draft.symbolicColor,
       colorMaterials: draft.colorMaterials, colorName: draft.colorName.trim() || null, size,
       material: draft.material.trim() || null, price, shop: draft.shop.trim(), url: draft.url.trim(),
-      imageUrl: draft.imageUrl.trim() || null, themes: draft.themes.split(/[\s,、]+/).filter(Boolean), position, enabled: draft.enabled,
+      imageUrl: draft.imageUrl.trim() || null, themes: draft.themes, position, enabled: draft.enabled,
     };
     save.mutate({ id: detail?.id ?? null, input }, { onSuccess: (result) => { setSaved(true); if (!detail) onCreated(result); } });
   };
@@ -267,8 +267,10 @@ function DetailEditor({ detail, catalog, models, onCreated, onClose }: {
       <Field label="家具の種類"><input className={field} required list="admin-categories" value={draft.category} onChange={(event) => set({ category: event.target.value })} /></Field>
       <Field label="置き場所の枠"><select className={field} value={draft.slot} onChange={(event) => set({ slot: event.target.value })}>{catalog.slots.map((value) => <option key={value}>{value}</option>)}</select></Field>
       <Field label="並び順（小さいほど先）"><input className={field} type="number" step={1} required value={draft.position} onChange={(event) => set({ position: event.target.value })} /></Field>
-      <Field label="テーマ（カンマ区切り）"><input className={field} value={draft.themes} onChange={(event) => set({ themes: event.target.value })} /></Field>
     </div>
+    <fieldset className="flex flex-wrap gap-x-3 gap-y-1"><legend className="text-xs text-slate-600">雰囲気のタグ（合うものを0〜3個）</legend>
+      {catalog.themes.map((theme) => <label key={theme.id} className="flex items-center gap-1 text-sm"><input type="checkbox" checked={draft.themes.includes(theme.id)} onChange={(event) => set({ themes: catalog.themes.map((value) => value.id).filter((id) => id === theme.id ? event.target.checked : draft.themes.includes(id)) })} />{theme.name}</label>)}
+    </fieldset>
     <datalist id="admin-categories">{catalog.categories.map((value) => <option key={value} value={value} />)}</datalist>
     <fieldset className="grid grid-cols-3 gap-2"><legend className="text-xs text-slate-600">寸法（cm）</legend>
       {AXES.map((axis) => <label key={axis} className="text-xs text-slate-600">{{ w: "幅", h: "高さ", d: "奥行き" }[axis]}<input className={field} type="number" min={0.1} step={0.1} required value={draft[axis]} onChange={(event) => set({ [axis]: event.target.value })} /></label>)}

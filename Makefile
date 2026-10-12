@@ -127,7 +127,7 @@ infra-psql:    ## Cloud SQL に psql で繋ぐ (自分の IP を一時的に許�
 		--project $$($(GTF) output -raw project_id)
 
 furniture-import: ## キャラクター・模様 (db/characters.json, furniture_textures.json) をDBへ取り込む。家具 (furnitures.json) と色・購入リンク (furniture_details.json) は空のときだけ入れる
-	docker compose exec api bin/rails character:import furniture:import furniture_texture:import furniture_detail:import
+	docker compose exec api bin/rails character:import furniture:import furniture_texture:import furniture_detail:import furniture_detail:retag_themes
 
 models-publish: ## バケットに置き済みの家具GLBを手元のDBへ登録 (例: make models-publish K="cushion bed_cover__101")
 	python3 tools/furniture_models/publish.py --api http://localhost:3000 --no-upload $(K)

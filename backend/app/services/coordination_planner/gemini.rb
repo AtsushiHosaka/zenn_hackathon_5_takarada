@@ -84,8 +84,9 @@ class CoordinationPlanner
       - title と concept は、前回からの変化が分かるように書く。
     TEXT
 
-    def initialize(prompt:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil, slots: SLOT_PRIORITY)
+    def initialize(prompt:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil, slots: SLOT_PRIORITY, preference: nil)
       @slots = slots
+      @preference = preference
       @prompt = prompt
       @room = room
       @kept_objects = kept_objects
@@ -96,7 +97,7 @@ class CoordinationPlanner
     end
 
     def plan
-      items = (@client.search(prompt: @prompt, theme: nil, slots: @slots).values.flatten + @additional_candidates)
+      items = (@client.search(prompt: @prompt, theme: nil, slots: @slots, preference: @preference).values.flatten + @additional_candidates)
         .uniq { |item| [ group_id(item), item.id ] }.group_by { |item| group_id(item) }.values.flat_map { |group| FurnitureCandidates.spread(group, CANDIDATES_PER_GROUP) }
       response = GeminiClient.new.generate_json(prompt: prompt_for(items), schema: SCHEMA)
       json = response.json.is_a?(Hash) ? response.json : {}
@@ -151,7 +152,7 @@ class CoordinationPlanner
       metadata = item.metadata
       { id: item.id, group_id: group_id(item), slot: item.slot, category: item.category, name: item.name,
         color: item.color, price: item.price, size: item.size, published_size: metadata["size"], estimated_axes: metadata["estimated_axes"],
-        material: metadata["material"], shape: metadata["shape"], color_name: metadata["color_name"], themes: metadata["themes"],
+        material: metadata["material"], shape: metadata["shape"], color_name: metadata["color_name"], themes: metadata["themes"]&.filter_map { |theme| FurnitureCandidates::THEMES[theme] },
         target_size: metadata["target_size"], preferred_position: metadata["preferred_position"] }.compact
     end
 

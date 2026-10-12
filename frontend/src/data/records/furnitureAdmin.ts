@@ -31,7 +31,7 @@ export function toAdminFurnitureDetail(record: AdminFurnitureDetailRecord): Admi
 }
 
 export function toFurnitureAdminCatalog(record: AdminFurnitureDetailListRecord): FurnitureAdminCatalog {
-  return { details: record.details.map(toAdminFurnitureDetail), slots: record.slots, categories: record.categories };
+  return { details: record.details.map(toAdminFurnitureDetail), slots: record.slots, categories: record.categories, themes: record.themes };
 }
 
 export function toAdminFurnitureDetailInputRecord(input: AdminFurnitureDetailInput): AdminFurnitureDetailInputRecord {
@@ -50,7 +50,7 @@ export function toAdminFurnitureDetailInputRecord(input: AdminFurnitureDetailInp
       shop: input.shop,
       url: input.url,
       image_url: input.imageUrl,
-      themes: input.themes,
+      themes: input.themes as NonNullable<AdminFurnitureDetailInputRecord["furniture_detail"]["themes"]>,
       position: input.position,
       enabled: input.enabled,
     },

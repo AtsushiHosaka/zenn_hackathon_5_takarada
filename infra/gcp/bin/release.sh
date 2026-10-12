@@ -53,7 +53,7 @@ docker buildx build \
 echo
 echo "== 2/3 db/Schemafile を Cloud SQL に適用します"
 # 新しいイメージでスキーマを当ててから、下でサービスを差し替える
-"$(dirname "$0")/task.sh" furniture_texture:clear_legacy,furniture_detail:migrate_fields,db:apply,character:import,furniture:import,furniture_texture:import,furniture_detail:import "$api_repo:$tag"
+"$(dirname "$0")/task.sh" furniture_texture:clear_legacy,furniture_detail:migrate_fields,db:apply,character:import,furniture:import,furniture_texture:import,furniture_detail:import,furniture_detail:retag_themes "$api_repo:$tag"
 
 echo
 echo "== 3/3 Cloud Run を更新します"

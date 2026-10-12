@@ -38,6 +38,8 @@ export type FurnitureAdminCatalog = {
   details: AdminFurnitureDetail[];
   slots: string[];
   categories: string[];
+  // 選べる雰囲気のタグ
+  themes: { id: string; name: string }[];
 };
 
 export type AdminFurnitureModel = {

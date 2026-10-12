@@ -19,8 +19,9 @@ class CoordinationPlanner
 
   # kept_objects: 活かす家具 (Scene の object)。部屋の雰囲気に合わせて選ぶのに使う
   # slots: その部屋で置き場所がありうる枠 (SlotLayout.placeable_slots)。この枠の商品だけを候補にする
-  def self.call(prompt:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil, slots: SLOT_PRIORITY)
+  # preference: 要望文から読み取った色・雰囲気・形 (FurnitureQuery::Result)。合う商品を先に候補へ入れる (Gemini のみ)
+  def self.call(prompt:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil, slots: SLOT_PRIORITY, preference: nil)
     planner = GeminiClient.configured?(user_id:) ? Gemini : Mock
-    planner.new(prompt:, room:, kept_objects:, user_id:, client:, additional_candidates:, previous:, slots:).plan
+    planner.new(prompt:, room:, kept_objects:, user_id:, client:, additional_candidates:, previous:, slots:, preference:).plan
   end
 end
