@@ -535,6 +535,39 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/NotFound"
+  "/api/v1/furniture_reviews":
+    post:
+      summary: 部屋に置いた家具が似合っているかをAIに聞く
+      tags:
+      - FurnitureReviews
+      description: 対象の家具1つについて、色・大きさ・雰囲気が部屋に合うかを答える。画面が今の配置を送り、結果は保存しない。Geminiが使えるときは登録された商品の写真も見せる。使えないときは色と大きさだけから答え、reviewed_byがmockになる。AIが答えられないときは503。
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: 答え
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/FurnitureReview"
+        '401':
+          description: ログインが必要
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Unauthorized"
+        '422':
+          description: 入力の確認に失敗
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationErrors"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/FurnitureReviewInput"
   "/api/v1/furniture_searches":
     post:
       summary: 登録された家具を検索し色で絞り込む
@@ -2189,6 +2222,126 @@ components:
           example: table
       required:
       - query
+    FurnitureReviewItem:
+      type: object
+      description: 部屋に置いた家具1つ。sizeはメートル
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: 2人掛けソファ グレー
+        category:
+          type: string
+          example: sofa
+        color:
+          type: string
+          pattern: "^#[0-9a-fA-F]{6}$"
+          example: "#8a8f98"
+        size:
+          "$ref": "#/components/schemas/Size"
+        existing:
+          type: boolean
+          description: 今持っている家具か
+          example: false
+        on_floor:
+          type: boolean
+          description: 床に直接置いているか。家具の上や壁のものはfalse (床の面積に数えない)。省略時はtrue
+          example: true
+        furniture_detail_id:
+          type: integer
+          nullable: true
+          description: 登録された商品のID。あれば商品写真をAIに見せる (対象の家具だけ)
+          example: 12
+      required:
+      - name
+      - category
+      - color
+      - size
+    FurnitureReviewInput:
+      type: object
+      description: 今の配置 (保存前の入れ替えを含む)。結果は保存しない
+      properties:
+        target:
+          "$ref": "#/components/schemas/FurnitureReviewItem"
+        others:
+          type: array
+          maxItems: 100
+          description: 対象以外の家具
+          items:
+            "$ref": "#/components/schemas/FurnitureReviewItem"
+        room:
+          type: object
+          properties:
+            width:
+              type: number
+              description: 幅 (メートル)
+              example: 2.7
+            depth:
+              type: number
+              description: 奥行き (メートル)
+              example: 3.6
+            wall_color:
+              type: string
+              nullable: true
+              example: "#f4f1ea"
+            floor_color:
+              type: string
+              nullable: true
+              example: "#d9bf99"
+          required:
+          - width
+          - depth
+        prompt:
+          type: string
+          maxLength: 500
+          description: どんな部屋にしたいか
+          example: 紫色の推し活ルームにしたい
+      required:
+      - target
+      - room
+    FurnitureReview:
+      type: object
+      properties:
+        verdict:
+          type: string
+          enum:
+          - good
+          - fair
+          - poor
+          description: 'good: よく合う / fair: 気になる点がある / poor: 合わない'
+          example: fair
+        summary:
+          type: string
+          example: 色は合いますが、少し大きめです。
+        color:
+          type: string
+          example: 床より明るいグレーで、輪郭がはっきり見えます。
+        size:
+          type: string
+          example: 床の約18%を占め、歩く場所は残ります。
+        mood:
+          type: string
+          example: 落ち着いた色で、紫の小物を引き立てます。
+        suggestion:
+          type: string
+          description: 直す点が無ければ空文字
+          example: クッションを紫にすると希望に近づきます。
+        reviewed_by:
+          type: string
+          enum:
+          - gemini
+          - mock
+          description: mockはAIにつながっていないときの、色と大きさだけからの答え
+          example: gemini
+      required:
+      - verdict
+      - summary
+      - color
+      - size
+      - mood
+      - suggestion
+      - reviewed_by
     FurnitureSearchResult:
       type: object
       properties:

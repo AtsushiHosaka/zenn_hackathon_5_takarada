@@ -1021,6 +1021,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/furniture_reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 部屋に置いた家具が似合っているかをAIに聞く
+         * @description 対象の家具1つについて、色・大きさ・雰囲気が部屋に合うかを答える。画面が今の配置を送り、結果は保存しない。Geminiが使えるときは登録された商品の写真も見せる。使えないときは色と大きさだけから答え、reviewed_byがmockになる。AIが答えられないときは503。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["FurnitureReviewInput"];
+                };
+            };
+            responses: {
+                /** @description 答え */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FurnitureReview"];
+                    };
+                };
+                /** @description ログインが必要 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Unauthorized"];
+                    };
+                };
+                /** @description 入力の確認に失敗 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ValidationErrors"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/furniture_searches": {
         parameters: {
             query?: never;
@@ -2285,6 +2346,85 @@ export interface components {
              * @enum {string}
              */
             category?: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
+        };
+        /** @description 部屋に置いた家具1つ。sizeはメートル */
+        FurnitureReviewItem: {
+            /** @example 2人掛けソファ グレー */
+            name: string;
+            /** @example sofa */
+            category: string;
+            /** @example #8a8f98 */
+            color: string;
+            size: components["schemas"]["Size"];
+            /**
+             * @description 今持っている家具か
+             * @example false
+             */
+            existing?: boolean;
+            /**
+             * @description 床に直接置いているか。家具の上や壁のものはfalse (床の面積に数えない)。省略時はtrue
+             * @example true
+             */
+            on_floor?: boolean;
+            /**
+             * @description 登録された商品のID。あれば商品写真をAIに見せる (対象の家具だけ)
+             * @example 12
+             */
+            furniture_detail_id?: number | null;
+        };
+        /** @description 今の配置 (保存前の入れ替えを含む)。結果は保存しない */
+        FurnitureReviewInput: {
+            target: components["schemas"]["FurnitureReviewItem"];
+            /** @description 対象以外の家具 */
+            others?: components["schemas"]["FurnitureReviewItem"][];
+            room: {
+                /**
+                 * @description 幅 (メートル)
+                 * @example 2.7
+                 */
+                width: number;
+                /**
+                 * @description 奥行き (メートル)
+                 * @example 3.6
+                 */
+                depth: number;
+                /** @example #f4f1ea */
+                wall_color?: string | null;
+                /** @example #d9bf99 */
+                floor_color?: string | null;
+            };
+            /**
+             * @description どんな部屋にしたいか
+             * @example 紫色の推し活ルームにしたい
+             */
+            prompt?: string;
+        };
+        FurnitureReview: {
+            /**
+             * @description good: よく合う / fair: 気になる点がある / poor: 合わない
+             * @example fair
+             * @enum {string}
+             */
+            verdict: "good" | "fair" | "poor";
+            /** @example 色は合いますが、少し大きめです。 */
+            summary: string;
+            /** @example 床より明るいグレーで、輪郭がはっきり見えます。 */
+            color: string;
+            /** @example 床の約18%を占め、歩く場所は残ります。 */
+            size: string;
+            /** @example 落ち着いた色で、紫の小物を引き立てます。 */
+            mood: string;
+            /**
+             * @description 直す点が無ければ空文字
+             * @example クッションを紫にすると希望に近づきます。
+             */
+            suggestion: string;
+            /**
+             * @description mockはAIにつながっていないときの、色と大きさだけからの答え
+             * @example gemini
+             * @enum {string}
+             */
+            reviewed_by: "gemini" | "mock";
         };
         FurnitureSearchResult: {
             /** @description 家具ごとに1件。同じ家具の他の色・寸法・購入先はvariants */

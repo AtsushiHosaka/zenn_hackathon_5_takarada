@@ -516,6 +516,53 @@ RSpec.configure do |config|
             },
             required: %w[query]
           },
+          FurnitureReviewItem: {
+            type: :object,
+            description: "部屋に置いた家具1つ。sizeはメートル",
+            properties: {
+              name: { type: :string, minLength: 1, maxLength: 100, example: "2人掛けソファ グレー" },
+              category: { type: :string, example: "sofa" },
+              color: { type: :string, pattern: "^#[0-9a-fA-F]{6}$", example: "#8a8f98" },
+              size: { "$ref" => "#/components/schemas/Size" },
+              existing: { type: :boolean, description: "今持っている家具か", example: false },
+              on_floor: { type: :boolean, description: "床に直接置いているか。家具の上や壁のものはfalse (床の面積に数えない)。省略時はtrue", example: true },
+              furniture_detail_id: { type: :integer, nullable: true, description: "登録された商品のID。あれば商品写真をAIに見せる (対象の家具だけ)", example: 12 }
+            },
+            required: %w[name category color size]
+          },
+          FurnitureReviewInput: {
+            type: :object,
+            description: "今の配置 (保存前の入れ替えを含む)。結果は保存しない",
+            properties: {
+              target: { "$ref" => "#/components/schemas/FurnitureReviewItem" },
+              others: { type: :array, maxItems: 100, description: "対象以外の家具", items: { "$ref" => "#/components/schemas/FurnitureReviewItem" } },
+              room: {
+                type: :object,
+                properties: {
+                  width: { type: :number, description: "幅 (メートル)", example: 2.7 },
+                  depth: { type: :number, description: "奥行き (メートル)", example: 3.6 },
+                  wall_color: { type: :string, nullable: true, example: "#f4f1ea" },
+                  floor_color: { type: :string, nullable: true, example: "#d9bf99" }
+                },
+                required: %w[width depth]
+              },
+              prompt: { type: :string, maxLength: 500, description: "どんな部屋にしたいか", example: "紫色の推し活ルームにしたい" }
+            },
+            required: %w[target room]
+          },
+          FurnitureReview: {
+            type: :object,
+            properties: {
+              verdict: { type: :string, enum: FurnitureReview::VERDICTS, description: "good: よく合う / fair: 気になる点がある / poor: 合わない", example: "fair" },
+              summary: { type: :string, example: "色は合いますが、少し大きめです。" },
+              color: { type: :string, example: "床より明るいグレーで、輪郭がはっきり見えます。" },
+              size: { type: :string, example: "床の約18%を占め、歩く場所は残ります。" },
+              mood: { type: :string, example: "落ち着いた色で、紫の小物を引き立てます。" },
+              suggestion: { type: :string, description: "直す点が無ければ空文字", example: "クッションを紫にすると希望に近づきます。" },
+              reviewed_by: { type: :string, enum: %w[gemini mock], description: "mockはAIにつながっていないときの、色と大きさだけからの答え", example: "gemini" }
+            },
+            required: %w[verdict summary color size mood suggestion reviewed_by]
+          },
           FurnitureSearchResult: {
             type: :object,
             properties: {

@@ -11,6 +11,7 @@ import { useImportedFurniture } from './importedFurniture';
 import { useRoomPlanScope } from './plans';
 import './planner.css';
 import FurnitureSearchPanel from './FurnitureSearchPanel';
+import FurnitureReviewPanel from './FurnitureReviewPanel';
 import { productReplacementPosition } from './productReplacement';
 
 export type PlannerView = 'perspective' | 'top' | 'front';
@@ -276,6 +277,7 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
             <p className="rc-planner-size">幅 {cm(selected.size[0])} × 高さ {cm(selected.size[1])} × 奥行き {cm(selected.size[2])} cm</p>
             {selectedProductLink && <a className="rc-furniture-product-link" href={selectedProductLink} target="_blank" rel="noopener noreferrer">商品ページを見る</a>}
           </div>
+          {design.items.some(item => item.id === selected.id) && <FurnitureReviewPanel key={`${selected.id}:${selected.furnitureDetailId ?? selected.productUrl ?? selected.name}`} item={selected} design={design} />}
           <fieldset className="rc-planner-section" disabled={itemDisabled}>
             <legend>向き（90°ずつ）<small>現在 {selected.rotation ?? 0}°</small></legend>
             <div className="rc-planner-rotation">
