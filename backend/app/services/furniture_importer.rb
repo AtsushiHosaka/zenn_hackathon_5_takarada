@@ -47,7 +47,9 @@ class FurnitureImporter
   def save(attributes, characters)
     model = Furniture3DModel.find_by(model_key: attributes.fetch(:model_key)) || Furniture3DModel.new(furniture: Furniture.new)
     model.furniture.update!(attributes.slice(:name, :category))
-    model.update!(attributes.except(:name, :category, :characters))
+    values = attributes.except(:name, :category, :characters)
+    values.delete(:estimated_axes) if values[:estimated_axes].nil?
+    model.update!(values)
     link_characters(model, attributes.fetch(:characters), characters)
     model
   end
@@ -80,6 +82,9 @@ class FurnitureImporter
     check(model["triangles"].is_a?(Integer) && model["triangles"].between?(0, 2_147_483_647), "#{label}.triangles must be a nonnegative 32-bit integer")
     check(model["bytes"].is_a?(Integer) && model["bytes"].between?(1, 9_223_372_036_854_775_807), "#{label}.bytes must be a positive 64-bit integer")
     check(model["color_material_keys"].is_a?(Array) && model["color_material_keys"].all? { |key| key.is_a?(String) }, "#{label}.color_material_keys must be an array of strings")
+    # 推定した辺は GLB から測れないので、送られてきたときだけ変える (GLB の公開で登録し直しても消さない)
+    estimated_axes = model["estimated_axes"]
+    check(estimated_axes.nil? || (estimated_axes.is_a?(Array) && (estimated_axes - Furniture3DModel::SIZE_AXES).empty? && estimated_axes.uniq == estimated_axes), "#{label}.estimated_axes must be a list of w, h, d")
     characters = model.fetch("characters", [])
     check(characters.is_a?(Array) && characters.all? { |key| key.is_a?(String) } && characters.uniq == characters, "#{label}.characters must be unique character keys")
     check(characters.empty? || GoodsCategories.find(model["category"]), "#{label}.category must be a goods category in config/goods_categories.json when characters are set")
@@ -89,7 +94,7 @@ class FurnitureImporter
       shape: model.fetch("shape"), variant: model["variant"], format: model.fetch("format"),
       width: size[0], height: size[1], depth: size[2],
       triangle_count: model.fetch("triangles"), byte_size: model.fetch("bytes"),
-      sha256: model.fetch("sha256"), color_material_keys: model.fetch("color_material_keys"), characters:
+      sha256: model.fetch("sha256"), color_material_keys: model.fetch("color_material_keys"), estimated_axes:, characters:
     }
   end
 

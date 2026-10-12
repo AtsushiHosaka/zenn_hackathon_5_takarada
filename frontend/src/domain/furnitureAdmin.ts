@@ -1,5 +1,6 @@
 // 管理画面 (/admin) で扱う商品 (家具の色・寸法・購入リンク) と 3D モデル。寸法はメートル。
 export type FurnitureSize = { w: number; h: number; d: number };
+export type FurnitureAxis = keyof FurnitureSize;
 
 export type AdminFurnitureDetail = {
   id: number;
@@ -16,6 +17,8 @@ export type AdminFurnitureDetail = {
   colorMaterials: Record<string, string>;
   colorName: string | null;
   size: FurnitureSize;
+  // 主な素材
+  material: string | null;
   price: number;
   shop: string;
   url: string;
@@ -25,11 +28,10 @@ export type AdminFurnitureDetail = {
   position: number;
   // false なら提案・検索に出さない
   enabled: boolean;
-  checkedAt: Date | null;
 };
 
 export type AdminFurnitureDetailInput = Pick<AdminFurnitureDetail,
-  "name" | "category" | "slot" | "symbolicColor" | "colorMaterials" | "colorName" | "size" | "price" | "shop" | "url" | "imageUrl" | "themes" | "position" | "enabled"
+  "name" | "category" | "slot" | "symbolicColor" | "colorMaterials" | "colorName" | "size" | "material" | "price" | "shop" | "url" | "imageUrl" | "themes" | "position" | "enabled"
 > & { modelKey: string };
 
 export type FurnitureAdminCatalog = {
@@ -47,6 +49,8 @@ export type AdminFurnitureModel = {
   variant: string | null;
   size: FurnitureSize;
   colorMaterialKeys: string[];
+  // このモデルを使う商品の寸法のうち、公開されておらず推定した辺
+  estimatedAxes: FurnitureAxis[];
   // バケット内の GLB のパス。モデル ID から決まる
   objectKey: string;
   modelUrl: string | null;

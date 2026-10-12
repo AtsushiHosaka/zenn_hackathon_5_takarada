@@ -38,7 +38,7 @@ module Api
 
         def model_params
           params.require(:furniture_model).permit(
-            :name, :category, :shape, :variant, :triangles, :bytes, :sha256, size: [], color_material_keys: [], characters: []
+            :name, :category, :shape, :variant, :triangles, :bytes, :sha256, size: [], color_material_keys: [], characters: [], estimated_axes: []
           ).to_h
         end
       end

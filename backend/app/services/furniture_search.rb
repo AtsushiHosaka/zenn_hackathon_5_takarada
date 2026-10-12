@@ -35,7 +35,7 @@ class FurnitureSearch
 
   # 家具ごとに 1 件。色で絞り、同じ家具の detail を variants に入れる
   def self.products(matches, details, color)
-    matches = matches.select { |detail| FurnitureCandidates::Colors.matches?(detail.metadata["official_color"].presence || detail.color_name.presence || detail.name, color) }
+    matches = matches.select { |detail| FurnitureCandidates::Colors.matches?(detail.color_name.presence || detail.name, color) }
     siblings = details.group_by { |detail| [ detail.furniture_id, detail.category ] }
     matches.uniq { |detail| [ detail.furniture_id, detail.category ] }.first(MAX_RESULTS)
       .map { |detail| Product.new(detail:, variants: siblings.fetch([ detail.furniture_id, detail.category ])) }

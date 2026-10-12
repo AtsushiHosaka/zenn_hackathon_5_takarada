@@ -20,6 +20,13 @@ module FurnitureCandidates
   }.freeze
   FALLBACK_SIZE = { "w" => 0.3, "h" => 0.3, "d" => 0.3 }.freeze
 
+  # 並び順を保ったまま、3D モデルの形 (stool_round, chair_office など) ごとに 1 件ずつ順に取って limit 件にする。
+  # 先頭から limit 件だと、同じ形が続くカテゴリ (椅子はスツールと食卓用が先に並ぶ) でほかの形が候補に入らないため
+  def self.spread(items, limit)
+    shapes = items.group_by { |item| item.metadata["shape"] }.values
+    (0...shapes.map(&:size).max.to_i).flat_map { |round| shapes.filter_map { |shape| shape[round] } }.first(limit)
+  end
+
   # selected: ユーザーが選んだ detail の候補。枠・予算・カテゴリが合えば先頭に混ぜる
   def self.client(selected: [])
     Client.new(selected:)
