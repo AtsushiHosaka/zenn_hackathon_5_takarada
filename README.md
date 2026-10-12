@@ -49,9 +49,7 @@ make front-build  # 本番ビルド (frontend/dist)
 make front-types  # backend の OpenAPI から TypeScript の型を再生成
 ```
 
-**dev の既定は「ダミー」接続**なので、backend を立てなくてもログインから一覧まで動く
-(データはブラウザのメモリ上の `frontend/src/data/dummy`)。実 API を叩くならログイン画面 /
-ヘッダの「接続先」を `API` に切り替える。URL は `VITE_API_ENDPOINT`
+**接続先は常に実 API**(切り替え画面はない)。URL は `VITE_API_ENDPOINT`
 (既定 `http://localhost:3000`、デプロイ済みなら `make infra-url` の値)。
 
 | ディレクトリ | 内容 |

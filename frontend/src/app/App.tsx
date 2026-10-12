@@ -1,6 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes, useParams } from "react-router";
-import { loadConnection } from "../core/connection";
 import { RepositoriesContext } from "../core/repositories";
 import { createRepositories } from "./container";
 import LoginPage from "../feature/auth/LoginPage";
@@ -13,8 +12,7 @@ import RoomStudioPage from "../feature/room/RoomStudioPage";
 import AdminPage from "../feature/admin/AdminPage";
 import { useRoomPlanScope } from "../feature/room/plans";
 
-// 接続先はアプリ起動時に 1 回決まる (切り替えるとリロードが走る)
-const repositories = createRepositories(loadConnection());
+const repositories = createRepositories();
 
 const queryClient = new QueryClient({
   defaultOptions: {

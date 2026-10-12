@@ -95,6 +95,8 @@ export type RoomItem = {
   productUrl?: string;
   imageUrl?: string;
   color: string;
+  // 編集パネルで選んだ3Dプレビュー用の色。商品の3Dモデルへ上書きする。未指定ならモデル本来の色のまま。
+  previewColor?: string;
   // 単位はメートル。Yが高さ、positionはオブジェクトの中心。
   position: [number, number, number];
   size: [number, number, number];
@@ -248,6 +250,7 @@ export function isRoomItem(value: unknown): value is RoomItem {
   if (value.supportSurface !== undefined && (!nonemptyString(value.supportObjectId) || !isFurnitureSupportSurface(value.supportSurface))) return false;
   if (![value.id, value.name, value.category, value.color].every(nonemptyString) || typeof value.existing !== "boolean") return false;
   if (!finiteVector(value.position) || !finiteVector(value.size) || value.size.some(number => number <= 0)) return false;
+  if (value.previewColor !== undefined && (typeof value.previewColor !== "string" || !/^#[0-9a-f]{6}$/i.test(value.previewColor))) return false;
   if (value.rotation !== undefined && (typeof value.rotation !== "number" || !Number.isFinite(value.rotation) || value.rotation < 0 || value.rotation >= 360)) return false;
   if (value.price !== undefined && (typeof value.price !== "number" || !Number.isFinite(value.price) || value.price < 0)) return false;
   if (value.marker !== undefined && (typeof value.marker !== "number" || !Number.isSafeInteger(value.marker) || value.marker <= 0)) return false;
