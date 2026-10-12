@@ -290,6 +290,7 @@ export default function PlannerPanel({ design, templateEditing=false, selectedId
             <div className="rc-planner-swatches" role="group" aria-label="家具の色を選ぶ">
               {itemColors.map(([color, label]) => <button className="motion-control" key={color} type="button" aria-label={`家具を${label}にする`} title={label} aria-pressed={selected.color.toUpperCase() === color.toUpperCase()} style={{ backgroundColor: color }} onClick={() => changeItem({ color, previewColor: color })} />)}
             </div>
+            <label className="rc-planner-floor-color">自由に選ぶ<input type="color" aria-label="家具の色を自由に選ぶ" value={selected.previewColor ?? selected.color} onChange={event => changeItem({ color: event.target.value, previewColor: event.target.value })} /></label>
             {selected.productUrl && <p className="rc-planner-note">色を変えるのはプレビューだけです。商品の色違いは「商品を置き換える」で選べます。</p>}
           </fieldset>
           {selected.artwork && !itemDisabled && <label className="rc-image-goods-height">床からの高さ（cm）<input type="number" min="0" max={Math.floor((getFurniturePlacementBounds(design).max[1] - getFurniturePlacementBounds(design).floor - selected.size[1]) * 100)} step="1" value={Math.round((selected.position[1] - selected.size[1] / 2 - getFurniturePlacementBounds(design).floor) * 100)} onChange={event => {
