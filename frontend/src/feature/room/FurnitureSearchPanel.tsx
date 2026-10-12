@@ -53,7 +53,7 @@ export default function FurnitureSearchPanel({ design, disabled, onAddItem, repl
       {!!search.data.models.length && <SearchModels models={search.data.models} interpretation={search.data.interpretation}/>}
       <p role="status" className="rc-planner-note">{search.data.products.length ? `${search.data.products.length}件の商品` : search.data.models.length ? 'この条件で購入できる商品はまだ登録されていません。' : 'この条件の商品は見つかりませんでした。検索語や色を変えてお試しください。'}</p>
       <div className="rc-furniture-search-results">{search.data.products.map(({ item, colorName, variants, characters }) => <button key={item.furnitureDetailId} type="button" className="rc-furniture-search-card" aria-pressed={selectedId === item.furnitureDetailId} disabled={disabled} onClick={() => setSelectedId(item.furnitureDetailId)}>
-        <ProductPhoto key={item.imageUrl} src={item.imageUrl} name={item.name}/><span>{item.name}</span><CharacterChips ids={characters} interpretation={search.data!.interpretation}/><span>{colorName ?? '色の掲載なし'} · ¥{item.price?.toLocaleString('ja-JP')}{variants.length > 1 ? ` · 他${variants.length - 1}件` : ''}</span>
+        <ProductPhoto key={item.imageUrl} src={item.imageUrl} name={item.name}/><span>{item.name}</span><CharacterChips ids={characters} interpretation={search.data!.interpretation}/><span>{item.productMetadata?.officialColor ?? colorName ?? '色の掲載なし'} · ¥{item.price?.toLocaleString('ja-JP')}{variants.length > 1 ? ` · ${variants.length}色から選べます` : ''}</span>
       </button>)}</div>
       {selected && <FurnitureSearchSelection key={selected.item.furnitureDetailId} product={selected} design={design} disabled={disabled} onAddItem={onAddItem} replacementTarget={replacementTarget}/>}
     </>}
@@ -103,13 +103,21 @@ const sizeLabel = (size: RoomItem['size']) => `幅${Math.round(size[0]*100)} × 
 
 function variantLabel(variant: FurnitureDetailChoice, variants: FurnitureDetailChoice[]) {
   const { item } = variant;
-  // 同じ家具 (3Dモデル) には別の商品も並ぶので、商品名を必ず出す。色名は商品名に無いときだけ足す
-  const parts = [item.name];
-  if (variant.colorName && !item.name.includes(variant.colorName)) parts.push(variant.colorName);
+  const parts = [item.productMetadata?.officialColor ?? variant.colorName ?? item.name];
   if (new Set(variants.map(value => sizeLabel(value.item.size))).size > 1) parts.push(`${Math.round(item.size[0]*100)}×${Math.round(item.size[1]*100)}×${Math.round(item.size[2]*100)}cm`);
   if (new Set(variants.map(value => value.item.price)).size > 1) parts.push(`¥${item.price?.toLocaleString('ja-JP')}`);
   if (new Set(variants.map(value => value.item.shop)).size > 1 && item.shop) parts.push(item.shop);
   return parts.join(' · ');
+}
+
+function RetailListing({ item }: { item: RoomItem }) {
+  const metadata = item.productMetadata;
+  if (!metadata?.sourceUrl) return null;
+  const checkedAt = metadata.priceCheckedAt && new Date(metadata.priceCheckedAt).toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo' });
+  const availability = metadata.availability === 'in_stock' ? '確認時点で在庫あり。'
+    : metadata.availability === 'out_of_stock' ? '確認時点で在庫なし。'
+    : metadata.availability === 'listed' ? 'ショップに掲載。' : '';
+  return <p className="rc-planner-note">{checkedAt && <>掲載確認 {checkedAt} · </>}{availability}最新の在庫・配送は商品ページで確認してください。</p>;
 }
 
 function FurnitureSearchSelection({ product, design, disabled, onAddItem, replacementTarget }: { product: FurnitureSearchProduct; design: RoomDesign; disabled: boolean; onAddItem: (item: RoomItem) => void; replacementTarget?: RoomItem }) {
@@ -117,17 +125,19 @@ function FurnitureSearchSelection({ product, design, disabled, onAddItem, replac
   const variants = product.variants;
   const chosen = variants.find(variant => variant.item.furnitureDetailId === choiceId) ?? product;
   const item = chosen.item;
+  const productUrl = item.productMetadata?.sourceUrl ?? item.productUrl;
   const aliases: Record<string, string> = { lamp: "floor_lamp", artwork: "wall_art", cover: "bed_cover" };
   const sameCategory = !replacementTarget || item.category === (aliases[replacementTarget.category] ?? replacementTarget.category);
   const fits = sameCategory && Boolean(replacementTarget ? productReplacementPosition(item, replacementTarget, design) : furniturePositionInRoom(item, item.position, design));
   return <div className="rc-furniture-imported">
-    <h4>{product.item.name}</h4>
-    {variants.length > 1 && <fieldset className="rc-furniture-variants" disabled={disabled}><legend>色・サイズ・購入先を選ぶ</legend>{variants.map(variant => <button key={variant.item.furnitureDetailId} type="button" aria-pressed={choiceId === variant.item.furnitureDetailId} onClick={() => setChoiceId(variant.item.furnitureDetailId)}>{variantLabel(variant, variants)}</button>)}</fieldset>}
+    <h4>{item.name}</h4>
+    {variants.length > 1 && <fieldset className="rc-furniture-variants" disabled={disabled}><legend>ショップで選べる色</legend>{variants.map(variant => <button key={variant.item.furnitureDetailId} type="button" aria-pressed={choiceId === variant.item.furnitureDetailId} onClick={() => setChoiceId(variant.item.furnitureDetailId)}>{variantLabel(variant, variants)}</button>)}</fieldset>}
     <ProductPhoto key={item.imageUrl} className="rc-furniture-variant-photo" src={item.imageUrl} name={item.name}/>
-    <p>{item.name} · {chosen.colorName ?? '色の掲載なし'} · ¥{item.price?.toLocaleString('ja-JP')}{item.shop ? ` · ${item.shop}` : ''}</p>
+    <p>{item.name} · {item.productMetadata?.officialColor ?? chosen.colorName ?? '色の掲載なし'} · ¥{item.price?.toLocaleString('ja-JP')}{item.shop ? ` · ${item.shop}` : ''}</p>
     <p className="rc-planner-note">{sizeLabel(item.size)}</p>
     <ModelCredits credits={chosen.credits}/>
-    {item.productUrl && <a className="rc-furniture-product-link" href={item.productUrl} target="_blank" rel="noopener noreferrer">選んだ商品のページを見る</a>}
+    <RetailListing item={item}/>
+    {productUrl && <a className="rc-furniture-product-link" href={productUrl} target="_blank" rel="noopener noreferrer">商品ページで色・在庫を確認</a>}
     {!sameCategory && <p role="alert" className="rc-planner-input-error">選んだ商品のカテゴリが元の家具と一致しません。</p>}
     {!fits && sameCategory && <p role="status" className="rc-planner-input-error">この家具は部屋の寸法に収まりません。</p>}
     <button type="button" className="rc-furniture-add" disabled={disabled || !fits} onClick={() => onAddItem(item)}>{replacementTarget ? '選んだ商品で置き換える' : '＋ 選んだ商品を部屋に追加'}</button>

@@ -7,7 +7,7 @@ RSpec.describe "Api::V1::FurnitureSearches", type: :request do
   path "/api/v1/furniture_searches" do
     post "登録された家具を検索し色で絞り込む" do
       tags "FurnitureSearches"
-      description "DBに登録された家具 (furniture_details) を検索する。外部ECは検索しない。商品名に検索語を含むものを優先し、無ければ推定したカテゴリ (なければ床置き家具) 全体を返す。色は公式の色名・商品名で絞り込む。家具ごとに1件で最大24件。同じ家具の他の色・寸法・購入先はvariantsに入る。"
+      description "DBに登録された家具を検索する。検索中に外部ECは検索しない。商品名に検索語を含むものを優先し、無ければカテゴリ全体を返す。色は公式の色名・商品名で絞り込む。最大24件。同じショップ・商品・寸法の確認済み販売色をvariantsにまとめる。未確認の商品は個別に返す。"
       security [ { bearerAuth: [] } ]
       consumes "application/json"
       produces "application/json"

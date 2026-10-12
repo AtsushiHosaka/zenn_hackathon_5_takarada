@@ -25,6 +25,7 @@ class CoordinationBuilder
   def call
     kept = kept_objects
     client = FurnitureCandidates.client(selected: selected_product_items, characters: wanted_characters)
+    @candidate_client = client
     gemini = GeminiClient.configured?(user_id: @coordination.room.user_id)
     candidate_limit = gemini ? CoordinationPlanner::Gemini::CANDIDATES_PER_GROUP : 3
     character_theme = CharacterRoomTheme.suggestion_profile(@coordination.character_theme_id, palette_id: @coordination.room_palette_id)
@@ -78,7 +79,13 @@ class CoordinationBuilder
     items = placed.map.with_index(1) { |entry, marker| item_json(entry[:item], entry[:placement].note, marker) }
     appearance = FurnitureProductAppearance.call(scene:, items:)
     failures = operation_failures(floor_placed)
-    failures << "条件と配置に合う家具が登録されていませんでした。希望を変更して再提案してください。" if placed.empty?
+    if character_theme && client.unavailable_color_slots.any?
+      labels = client.unavailable_color_slots.map { |slot| CoordinationPlanner::Gemini::SLOT_LABELS.fetch(slot) }
+      failures << "#{labels.join('・')}には、希望の販売色を確認できた商品がありませんでした。"
+    end
+    if placed.empty?
+      failures << (character_theme ? "お店で販売されている色を確認できた商品に、希望の配色と配置に合う家具がありませんでした。" : "条件と配置に合う家具が登録されていませんでした。希望を変更して再提案してください。")
+    end
     if character_theme && placed.any?
       colors = preference&.color ? [ preference.color ] : character_theme.fetch("colors")
       unless placed.any? { |entry| colors.any? { |color| FurnitureCandidates::Colors.matches?("#{entry[:item].metadata['color_name']} #{entry[:item].name}", color) } }
@@ -255,7 +262,8 @@ class CoordinationBuilder
     selected_product_items
     @coordination.edited_objects.map do |edit|
       product = @selected_products_by_edit[edit["id"]]
-      product ? edit.merge("id" => SlotLayout.object_id_for(product)) : edit
+      product = @candidate_client.resolved_selection(product) if product && @candidate_client
+      product ? edit.merge("id" => SlotLayout.object_id_for(product), **(@coordination.character_theme_id ? { "color" => product.color } : {})) : edit
     end
   end
 

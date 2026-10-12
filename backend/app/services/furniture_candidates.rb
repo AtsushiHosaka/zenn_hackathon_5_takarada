@@ -28,6 +28,19 @@ module FurnitureCandidates
   }.freeze
 
   # Published color names establish palette matches; preview RGB is never color evidence.
+  def self.theme_color_eligible?(item, preference, character_theme)
+    return false unless item.metadata["retail_variant_available"]
+
+    colors = preference&.color ? [ preference.color, "white" ] : character_theme.fetch("allowed_colors")
+    text = item.metadata["color_name"].to_s
+    return false unless colors.any? { |color| Colors.matches?(text, color) }
+
+    # A blue/red or white/black article is not a blue/green/white variant.
+    conflicting = (Colors::PATTERNS.keys + Colors::THEME_PATTERNS.keys - colors)
+      .reject { |color| color == "gray" && Colors.matches?(text, "green") }
+    conflicting.none? { |color| Colors.matches?(text, color) }
+  end
+
   def self.score(item, preference, character_theme: nil)
     text = "#{item.metadata['color_name']} #{item.name}"
     colors = preference&.color ? [ preference.color ] : Array(character_theme&.fetch("colors", []))
@@ -67,6 +80,7 @@ module FurnitureCandidates
   # Keep chosen/previous products eligible, then offer ordinary palette furniture
   # and a smaller set of matching goods. These are options, never forced purchases.
   def self.shortlist(items, limit, preference: nil, character_theme: nil, preferred_ids: [])
+    items = items.select { |item| theme_color_eligible?(item, preference, character_theme) } if character_theme
     preferred, remaining = items.partition { |item| item.metadata["selected_by_user"] || preferred_ids.include?(item.id) }
     preferred = preferred.first(limit)
     capacity = limit - preferred.size

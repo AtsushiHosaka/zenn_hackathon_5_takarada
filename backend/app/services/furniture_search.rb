@@ -1,5 +1,5 @@
 # 登録済みの furniture_details を検索する。外部の EC は検索しない。
-# 家具 (モデル) ごとに 1 件を返し、同じ家具の他の色・寸法・購入先は variants に入れる。
+# 公式ページで確認した同一商品・寸法の色違いを variants に入れる。未確認の商品は個別に返す。
 # 検索語が推し活グッズ (キャラクター・フランチャイズ・グッズ種別) と解釈できたら、グッズの 3D モデルも models で返す。
 class FurnitureSearch
   MAX_RESULTS = 24
@@ -42,12 +42,13 @@ class FurnitureSearch
     Result.new(products: products(matches, details, color), color:, interpretation:, models: [])
   end
 
-  # 家具ごとに 1 件。色で絞り、同じ家具の detail を variants に入れる
+  # Preview-model reuse cannot establish that a shop sells these as color variants.
   def self.products(matches, details, color)
     matches = matches.select { |detail| FurnitureCandidates::Colors.matches?("#{detail.color_name} #{detail.name}", color) }
-    siblings = details.group_by { |detail| [ detail.furniture_id, detail.category ] }
-    matches.uniq { |detail| [ detail.furniture_id, detail.category ] }.first(MAX_RESULTS)
-      .map { |detail| Product.new(detail:, variants: siblings.fetch([ detail.furniture_id, detail.category ])) }
+    identity = ->(detail) { detail.retail_family_identity || [ "detail", detail.key ] }
+    siblings = details.group_by(&identity)
+    matches.uniq(&identity).first(MAX_RESULTS)
+      .map { |detail| Product.new(detail:, variants: siblings.fetch(identity.call(detail))) }
   end
 
   # 推し活グッズ: キャラクターとグッズ種別が合う家具の 3D モデルと、その家具の detail を返す。

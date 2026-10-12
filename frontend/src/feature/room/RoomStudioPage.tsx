@@ -216,7 +216,9 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
       return result;
     },
     onSuccess:(result,variables)=>{
-      const editedItems=(variables.createNew?[]:design.editedItems??[]).filter(item=>item.existing||result.items.some(current=>current.id===item.id));
+      // The API has applied positions and shop variant colors. Old preview tints
+      // must not override the actual sale color when a character tag is selected.
+      const editedItems=(variables.createNew?[]:design.editedItems??[]).filter(item=>item.existing||!characterThemeId&&result.items.some(current=>current.id===item.id));
       const references=new Map((variables.createNew?[]:existingFurniture).filter(item=>item.referenceImage||item.artwork).map(item=>[item.id,{referenceImage:item.referenceImage,artwork:item.artwork}]));
       const preserveReference=(item:RoomItem):RoomItem=>references.has(item.id)&&(isManualFurniture(item)||isTemplateFurniture(item))?{...item,...references.get(item.id)}:item;
       const saved={...result,items:result.items.map(preserveReference),...(result.before?{before:{...result.before,items:result.before.items.map(preserveReference)}}:{}),characterThemeId:result.characterThemeId??characterThemeId,roomPaletteId:result.roomPaletteId??suggestedRoomPaletteId(variables.request,palettePreference(variables.request),characterThemeId),...(!variables.analyzeOnly&&editedItems.length?{editedItems}:{}),...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request.trim()||undefined}:{}),id:result.id};

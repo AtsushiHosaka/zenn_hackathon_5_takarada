@@ -2,12 +2,14 @@ module FurnitureCandidates
   # DB の furniture_details から候補を返す。枠ごとに position 順。theme を渡すとそのテーマの商品だけに絞る (モック用)。
   # ユーザーが選んだ候補 (selected) は先頭に混ぜる。AI が後の指示で外す・入れ替えることはできる
   class Client
+    attr_reader :unavailable_color_slots
     def self.item(detail)
       Item.build(
         id: detail.id, slot: detail.slot, category: detail.category, name: detail.name, price: detail.price,
         shop: detail.shop, url: detail.url, image_url: detail.image_url, color: detail.symbolic_color, size: detail.size,
         metadata: detail.product_metadata.merge("furniture_detail_id" => detail.id, "furniture_id" => detail.furniture_id,
                                         "characters" => detail.furniture.characters.map(&:character_key), "color_materials" => detail.color_materials,
+                                        "retail_family_identity" => detail.retail_family_identity, "retail_variant_available" => detail.retail_variant_available?,
                                         "texture_materials" => detail.detail_textures.to_h { |texture| [ texture.material_key, texture.furniture_texture.texture_key ] })
       )
     end
@@ -20,6 +22,12 @@ module FurnitureCandidates
     def initialize(selected: [], characters: nil)
       @selected = selected.map { |item| item.with(metadata: item.metadata.merge("selected_by_user" => true)) }
       @characters = characters
+      @resolved_selected = {}
+      @unavailable_color_slots = []
+    end
+
+    def resolved_selection(item)
+      @resolved_selected.fetch([ item.id, item.metadata["group_id"] ], item)
     end
 
     def search(slots:, theme: nil, categories: nil, preference: nil, character_theme: nil, prompt: nil, **)
@@ -38,9 +46,25 @@ module FurnitureCandidates
       end
       items = scope.map { |detail| self.class.item(detail) }
       items = items.select { |item| FurnitureCandidates.compatible_character?(item, character_theme) }
-      items = FurnitureCandidates.rank(items, preference:, character_theme:) if preference || character_theme
       color_preference = ColorPreference.new(prompt)
+      items = FurnitureCandidates.rank(items, preference:, character_theme:) if preference || character_theme
       items = color_preference.sort(items).reject { |item| color_preference.rank(item) == 4 }
+      if character_theme
+        # Resolve the color within a proven retail family before comparing furniture.
+        # Never infer a shop family from a shared 3D model or rewrite a SKU's color.
+        selected = selected.filter_map do |item|
+          family = item.metadata["retail_family_identity"]
+          alternatives = family ? items.select { |candidate| candidate.metadata["retail_family_identity"] == family } : [ item ]
+          matching = alternatives.select { |candidate| FurnitureCandidates.theme_color_eligible?(candidate, preference, character_theme) && color_preference.rank(candidate) < 4 }
+          choice = matching.find { |candidate| candidate.id == item.id } || color_preference.sort(FurnitureCandidates.rank(matching, preference:, character_theme:)).first
+          choice = choice&.with(metadata: choice.metadata.merge(item.metadata.slice("group_id", "replaces_object_id", "preferred_position", "preferred_rotation", "target_size")).merge("selected_by_user" => true))
+          @resolved_selected[[ item.id, item.metadata["group_id"] ]] = choice if choice
+          choice
+        end
+        items = items.select { |item| FurnitureCandidates.theme_color_eligible?(item, preference, character_theme) }
+        @unavailable_color_slots |= (slots - [ "floor" ]) - items.map(&:slot)
+        items = items.uniq { |item| item.metadata["retail_family_identity"] || [ "detail", item.id ] }
+      end
       (selected + items).uniq { |item| [ item.metadata["group_id"], item.id ] }.group_by(&:slot)
     end
   end

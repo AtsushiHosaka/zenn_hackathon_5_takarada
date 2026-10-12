@@ -29,11 +29,21 @@ class FurnitureDetailImporter
     textures = FurnitureTexture.all.index_by(&:texture_key)
     FurnitureDetail.transaction do
       keys = rows.each_with_index.map do |row, index|
+        if row["retail_alias_of"].present?
+          canonical = FurnitureDetail.find_by(key: row["retail_alias_of"])
+          unless canonical && canonical.url == row["url"] && canonical.shop == row["shop"]
+            raise InvalidDetails, "details[#{index}].retail_alias_of must refer to the same imported shop article"
+          end
+          next canonical.key
+        end
         furniture = furnitures[row["model_key"]] or raise InvalidDetails, "details[#{index}].model_key #{row["model_key"].inspect} is not imported"
         size = row["size"].to_h
         detail = FurnitureDetail.find_or_initialize_by(key: row["key"])
+        detail.retail_verification_import = row["retail_checked_at"].present?
+        retail = %w[retail_family_key retail_variant_key retail_source_url retail_checked_at retail_availability].to_h { |field| [ field.to_sym, row[field] ] }
         detail.update!(
           furniture:, position: index,
+          **retail,
           **row.slice("name", "category", "slot", "symbolic_color", "color_materials", "color_name", "price", "shop", "url", "image_url", "themes", "material").symbolize_keys,
           width: size["w"], height: size["h"], depth: size["d"]
         )
