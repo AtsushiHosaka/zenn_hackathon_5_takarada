@@ -12,9 +12,11 @@ export function buildCharacterThemeDecor(design: RoomDesign): THREE.Group | unde
   const palette = roomPalette(design.roomPaletteId);
   const accent = palette?.accent ?? theme.accent;
   const secondary = palette?.secondary ?? theme.secondary;
+  let shapeLayer = 0;
   const addShape = (geometry: THREE.BufferGeometry, x: number, y: number, color = accent) => {
     const object = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide, toneMapped: false }));
-    object.position.set(x, y, 0);
+    // Layer overlapping motif pieces toward the room to avoid coplanar depth flicker.
+    object.position.set(x, y, shapeLayer++ * .001);
     group.add(object);
     return object;
   };

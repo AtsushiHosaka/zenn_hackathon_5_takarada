@@ -1,0 +1,47 @@
+{
+  "rendered": 20338,
+  "partialFrames": 31,
+  "intermediateRange": [],
+  "opacities": [
+    1,
+    0.12,
+    0.12,
+    0.12,
+    0.12,
+    0.12,
+    0.12,
+    0.12,
+    0.12,
+    0.12,
+    1
+  ],
+  "artMaterials": [
+    {
+      "name": "poster",
+      "transparent": false,
+      "alphaTest": 0.01,
+      "depthWrite": true
+    },
+    {
+      "name": "stand",
+      "transparent": false,
+      "alphaTest": 0.1,
+      "depthWrite": true
+    }
+  ],
+  "layers": [
+    0,
+    0.001,
+    0.002
+  ],
+  "canvasCount": 1,
+  "failures": [],
+  "camera": [
+    6.6478373995926985,
+    6.754183415657871,
+    7.977404879511246
+  ],
+  "preview": false,
+  "reduced": false,
+  "view": "perspective"
+}

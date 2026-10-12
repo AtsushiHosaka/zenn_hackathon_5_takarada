@@ -13,6 +13,7 @@ import { buildReferenceRoom, usesReferenceRoom } from "./referenceRoomModel";
 import { buildCharacterThemeDecor } from "./characterThemeDecor";
 import { addMirrorSurface, isMirrorCategory } from "./mirrorSurface";
 import { buildMeasuredRoom } from "./roomArchitecture";
+import { createWallCutaway } from "./wallCutaway";
 import { createShellFloorOverlay } from "./shellFloorSurface";
 import { LAYOUT_GRID_STEP } from "./layoutGrid";
 import { applyMaterialOverrides } from "./furnitureMaterials";
@@ -177,9 +178,10 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean, manager?
         const texture = new THREE.TextureLoader(manager).load(item.artwork.dataUrl);
         texture.colorSpace = THREE.SRGBColorSpace;
         const art = new THREE.Mesh(new THREE.PlaneGeometry(stand ? w : w * .96, stand ? h - baseHeight : h * .96), new THREE.MeshBasicMaterial({
-          map: texture, transparent: true, alphaTest: stand ? .1 : 0, side: THREE.DoubleSide, toneMapped: false,
+          map: texture, alphaTest: stand ? .1 : .01, alphaToCoverage: true, side: THREE.DoubleSide, toneMapped: false,
+          polygonOffset: !stand, polygonOffsetFactor: -1, polygonOffsetUnits: -1,
         }));
-        art.position.set(0, (h + baseHeight) / 2, stand ? 0 : d / 2 + .0005);
+        art.position.set(0, (h + baseHeight) / 2, stand ? 0 : d / 2 + .002);
         group.add(art);
       }
       break;
@@ -666,18 +668,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     layoutGrid.userData.reflectionExcluded = true;
     layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel;
     scene.add(layoutGrid);
-    const cutawayWalls: { object: THREE.Object3D; wall: "north" | "east" | "south" | "west" }[] = [];
-    architecture.traverse(object => {
-      if (object.userData.cutawayWall) cutawayWalls.push({ object, wall: object.userData.cutawayWall });
-      else if (object.name === "cutaway-left-wall") cutawayWalls.push({ object, wall: "west" });
-      else if (object.name === "cutaway-back-wall") cutawayWalls.push({ object, wall: "north" });
-    });
-    for (const { object } of cutawayWalls) {
-      object.traverse(child => {
-        if (!(child instanceof THREE.Mesh)) return;
-        for (const surface of Array.isArray(child.material) ? child.material : [child.material]) surface.transparent = true;
-      });
-    }
+    const updateWallCutaway = createWallCutaway(architecture);
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const furniture = referenceRoom?.furniture ?? new Map<string, THREE.Group>();
     const hitTargets = new Map<string, THREE.Group>();
     const markers = new Map<string, THREE.Sprite>();
@@ -1276,8 +1268,11 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     resize();
     const render = () => {
       const cameraChanged = controls.update();
+      const wallFade = proceduralRoomVisible
+        ? updateWallCutaway(camera.position, roomCenter, performance.now(), reducedMotion.matches)
+        : { changed: false, transitioning: false };
       // 一覧の静止した視点は描き直さず、回転・読み込み・リサイズ時に描画する。
-      if (preview && readySent && assetsReady && !cameraChanged && !previewNeedsRender) return;
+      if (preview && readySent && assetsReady && !cameraChanged && !previewNeedsRender && !wallFade.changed && !wallFade.transitioning) return;
       previewNeedsRender = false;
       const markerObjects = loadedRoom && completeRoomModel && !currentBefore ? hitTargets : furniture;
       for (const [id, marker] of markers) {
@@ -1288,24 +1283,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         bounds.getCenter(marker.position);
         marker.position.y = bounds.max.y + 0.14;
       }
-      // Fade the near wall when orbiting behind the room so its contents remain visible.
-      if (proceduralRoomVisible) {
-        for (const { object, wall } of cutawayWalls) {
-          const nearSide = wall === "west" ? camera.position.x < roomCenter.x - 0.3
-            : wall === "east" ? camera.position.x > roomCenter.x + 0.3
-              : wall === "north" ? camera.position.z < roomCenter.z - 0.3
-                : camera.position.z > roomCenter.z + 0.3;
-          object.traverse(child => {
-            if (!(child instanceof THREE.Mesh)) return;
-            for (const surface of Array.isArray(child.material) ? child.material : [child.material]) {
-              surface.opacity = nearSide ? 0.12 : 1;
-              surface.depthWrite = !nearSide;
-            }
-          });
-        }
-      }
       renderer.render(scene, camera);
-      if (assetsReady && !readySent) {
+      if (assetsReady && !readySent && !wallFade.transitioning) {
         readySent = true;
         window.clearTimeout(previewDeadline);
         // 描画した直後でないと、キャンバスの中身は読み出せない。
