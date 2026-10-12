@@ -22,7 +22,7 @@ function ProductDetails({item,originalItems}:{item:RoomItem;originalItems?:RoomI
     {metadata?.size&&<span className="rc-item-shop">商品寸法: 幅{dimensionLabel(metadata.size.w)} × 高さ{dimensionLabel(metadata.size.h)} × 奥行き{dimensionLabel(metadata.size.d)}</span>}
   </>;
 }
-export default function RecommendationPanel({items,originalItems,searchEntryPoints,selectedId,filter,onSelect,onFilter,onClose,onEditLayout}:{items:RoomItem[];originalItems?:RoomItem[];searchEntryPoints?:string[];selectedId:string|null;filter:string;onSelect:(id:string)=>void;onFilter:(filter:string)=>void;onClose:()=>void;onEditLayout?:()=>void}) {
+export default function RecommendationPanel({items,originalItems,selectedId,filter,onSelect,onFilter,onClose,onEditLayout}:{items:RoomItem[];originalItems?:RoomItem[];selectedId:string|null;filter:string;onSelect:(id:string)=>void;onFilter:(filter:string)=>void;onClose:()=>void;onEditLayout?:()=>void}) {
   const listRef = useRef<HTMLUListElement>(null);
   const reduced=useReducedMotion();
   const positions = useRef(new Map<string,number>());
@@ -56,7 +56,6 @@ export default function RecommendationPanel({items,originalItems,searchEntryPoin
     if (row.top < viewport.top || row.bottom > viewport.bottom) motionScrollIntoView(selected);
   }, [selectedId, filter]);
   const total=items.reduce((sum,item)=>sum+(item.price??0),0);
-  const searchSuggestions=[...new Set([...(searchEntryPoints??[]),...items.flatMap(item=>item.productMetadata?.searchEntryPointHtml?[item.productMetadata.searchEntryPointHtml]:[])])];
   return <aside className="rc-panel" aria-label="おすすめアイテム">
     <div className="rc-panel-header"><div className="rc-panel-title"><h2>おすすめアイテム<span>{items.length}</span></h2><button type="button" className="motion-control" aria-label="パネルを閉じる" onClick={onClose}><ReferenceSvg page={5} index={20}/></button></div><div className="rc-panel-total"><span>商品価格の合計</span><strong>{money(total)}</strong><span>{items.length}点</span></div>
       {onEditLayout&&<button type="button" className="rc-secondary" onClick={onEditLayout}>家具を追加・配置を編集</button>}
@@ -66,7 +65,5 @@ export default function RecommendationPanel({items,originalItems,searchEntryPoin
       <span className="rc-item-art"><ProductImage key={item.imageUrl??item.id} item={item}/><span className="rc-item-number">{item.marker??items.indexOf(item)+1}</span></span>
       <span className="rc-item-copy"><span className="rc-item-name clamp2">{item.name}</span><span className="rc-item-shop">{labels.find(([key])=>key===categoryOf(item))?.[1]} · {item.shop??'購入先未登録'}</span><span className="rc-money">{item.price===undefined?'価格未登録':money(item.price)}</span><ProductDetails item={item} originalItems={originalItems}/></span><span className="rc-item-external">{url&&<ReferenceSvg page={5} index={22}/>}</span>
     </>;return <li key={item.id} data-product-id={item.id} style={motionStaggerStyle(index)}>{url?<a href={url} target="_blank" rel="noopener noreferrer" className={`rc-item-link motion-control${selectedId===item.id?' is-selected':''}`} onMouseEnter={()=>onSelect(item.id)} onFocus={()=>onSelect(item.id)} onClick={()=>onSelect(item.id)}>{body}</a>:<button type="button" className={`rc-item-link motion-control${selectedId===item.id?' is-selected':''}`} onFocus={()=>onSelect(item.id)} onClick={()=>onSelect(item.id)} aria-label={`${index+1}. ${item.name}（購入リンク未登録）`}>{body}</button>}</li>;})}</ul>
-    {/* google.com refuses to render inside a frame, so suggestion links open in a new tab. */}
-    {!!searchSuggestions.length&&<div className="rc-panel-note" style={{maxHeight:220,overflowY:"auto"}}><span>Googleの検索候補</span>{searchSuggestions.map((html,index)=><iframe key={html} title={`Googleの検索候補 ${index+1}`} srcDoc={`<base target="_blank">${html}`} sandbox="allow-popups allow-popups-to-escape-sandbox" referrerPolicy="no-referrer" style={{display:'block',width:'100%',height:160,border:0,background:'#fff'}}/>)}</div>}
   </aside>;
 }
