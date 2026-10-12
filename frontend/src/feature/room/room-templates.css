@@ -12,7 +12,7 @@
 .room-template-card-actions {display:flex;gap:8px;margin-top:8px}
 .room-template-grid .rc-primary {width:100%;justify-content:center}
 .room-template-card-actions>* {flex:1;justify-content:center;text-align:center;text-decoration:none}
-.room-template-empty {margin-top:32px;padding:24px;border:1px dashed #6b5c80;border-radius:16px;font-size:14px;line-height:1.8}
+.room-template-default {margin-left:8px;padding:2px 8px;border:1px solid #615176;border-radius:999px;font-size:11px;font-weight:500;color:#c3bbcf;vertical-align:middle}
 .rc-template-actions {display:flex;align-items:center;gap:8px;margin-right:12px}
 .rc-template-actions>* {font-size:12px;padding:8px 10px;text-decoration:none;white-space:nowrap}
 .rc-template-badge {display:inline-block;color:#6A3CD6;font-size:12px;margin-right:8px}

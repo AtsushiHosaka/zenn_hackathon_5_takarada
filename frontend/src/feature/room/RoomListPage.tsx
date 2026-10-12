@@ -106,7 +106,7 @@ export default function RoomListPage() {
       <AccountMenu/>
     </header>
     <main className="room-list-main">
-      <div className="room-list-heading"><h1>マイルーム</h1><Link to="/rooms/new" className="room-list-new motion-control"><span aria-hidden="true">＋</span> 新しいルームを作る</Link></div>
+      <div className="room-list-heading"><h1>マイルーム</h1><Link to="/rooms/new" className="room-list-new motion-control"><span aria-hidden="true">＋</span> 新しい部屋をつくる</Link></div>
       {ready.length > 0 && <RoomHero rooms={ready} snapshot={snapshot}/>}
       {rooms.data.length > 0 && <section className="room-card-section" aria-labelledby="room-card-heading">
         <h2 id="room-card-heading">すべての部屋</h2>
