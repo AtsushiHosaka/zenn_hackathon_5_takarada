@@ -1,0 +1,4 @@
+.rc-theme-tags { min-width: 0; }
+.rc-presets.rc-theme-tags button { max-width: 100%; height: auto; min-height: 32px; padding-top: 6px; padding-bottom: 6px; overflow-wrap: anywhere; }
+.rc-theme-tags button:focus-visible { outline: 3px solid #BBA5EE; outline-offset: 2px; }
+.rc-followup-composer .rc-theme-tags { margin-bottom: 12px; }

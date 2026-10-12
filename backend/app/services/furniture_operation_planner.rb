@@ -1,6 +1,6 @@
 # 追加・交換ごとに候補グループを作る。同じSKUを複数購入しても配置IDは別になる。
 class FurnitureOperationPlanner
-  def self.call(coordination, scene, client:, candidate_limit: 3, preference: nil)
+  def self.call(coordination, scene, client:, candidate_limit: 3, preference: nil, character_theme: nil)
     operations = coordination.furniture_operations.select { |operation| operation["action"] == "replace" }.filter_map do |operation|
       original = scene.fetch("objects").find { |object| object["id"] == operation["object_id"] }
       { category: original["category"], group: "replace:#{original['id']}", original: } if original
@@ -11,8 +11,10 @@ class FurnitureOperationPlanner
     by_category = {}
     operations.flat_map do |operation|
       category = operation[:category]
-      candidates = by_category[category] ||= client.search(prompt: coordination.generation_prompt, theme: nil, slots: [ "floor" ], categories: [ category ], preference:).fetch("floor", [])
-      FurnitureCandidates.spread(candidates.select { |item| item.category == category }, candidate_limit).map do |item|
+      candidates = by_category[category] ||= client.search(prompt: coordination.generation_prompt, theme: nil, slots: [ "floor" ], categories: [ category ], preference:, character_theme:).fetch("floor", [])
+      matching = candidates.select { |item| item.category == category }
+      shortlist = character_theme ? FurnitureCandidates.shortlist(matching, candidate_limit, preference:, character_theme:) : FurnitureCandidates.spread(matching, candidate_limit)
+      shortlist.map do |item|
         original = operation[:original]
         item.with(metadata: item.metadata.merge(
           "group_id" => operation[:group], "replaces_object_id" => original&.fetch("id"),

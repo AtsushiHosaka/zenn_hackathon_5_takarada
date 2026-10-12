@@ -16,6 +16,8 @@ import { buildMeasuredRoom } from "./roomArchitecture";
 import { createShellFloorOverlay } from "./shellFloorSurface";
 import { LAYOUT_GRID_STEP } from "./layoutGrid";
 import { applyMaterialOverrides } from "./furnitureMaterials";
+import { createBedCoverModel } from "./bedCoverModel";
+import { normalizeRoomBedding } from "../../domain/bedding";
 import { canPlaceOnFurniture, furniturePositionInRoom, getFurniturePlacementBounds, isFurnitureSupport, snapFurnitureEditPosition } from './roomBounds';
 
 interface RoomViewerProps {
@@ -154,6 +156,9 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean, manager?
   const dark = "#605747";
   const color = item.color;
   switch (item.category) {
+    case "bed_cover":
+      group.add(createBedCoverModel(item));
+      break;
     case "wall_mirror":
     case "mirror":
       box(group, [w, h, d], [0, h / 2, 0], color, true);
@@ -513,7 +518,7 @@ function DimensionLabel({item}:{item:RoomItem|undefined}) {
 }
 
 export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, view, resetKey, before = false, command, dimensions = false, markers: markersShownProp = true, editing = false, onMoveItem, placementItem = null, onPlaceItem, preview = false, onReady, onSnapshot }: RoomViewerProps) {
-  const design = useMemo<RoomDesign>(() => before && afterDesign.before ? {
+  const design = useMemo<RoomDesign>(() => normalizeRoomBedding(before && afterDesign.before ? {
     ...afterDesign,
     room: afterDesign.before.room,
     items: afterDesign.before.items,
@@ -524,7 +529,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     style: afterDesign.characterThemeId ? "natural" : afterDesign.style,
     modelUrl: undefined,
     modelKind: undefined,
-  } : afterDesign, [afterDesign, before]);
+  } : afterDesign), [afterDesign, before]);
   // A supplied Before snapshot is a separate scene, including removed original
   // furniture. Legacy designs still use the existing visibility-only comparison.
   const legacyBefore = before && !afterDesign.before;
@@ -684,6 +689,14 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       const previous = furniture.get(item.id);
       if (previous) { scene.remove(previous); disposeObject(previous); }
       const group = createFurniture(item, accent, oshi, loadingManager);
+      if (item.category === "bed_cover" && !item.modelUrl && !item.existing && item.materialOverrides && !item.previewColor) {
+        const cloth = group.children[0] as THREE.Mesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>;
+        const originalMaterial = cloth.material;
+        textureCleanups.push(applyMaterialOverrides(group, item.materialOverrides, 1, () => {
+          if (!disposed && textureNotice.current) textureNotice.current.hidden = false;
+        }, loadingManager));
+        originalMaterial.dispose();
+      }
       scene.add(group);
       furniture.set(item.id, group);
     }
@@ -909,9 +922,14 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
           return;
         }
         const scale = Math.min(item.size[0] / modelSize.x, item.size[1] / modelSize.y, item.size[2] / modelSize.z);
-        gltf.scene.scale.setScalar(scale);
+        // A textile follows the declared horizontal footprint; contain fitting
+        // would shrink a wider cover merely because its thickness stays 4 cm.
+        const modelScale = item.category === "bed_cover"
+          ? new THREE.Vector3(item.size[0] / modelSize.x, item.size[1] / modelSize.y, item.size[2] / modelSize.z)
+          : new THREE.Vector3(scale, scale, scale);
+        gltf.scene.scale.copy(modelScale);
         const center = bounds.getCenter(new THREE.Vector3());
-        gltf.scene.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale);
+        gltf.scene.position.set(-center.x * modelScale.x, -bounds.min.y * modelScale.y, -center.z * modelScale.z);
         gltf.scene.traverse((object) => {
           if (!(object instanceof THREE.Mesh)) return;
           object.castShadow = true;
@@ -928,7 +946,8 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         });
         // 選んだ色を、商品の素材・画像の上書きで打ち消さない。
         if (!item.existing && item.materialOverrides && !item.previewColor) {
-          textureCleanups.push(applyMaterialOverrides(gltf.scene, item.materialOverrides, scale, () => {
+          const textureScale: number | readonly [number, number] = item.category === "bed_cover" ? [modelScale.x, modelScale.z] : scale;
+          textureCleanups.push(applyMaterialOverrides(gltf.scene, item.materialOverrides, textureScale, () => {
             if (!disposed && textureNotice.current) textureNotice.current.hidden = false;
           }, loadingManager));
         }

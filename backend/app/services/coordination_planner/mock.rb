@@ -7,22 +7,24 @@ class CoordinationPlanner
       "korean" => { title: "くすみベージュの韓国風ルーム", keywords: %w[韓国 ベージュ くすみ アイボリー ナチュラル] }
     }.freeze
 
-    def initialize(prompt:, user_id: nil, client: nil, previous: nil, slots: SLOT_PRIORITY, **)
+    def initialize(prompt:, user_id: nil, client: nil, previous: nil, slots: SLOT_PRIORITY, preference: nil, character_theme: nil, **)
       @prompt = prompt
       @slots = slots
       @previous = previous
       @user_id = user_id
       @client = client || FurnitureCandidates.client(user_id: user_id)
+      @preference = preference
+      @character_theme = character_theme
     end
 
     def plan
       theme = detect_theme
-      items = @client.search(prompt: @prompt, theme:, slots: @slots)
+      items = @client.search(prompt: @prompt, theme: @character_theme ? nil : theme, slots: @slots, preference: @preference, character_theme: @character_theme)
       Plan.new(
         title: THEMES.fetch(theme)[:title],
         concept: nil,
         note: nil,
-        candidates: @slots.flat_map { |slot| keep_previous_first(items.fetch(slot, [])) },
+        candidates: @slots.flat_map { |slot| @character_theme ? character_choices(items.fetch(slot, []), slot) : keep_previous_first(items.fetch(slot, [])) },
         removed_object_ids: [],
         planned_by: "mock",
         analysis: { "meta" => { "planner" => "mock", "theme" => theme } }
@@ -30,6 +32,16 @@ class CoordinationPlanner
     end
 
     private
+
+    # In the offline demo, large surfaces use ordinary palette furniture and
+    # character goods belong to accent slots. User-selected products stay first.
+    def character_choices(items, slot)
+      selected, automatic = items.partition { |item| item.metadata["selected_by_user"] }
+      ordinary, goods = automatic.partition { |item| Array(item.metadata["characters"]).empty? }
+      ordinary = keep_previous_first(ordinary)
+      goods = keep_previous_first(goods)
+      selected + (%w[display wall_decor desk_top].include?(slot) ? goods + ordinary : ordinary + goods)
+    end
 
     # 追加の指示のときは、前回の商品を各枠の先頭にして選ばれやすくする
     def keep_previous_first(items)

@@ -19,7 +19,9 @@
 ## 対話（カラーとキャラクター）
 - カラーは単色で提案する。雰囲気の文章から、14色（ホワイト、グレー、ベージュ、ブラウン、グリーン、ミント、ブルー、ネイビー、パープル、ピンク、レッド、オレンジ、イエロー、ブラック）のうち4色を色名つきの丸で出す。選ぶまでは先頭の候補を選んだ状態にする。
 - APIには従来どおり`room_palette_id`を送る。各色に60配色のうち1つを割り当てており（`frontend/src/domain/roomPalette.ts`の`roomColors`）、backendの配色カタログと反映方法（壁と床）は変えていない。保存済みの部屋が14色以外の配色を使っている場合は、その配色も候補に残す。
-- キャラクターテーマで新しく選べるのは初音ミクだけ。ほかのテーマは、選択済みの部屋を表示するためにカタログへ残す。
+- キャラクターは雰囲気のテーマタグと同じ場所で選ぶ。別の「キャラクターテーマ」欄と「指定しない」ボタンは置かない。初音ミクと、既存カタログにある他のキャラクターをタグとして表示する。キャラクターは1つ選べ、選んだタグをもう一度押すと解除する。
+
+2026-10-12 user update: replace the separate character-theme section shown in the attached screenshot with theme tag chips, including 初音ミク and the other character choices already supported by the catalogue/API. The chips belong beside the existing atmosphere presets and remain available for later room requests. Selecting a character preserves a typed brief; when the brief is empty, it supplies a short character brief. This supersedes the former Miku-only UI restriction. Source: this chat and `codex-clipboard-b4b5d09b-99c5-478d-a118-c4a3c4374822.png`. Google Docs remain unverified and unmodified because their URL is unset.
 
 ## 部屋の作成（2部構成）
 - 第1部「現在のあなたの部屋を教えてください」: 広さ・形・写真を1画面で聞く。「既存のテンプレートを使う」を押すと保存済みテンプレートが並び、選ぶとその部屋を作って第2部へ進む。
@@ -53,3 +55,5 @@
 - 「新しいルームを作る」を「新しい部屋をつくる」に、作成画面の見出し「新しいルーム」を「新しい部屋」に変えた。「マイルーム」は変えていない。
 - 部屋の画面の上の帯に、全体の流れ「1 今の部屋 → 2 どんな部屋がいい？ → 3 完成」を常に出し、今の段階を濃くする。幅が狭いときは今の段階の名前だけを出す。入力欄の中にあった2段階の表示（今の部屋／作りたい部屋）は、これに置き換えた。テンプレートの編集画面には出さない。
 - 未検証：提案ができた後（3 完成）の表示。
+
+2026-10-12: 初音ミクを選んだときは、部屋の色を未指定ならブルーを提案する。ミント・ホワイト・ブラックも候補に出す。文章に色を指定した場合はその色を優先し、ユーザーが色を選んだ場合は選択を維持する。テーマを切り替えた場合は、前の部屋から引き継いだ色を新しいテーマの色へ替える。保存済みの配色は選択肢として残す。家具の候補を選ぶ方針と検証の範囲は `specs/character-room-themes/spec.md` に記録した。Google Docsには未反映。
