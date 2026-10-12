@@ -389,7 +389,7 @@ RSpec.configure do |config|
               image_url: { type: :string, nullable: true, description: "商品ページに掲載された写真URL", example: "https://www.ikea.com/jp/ja/images/products/teodores-chair-white__0727344_pe735616_s5.jpg" },
               product_metadata: { "$ref" => "#/components/schemas/ProductMetadata" },
               model_url: { type: :string, nullable: true, description: "GLB の URL。null なら category と size から箱などで代わりに描く", example: nil },
-              slot: { type: :string, nullable: true, enum: [ nil, "bed_cover", "curtain", "rug", "wall_decor", "light", "display", "cushion", "desk_top", "floor" ], description: "suggested の置き場所の枠", example: nil },
+              slot: { type: :string, nullable: true, enum: [ nil, *FurnitureCandidates::SLOTS ], description: "suggested の置き場所の枠", example: nil },
               attach_to: { type: :string, nullable: true, description: "付けた先の家具・窓の id", example: nil },
               item_id: { type: :integer, nullable: true, description: "suggested の商品 id (Coordination.items と対応)", example: nil },
               marker: { type: :integer, nullable: true, description: "suggested の番号マーカー (Coordination.items と対応)", example: nil },
@@ -483,7 +483,8 @@ RSpec.configure do |config|
             properties: {
               id: { type: :string, description: "元の家具、この部屋で採用済みの商品、またはmanual-UUID形式の所有家具id", example: "bed-1" },
               label: { type: :string, maxLength: 100, description: "手動で補完した所有家具では必須", example: "今ある椅子" },
-              category: { type: :string, enum: %w[sofa bed desk chair shelf table poster acrylic_stand mirror], description: "手動で補完した所有家具では必須", example: "chair" },
+              category: { type: :string, enum: Coordination::MANUAL_CATEGORIES, description: "手動で補完した所有家具では必須", example: "chair" },
+              attach_to: { type: :string, nullable: true, description: "小物を載せる家具・布団のSceneObject ID。クッション・ブランケットはbed/sofa/bed_coverに対応。nullは支持関係を解除", example: "bed-1" },
               artwork: { "$ref" => "#/components/schemas/ImageArtwork" },
               replacement_furniture_detail_id: { type: :integer, minimum: 1, description: "手動の所有家具を置き換える購入商品 (FurnitureDetail) のID。所有家具のfurniture_detail_idは変更しない", example: 2 },
               furniture_detail_id: { type: :integer, minimum: 1, description: "家具検索結果 (FurnitureDetail) のID。元の家具と同じカテゴリの商品に限り、商品・モデル情報をサーバー側で復元する", example: 1 },

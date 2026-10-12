@@ -32,7 +32,7 @@ class CoordinationPlanner
     }.freeze
 
     SLOT_LABELS = {
-      "bed_cover" => "ベッドカバー", "curtain" => "カーテン", "rug" => "ラグ", "wall_decor" => "壁飾り",
+      "bed_cover" => "ベッドカバー", "blanket" => "ブランケット", "curtain" => "カーテン", "rug" => "ラグ", "wall_decor" => "壁飾り",
       "light" => "照明", "display" => "飾り棚・大きめの飾り", "cushion" => "クッション", "desk_top" => "デスクの上の小物", "floor" => "追加・入れ替え用の大型家具"
     }.freeze
 
@@ -105,9 +105,11 @@ class CoordinationPlanner
     end
 
     def plan
+      color_preference = FurnitureCandidates::ColorPreference.new(@prompt)
       previous_ids = Array(@previous&.items).map { |item| item["item_id"] }
       items = (@client.search(prompt: @prompt, theme: nil, slots: @slots, preference: @preference, character_theme: @character_theme).values.flatten + @additional_candidates)
         .uniq { |item| [ group_id(item), item.id ] }.group_by { |item| group_id(item) }.values.flat_map do |group|
+          group = color_preference.focused_candidates(group)
           if @character_theme
             FurnitureCandidates.shortlist(group, CANDIDATES_PER_GROUP, preference: @preference, character_theme: @character_theme, preferred_ids: previous_ids)
           else
@@ -174,6 +176,7 @@ class CoordinationPlanner
       { id: item.id, group_id: group_id(item), slot: item.slot, category: item.category, name: item.name,
         color: item.color, color_word: FurnitureCandidates::Colors.word(item.color), price: item.price, size: item.size, published_size: metadata["size"], estimated_axes: metadata["estimated_axes"],
         material: metadata["material"], shape: metadata["shape"], color_name: metadata["color_name"], characters: metadata["characters"], selected_by_user: metadata["selected_by_user"], themes: metadata["themes"]&.filter_map { |theme| FurnitureCandidates::THEMES[theme] },
+        official_color: metadata["color_name"], requested_color_rank: FurnitureCandidates::ColorPreference.new(@prompt).rank(item),
         target_size: metadata["target_size"], preferred_position: metadata["preferred_position"] }.compact
     end
 

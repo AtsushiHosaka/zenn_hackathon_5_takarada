@@ -43,16 +43,17 @@ export function getFurniturePlacementBounds(design: RoomDesign): RoomBounds & { 
 type PlacementItem = Pick<RoomItem, 'size' | 'rotation'> & Partial<Pick<RoomItem, 'id' | 'category' | 'supportObjectId' | 'supportSurface'>>;
 
 export function canPlaceOnFurniture(item: PlacementItem) {
+  if (['blanket', 'cushion', 'bed_cover', 'cover'].includes(item.category ?? '')) return item.size.every(value => Number.isFinite(value) && value > 0) && item.size[1] <= .4;
   return Boolean(item.category && !['sofa', 'bed', 'desk', 'chair', 'shelf', 'table', 'storage', 'tv_stand', 'display', 'display_case', 'wall_shelf', 'poster', 'rug', 'mirror', 'wall_mirror'].includes(item.category)
     && item.size.every(value => Number.isFinite(value) && value > 0 && value <= .8));
 }
 
 export function isFurnitureSupport(item: RoomItem) {
-  return ['shelf', 'desk', 'table', 'storage', 'tv_stand', 'display', 'display_case', 'wall_shelf'].includes(item.category);
+  return ['shelf', 'desk', 'table', 'storage', 'tv_stand', 'display', 'display_case', 'wall_shelf', 'bed', 'sofa', 'bed_cover', 'cover'].includes(item.category);
 }
 
-// Every path checks the same captured rendered footprint, including circular
-// tops. No model shape is inferred from the furniture category.
+// Captured rendered footprints include circular tops. API-restored objects
+// instead retain the confirmed height within the supporting object's bounds.
 export function fitsFurnitureSurface(item: PlacementItem, position: RoomItem['position'], surface: NonNullable<RoomItem['supportSurface']>): boolean {
   if (!isFurnitureSupportSurface(surface) || !item.size.every(value => Number.isFinite(value) && value > 0) || !position.every(Number.isFinite) || !Number.isFinite(item.rotation ?? 0)) return false;
   const [a, b, c, d, e, f] = surface.transform;
@@ -69,13 +70,52 @@ export function fitsFurnitureSurface(item: PlacementItem, position: RoomItem['po
 }
 
 export function furnitureSurfaceHeight(item: PlacementItem, position: RoomItem['position'], design: RoomDesign): number | null {
-  const surface = item.supportSurface;
-  if (!canPlaceOnFurniture(item) || !surface || !isFurnitureSupportSurface(surface)) return null;
+  if (!canPlaceOnFurniture(item)) return null;
   const support = design.items.find(candidate => candidate.id === item.supportObjectId && candidate.id !== item.id && isFurnitureSupport(candidate));
+  // The API persists the supporting object and the confirmed height, while a
+  // surface picked in this browser also carries its exact rendered footprint.
+  let surface = item.supportSurface;
+  if (!surface && support) {
+    const angle = (support.rotation ?? 0) * Math.PI / 180;
+    const cosine = Math.cos(angle), sine = Math.sin(angle);
+    surface = {
+      transform: [cosine, -sine, -cosine * support.position[0] + sine * support.position[2], sine, cosine, -sine * support.position[0] - cosine * support.position[2]],
+      bounds: [-support.size[0] / 2, -support.size[2] / 2, support.size[0] / 2, support.size[2] / 2],
+      height: position[1] - item.size[1] / 2,
+      supportPosition: [...support.position], supportSize: [...support.size], supportRotation: support.rotation ?? 0,
+    };
+  }
+  if (!surface || !isFurnitureSupportSurface(surface)) return null;
   if (!support || JSON.stringify([support.position, support.size, support.rotation ?? 0]) !== JSON.stringify([surface.supportPosition, surface.supportSize, surface.supportRotation])) return null;
   const bounds = getFurniturePlacementBounds(design);
-  if (surface.height < support.position[1] - support.size[1] / 2 || surface.height > support.position[1] + support.size[1] / 2 + .001 || surface.height <= bounds.floor + .0001 || surface.height + item.size[1] > bounds.max[1] + 1e-9 || Math.abs(position[1] - item.size[1] / 2 - surface.height) > .001) return null;
+  const clearance = !item.supportSurface && ['bed', 'sofa'].includes(support.category) ? .05 : .001;
+  if (surface.height < support.position[1] - support.size[1] / 2 || surface.height > support.position[1] + support.size[1] / 2 + clearance || surface.height <= bounds.floor + .0001 || surface.height + item.size[1] > bounds.max[1] + 1e-9 || Math.abs(position[1] - item.size[1] / 2 - surface.height) > .001) return null;
+  // A duvet intentionally covers more than the bed's footprint. Captured
+  // browser surfaces still require an exact fit when placing a new object.
+  if (!item.supportSurface && ['bed_cover', 'cover'].includes(item.category ?? '') && support.category === 'bed') return surface.height;
   return fitsFurnitureSurface(item, position, surface) ? surface.height : null;
+}
+
+export function followFurnitureSupport(item: RoomItem, previousSupport: RoomItem, support: RoomItem): RoomItem {
+  const delta = ((support.rotation ?? 0) - (previousSupport.rotation ?? 0)) * Math.PI / 180;
+  const cosine = Math.cos(delta), sine = Math.sin(delta);
+  const x = item.position[0] - previousSupport.position[0], z = item.position[2] - previousSupport.position[2];
+  const heightDelta = support.position[1] - previousSupport.position[1];
+  let surface = item.supportSurface;
+  if (surface) {
+    const [a, b, c, d, e, f] = surface.transform;
+    const na = a * cosine + b * sine, nb = -a * sine + b * cosine;
+    const nd = d * cosine + e * sine, ne = -d * sine + e * cosine;
+    surface = { ...surface,
+      transform: [na, nb, c + a * previousSupport.position[0] + b * previousSupport.position[2] - na * support.position[0] - nb * support.position[2], nd, ne, f + d * previousSupport.position[0] + e * previousSupport.position[2] - nd * support.position[0] - ne * support.position[2]],
+      height: surface.height + heightDelta,
+      supportPosition: [...support.position], supportSize: [...support.size], supportRotation: support.rotation ?? 0,
+    };
+  }
+  return { ...item, position: [support.position[0] + cosine * x + sine * z, item.position[1] + heightDelta, support.position[2] - sine * x + cosine * z],
+    rotation: ((item.rotation ?? 0) + (support.rotation ?? 0) - (previousSupport.rotation ?? 0) + 360) % 360,
+    supportSurface: surface,
+  };
 }
 
 export function furniturePositionInRoom(item: PlacementItem, position: RoomItem['position'], design: RoomDesign, axes: readonly (0 | 2)[] = [0, 2]): RoomItem['position'] | null {

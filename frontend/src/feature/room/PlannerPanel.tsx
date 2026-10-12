@@ -73,6 +73,8 @@ function RotateIcon({ clockwise = false }: { clockwise?: boolean }) {
 
 function FurnitureIcon({ category }: { category: ManualFurnitureCategory }) {
   const paths: Record<ManualFurnitureCategory, string> = {
+    blanket: 'M4 5h16v16H4V5m0 4h16M7 21v3m5-3v3m5-3v3',
+    cushion: 'M5 6Q12 3 19 6Q22 13 19 20Q12 23 5 20Q2 13 5 6Z',
     mirror: 'M5 2h14v21H5V2m3 3h8v15H8V5m1 12 5-8m-5 3 3-5',
     sofa: 'M5 13V7h14v6M3 12h4v7h10v-7h4v9H3v-9M6 21v2m12-2v2M7 16h10',
     bed: 'M3 21V5m18 16V10H3m0 7h18M6 7h5v3H6V7m15 10v4',
@@ -162,6 +164,7 @@ function FurniturePalette({ design, disabled, hint, onAddItem, onDragItem, onVie
     </fieldset>
     {inputError && !disabled && <p className="rc-planner-input-error" role="status">{inputError}</p>}
     {category === 'mirror' && <p className="rc-planner-note">鏡は正面の部屋を反射します。反射したい方向へ回転してください。</p>}
+    {(category === 'blanket' || category === 'cushion') && <p className="rc-planner-note">上面表示でベッドの布団やソファの座面へドラッグして追加できます。面に収まる寸法に調整してください。</p>}
     <button className="rc-furniture-add motion-control" type="button" disabled={disabled || !valid} onClick={() => onAddItem(createFurnitureItem(category, size))}>＋ 部屋の中央に追加</button>
     </>}
     {hint && <p className="rc-planner-warning" role="status">{hint}</p>}

@@ -955,6 +955,7 @@ components:
           type: string
           enum:
           - bed_cover
+          - blanket
           - curtain
           - rug
           - wall_decor
@@ -1118,6 +1119,7 @@ components:
               type: string
               enum:
               - bed_cover
+              - blanket
               - curtain
               - rug
               - wall_decor
@@ -1842,6 +1844,7 @@ components:
           enum:
           -
           - bed_cover
+          - blanket
           - curtain
           - rug
           - wall_decor
@@ -2099,8 +2102,15 @@ components:
           - poster
           - acrylic_stand
           - mirror
+          - cushion
+          - blanket
           description: 手動で補完した所有家具では必須
           example: chair
+        attach_to:
+          type: string
+          nullable: true
+          description: 小物を載せる家具・布団のSceneObject ID。クッション・ブランケットはbed/sofa/bed_coverに対応。nullは支持関係を解除
+          example: bed-1
         artwork:
           "$ref": "#/components/schemas/ImageArtwork"
         replacement_furniture_detail_id:
@@ -2200,6 +2210,7 @@ components:
           - bed_cover
           - curtain
           - rug
+          - blanket
           - cushion
           - floor_lamp
           - desk_lamp
@@ -2419,6 +2430,7 @@ components:
           - bed_cover
           - curtain
           - rug
+          - blanket
           - cushion
           - floor_lamp
           - desk_lamp
