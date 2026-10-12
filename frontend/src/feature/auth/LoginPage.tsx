@@ -2,11 +2,9 @@ import { useRef, useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation } from 'react-router';
 import { useLogin, useSession, useSignup } from '../../core/session';
 import { appConfig } from '../../core/config';
-import { loadConnection } from '../../core/connection';
 import ErrorText from '../shared/ErrorText';
 import { useMotionDialog } from '../shared/useMotionDialog';
 import ReferenceSvg from '../room/ReferenceSvg';
-import ConnectionSwitch from '../shared/ConnectionSwitch';
 import './auth-reference.css';
 
 function AuthHero({ signup }: { signup: boolean }) {
@@ -18,7 +16,7 @@ function AuthHero({ signup }: { signup: boolean }) {
     </div>
     <div className={`reference-auth-illustration${signup ? ' reference-auth-illustration-signup' : ''}`}>
       <ReferenceSvg page={page} index={1} />
-      <div className="reference-auth-prompt">{signup ? 'ボタニカルにしたい' : '紫色の推し活ルームにしたい'}</div>
+      <div className="reference-auth-prompt">{signup ? 'ボタニカルにしたい' : '初音ミクの水色推し活ルームにしたい'}</div>
       {!signup && <div className="reference-auth-item">
         <div className="reference-auth-item-image"><ReferenceSvg page={0} index={2} /></div>
         <div className="reference-auth-item-copy"><span>LEDテープライト 5m</span><span>¥2,980 · Shop A</span></div>
@@ -40,8 +38,7 @@ export default function LoginPage() {
   const from: unknown = location.state?.from;
   const destination = typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') && !/^\/(login|signup)([/?#]|$)/.test(from) ? from : '/rooms/new';
   const isSignup = mode === 'signup';
-  const isDummy = loadConnection() === 'dummy';
-  const signupPaused = isSignup && !isDummy && (!appConfig.legal.termsUrl || !appConfig.legal.privacyUrl);
+  const signupPaused = isSignup && (!appConfig.legal.termsUrl || !appConfig.legal.privacyUrl);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -76,11 +73,9 @@ export default function LoginPage() {
     <AuthHero signup={isSignup} />
     <section className="reference-auth-form-section">
       <div className="reference-auth-form-container motion-enter">
-        <ConnectionSwitch />
         {session.status === 'loading' && <p className="motion-fade" role="status">ログイン状態を確認しています…</p>}
         {session.status === 'error' && <div><ErrorText error={session.error} /><button className="reference-auth-secondary motion-control" type="button" onClick={session.retry}>ログイン状態を再確認</button></div>}
         <div className="reference-auth-heading"><h1>{isSignup ? 'アカウントを作成' : 'おかえりなさい'}</h1></div>
-        {isSignup && isDummy && <p role="status" className="reference-auth-hint motion-fade">ダミーモードのデモ登録です。</p>}
         {signupPaused && <p role="alert" className="reference-auth-error motion-fade">利用規約とプライバシーポリシーを公開するまで、新規登録を停止しています。</p>}
         <form className="reference-auth-form" onSubmit={submit} aria-busy={pending}>
           {isSignup && <div className="reference-auth-field"><label htmlFor="su-name">ニックネーム</label><input className="motion-field" id="su-name" type="text" autoComplete="nickname" placeholder="ルームに表示される名前" value={name} onChange={(event) => { setName(event.target.value); setValidation(null); signup.reset(); }} disabled={pending || signupPaused} required maxLength={50} /></div>}
@@ -90,7 +85,7 @@ export default function LoginPage() {
             <div className="reference-auth-password"><input className="motion-field" id={`${id}-password`} type={showPassword ? 'text' : 'password'} autoComplete={isSignup ? 'new-password' : 'current-password'} placeholder="パスワード" aria-describedby={isSignup ? 'su-password-hint' : undefined} value={password} onChange={(event) => { setPassword(event.target.value); resetAuth(); }} disabled={pending || signupPaused} minLength={isSignup ? 8 : undefined} maxLength={isSignup ? 72 : undefined} required /><button className="motion-control" type="button" aria-label={showPassword ? 'パスワードを隠す' : 'パスワードを表示'} aria-pressed={showPassword} onClick={() => setShowPassword((value) => !value)}><ReferenceSvg page={isSignup ? 1 : 0} index={isSignup ? 2 : 4} /></button></div>
             {isSignup && <span id="su-password-hint" className="reference-auth-hint">8文字以上、半角英数字なら72文字以内で入力してください</span>}
           </div>
-          {isSignup && !isDummy && !signupPaused && <label className="reference-auth-terms" htmlFor="su-terms"><input className="motion-field" id="su-terms" type="checkbox" required /><span>{legalLink('terms')}と{legalLink('privacy')}に同意します</span></label>}
+          {isSignup && !signupPaused && <label className="reference-auth-terms" htmlFor="su-terms"><input className="motion-field" id="su-terms" type="checkbox" required /><span>{legalLink('terms')}と{legalLink('privacy')}に同意します</span></label>}
           {validation && <p key={validation} role="alert" className="reference-auth-error motion-fade">{validation}</p>}
           {error && <ErrorText error={error} />}
           <button className="reference-auth-primary motion-control" type="submit" disabled={pending || session.status === 'loading' || signupPaused}>{pending ? '送信しています…' : isSignup ? '登録してはじめる' : 'ログイン'}</button>

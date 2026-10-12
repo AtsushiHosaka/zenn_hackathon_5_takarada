@@ -5,6 +5,7 @@
 # プロフィール。認証情報は持たない
 create_table "users", force: :cascade do |t|
   t.string "name", null: false
+  t.boolean "admin", null: false, default: false # 家具・商品の管理画面 (/admin) を使えるか。rails admin:grant[メールアドレス] で付ける。API の応答には出さない
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
 end
@@ -44,7 +45,6 @@ end
 create_table "coordinations", force: :cascade do |t|
   t.references "room", null: false, foreign_key: true
   t.text "prompt", null: false
-  t.integer "budget"
   t.jsonb "kept_object_ids", null: false, default: []
   t.jsonb "edited_objects", null: false, default: []
   t.jsonb "furniture_operations", null: false, default: []
@@ -65,7 +65,7 @@ create_table "coordinations", force: :cascade do |t|
 end
 
 # 家具。detail (色・寸法・購入リンク) が指す。3D モデルは furniture_3d_models (1 : 1)。
-# db/furnitures.json から rails furniture:import で入れる
+# DB が正で、管理 API (PUT /api/v1/admin/furniture_models/:id) で登録・更新する。db/furnitures.json は空の DB に入れる初期データ (rails furniture:import)
 create_table "furnitures", force: :cascade do |t|
   t.string "name", null: false # 表示名 (例: 2人掛けソファ)
   t.string "category", null: false # 家具の種類 (sofa, chair, rug など)。推し活グッズはグッズ種別 (acrylic_stand など、config/goods_categories.json)
@@ -88,6 +88,7 @@ create_table "furniture_3d_models", force: :cascade do |t|
   t.bigint "byte_size", null: false # GLB のバイト数
   t.string "sha256", null: false # GLB のハッシュ。ファイルとの照合用
   t.jsonb "color_material_keys", null: false, default: [] # 色が分かれている部位の名前 (GLB の素材名。例: ["tint", "wood"])
+  t.jsonb "estimated_axes", null: false, default: [] # このモデルを使う商品の寸法のうち、公開されておらず推定した辺 (例: ["h"])。それ以外の辺は公開されている寸法
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
 
@@ -98,7 +99,7 @@ create_table "furniture_3d_models", force: :cascade do |t|
 end
 
 # 家具の色・寸法・購入リンク 1 つ (家具 1 : 多)。3D は家具のモデルを部位ごとに color_materials で塗る。価格はリンク先の参考価格 (税込)。
-# db/furniture_details.json から rails furniture_detail:import で入れる
+# DB が正で、管理画面 (/admin) で編集する。db/furniture_details.json は空の DB に入れる初期データ (rails furniture_detail:import)
 create_table "furniture_details", force: :cascade do |t|
   t.string "key", null: false
   t.references "furniture", null: false, foreign_key: true
@@ -111,14 +112,14 @@ create_table "furniture_details", force: :cascade do |t|
   t.decimal "width", precision: 10, scale: 6, null: false
   t.decimal "height", precision: 10, scale: 6, null: false
   t.decimal "depth", precision: 10, scale: 6, null: false
+  t.string "material" # 主な素材 (例: 綿、スチール)
   t.integer "price", null: false
   t.string "shop", null: false
   t.string "url", null: false
   t.string "image_url"
   t.jsonb "themes", null: false, default: []
-  t.jsonb "metadata", null: false, default: {} # 出典・推定した寸法の軸など
   t.integer "position", null: false, default: 0 # 候補の並び順 (小さいほど先)。AI は枠ごとに先頭から一定数だけ見る
-  t.datetime "checked_at"
+  t.boolean "enabled", null: false, default: true # false なら提案・検索に出さない (管理画面の「非表示」)
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
 
@@ -126,6 +127,24 @@ create_table "furniture_details", force: :cascade do |t|
   t.index [ "slot", "position" ]
   t.check_constraint "price > 0", name: "furniture_details_positive_price"
   t.check_constraint "width > 0::numeric AND height > 0::numeric AND depth > 0::numeric", name: "furniture_details_positive_dimensions"
+end
+
+# AI に 3D モデルを作らせた記録 (管理画面の「3Dモデルを作る」)。1 行 = 1 回の生成。
+# 生成はデータベースに触れない専用のジョブが行い、結果 (result.json・GLB・確認用の画像) を MODEL_BUILDS_BUCKET の generations/<id>/ に置く。
+# 採用すると GLB を公開バケットへ複製し、家具と 3D モデルを作って、その商品に割り当てる
+create_table "furniture_model_generations", force: :cascade do |t|
+  t.references "furniture_detail", null: false, foreign_key: { on_delete: :cascade } # もとにした商品
+  t.references "user", null: false, foreign_key: true # 依頼した管理者
+  t.string "model_key", null: false # 作るモデルの ID (ai_<商品ID>_<乱数>)。採用後は furniture_3d_models.model_key になる
+  t.string "status", null: false, default: "running" # running: 生成中 / succeeded: 検査に合格し採用待ち / failed: 失敗 / adopted: 採用した / rejected: 不採用にした
+  t.jsonb "request", null: false, default: {} # ジョブへ渡した内容 (商品名・種類・寸法・色・素材・画像の URL)
+  t.jsonb "result", null: false, default: {} # ジョブの結果 (検査の一覧・三角形数など・AI の呼び出し回数と時間)
+  t.text "error_message"
+  t.datetime "finished_at"
+  t.datetime "created_at", null: false
+  t.datetime "updated_at", null: false
+
+  t.index [ "model_key" ], unique: true
 end
 
 # 模様 (質感の画像)。静的に用意し、db/furniture_textures.json から rails furniture_texture:import で入れる
@@ -186,7 +205,7 @@ create_table "characters", force: :cascade do |t|
   t.index [ "character_key" ], unique: true
 end
 
-# キャラクターと、そのキャラクターのグッズである家具 (多対多)。db/furnitures.json の characters から rails furniture:import で作る
+# キャラクターと、そのキャラクターのグッズである家具 (多対多)。3D モデルの登録・取り込み (characters) で作る
 create_table "character_goods", force: :cascade do |t|
   t.references "character", null: false, foreign_key: true
   t.references "furniture", null: false, foreign_key: true

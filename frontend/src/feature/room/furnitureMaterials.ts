@@ -1,11 +1,11 @@
 import * as THREE from "three";
 import type { MaterialOverrides } from "../../domain/room";
 
-/** GLBの1UV=1mを、contain表示の等方スケールに合わせて補正する。 */
+/** 1UV=1mの素材を表示倍率に合わせる。水平な布ではU=X、V=Zの倍率を渡す。 */
 export function applyMaterialOverrides(
   root: THREE.Object3D,
   overrides: MaterialOverrides,
-  modelScale: number,
+  modelScale: number | readonly [number, number],
   onFailure: () => void,
   manager?: THREE.LoadingManager,
 ): () => void {
@@ -35,8 +35,9 @@ export function applyMaterialOverrides(
           loaded.colorSpace = THREE.SRGBColorSpace;
           loaded.wrapS = THREE.RepeatWrapping;
           loaded.wrapT = THREE.RepeatWrapping;
-          const repeat = modelScale / (override.tileSizeM ?? 0.5);
-          loaded.repeat.set(repeat, repeat);
+          const [scaleU, scaleV] = typeof modelScale === "number" ? [modelScale, modelScale] : modelScale;
+          const tileSize = override.tileSizeM ?? 0.5;
+          loaded.repeat.set(scaleU / tileSize, scaleV / tileSize);
           loaded.anisotropy = 4;
           // glTFのUV方向に合わせる。
           loaded.flipY = false;

@@ -101,6 +101,183 @@ RSpec.configure do |config|
             },
             required: %w[error]
           },
+          Forbidden: {
+            type: :object,
+            properties: {
+              error: { type: :string, example: "管理者だけが使えます" }
+            },
+            required: %w[error]
+          },
+          AdminFurnitureDetail: {
+            type: :object,
+            description: "管理画面用の商品 (家具の色・寸法・購入リンク)。非表示のものも含む",
+            properties: {
+              id: { type: :integer, minimum: 1, example: 1 },
+              key: { type: :string, description: "安定 ID。初期データ (db/furniture_details.json) の key。管理画面で足した商品は admin:<uuid>", example: "static:101" },
+              name: { type: :string, example: "SANDSBERG サンドスベリ チェア - ホワイト" },
+              category: { type: :string, example: "chair" },
+              slot: { type: :string, enum: FurnitureCandidates::SLOTS, description: "置き場所の枠", example: "floor" },
+              model_key: { type: :string, nullable: true, description: "使う 3D モデルの ID", example: "chair_dining" },
+              symbolic_color: { type: :string, description: "代表色", example: "#f2efe8" },
+              color_materials: { type: :object, additionalProperties: { type: :string, pattern: "^#[0-9a-fA-F]{6}$" }, description: "部位ごとの色。キーはモデルの color_material_keys", example: { "tint" => "#f2efe8" } },
+              texture_materials: { type: :object, additionalProperties: { type: :string }, description: "部位ごとの模様 (texture_key)", example: {} },
+              color_name: { type: :string, nullable: true, example: "ホワイト" },
+              size: { "$ref" => "#/components/schemas/Size" },
+              material: { type: :string, nullable: true, description: "主な素材", example: "スチール" },
+              price: { type: :integer, minimum: 1, description: "リンク先の参考価格 (税込)", example: 2000 },
+              shop: { type: :string, example: "IKEA" },
+              url: { type: :string, description: "購入リンク", example: "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/" },
+              image_url: { type: :string, nullable: true, description: "商品画像", example: nil },
+              themes: { type: :array, items: { type: :string, enum: FurnitureCandidates::THEMES.keys }, description: "雰囲気のタグ", example: %w[nordic simple] },
+              position: { type: :integer, description: "候補の並び順 (小さいほど先)", example: 0 },
+              enabled: { type: :boolean, description: "false なら提案・検索に出さない", example: true }
+            },
+            required: %w[id key name category slot model_key symbolic_color color_materials texture_materials color_name size material price shop url image_url themes position enabled]
+          },
+          AdminFurnitureDetailList: {
+            type: :object,
+            properties: {
+              details: { type: :array, items: { "$ref" => "#/components/schemas/AdminFurnitureDetail" } },
+              slots: { type: :array, items: { type: :string }, description: "選べる置き場所の枠" },
+              categories: { type: :array, items: { type: :string }, description: "家具検索で使う家具の種類" },
+              themes: { type: :array, description: "選べる雰囲気のタグ", items: { type: :object, properties: { id: { type: :string, example: "nordic" }, name: { type: :string, example: "北欧" } }, required: %w[id name] } }
+            },
+            required: %w[details slots categories themes]
+          },
+          AdminFurnitureDetailInput: {
+            type: :object,
+            properties: {
+              furniture_detail: {
+                type: :object,
+                description: "作成では name, category, slot, model_key, symbolic_color, color_materials, size, price, shop, url が必須。更新では変える項目だけ",
+                properties: {
+                  name: { type: :string, example: "SANDSBERG サンドスベリ チェア - ホワイト" },
+                  category: { type: :string, example: "chair" },
+                  slot: { type: :string, enum: FurnitureCandidates::SLOTS, example: "floor" },
+                  model_key: { type: :string, example: "chair_dining" },
+                  symbolic_color: { type: :string, pattern: "^#[0-9a-fA-F]{6}$", example: "#f2efe8" },
+                  color_materials: { type: :object, additionalProperties: { type: :string, pattern: "^#[0-9a-fA-F]{6}$" }, example: { "tint" => "#f2efe8" } },
+                  color_name: { type: :string, nullable: true, example: "ホワイト" },
+                  size: { "$ref" => "#/components/schemas/Size" },
+                  material: { type: :string, nullable: true, example: "スチール" },
+                  price: { type: :integer, minimum: 1, example: 2000 },
+                  shop: { type: :string, example: "IKEA" },
+                  url: { type: :string, example: "https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/" },
+                  image_url: { type: :string, nullable: true, example: nil },
+                  themes: { type: :array, items: { type: :string, enum: FurnitureCandidates::THEMES.keys }, description: "雰囲気のタグ", example: %w[nordic simple] },
+                  position: { type: :integer, example: 0 },
+                  enabled: { type: :boolean, example: true }
+                }
+              }
+            },
+            required: %w[furniture_detail]
+          },
+          AdminFurnitureDetailExport: {
+            type: :object,
+            description: "db/furniture_details.json と同じ形。非表示の商品は含まない",
+            properties: {
+              details: { type: :array, items: { type: :object, additionalProperties: true } }
+            },
+            required: %w[details]
+          },
+          AdminFurnitureModel: {
+            type: :object,
+            description: "管理画面用の 3D モデル。無効なものも含む",
+            properties: {
+              id: { type: :string, description: "モデルの安定 ID (GLB ファイル名から拡張子を除いた値)", example: "chair_dining" },
+              name: { type: :string, example: "ダイニングチェア" },
+              category: { type: :string, example: "chair" },
+              shape: { type: :string, example: "chair_dining" },
+              variant: { type: :string, nullable: true, example: nil },
+              size: { "$ref" => "#/components/schemas/Size" },
+              color_material_keys: { type: :array, items: { type: :string }, description: "色が分かれている部位の名前", example: [ "tint", "wood" ] },
+              estimated_axes: { type: :array, items: { type: :string, enum: Furniture3DModel::SIZE_AXES }, description: "このモデルを使う商品の寸法のうち、公開されておらず推定した辺", example: [] },
+              object_key: { type: :string, description: "バケット内の GLB のパス。モデル ID から決まる", example: "models/furniture/v1/chair_dining.glb" },
+              model_url: { type: :string, nullable: true, example: nil },
+              enabled: { type: :boolean, description: "false なら API・提案から外す", example: true },
+              details_count: { type: :integer, minimum: 0, description: "このモデルを使っている商品の数", example: 2 }
+            },
+            required: %w[id name category shape variant size color_material_keys estimated_axes object_key model_url enabled details_count]
+          },
+          AdminModelGeneration: {
+            type: :object,
+            description: "AI による 3D モデルの生成 1 回分。running のあいだは数秒おきに取得し直す",
+            properties: {
+              id: { type: :integer, minimum: 1, example: 1 },
+              furniture_detail_id: { type: :integer, minimum: 1, description: "もとにした商品", example: 39 },
+              model_key: { type: :string, description: "作るモデルの ID。採用すると 3D モデルの ID になる", example: "ai_39_1a2b3c4d" },
+              status: { type: :string, enum: FurnitureModelGeneration::STATUSES, description: "running: 生成中 / succeeded: 検査に合格し採用待ち / failed: 失敗 / adopted: 採用した / rejected: 不採用にした", example: "succeeded" },
+              error_message: { type: :string, nullable: true, example: nil },
+              notes: { type: :string, nullable: true, description: "AI が書いた、形の捉え方のメモ", example: "扉と取っ手を箱で表現" },
+              checks: {
+                type: :array, description: "検査の一覧",
+                items: { type: :object, properties: { name: { type: :string, example: "connected" }, ok: { type: :boolean, example: true }, detail: { type: :string, example: "すべての部品がつながっています" } }, required: %w[name ok detail] }
+              },
+              stats: {
+                type: :object, nullable: true, description: "組み立てられたときだけ入る",
+                properties: {
+                  triangles: { type: :integer, example: 860 }, materials: { type: :array, items: { type: :string }, example: %w[tint metal] },
+                  bytes: { type: :integer, example: 33_212 }, sha256: { type: :string }, size: { "$ref" => "#/components/schemas/Size" }
+                }
+              },
+              ai: {
+                type: :object, nullable: true,
+                properties: {
+                  model: { type: :string, example: "gemini-3.1-pro-preview" }, calls: { type: :integer, example: 1 }, seconds: { type: :integer, example: 95 },
+                  input_tokens: { type: :integer, example: 23_563 }, output_tokens: { type: :integer, example: 10_965 }
+                }
+              },
+              files: { type: :array, items: { type: :string, enum: FurnitureModelGeneration::FILES.keys }, description: "取得できるファイル名 (files/{name})", example: %w[front.png side.png model.glb] },
+              created_at: { type: :string, format: "date-time" },
+              finished_at: { type: :string, format: "date-time", nullable: true }
+            },
+            required: %w[id furniture_detail_id model_key status error_message notes checks stats ai files created_at finished_at]
+          },
+          AdminFurnitureModelInput: {
+            type: :object,
+            properties: {
+              furniture_model: {
+                type: :object,
+                properties: { enabled: { type: :boolean, example: false } },
+                required: %w[enabled]
+              }
+            },
+            required: %w[furniture_model]
+          },
+          AdminFurnitureModelUpsert: {
+            type: :object,
+            description: "3D モデルの登録・更新。GLB は先に公開バケットの models/furniture/v1/<id>.glb へ置く。db/furnitures.json の models[] から id・format・object_key を除いた形",
+            properties: {
+              furniture_model: {
+                type: :object,
+                properties: {
+                  name: { type: :string, example: "クッション" },
+                  category: { type: :string, example: "cushion" },
+                  shape: { type: :string, example: "cushion" },
+                  variant: { type: :string, nullable: true, example: nil },
+                  size: { type: :array, items: { type: :number }, minItems: 3, maxItems: 3, description: "[幅, 高さ, 奥行き] (m)", example: [ 0.45, 0.15, 0.45 ] },
+                  triangles: { type: :integer, minimum: 0, example: 2496 },
+                  bytes: { type: :integer, minimum: 1, description: "GLB のバイト数", example: 62864 },
+                  sha256: { type: :string, description: "GLB の SHA256 (小文字 16 進)", example: "74851bb7a3d46ca993470a9ac371d89e013fa329f472519a4a0e09bab7172dfe" },
+                  color_material_keys: { type: :array, items: { type: :string }, example: [ "tint" ] },
+                  characters: { type: :array, items: { type: :string }, description: "推し活グッズのキャラクター (db/characters.json のキー)", example: [] },
+                  estimated_axes: { type: :array, items: { type: :string, enum: Furniture3DModel::SIZE_AXES }, description: "このモデルを使う商品の寸法のうち推定した辺。省略すると今の値のまま (新規は空)", example: [] }
+                },
+                required: %w[name category shape size triangles bytes sha256 color_material_keys]
+              }
+            },
+            required: %w[furniture_model]
+          },
+          AdminFurnitureModelExport: {
+            type: :object,
+            description: "db/furnitures.json と同じ形。無効な家具も含む",
+            properties: {
+              unit: { type: :string, example: "meter" },
+              axes: { type: :string, example: "+Y up, +Z front, origin bottom center" },
+              models: { type: :array, items: { type: :object, additionalProperties: true } }
+            },
+            required: %w[unit axes models]
+          },
           NotFound: {
             type: :object,
             properties: {
@@ -339,6 +516,53 @@ RSpec.configure do |config|
             },
             required: %w[query]
           },
+          FurnitureReviewItem: {
+            type: :object,
+            description: "部屋に置いた家具1つ。sizeはメートル",
+            properties: {
+              name: { type: :string, minLength: 1, maxLength: 100, example: "2人掛けソファ グレー" },
+              category: { type: :string, example: "sofa" },
+              color: { type: :string, pattern: "^#[0-9a-fA-F]{6}$", example: "#8a8f98" },
+              size: { "$ref" => "#/components/schemas/Size" },
+              existing: { type: :boolean, description: "今持っている家具か", example: false },
+              on_floor: { type: :boolean, description: "床に直接置いているか。家具の上や壁のものはfalse (床の面積に数えない)。省略時はtrue", example: true },
+              furniture_detail_id: { type: :integer, nullable: true, description: "登録された商品のID。あれば商品写真をAIに見せる (対象の家具だけ)", example: 12 }
+            },
+            required: %w[name category color size]
+          },
+          FurnitureReviewInput: {
+            type: :object,
+            description: "今の配置 (保存前の入れ替えを含む)。結果は保存しない",
+            properties: {
+              target: { "$ref" => "#/components/schemas/FurnitureReviewItem" },
+              others: { type: :array, maxItems: 100, description: "対象以外の家具", items: { "$ref" => "#/components/schemas/FurnitureReviewItem" } },
+              room: {
+                type: :object,
+                properties: {
+                  width: { type: :number, description: "幅 (メートル)", example: 2.7 },
+                  depth: { type: :number, description: "奥行き (メートル)", example: 3.6 },
+                  wall_color: { type: :string, nullable: true, example: "#f4f1ea" },
+                  floor_color: { type: :string, nullable: true, example: "#d9bf99" }
+                },
+                required: %w[width depth]
+              },
+              prompt: { type: :string, maxLength: 500, description: "どんな部屋にしたいか", example: "紫色の推し活ルームにしたい" }
+            },
+            required: %w[target room]
+          },
+          FurnitureReview: {
+            type: :object,
+            properties: {
+              verdict: { type: :string, enum: FurnitureReview::VERDICTS, description: "good: よく合う / fair: 気になる点がある / poor: 合わない", example: "fair" },
+              summary: { type: :string, example: "色は合いますが、少し大きめです。" },
+              color: { type: :string, example: "床より明るいグレーで、輪郭がはっきり見えます。" },
+              size: { type: :string, example: "床の約18%を占め、歩く場所は残ります。" },
+              mood: { type: :string, example: "落ち着いた色で、紫の小物を引き立てます。" },
+              suggestion: { type: :string, description: "直す点が無ければ空文字", example: "クッションを紫にすると希望に近づきます。" },
+              reviewed_by: { type: :string, enum: %w[gemini mock], description: "mockはAIにつながっていないときの、色と大きさだけからの答え", example: "gemini" }
+            },
+            required: %w[verdict summary color size mood suggestion reviewed_by]
+          },
           FurnitureSearchResult: {
             type: :object,
             properties: {
@@ -469,8 +693,7 @@ RSpec.configure do |config|
                 properties: {
                   room_palette_id: { type: :string, enum: RoomPalette::CATALOGUE.keys, description: "部屋のカラーテーマ。省略時は従来の配色", example: "warm-ivory" },
                   character_theme_id: { type: :string, enum: CharacterRoomTheme::CATALOGUE.keys, description: "任意のキャラクターテーマ。画像や公式商品を保証しない", example: "hatsune-miku" },
-                  prompt: { type: :string, example: "紫色の推し活ルームにしたい" },
-                  budget: { type: :integer, nullable: true, description: "追加・入れ替え商品の予算 (円・送料別)。省略すると上限なしで選ぶ", example: 30_000 },
+                  prompt: { type: :string, example: "初音ミクの水色推し活ルームにしたい" },
                   kept_object_ids: { type: :array, items: { type: :string }, description: "活かす家具の id。空なら全部活かす", example: %w[bed-1 desk-1 shelf-1] },
                   furniture_operations: { type: :array, maxItems: 100, items: { "$ref" => "#/components/schemas/FurnitureOperation" }, description: "指定時は既存家具すべてにkeep/replace/removeを一つ指定。全replace・全removeも可能。未指定・空配列は旧kept_object_idsの意味を維持", example: [] },
                   additions: { type: :array, maxItems: 6, items: { "$ref" => "#/components/schemas/FurnitureAddition" }, example: [] },
@@ -510,15 +733,14 @@ RSpec.configure do |config|
               room_id: { type: :integer, example: 1 },
               status: { type: :string, enum: %w[pending processing done failed], example: "done" },
               character_theme_id: { type: :string, nullable: true, enum: [ nil, *CharacterRoomTheme::CATALOGUE.keys ], example: "hatsune-miku" },
-              prompt: { type: :string, example: "紫色の推し活ルームにしたい" },
-              budget: { type: :integer, nullable: true, description: "省略したコーデでは null", example: 30_000 },
+              prompt: { type: :string, example: "初音ミクの水色推し活ルームにしたい" },
               kept_object_ids: { type: :array, items: { type: :string }, example: %w[bed-1 desk-1 shelf-1] },
               furniture_operations: { type: :array, items: { "$ref" => "#/components/schemas/FurnitureOperation" }, example: [] },
               additions: { type: :array, items: { "$ref" => "#/components/schemas/FurnitureAddition" }, example: [] },
               search_entry_points: { type: :array, items: { type: :string }, description: "Google検索候補HTML。各要素を未改変で隔離表示する", example: [] },
               product_source: { type: :string, nullable: true, enum: [ nil, "db", "ec", "mock" ], description: "db: 登録された家具から選んだ / ec・mock: 以前の実EC検索・モックで作った提案", example: "db" },
-              title: { type: :string, nullable: true, example: "ラベンダーの推し活ルーム" },
-              comment: { type: :string, nullable: true, example: "ラベンダー 布団カバー3点セット シングル (ベッドに掛ける) などを追加しました。今のベッドとデスクと本棚はそのまま活かしています。" },
+              title: { type: :string, nullable: true, example: "初音ミクの水色推し活ルーム" },
+              comment: { type: :string, nullable: true, example: "水色の掛け布団カバー シングル (ベッドに掛ける) などを追加しました。今のベッドとデスクと本棚はそのまま活かしています。" },
               before_scene: { allOf: [ { "$ref" => "#/components/schemas/Scene" } ], nullable: true },
               after_scene: { allOf: [ { "$ref" => "#/components/schemas/Scene" } ], nullable: true, description: "status が done になると入る" },
               items: { type: :array, items: { "$ref" => "#/components/schemas/CoordinationItem" }, description: "購入リンク一覧。after_scene の suggested と marker で対応する" },
@@ -529,7 +751,7 @@ RSpec.configure do |config|
               error_message: { type: :string, nullable: true, example: nil },
               created_at: { type: :string, format: "date-time" }
             },
-            required: %w[id room_id status prompt budget kept_object_ids title comment before_scene after_scene items total_price planned_by base_coordination_id error_message created_at]
+            required: %w[id room_id status prompt kept_object_ids title comment before_scene after_scene items total_price planned_by base_coordination_id error_message created_at]
           }
         }
       }

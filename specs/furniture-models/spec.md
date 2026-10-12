@@ -31,13 +31,27 @@ GLBの座標は`+Y`が上、`+Z`が正面、底面中心を原点とする。制
 
 2026年10月5日の追加要求では、日本向けECの実商品を用途・形状・寸法から照合し、採用したモデルを商品バリエーションの明示対応として保存する。表示時にカテゴリだけから推測する処理は追加しない。生成するのはテクスチャだけで、元のGLBを共用する。詳細は[EC家具Spec](../ec-furniture/spec.md)を参照する。照合・生成処理は実装済み。`managed_by`で台帳とEC照合の管理元を分け、台帳取り込みはEC照合の対応を維持する。
 
-取り込みの正本は`backend/db/furnitures.json`（`furnitures`テーブル。旧`furniture_models`から置き換え）。生成ツールはGLBを照合し、メタデータと対応表を出力する。入力から外した対応関係はDBから削除する。入力にないDBのモデルは削除せず、無効化したモデルも再有効化しない。
+3DモデルはDB（`furnitures`・`furniture_3d_models`）が正。生成ツールはGLBを照合し、管理API（`PUT /api/v1/admin/furniture_models/{id}`）で1件ずつ登録・更新する。`backend/db/furnitures.json`は空のDBへ入れる初期データで、本番DBから書き出して更新する。登録・取り込みは無効化したモデルを再有効化しない。
 
 公開モデル用バケットは`infra/gcp/storage.tf`で`${project_id}-models`として定義済み。`allUsers`の読み取り権限と、すべてのオリジンからの`GET`・`HEAD`を許可するCORSを利用する。部屋写真の非公開バケットとは分ける。署名付きURLやWeb向けのGCP認証情報は発行しない。
 
-`make infra-models-publish`は、`output/furniture_models/furniture/`から台帳に載ったGLBだけを一時ディレクトリへ複製し、検証したファイルを`gs://<bucket>/models/furniture/v1/`へアップロードする。`MODELS_BUCKET`を指定でき、未指定時はTerraformの`models_bucket`出力を使う。デプロイCIと`make infra-release`は、Cloud Runジョブで`db:apply`・`furniture:import`・`furniture_detail:import`を順に実行してからサービスを更新する。
+`make infra-models-publish K=<モデルID>`は、指定したGLBを照合して`gs://<bucket>/models/furniture/v1/`へアップロードし、本番DBへ登録する。`MODELS_BUCKET`を指定でき、未指定時はTerraformの`models_bucket`出力を使う。デプロイCIと`make infra-release`は、Cloud Runジョブで`db:apply`・`furniture:import`・`furniture_detail:import`（どちらも空のときだけ）を順に実行してからサービスを更新する。
 
-GCS上のファイル一覧を自動収集する処理と管理画面は含めない。運用手順は`docs/furniture-models.md`に記す。
+GCS上のファイル一覧を自動収集する処理と、GLBを上げる管理画面は含めない。運用手順は`docs/furniture-models.md`に記す。
+
+## 2026-10-12 掛け布団カバーの描画修正
+
+ユーザーが指摘したÄNGSLILJAの巨大な直方体は、カタログの長さ200cmが高さにも保存されていたことと、GLB未取得時の簡易形状に起因する。カバーは幅と奥行きを水平面へ置き、高さ4cmを布団を覆う描画用の推定値として扱う。商品本体の厚みとしては表示しない。
+
+家具詳細の読み取りでは既存DBの行にもこの高さを適用し、初期データの誤った高さを修正する。保存した部屋・テンプレート・API結果では、高さ12cmを超える`bed_cover`を4cmへ補正する。補正時は底面の高さ、幅、奥行き、回転を保ち、布団カバーがベッド上の位置から浮いたり床へ落ちたりしないようにする。自動補正だけでは保存データを書き換えない。
+
+GLBがないカバーは、外周が薄く中央が膨らむ布のメッシュで描く。登録済みGLBが取得できた場合は、柄やキャラクターの素材を維持し、布を配置寸法の幅・厚み・長さへ合わせる。家具全般のGLBは従来のcontain表示を維持する。選択枠、寸法表示、編集で使う寸法は補正後の値にそろえる。
+
+カバーの生成テクスチャは、水平面のU方向に幅の倍率、V方向に奥行きの倍率を使って繰り返す。厚みの倍率で柄の大きさを変えず、指定されたタイル寸法に合わせる。
+
+Google DocsのURLは未設定で、今回の変更は依頼文を根拠としたDocs未反映の差分である。本番DBの更新、GCSモデルの差し替え、デプロイはこの修正に含めない。
+
+2026-10-12 validation: frontend lint/build passed; targeted backend RuboCop passed; the 17 existing furniture-search, admin-furniture-detail, and coordination request examples passed in an isolated test database using the installed Rails image and cached gems. An unsaved Rails model with legacy dimensions 150 × 200 × 200 cm returned preview dimensions 150 × 4 × 200 cm, published height null, and estimated axis h. Browser checks using the actual RoomViewer rendered the legacy scene fixture as a thin horizontal cover in perspective and top views. Evidence is in `outputs/room-fixes/20261012`. No new tests were added. Assigned remote GLBs, live generated textures, production storage and production generation were not exercised; the change preserves assigned assets and fixes their horizontal UV scale calculations.
 
 ## Google Docsへ未反映の変更
 

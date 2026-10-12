@@ -188,14 +188,31 @@ Cloud Run がゼロまで縮んでいるためのコールドスタート。常�
 
 ## 家具GLBの配置
 
-公開モデル用バケットはTerraformの `models_bucket` 出力で確認できます。BlenderでGLBを生成した後、`make infra-models-publish` で台帳と照合してアップロードします。Terraformのローカル設定がない場合は `MODELS_BUCKET=<バケット名> make infra-models-publish` を使います。
+公開モデル用バケットはTerraformの `models_bucket` 出力で確認できます。BlenderでGLBを生成した後、`make infra-models-publish K="<モデルID>"` でアップロードし、管理APIで本番DBへ登録します（管理者のログインが要ります）。Terraformのローカル設定がない場合は `MODELS_BUCKET=<バケット名>` を付けます。
 
-`make infra-release` とGitHub Actionsは、スキーマ適用に続けて `furniture:import` と `furniture_detail:import` を実行し、家具（3Dモデルの台帳）と家具ごとの色・寸法・購入リンクをDBへ取り込んでからCloud Runを更新します。APIは既存の `MODELS_BUCKET` から公開URLを作るため、本番への新しい秘密情報の登録は不要です。GLBのアップロードはリリース前に行います。詳しくは[家具モデルの運用](../../docs/furniture-models.md)を参照してください。
+`make infra-release` とGitHub Actionsは、スキーマ適用に続けて `furniture:import` と `furniture_detail:import` を実行してからCloud Runを更新します。3Dモデルと、家具ごとの色・寸法・購入リンクはどちらもDBが正で、両タスクは空のときだけ初期データを入れます（本番の3Dモデルは `make infra-models-publish`、商品は管理画面 `/admin` で更新します）。APIは既存の `MODELS_BUCKET` から公開URLを作るため、本番への新しい秘密情報の登録は不要です。GLBのアップロードと登録はリリースと別に行います。詳しくは[家具モデルの運用](../../docs/furniture-models.md)を参照してください。
 
 ## 登録された家具と模様
 
-コーデ生成と家具検索は、DBに登録した家具（`furnitures`・`furniture_details`）だけを使い、外部のECは検索しない。登録内容は`backend/db/furnitures.json`と`backend/db/furniture_details.json`が正で、リリース時に取り込む。Gemini認証とownerの利用許可があれば商品選定をGeminiで行い、未設定時はモックのプランナーで動く。
+コーデ生成と家具検索は、DBに登録した家具（`furnitures`・`furniture_details`）だけを使い、外部のECは検索しない。家具（3Dモデル）はDBが正で、`make infra-models-publish`で登録する。`backend/db/furnitures.json`は空のDBへ入れる初期データ。色・寸法・購入リンク（`furniture_details`）はDBが正で、管理画面`/admin`で編集する。`backend/db/furniture_details.json`は空のDBへ入れる初期データ。Gemini認証とownerの利用許可があれば商品選定をGeminiで行い、未設定時はモックのプランナーで動く。
 
-模様（質感の画像）は静的に用意し、`MODELS_BUCKET`の`textures/v1/<texture_key>.png`に置く。一覧は`backend/db/furniture_textures.json`が正で、detailの部位ごとの模様は`furniture_details.json`の`texture_materials`に書く。表示では模様に部位の色を掛ける（`tinted: false`の柄物は掛けない）。APIは画像を生成・保存しない。
+模様（質感の画像）は静的に用意し、`MODELS_BUCKET`の`textures/v1/<texture_key>.png`に置く。一覧は`backend/db/furniture_textures.json`が正で、detailの部位ごとの模様は初期データ`furniture_details.json`の`texture_materials`で入れる（管理画面からの模様の変更は未対応）。表示では模様に部位の色を掛ける（`tinted: false`の柄物は掛けない）。APIは画像を生成・保存しない。
 
-リリース時のタスクは`furniture_texture:clear_legacy`→`db:apply`→`furniture:import`→`furniture_texture:import`→`furniture_detail:import`の順。`db:apply`はSchemafileにないテーブルを削除する（`--drop-table`）。
+リリース時のタスクは`furniture_texture:clear_legacy`→`furniture_detail:migrate_fields`→`db:apply`→`furniture:import`→`furniture_texture:import`→`furniture_detail:import`→`furniture_detail:retag_themes`の順（`furniture:import`と`furniture_detail:import`は空のときだけ入れ、`retag_themes`は旧いテーマが残っているときだけ付け直す）。`db:apply`はSchemafileにないテーブルを削除する（`--drop-table`）。
+
+## AI で 3D モデルを作るジョブ
+
+管理画面の「3Dモデルを作る」が使う（[specs/model-generation/spec.md](../../specs/model-generation/spec.md)）。定義は`model_builder.tf`。
+
+- 作られるもの：サービスアカウント`<project>-model-builder`、非公開のバケット`<project_id>-model-builds`、Cloud Run ジョブ`<project>-model-builder`、API のサービスアカウントへの権限（builds バケットの読み書き、公開バケットへの追加、ジョブの起動）、API の環境変数 4 つ（`MODEL_BUILDS_BUCKET`など）。
+- **自動デプロイ（GitHub Actions）は Terraform を適用しない。**初めて使うときは、Terraform の状態を持つ端末で次を実行する。
+
+```bash
+make infra-apply     # アカウント・バケット・ジョブ・権限を作り、API に環境変数を足す
+make infra-release   # ジョブのイメージをビルドして差し替える (GitHub の Deploy をやり直してもよい)
+```
+
+- `infra-apply`の直後は、ジョブの中身が仮のイメージ。`infra-release`か Deploy のやり直しで、本物のイメージ（`tools/furniture_models/generator/Dockerfile`）が入る。Deploy は、ジョブがまだ無い環境ではこの手順を飛ばす。
+- 権限を付ける操作があるので、適用にはプロジェクトのオーナー（または IAM を変更できる権限）が要る。
+- Vertex AI を使う。`gemini_provider = "vertex"`の環境で使う。モデルは`model_generation_model`（既定は`gemini-3.1-pro-preview`）。
+- 確かめ方：管理画面（`/admin`）で商品を選び、「AIで3Dモデルを作る」の「作る」を押す。2〜5 分で画像が出る。ジョブのログは`gcloud run jobs executions list --job <project>-model-builder`から追える。

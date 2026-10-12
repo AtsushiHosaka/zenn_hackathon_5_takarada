@@ -77,11 +77,7 @@ function RoomHero({ rooms, snapshot }: { rooms: ReadyRoom[]; snapshot: (design: 
         <span className="room-hero-caption"><strong>{room.title}</strong><span>{roomDimensions(room.design)}</span></span>
       </Link>)}
     </div>
-    {rooms.length > 1 && <>
-      <button className="room-list-arrow is-previous motion-control" type="button" aria-label="前の部屋" aria-controls="room-hero-track" onClick={() => show(current - 1)}><span aria-hidden="true">‹</span></button>
-      <button className="room-list-arrow is-next motion-control" type="button" aria-label="次の部屋" aria-controls="room-hero-track" onClick={() => show(current + 1)}><span aria-hidden="true">›</span></button>
-      <p className="room-list-position" aria-live="polite" aria-atomic="true">{current + 1} / {rooms.length}<span className="room-list-sr-only"> · {rooms[current].title}</span></p>
-    </>}
+    {rooms.length > 1 && <p className="room-list-position" aria-live="polite" aria-atomic="true">{current + 1} / {rooms.length}<span className="room-list-sr-only"> · {rooms[current].title}</span></p>}
   </section>;
 }
 
@@ -110,7 +106,7 @@ export default function RoomListPage() {
       <AccountMenu/>
     </header>
     <main className="room-list-main">
-      <div className="room-list-heading"><h1>マイルーム</h1><Link to="/rooms/new" className="room-list-new motion-control"><span aria-hidden="true">＋</span> 新しいルームを作る</Link></div>
+      <div className="room-list-heading"><h1>マイルーム</h1><Link to="/rooms/new" className="room-list-new motion-control"><span aria-hidden="true">＋</span> 新しい部屋をつくる</Link></div>
       {ready.length > 0 && <RoomHero rooms={ready} snapshot={snapshot}/>}
       {rooms.data.length > 0 && <section className="room-card-section" aria-labelledby="room-card-heading">
         <h2 id="room-card-heading">すべての部屋</h2>

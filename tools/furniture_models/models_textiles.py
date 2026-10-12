@@ -1,6 +1,7 @@
 """布もの (ベッドカバー・カーテン・ラグ・クッション・タペストリー)。"""
 import math
 
+import bmesh
 import palette as P
 from lib import Model, asset, circle, rrect
 
@@ -121,9 +122,44 @@ def _shade(hex_color, k):
 @asset("cushion.glb", (0.45, 0.15, 0.45), variants={
     "107": {"tint": "#7b4fc4"}, "207": {"tint": "#7c9a6a"}, "307": {"tint": "#f1ebe1"}})
 def cushion(tint=None):
+    """平置きの角クッション。中央がふくらみ、縁は縫い目へ細くなる。辺は内へ反り、角がとがる。"""
     m = Model("cushion")
     fab = m.mat("tint", tint or "#7b4fc4", rough=0.95)
-    m.cushion((0.45, 0.15, 0.45), (0, 0.075, 0), fab, puff=0.7, round_=0.5, cuts=6, pinch=0.05, name="cushion")
+    W, H, D = 0.45, 0.15, 0.45
+    n = 24
+    bow = 0.07  # 辺の中央が内へ反る割合
+
+    def point(u, v):
+        x = u * W / 2 * (1 - bow * (1 - v * v))
+        z = v * D / 2 * (1 - bow * (1 - u * u))
+        return x, z
+
+    def half(u, v):
+        f = max(0.0, (1 - u * u) * (1 - v * v)) ** 0.55
+        return H / 2 * (0.06 + 0.94 * f)
+
+    bm = bmesh.new()
+    ts = [-1 + 2 * i / n for i in range(n + 1)]
+    top, bottom = {}, {}
+    for i, u in enumerate(ts):
+        for j, v in enumerate(ts):
+            x, z = point(u, v)
+            h = half(u, v)
+            top[i, j] = bm.verts.new((x, H / 2 + h, z))
+            bottom[i, j] = bm.verts.new((x, H / 2 - h, z))
+    for i in range(n):
+        for j in range(n):
+            bm.faces.new((top[i, j], top[i, j + 1], top[i + 1, j + 1], top[i + 1, j]))
+            bm.faces.new((bottom[i, j], bottom[i + 1, j], bottom[i + 1, j + 1], bottom[i, j + 1]))
+    # 縫い目の帯 (外周の上下をつなぐ)
+    ring = [(i, 0) for i in range(n)] + [(n, j) for j in range(n)] + \
+           [(i, n) for i in range(n, 0, -1)] + [(0, j) for j in range(n, 0, -1)]
+    for k, a in enumerate(ring):
+        b = ring[(k + 1) % len(ring)]
+        bm.faces.new((top[a], top[b], bottom[b], bottom[a]))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    ob = m._obj(bm, fab, "cushion")
+    ob.data.set_sharp_from_angle(angle=math.pi)  # 布は全面なめらかにする
     return m
 
 

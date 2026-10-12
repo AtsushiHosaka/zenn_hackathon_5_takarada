@@ -2,8 +2,7 @@
 #
 # GEMINI_API_KEY があれば Gemini が要望文と部屋を見て候補を選ぶ (CoordinationPlanner::Gemini)。
 # 無ければキーワードでテーマを決めるモック (CoordinationPlanner::Mock)。
-# Geminiは予算内で相性のよい採用一式を選び、Rubyが合計と配置を最終確認する。
-# Mockの予算調整はCoordinationBuilder、座標はSlotLayoutの責務。
+# Geminiは相性のよい採用一式を選び、Rubyが配置を最終確認する。座標はSlotLayoutの責務。
 class CoordinationPlanner
   # candidates: 枠・操作グループごとの承認済み商品と代替順位。
   # Geminiの採用一式はanalysis.selection、MockはBuilderで枠ごとに選ぶ。
@@ -18,10 +17,15 @@ class CoordinationPlanner
   # 雰囲気が大きく変わる順 (色の面積が大きい布もの → 壁 → 照明 → 小物)
   SLOT_PRIORITY = %w[bed_cover curtain rug wall_decor light display cushion desk_top].freeze
 
+  # 1 つの枠で採用できる商品の上限。何点にするかは AI が決める。無い枠 (ベッドカバー・カーテン・ラグ・床の家具の各操作) は 1 点。
+  # floor は、利用者が指定していない大型家具を AI が自分から足すときの上限
+  MAX_PICKS = { "wall_decor" => 3, "light" => 2, "display" => 2, "cushion" => 2, "desk_top" => 6, "floor" => 2 }.freeze
+
   # kept_objects: 活かす家具 (Scene の object)。部屋の雰囲気に合わせて選ぶのに使う
   # slots: その部屋で置き場所がありうる枠 (SlotLayout.placeable_slots)。この枠の商品だけを候補にする
-  def self.call(prompt:, budget:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil, slots: SLOT_PRIORITY)
+  # preference: 要望文から読み取った色・雰囲気・形 (FurnitureQuery::Result)。合う商品を先に候補へ入れる (Gemini のみ)
+  def self.call(prompt:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil, slots: SLOT_PRIORITY, preference: nil, character_theme: nil)
     planner = GeminiClient.configured?(user_id:) ? Gemini : Mock
-    planner.new(prompt:, budget:, room:, kept_objects:, user_id:, client:, additional_candidates:, previous:, slots:).plan
+    planner.new(prompt:, room:, kept_objects:, user_id:, client:, additional_candidates:, previous:, slots:, preference:, character_theme:).plan
   end
 end

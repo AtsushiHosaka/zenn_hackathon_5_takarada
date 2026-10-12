@@ -1,0 +1,94 @@
+import type { components } from "../generated/api";
+import type { AdminFurnitureDetail, AdminFurnitureDetailInput, AdminFurnitureModel, FurnitureAdminCatalog, ModelGeneration } from "../../domain/furnitureAdmin";
+
+export type AdminFurnitureDetailRecord = components["schemas"]["AdminFurnitureDetail"];
+export type AdminFurnitureDetailListRecord = components["schemas"]["AdminFurnitureDetailList"];
+export type AdminFurnitureDetailInputRecord = components["schemas"]["AdminFurnitureDetailInput"];
+export type AdminFurnitureModelRecord = components["schemas"]["AdminFurnitureModel"];
+export type AdminFurnitureModelInputRecord = components["schemas"]["AdminFurnitureModelInput"];
+export type AdminModelGenerationRecord = components["schemas"]["AdminModelGeneration"];
+
+export function toAdminFurnitureDetail(record: AdminFurnitureDetailRecord): AdminFurnitureDetail {
+  return {
+    id: record.id,
+    key: record.key,
+    name: record.name,
+    category: record.category,
+    slot: record.slot,
+    modelKey: record.model_key,
+    symbolicColor: record.symbolic_color,
+    colorMaterials: record.color_materials,
+    colorName: record.color_name,
+    size: record.size,
+    material: record.material,
+    price: record.price,
+    shop: record.shop,
+    url: record.url,
+    imageUrl: record.image_url,
+    themes: record.themes,
+    position: record.position,
+    enabled: record.enabled,
+  };
+}
+
+export function toFurnitureAdminCatalog(record: AdminFurnitureDetailListRecord): FurnitureAdminCatalog {
+  return { details: record.details.map(toAdminFurnitureDetail), slots: record.slots, categories: record.categories, themes: record.themes };
+}
+
+export function toAdminFurnitureDetailInputRecord(input: AdminFurnitureDetailInput): AdminFurnitureDetailInputRecord {
+  return {
+    furniture_detail: {
+      name: input.name,
+      category: input.category,
+      slot: input.slot as NonNullable<AdminFurnitureDetailInputRecord["furniture_detail"]["slot"]>,
+      model_key: input.modelKey,
+      symbolic_color: input.symbolicColor,
+      color_materials: input.colorMaterials,
+      color_name: input.colorName,
+      size: input.size,
+      material: input.material,
+      price: input.price,
+      shop: input.shop,
+      url: input.url,
+      image_url: input.imageUrl,
+      themes: input.themes as NonNullable<AdminFurnitureDetailInputRecord["furniture_detail"]["themes"]>,
+      position: input.position,
+      enabled: input.enabled,
+    },
+  };
+}
+
+export function toAdminFurnitureModel(record: AdminFurnitureModelRecord): AdminFurnitureModel {
+  return {
+    id: record.id,
+    name: record.name,
+    category: record.category,
+    shape: record.shape,
+    variant: record.variant,
+    size: record.size,
+    colorMaterialKeys: record.color_material_keys,
+    estimatedAxes: record.estimated_axes,
+    objectKey: record.object_key,
+    modelUrl: record.model_url,
+    enabled: record.enabled,
+    detailsCount: record.details_count,
+  };
+}
+
+export function toModelGeneration(record: AdminModelGenerationRecord): ModelGeneration {
+  const stats = record.stats;
+  return {
+    id: record.id,
+    furnitureDetailId: record.furniture_detail_id,
+    modelKey: record.model_key,
+    status: record.status,
+    errorMessage: record.error_message,
+    notes: record.notes,
+    checks: record.checks,
+    stats: stats?.triangles != null && stats.size ? { triangles: stats.triangles, materials: stats.materials ?? [], bytes: stats.bytes ?? 0, size: stats.size } : null,
+    ai: record.ai?.model != null ? { model: record.ai.model, calls: record.ai.calls ?? 0, seconds: record.ai.seconds ?? 0 } : null,
+    files: record.files,
+    createdAt: new Date(record.created_at),
+    finishedAt: record.finished_at ? new Date(record.finished_at) : null,
+  };
+}

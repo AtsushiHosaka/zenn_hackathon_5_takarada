@@ -1,12 +1,17 @@
 require "json"
 
-# db/furniture_details.json (家具の色・寸法・購入リンク) を furniture_details に取り込む。
-# JSON を正とし、載っていない detail は消す。家具と模様は先に FurnitureImporter / FurnitureTextureImporter で入れておく。
+# db/furniture_details.json (家具の色・寸法・購入リンクの初期データ) を furniture_details に入れる。
+# 商品は DB が正で、管理画面 (/admin) で編集する。furniture_details に 1 件でもあれば何もしない (デプロイのたびに呼んでも編集は消えない)。
+# force: true のときだけ JSON で作り直し、JSON に載っていない detail は消す (手元の DB を初期データへ戻すとき用)。
+# 家具と模様は先に FurnitureImporter / FurnitureTextureImporter で入れておく。
+# 初期データを今の DB に合わせるには、管理画面の「JSON を書き出す」(FurnitureDetailExporter) の結果をコミットする。
 # texture_materials は部位ごとの模様 ({"tint": "linen"})。
 class FurnitureDetailImporter
   class InvalidDetails < StandardError; end
 
-  def self.call(path = Rails.root.join("db/furniture_details.json"))
+  def self.call(path = Rails.root.join("db/furniture_details.json"), force: false)
+    return { details: 0, furnitures: 0, skipped: true } if !force && FurnitureDetail.exists?
+
     new(JSON.parse(File.read(path))).call
   rescue JSON::ParserError => error
     raise InvalidDetails, "Invalid JSON: #{error.message}"
@@ -29,7 +34,7 @@ class FurnitureDetailImporter
         detail = FurnitureDetail.find_or_initialize_by(key: row["key"])
         detail.update!(
           furniture:, position: index,
-          **row.slice("name", "category", "slot", "symbolic_color", "color_materials", "color_name", "price", "shop", "url", "image_url", "themes", "metadata", "checked_at").symbolize_keys,
+          **row.slice("name", "category", "slot", "symbolic_color", "color_materials", "color_name", "price", "shop", "url", "image_url", "themes", "material").symbolize_keys,
           width: size["w"], height: size["h"], depth: size["d"]
         )
         detail.detail_textures.delete_all
@@ -44,7 +49,7 @@ class FurnitureDetailImporter
       removed = FurnitureDetail.where.not(key: keys)
       FurnitureDetailTexture.where(furniture_detail: removed).delete_all
       removed.delete_all
-      { details: keys.size, furnitures: rows.map { |row| row["model_key"] }.uniq.size }
+      { details: keys.size, furnitures: rows.map { |row| row["model_key"] }.uniq.size, skipped: false }
     end
   end
 end

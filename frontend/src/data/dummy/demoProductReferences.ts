@@ -63,26 +63,12 @@ const common: Record<string, ProductReference> = {
 
 const byStyle: Record<Style, Record<string, ProductReference>> = {
   "oshi": {
-    "5": {
-      "name": "ポップコーンワッフル フロアクッション φ60 ライトパープル",
-      "price": 3480,
-      "color": "#cbb8e6",
-      "shop": "Francfranc",
-      "productUrl": "https://francfranc.com/products/1102130131612"
-    },
     "6": {
       "name": "カールトン フロアランプ ブラック",
       "price": 14000,
       "color": "#222222",
       "shop": "Francfranc",
       "productUrl": "https://francfranc.com/products/1109040028100"
-    },
-    "8": {
-      "name": "フリルチェック 掛け布団カバー シングル オレンジ×パープル",
-      "price": 12800,
-      "color": "#b9a3e3",
-      "shop": "Francfranc",
-      "productUrl": "https://francfranc.com/products/1102030047044"
     }
   },
   "botanical": {

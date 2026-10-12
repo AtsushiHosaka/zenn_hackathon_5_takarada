@@ -3,12 +3,11 @@ import { isRoomDesign, type RoomDesign } from '../../domain/room';
 import type { SavedRoom } from '../../domain/roomRepository';
 import { useSession } from '../../core/session';
 import { useRepositories } from '../../core/repositories';
-import { loadConnection } from '../../core/connection';
 import { DomainError } from '../../domain/error';
 import { isTemplateId } from '../../domain/roomTemplate';
-import { starterRoomTemplates } from '../../domain/starterRoomTemplates';
 import { readRoomTemplates } from './templateStorage';
 import { appConfig } from '../../core/config';
+import { normalizeRoomBedding } from '../../domain/bedding';
 
 export const roomPlanKeys = { capabilities: ['room', 'capabilities'] as const };
 export const scopedRoomPlanKeys = (scope: string) => ({
@@ -18,14 +17,15 @@ export const scopedRoomPlanKeys = (scope: string) => ({
 });
 export function useRoomPlanScope(): string {
   const session = useSession();
-  return JSON.stringify([loadConnection(), appConfig.apiEndpoint, session.user?.id ?? 'guest']);
+  // 先頭の 'api' は、保存済みの下書きのキーを変えないために残す。
+  return JSON.stringify(['api', appConfig.apiEndpoint, session.user?.id ?? 'guest']);
 }
 const storageKey = (scope: string) => `room-coordinator.plans.v2:${scope}`;
 function readPlans(scope: string): RoomDesign[] {
   try {
     // Legacy unowned plans remain on disk; never assign them to the next login.
     const value: unknown = JSON.parse(localStorage.getItem(storageKey(scope)) || '[]');
-    return Array.isArray(value) ? value.filter(isRoomDesign) : [];
+    return Array.isArray(value) ? value.filter(isRoomDesign).map(normalizeRoomBedding) : [];
   } catch { return []; }
 }
 function useLocalPlans(): RoomDesign[] {
@@ -55,13 +55,13 @@ export function useSavedRooms() {
     if (saved.some(room => room.id === (design.backendRoomId ?? design.id))) continue;
     saved.push({ id: design.backendRoomId ?? design.id, title: design.title, status: 'ready', createdAt: '', design });
   }
-  return { ...query, data: session.status === 'authenticated' ? saved : [], persistenceWarning: session.status === 'authenticated' ? rooms.persistenceWarning?.() : undefined };
+  return { ...query, data: session.status === 'authenticated' ? saved.map(room => room.design ? { ...room, design: normalizeRoomBedding(room.design) } : room) : [], persistenceWarning: session.status === 'authenticated' ? rooms.persistenceWarning?.() : undefined };
 }
 export function useRoomPlans(): RoomDesign[] {
   return useSavedRooms().data.flatMap(room => room.design ? [room.design] : []);
 }
 export function isApiRoomAlias(id: string): boolean {
-  return loadConnection() === 'api' && /^(?:api-room-)?[1-9]\d*$/.test(id);
+  return /^(?:api-room-)?[1-9]\d*$/.test(id);
 }
 export function useRoomPlan(id: string, enabled: boolean, initialDesign?: () => RoomDesign) {
   const scope = useRoomPlanScope();
@@ -70,10 +70,11 @@ export function useRoomPlan(id: string, enabled: boolean, initialDesign?: () => 
   const alias = isApiRoomAlias(id);
   return useQuery({
     queryKey: scopedRoomPlanKeys(scope).detail(id),
+    select: normalizeRoomBedding,
     queryFn: async ({ signal }) => {
       if (isTemplateId(id)) {
         const templates = client.getQueryData<import('../../domain/roomTemplate').RoomTemplate[]>(['room', scope, 'templates']) ?? readRoomTemplates(scope);
-        const template = templates.find(item => item.id === id) ?? starterRoomTemplates.find(item => item.id === id);
+        const template = templates.find(item => item.id === id);
         if (!template) throw new DomainError('テンプレートが見つかりません。');
         return template.design;
       }

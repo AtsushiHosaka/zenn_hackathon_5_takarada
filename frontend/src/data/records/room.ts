@@ -1,9 +1,10 @@
 import { roomPalette } from "../../domain/roomPalette";
 import { characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
+import { normalizeBedCover, normalizeRoomBedding } from "../../domain/bedding";
 import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
 import { productCategories, furnitureCategories, isManualFurniture, isImageArtwork, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
-import type { FurnitureDetailChoice, FurnitureSearchInterpretation, FurnitureSearchResult, ModelCredit, SavedRoom, SearchModel } from "../../domain/roomRepository";
+import type { FurnitureDetailChoice, FurnitureReview, FurnitureReviewInput, FurnitureSearchInterpretation, FurnitureSearchResult, ModelCredit, SavedRoom, SearchModel } from "../../domain/roomRepository";
 import type { components } from "../generated/api";
 
 export type AnalysisRoomRecord = components["schemas"]["Room"];
@@ -15,6 +16,42 @@ export function toRoomPaletteId(value: unknown): NonNullable<CoordinationRecord[
 }
 
 export type UploadRecord = components["schemas"]["Upload"];
+
+const HEX_COLOR = /^#[0-9a-f]{6}$/i;
+
+// 対象の家具はそのまま送る (おかしければ API が理由を返す)。ほかの家具は、色や寸法を送れる形のものだけにする
+export function furnitureReviewRequest(input: FurnitureReviewInput): components["schemas"]["FurnitureReviewInput"] {
+  const item = (source: RoomItem) => ({
+    name: source.name.slice(0, 100), category: source.category, color: source.color, existing: source.existing,
+    size: { w: source.size[0], h: source.size[1], d: source.size[2] },
+    // 家具の上に載せたものや、底が床から浮いているもの (壁掛け) は床の面積に数えない
+    on_floor: !source.supportObjectId && source.position[1] - source.size[1] / 2 <= input.floor + 0.05,
+  });
+  const sendable = (source: RoomItem) => Boolean(source.name.trim()) && HEX_COLOR.test(source.color) && source.size.every(value => Number.isFinite(value) && value > 0 && value <= 10);
+  const detailId = Number(input.target.furnitureDetailId);
+  return {
+    target: { ...item(input.target), ...(Number.isInteger(detailId) && detailId > 0 ? { furniture_detail_id: detailId } : {}) },
+    others: input.others.filter(sendable).slice(0, 100).map(item),
+    room: {
+      width: input.room.width, depth: input.room.depth,
+      ...(input.room.wallColor && HEX_COLOR.test(input.room.wallColor) ? { wall_color: input.room.wallColor } : {}),
+      ...(input.room.floorColor && HEX_COLOR.test(input.room.floorColor) ? { floor_color: input.room.floorColor } : {}),
+    },
+    ...(input.prompt?.trim() ? { prompt: input.prompt.trim().slice(0, 500) } : {}),
+  };
+}
+
+export function toFurnitureReview(value: unknown): FurnitureReview {
+  const record = object(value, "FurnitureReview");
+  if (record.verdict !== "good" && record.verdict !== "fair" && record.verdict !== "poor") invalid("FurnitureReview.verdict");
+  if (record.reviewed_by !== "gemini" && record.reviewed_by !== "mock") invalid("FurnitureReview.reviewed_by");
+  return {
+    verdict: record.verdict, reviewedBy: record.reviewed_by,
+    summary: text(record.summary, "FurnitureReview.summary"), color: text(record.color, "FurnitureReview.color"),
+    size: text(record.size, "FurnitureReview.size"), mood: text(record.mood, "FurnitureReview.mood"),
+    suggestion: typeof record.suggestion === "string" ? record.suggestion.trim() : "",
+  };
+}
 
 export function toFurnitureSearch(value: unknown, baseUrl: string): FurnitureSearchResult {
   const record = object(value, "FurnitureSearch");
@@ -108,7 +145,7 @@ function toFurnitureDetail(value: unknown, baseUrl: string): FurnitureDetailChoi
   };
   if (!isRoomItem(item)) invalid("FurnitureDetail");
   return {
-    item, colorName: record.color_name == null ? undefined : text(record.color_name, "FurnitureDetail.color_name"),
+    item: normalizeBedCover(item), colorName: record.color_name == null ? undefined : text(record.color_name, "FurnitureDetail.color_name"),
     characters: characterKeys(record.characters, "FurnitureDetail.characters"),
     credits: credits(record.credits, "FurnitureDetail.credits", baseUrl),
   };
@@ -165,7 +202,6 @@ export function toCoordinationRecord(value: unknown): CoordinationRecord {
     status: record.status,
     prompt: text(record.prompt, "Coordination.prompt"),
     character_theme_id: record.character_theme_id == null ? undefined : characterThemeRecord(record.character_theme_id),
-    budget: record.budget == null ? null : integer(record.budget, "Coordination.budget"),
     room_palette_id: record.room_palette_id == null ? null : toRoomPaletteId(record.room_palette_id),
     kept_object_ids: record.kept_object_ids as string[],
     title: nullableText(record.title, "Coordination.title"),
@@ -194,7 +230,7 @@ export function toCoordinationRecord(value: unknown): CoordinationRecord {
     suggestions.forEach(item => {
       if (!parsed.items.some(product => product.marker === item.marker && product.item_id === item.item_id)) invalid("Coordination.marker/item_id");
     });
-    if (parsed.total_price !== parsed.items.reduce((sum, item) => sum + item.price, 0) || (parsed.budget != null && parsed.total_price > parsed.budget)) invalid("Coordination.total_price");
+    if (parsed.total_price !== parsed.items.reduce((sum, item) => sum + item.price, 0)) invalid("Coordination.total_price");
   }
   return parsed;
 }
@@ -212,7 +248,7 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     characterThemeId: record.character_theme_id??undefined,
     description: record.comment,
     ...(record.planned_by ? { generatedBy: record.planned_by } : {}),
-    style: record.character_theme_id ? "oshi" : record.title === "ラベンダーの推し活ルーム" ? "oshi" : record.title === "グリーンが映えるボタニカルルーム" ? "botanical" : "natural",
+    style: record.character_theme_id ? "oshi" : ["水色の推し活ルーム", "ラベンダーの推し活ルーム"].includes(record.title) ? "oshi" : record.title === "グリーンが映えるボタニカルルーム" ? "botanical" : "natural",
     ...after,
     items: after.items.map(item => {
       if (item.existing) return item;
@@ -235,7 +271,6 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     analysisInput,
     prompt: record.prompt,
     roomPaletteId: record.room_palette_id ?? undefined,
-    budget: record.budget ?? undefined,
     keptObjectIds: record.furniture_operations !== undefined ? record.furniture_operations.filter(operation => operation.action === "keep").map(operation => operation.object_id) : record.kept_object_ids.length > 0 ? record.kept_object_ids : record.before_scene.objects.filter(item => item.source === "existing").map(item => item.id),
     furnitureOperations: record.furniture_operations?.map(operation => ({ objectId: operation.object_id, action: operation.action })),
     furnitureAdditions: record.additions,
@@ -246,7 +281,7 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     })])],
   };
   if (!isRoomDesign(design)) invalid("Coordination の部屋データ");
-  return design;
+  return normalizeRoomBedding(design);
 }
 
 function sceneSnapshot(scene: components["schemas"]["Scene"], baseUrl: string): RoomSnapshot {

@@ -1,4 +1,4 @@
-import { roomPalette } from "../../domain/roomPalette";
+import { roomColor, roomPalette } from "../../domain/roomPalette";
 import { characterTheme } from "../../domain/characterTheme";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useMotionPresence } from "../shared/useMotionPresence";
@@ -16,6 +16,8 @@ import { buildMeasuredRoom } from "./roomArchitecture";
 import { createShellFloorOverlay } from "./shellFloorSurface";
 import { LAYOUT_GRID_STEP } from "./layoutGrid";
 import { applyMaterialOverrides } from "./furnitureMaterials";
+import { createBedCoverModel } from "./bedCoverModel";
+import { normalizeRoomBedding } from "../../domain/bedding";
 import { canPlaceOnFurniture, furniturePositionInRoom, getFurniturePlacementBounds, isFurnitureSupport, snapFurnitureEditPosition } from './roomBounds';
 
 interface RoomViewerProps {
@@ -24,6 +26,7 @@ interface RoomViewerProps {
   onSelectItem: (id: string) => void;
   view: "perspective" | "top" | "front";
   dimensions?: boolean;
+  markers?: boolean;
   editing?: boolean;
   onMoveItem?: (id: string, position: RoomItem["position"], supportObjectId?: string, supportSurface?: RoomItem['supportSurface']) => void;
   placementItem?: RoomItem | null;
@@ -43,6 +46,7 @@ type ViewerRuntime = {
   setView: (view: RoomViewerProps["view"]) => void;
   reset: () => void;
   setBefore: (before: boolean, markersVisible: boolean) => void;
+  setMarkersShown: (shown: boolean) => void;
   setEditing: (editing: boolean) => void;
   setPlacement: (item: RoomItem | null) => void;
   command: (command: NonNullable<RoomViewerProps["command"]>) => void;
@@ -52,7 +56,7 @@ function material(color: THREE.ColorRepresentation, roughness = 0.85) {
   return new THREE.MeshStandardMaterial({ color, roughness });
 }
 
-function createItemMarker(item: RoomItem) {
+function createItemMarker(item: RoomItem, color: string) {
   if (item.marker === undefined) return null;
   const canvas = document.createElement("canvas");
   canvas.width = 144;
@@ -61,13 +65,15 @@ function createItemMarker(item: RoomItem) {
   if (!context) return null;
   context.beginPath();
   context.arc(72, 72, 59, 0, Math.PI * 2);
-  context.fillStyle = "#ffffff";
+  context.fillStyle = color;
   context.fill();
   context.lineWidth = 8;
-  context.strokeStyle = "#6a3cd6";
+  context.strokeStyle = "#ffffff";
   context.stroke();
   const label = String(item.marker);
-  context.fillStyle = "#6a3cd6";
+  // 部屋の色は淡い色も濃い色もあるので、数字は読みやすい方の色にする。
+  const fill = new THREE.Color(color);
+  context.fillStyle = fill.r * 0.299 + fill.g * 0.587 + fill.b * 0.114 > 0.6 ? "#1d1b26" : "#ffffff";
   context.font = `700 ${label.length > 2 ? 40 : label.length > 1 ? 54 : 64}px Arial, sans-serif`;
   context.textAlign = "center";
   context.textBaseline = "middle";
@@ -150,6 +156,9 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean, manager?
   const dark = "#605747";
   const color = item.color;
   switch (item.category) {
+    case "bed_cover":
+      group.add(createBedCoverModel(item));
+      break;
     case "wall_mirror":
     case "mirror":
       box(group, [w, h, d], [0, h / 2, 0], color, true);
@@ -234,7 +243,7 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean, manager?
           box(group, [w, tierHeight, d / 3], [0, tierHeight / 2, z], color, true);
           for (let figure = 0; figure < 3; figure += 1) {
             const x = w * (figure - 1) * 0.27;
-            const figureColor = ["#b49cf0", "#7d5ce6", "#d9cbff"][(figure + tier) % 3];
+            const figureColor = ["#9cf0e9", "#5ce6db", "#cbfffb"][(figure + tier) % 3];
             cylinder(group, w * 0.055, w * 0.055, 0.018, [x, tierHeight + 0.009, z], "#eee8ff");
             box(group, [w * 0.095, h * 0.14, 0.016], [x, tierHeight + h * 0.09, z], figureColor, true);
             const head = new THREE.Mesh(new THREE.SphereGeometry(w * 0.042, 12, 8), material("#efddcf"));
@@ -401,8 +410,8 @@ function buildRoom(scene: THREE.Scene, accent: string, bounds: THREE.Box3, oshi:
     led.userData.afterAccent = true;
     architecture.add(led);
     const strips = [
-      box(led, [0.025, 0.035, depth - 0.2], [left + 0.08, height - 0.16, 0], "#e2d6ff"),
-      box(led, [width - 0.2, 0.035, 0.025], [0, height - 0.16, back + 0.08], "#e2d6ff"),
+      box(led, [0.025, 0.035, depth - 0.2], [left + 0.08, height - 0.16, 0], "#d6fffc"),
+      box(led, [width - 0.2, 0.035, 0.025], [0, height - 0.16, back + 0.08], "#d6fffc"),
     ];
     for (const strip of strips) {
       const surface = strip.material as THREE.MeshStandardMaterial;
@@ -508,8 +517,8 @@ function DimensionLabel({item}:{item:RoomItem|undefined}) {
   return presence.isPresent&&displayed?<div role="status" className="motion-presence" data-motion-state={presence.state} aria-hidden={!item||undefined} style={{position:"absolute",left:16,bottom:16,padding:"8px 12px",background:"rgba(29,27,38,.88)",border:"1px solid #6e6a7c",borderRadius:8,color:"#fff",fontSize:12,pointerEvents:"none"}}>幅 {Math.round(displayed.size[0]*100)} × 高さ {Math.round(displayed.size[1]*100)} × 奥行き {Math.round(displayed.size[2]*100)} cm</div>:null;
 }
 
-export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, view, resetKey, before = false, command, dimensions = false, editing = false, onMoveItem, placementItem = null, onPlaceItem, preview = false, onReady, onSnapshot }: RoomViewerProps) {
-  const design = useMemo<RoomDesign>(() => before && afterDesign.before ? {
+export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, view, resetKey, before = false, command, dimensions = false, markers: markersShownProp = true, editing = false, onMoveItem, placementItem = null, onPlaceItem, preview = false, onReady, onSnapshot }: RoomViewerProps) {
+  const design = useMemo<RoomDesign>(() => normalizeRoomBedding(before && afterDesign.before ? {
     ...afterDesign,
     room: afterDesign.before.room,
     items: afterDesign.before.items,
@@ -520,7 +529,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     style: afterDesign.characterThemeId ? "natural" : afterDesign.style,
     modelUrl: undefined,
     modelKind: undefined,
-  } : afterDesign, [afterDesign, before]);
+  } : afterDesign), [afterDesign, before]);
   // A supplied Before snapshot is a separate scene, including removed original
   // furniture. Legacy designs still use the existing visibility-only comparison.
   const legacyBefore = before && !afterDesign.before;
@@ -540,6 +549,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   const initialView = useEffectEvent(() => view);
   const initialBefore = useEffectEvent(() => legacyBefore);
   const initialMarkersVisible = useEffectEvent(() => !before && !preview);
+  const initialMarkersShown = useEffectEvent(() => markersShownProp);
   const initialEditing = useEffectEvent(() => editing && Boolean(onMoveItem) && !before);
   const initialPlacement = useEffectEvent(() => !before && onPlaceItem ? placementItem : null);
   const dimensionItem = dimensions ? design.items.find(item => item.id === selectedItemId) : undefined;
@@ -617,7 +627,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     scene.add(sun.target);
     const theme = characterTheme(design.characterThemeId);
     const oshi = design.style === "oshi" && !theme;
-    const accent = roomPalette(design.roomPaletteId)?.accent ?? theme?.accent ?? (oshi ? "#bba5ee" : design.style === "natural" ? "#c2a07f" : "#819274");
+    const accent = roomPalette(design.roomPaletteId)?.accent ?? theme?.accent ?? (oshi ? "#a5eee8" : design.style === "natural" ? "#c2a07f" : "#819274");
     if (design.room) {
       roomBounds.current = {
         id: design.id,
@@ -641,6 +651,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     let proceduralRoomVisible = true;
     let currentBefore = initialBefore();
     let markersVisible = initialMarkersVisible();
+    let markersShown = initialMarkersShown();
     let currentEditing = initialEditing();
     let cancelDrag = () => {};
     let clearPlacementPreview = () => {};
@@ -678,11 +689,19 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       const previous = furniture.get(item.id);
       if (previous) { scene.remove(previous); disposeObject(previous); }
       const group = createFurniture(item, accent, oshi, loadingManager);
+      if (item.category === "bed_cover" && !item.modelUrl && !item.existing && item.materialOverrides && !item.previewColor) {
+        const cloth = group.children[0] as THREE.Mesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>;
+        const originalMaterial = cloth.material;
+        textureCleanups.push(applyMaterialOverrides(group, item.materialOverrides, 1, () => {
+          if (!disposed && textureNotice.current) textureNotice.current.hidden = false;
+        }, loadingManager));
+        originalMaterial.dispose();
+      }
       scene.add(group);
       furniture.set(item.id, group);
     }
     for (const item of design.items) {
-      const marker = createItemMarker(item);
+      const marker = createItemMarker(item, roomColor(design.roomPaletteId)?.color ?? accent);
       if (!marker) continue;
       markers.set(item.id, marker);
       scene.add(marker);
@@ -730,7 +749,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         });
       }
       for (const group of hitTargets.values()) group.visible = !currentBefore;
-      for (const marker of markers.values()) marker.visible = markersVisible;
+      for (const marker of markers.values()) marker.visible = markersVisible && markersShown;
       architecture.traverse(object => {
         if (object.userData.afterAccent) object.visible = !currentBefore;
         if (object instanceof THREE.Mesh || object instanceof THREE.Line) {
@@ -846,6 +865,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       focus: focusItem,
       reset: () => { cancelDrag(); clearPlacementPreview(); lastCommandSequence = null; reset(); },
       setBefore: (nextBefore, nextMarkersVisible) => { if (nextBefore !== currentBefore) cancelDrag(); clearPlacementPreview(); currentBefore = nextBefore; markersVisible = nextMarkersVisible; updateVisibility(); },
+      setMarkersShown: (shown) => { markersShown = shown; updateVisibility(); },
       setEditing: (nextEditing) => { if (nextEditing !== currentEditing) cancelDrag(); if (!nextEditing) clearPlacementPreview(); currentEditing = nextEditing; layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel; },
       setPlacement: (item) => { if (item !== currentPlacement) clearPlacementPreview(); currentPlacement = item; },
       command: (nextCommand) => {
@@ -902,23 +922,32 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
           return;
         }
         const scale = Math.min(item.size[0] / modelSize.x, item.size[1] / modelSize.y, item.size[2] / modelSize.z);
-        gltf.scene.scale.setScalar(scale);
+        // A textile follows the declared horizontal footprint; contain fitting
+        // would shrink a wider cover merely because its thickness stays 4 cm.
+        const modelScale = item.category === "bed_cover"
+          ? new THREE.Vector3(item.size[0] / modelSize.x, item.size[1] / modelSize.y, item.size[2] / modelSize.z)
+          : new THREE.Vector3(scale, scale, scale);
+        gltf.scene.scale.copy(modelScale);
         const center = bounds.getCenter(new THREE.Vector3());
-        gltf.scene.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale);
+        gltf.scene.position.set(-center.x * modelScale.x, -bounds.min.y * modelScale.y, -center.z * modelScale.z);
         gltf.scene.traverse((object) => {
           if (!(object instanceof THREE.Mesh)) return;
           object.castShadow = true;
           object.receiveShadow = true;
           // Imported owned furniture uses a catalog approximation; keep its
           // measured dimensions and the product/edited color from the room item.
-          if (isManualFurniture(item)) {
+          // A color picked in the edit panel applies to every 3D model, not only owned furniture.
+          const tint = isManualFurniture(item) ? item.color : item.previewColor;
+          if (tint) {
             for (const surface of Array.isArray(object.material) ? object.material : [object.material]) {
-              if ("color" in surface && surface.color instanceof THREE.Color) surface.color.set(item.color);
+              if ("color" in surface && surface.color instanceof THREE.Color) surface.color.set(tint);
             }
           }
         });
-        if (!item.existing && item.materialOverrides) {
-          textureCleanups.push(applyMaterialOverrides(gltf.scene, item.materialOverrides, scale, () => {
+        // 選んだ色を、商品の素材・画像の上書きで打ち消さない。
+        if (!item.existing && item.materialOverrides && !item.previewColor) {
+          const textureScale: number | readonly [number, number] = item.category === "bed_cover" ? [modelScale.x, modelScale.z] : scale;
+          textureCleanups.push(applyMaterialOverrides(gltf.scene, item.materialOverrides, textureScale, () => {
             if (!disposed && textureNotice.current) textureNotice.current.hidden = false;
           }, loadingManager));
         }
@@ -1253,7 +1282,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       const markerObjects = loadedRoom && completeRoomModel && !currentBefore ? hitTargets : furniture;
       for (const [id, marker] of markers) {
         const group = markerObjects.get(id);
-        marker.visible = markersVisible && Boolean(group?.visible);
+        marker.visible = markersVisible && markersShown && Boolean(group?.visible);
         if (!marker.visible || !group) continue;
         const bounds = new THREE.Box3().setFromObject(group);
         bounds.getCenter(marker.position);
@@ -1331,6 +1360,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   useEffect(() => { runtime.current?.setView(view); }, [design, view]);
   useEffect(() => { runtime.current?.reset(); }, [resetKey]);
   useEffect(() => { runtime.current?.setBefore(legacyBefore, !before && !preview); }, [design, legacyBefore, before, preview]);
+  useEffect(() => { runtime.current?.setMarkersShown(markersShownProp); }, [design, markersShownProp]);
   useEffect(() => { runtime.current?.setEditing(editing && Boolean(onMoveItem) && !before); }, [design, editing, onMoveItem, before]);
   useEffect(() => { runtime.current?.setPlacement(!before && onPlaceItem ? placementItem : null); }, [design, placementItem, onPlaceItem, before]);
   useEffect(() => { canvasHost.current?.querySelector("canvas")?.setAttribute("aria-label", instructions); }, [design, instructions]);
