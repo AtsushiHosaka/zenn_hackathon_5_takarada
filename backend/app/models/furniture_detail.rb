@@ -1,6 +1,8 @@
 require "uri"
 
 class FurnitureDetail < ApplicationRecord
+  # Trusted full snapshot imports explicitly supply the evidence. Admin edits do not.
+  attr_accessor :retail_verification_import
   RETAIL_AVAILABILITIES = %w[listed in_stock out_of_stock unknown].freeze
   RETAIL_COMMERCIAL_FIELDS = %w[furniture_id name category slot color_name symbolic_color color_materials width height depth material price shop url image_url].freeze
   belongs_to :furniture, inverse_of: :details
@@ -90,6 +92,7 @@ class FurnitureDetail < ApplicationRecord
   # An admin edit must not keep provenance for the old product/color. An import
   # can retain it only when the shop check was refreshed in the same update.
   def invalidate_retail_verification
+    return if retail_verification_import && verified_retail_variant?
     return unless persisted? && RETAIL_COMMERCIAL_FIELDS.any? { |field| will_save_change_to_attribute?(field) }
     return if will_save_change_to_retail_checked_at? && retail_checked_at.present?
 
