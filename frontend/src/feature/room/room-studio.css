@@ -8,6 +8,17 @@
 .rc-title.is-new h1 {color:#6E6A7C}
 .rc-title button {flex:none;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:0;border-radius:10px;background:transparent;color:#6E6A7C}
 .rc-title button:hover {background:#F1EFF5;color:#1D1B26}
+/* 全体の流れ (今の部屋 → どんな部屋がいい？ → 完成)。今いる段階だけ濃くする。 */
+.rc-flow {flex:none;display:flex;align-items:center;gap:6px;margin:0 12px 0 0;padding:0;list-style:none}
+.rc-flow li {display:flex;align-items:center;gap:6px;color:#6E6A7C;font-size:12px;white-space:nowrap}
+.rc-flow li+li::before {content:'';width:18px;height:1px;background:#D8D4E2}
+.rc-flow li>span {display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#F1EFF5;font-family:'Bricolage Grotesque',sans-serif}
+.rc-flow li>b {font-weight:500}
+.rc-flow li[aria-current=step] {color:#5A2FC0}
+.rc-flow li[aria-current=step]>b {font-weight:700}
+.rc-flow li[aria-current=step]>span {background:#6A3CD6;color:#fff}
+.rc-flow .is-complete>span {background:#F1ECFB;color:#5A2FC0}
+@media(max-width:900px){.rc-flow li:not([aria-current=step])>b{display:none}.rc-flow li+li::before{width:8px}}
 .rc-studio-header .rc-account {width:40px;height:40px}
 .rc-workspace {flex:1;min-width:0;min-height:0;display:flex;flex-wrap:nowrap}
 .rc-chat {flex:0 0 clamp(240px,26.4vw,460px);min-width:0;height:100%;min-height:0;display:flex;flex-direction:column;background:#fff;border-right:1px solid #E4E1EC}
@@ -27,12 +38,6 @@
 .rc-bullets li::before {content:'';flex:none;width:6px;height:6px;margin-top:10px;border-radius:999px;background:#6A3CD6}
 .rc-tips .rc-bullets li::before {margin-top:9px}
 .rc-new-composer {flex:none;display:flex;flex-direction:column;gap:12px;padding:16px 20px 20px;border-top:1px solid #ECE8F3}
-.rc-input-progress {display:flex;flex-wrap:wrap;gap:12px;margin:0 0 4px;padding:0;list-style:none}
-.rc-input-progress li {display:flex;align-items:center;gap:5px;color:#6E6A7C;font-size:12px}
-.rc-input-progress li>span {display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#F1EFF5;font-family:'Bricolage Grotesque',sans-serif}
-.rc-input-progress li[aria-current=step] {color:#5A2FC0;font-weight:700}
-.rc-input-progress li[aria-current=step]>span {background:#6A3CD6;color:#fff}
-.rc-input-progress .is-complete>span {background:#F1ECFB;color:#5A2FC0}
 .rc-input-actions {display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-top:4px}
 .rc-input-actions .rc-primary {flex:1;justify-content:center;font-size:14px}
 .rc-input-actions button:disabled {opacity:.5;cursor:not-allowed}
@@ -108,6 +113,8 @@
 .rc-toolbar {display:flex;gap:2px;padding:4px;border-radius:14px;background:#221F2C;border:1px solid #2E2A38}
 .rc-toolbar button {width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:0;border-radius:10px;background:transparent;color:#DCD8E8}
 .rc-toolbar button:hover {background:#2E2A38}
+.rc-toolbar .rc-number-toggle[aria-pressed=false] {color:#8E889E}
+.rc-toolbar .rc-number-toggle[aria-pressed=true] {box-shadow:none}
 .rc-toolbar-divider {width:1px;margin:8px 4px;background:#3A3548}
 .rc-scene-footer>span {font-size:12px;color:#A7A2B6}
 .rc-panel {position:absolute;top:16px;right:16px;bottom:16px;width:min(var(--rc-panel-width),calc(100% - 32px));display:flex;flex-direction:column;border-radius:20px;background:#fff;color:#1D1B26;box-shadow:0 24px 60px rgba(0,0,0,.45);overflow:hidden}
@@ -139,7 +146,7 @@
 .room-viewer {position:absolute;inset:0;height:100%;width:100%}
 .viewer-fallback {position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;background:#16141C;color:#EDEAF4;text-align:center}
 .viewer-model-notice {position:absolute;bottom:12px;left:12px;right:12px;padding:12px;border:1px solid #615176;border-radius:12px;background:#221F2CEE;color:#EDEAF4;font-size:12px;line-height:1.6}
-.viewer-selected-item {position:absolute;top:72px;left:16px;z-index:1;max-width:calc(100% - 32px);min-height:40px;padding:8px 12px;border:1px solid #B49CF0;border-radius:10px;background:#221F2CEE;color:#fff;font:inherit;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.viewer-selected-item {position:absolute;top:72px;left:20px;z-index:1;max-width:calc(100% - 40px);min-height:32px;padding:5px 10px;border:1px solid rgba(255,255,255,.28);border-radius:10px;background:rgba(34,31,44,.4);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#fff;font:inherit;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
 .viewer-selected-item:focus-visible {outline:3px solid #BBA5EE;outline-offset:3px}
 .rc-error {color:#A02D4A;font-size:13px;line-height:1.7;margin:0}
 .rc-analysis-settings {display:flex;flex-direction:column;gap:16px}
@@ -263,3 +270,9 @@
 .rc-template-save:hover {color:#5A2FC0}
 .rc-template-save:focus-visible {outline:2px solid #BBA5EE;outline-offset:2px}
 .rc-coordinate-form .rc-input-progress {margin-bottom:12px}
+
+/* 3Dは枠を取らず画面いっぱいに描き、切り替えや操作のボタンはその上に重ねる。 */
+.rc-stage .rc-scene-stage.is-bleed {top:0;bottom:0;padding:0}
+.rc-scene-stage.is-bleed.has-panel {right:calc(var(--rc-panel-width) - 8px)}
+.rc-scene-stage.is-bleed .rc-scene {width:100%;height:100%;aspect-ratio:auto}
+.rc-scene-stage.is-bleed .viewer-model-notice {left:20px;margin-bottom:72px}

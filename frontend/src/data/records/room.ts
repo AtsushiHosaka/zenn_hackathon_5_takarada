@@ -1,6 +1,7 @@
 import { roomPalette } from "../../domain/roomPalette";
 import { characterTheme } from "../../domain/characterTheme";
 import { DomainError } from "../../domain/error";
+import { normalizeBedCover, normalizeRoomBedding } from "../../domain/bedding";
 import type { MaterialOverrides, ProductMetadata, RoomDesign, RoomItem, RoomShape, RoomSnapshot, Style } from "../../domain/room";
 import { productCategories, furnitureCategories, isManualFurniture, isImageArtwork, isRoomDesign, isRoomItem, isRoomShape, isTextureStatus } from "../../domain/room";
 import type { FurnitureDetailChoice, FurnitureReview, FurnitureReviewInput, FurnitureSearchInterpretation, FurnitureSearchResult, ModelCredit, SavedRoom, SearchModel } from "../../domain/roomRepository";
@@ -144,7 +145,7 @@ function toFurnitureDetail(value: unknown, baseUrl: string): FurnitureDetailChoi
   };
   if (!isRoomItem(item)) invalid("FurnitureDetail");
   return {
-    item, colorName: record.color_name == null ? undefined : text(record.color_name, "FurnitureDetail.color_name"),
+    item: normalizeBedCover(item), colorName: record.color_name == null ? undefined : text(record.color_name, "FurnitureDetail.color_name"),
     characters: characterKeys(record.characters, "FurnitureDetail.characters"),
     credits: credits(record.credits, "FurnitureDetail.credits", baseUrl),
   };
@@ -280,7 +281,7 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     })])],
   };
   if (!isRoomDesign(design)) invalid("Coordination の部屋データ");
-  return design;
+  return normalizeRoomBedding(design);
 }
 
 function sceneSnapshot(scene: components["schemas"]["Scene"], baseUrl: string): RoomSnapshot {

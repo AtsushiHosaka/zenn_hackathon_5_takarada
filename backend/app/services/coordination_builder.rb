@@ -24,14 +24,23 @@ class CoordinationBuilder
 
   def call
     kept = kept_objects
-    client = FurnitureCandidates.client(selected: selected_product_items)
+    client = FurnitureCandidates.client(selected: selected_product_items, characters: wanted_characters)
     gemini = GeminiClient.configured?(user_id: @coordination.room.user_id)
     candidate_limit = gemini ? CoordinationPlanner::Gemini::CANDIDATES_PER_GROUP : 3
-    # 要望文から読み取った色・雰囲気・形。合う商品を先に候補へ入れる (モックは並び順のまま)
-    preference = FurnitureQuery.call(@coordination.generation_prompt, user_id: @coordination.room.user_id) if gemini
-    floor_candidates = FurnitureOperationPlanner.call(@coordination, @scene, client:, candidate_limit:, preference:)
-    plan = CoordinationPlanner.call(prompt: @coordination.generation_prompt, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id, client:, additional_candidates: floor_candidates, previous:, preference:,
-                                    slots: SlotLayout.placeable_slots(@scene["room"], kept))
+    character_theme = CharacterRoomTheme.suggestion_profile(@coordination.character_theme_id, palette_id: @coordination.room_palette_id)
+    # Read literal user preferences separately from appended theme/palette instructions.
+    # Otherwise a generated theme default can masquerade as an explicit user color.
+    preference_text = character_theme ? @coordination.prompt : @coordination.generation_prompt
+    preference = FurnitureQuery.call(preference_text, user_id: @coordination.room.user_id) if gemini || character_theme
+    if character_theme
+      literal_color = (FurnitureCandidates::Colors::THEME_PATTERNS.to_a + FurnitureCandidates::Colors::PATTERNS.to_a)
+        .find { |_, pattern| pattern.match?(@coordination.prompt) }&.first
+      preference = preference.with(color: RoomPalette.find(@coordination.room_palette_id) ? nil : literal_color)
+    end
+    floor_candidates = FurnitureOperationPlanner.call(@coordination, @scene, client:, candidate_limit:, preference:, character_theme:)
+    suggested_floor = gemini ? suggested_floor_candidates(client, preference, candidate_limit, character_theme:) : []
+    plan = CoordinationPlanner.call(prompt: @coordination.generation_prompt, room: @scene["room"], kept_objects: kept, user_id: @coordination.room.user_id, client:, additional_candidates: floor_candidates + suggested_floor, previous:, preference:,
+                                    slots: SlotLayout.placeable_slots(@scene["room"], kept), character_theme:)
     removed, kept = kept.partition { |object| plan.removed_object_ids.include?(object["id"]) }
     # 従来の空配列は「全部活かす」。明示操作がある場合は、全置換・全除外も許可する。
     removed, kept = [], kept_objects if kept.empty? && @coordination.furniture_operations.empty?
@@ -40,7 +49,8 @@ class CoordinationBuilder
     coherent = plan.planned_by == "gemini"
     candidates = coherent ? plan.candidates : floor_candidates + plan.candidates.reject { |item| item.slot == "floor" }
     by_group = candidates.group_by { |item| item.metadata["group_id"] || item.slot }
-    chosen = coherent ? choose_planned_bundle(plan, by_group) : by_group.transform_values(&:first)
+    # [グループ, 商品] の並び。Gemini は 1 つの枠に複数の商品を選べる (CoordinationPlanner::MAX_PICKS)
+    chosen = coherent ? choose_planned_bundle(plan, by_group) : by_group.transform_values(&:first).to_a
     floor_choices = chosen.select { |_, item| item.slot == "floor" }
     active, floor_placed = place_floor_choices(floor_choices, by_group, kept, removed_object_ids: removed.pluck("id"))
     anchors = active + floor_placed.map { |entry| entry[:placement].object }
@@ -48,7 +58,7 @@ class CoordinationBuilder
     chosen = chosen.reject { |_, item| item.slot == "floor" }
     placed = []
     loop do
-      reserved_ids = chosen.values.map { |item| SlotLayout.object_id_for(item) }
+      reserved_ids = chosen.map { |_, item| SlotLayout.object_id_for(item) }
       placed = place_choices(chosen, by_slot, anchors)
       newly_kept_edit = placed.any? do |entry|
         id = SlotLayout.object_id_for(entry[:item])
@@ -56,7 +66,7 @@ class CoordinationBuilder
       end
       break unless newly_kept_edit
 
-      chosen = placed.to_h { |entry| [ entry[:slot], entry[:item] ] }
+      chosen = placed.map { |entry| [ entry[:slot], entry[:item] ] }
     end
     placed = floor_placed + placed
 
@@ -69,6 +79,13 @@ class CoordinationBuilder
     appearance = FurnitureProductAppearance.call(scene:, items:)
     failures = operation_failures(floor_placed)
     failures << "条件と配置に合う家具が登録されていませんでした。希望を変更して再提案してください。" if placed.empty?
+    if character_theme && placed.any?
+      colors = preference&.color ? [ preference.color ] : character_theme.fetch("colors")
+      unless placed.any? { |entry| colors.any? { |color| FurnitureCandidates::Colors.matches?("#{entry[:item].metadata['color_name']} #{entry[:item].name}", color) } }
+        names = { "cyan" => "シアン", "blue" => "ブルー", "white" => "白", "gray" => "グレー", "black" => "黒", "beige" => "ベージュ", "brown" => "ブラウン", "green" => "グリーン", "purple" => "紫", "pink" => "ピンク", "red" => "赤", "orange" => "オレンジ", "yellow" => "黄色" }
+        failures << "希望の#{colors.map { |color| names.fetch(color) }.join('・')}の商品は今回の提案に含まれていません。商品の登録色を使って提案しています。"
+      end
+    end
 
     Result.new(
       title: result_title(plan),
@@ -78,7 +95,7 @@ class CoordinationBuilder
       total_price: placed.sum { |p| p[:item].price },
       planned_by: plan.planned_by,
       # 精度の確認用: Gemini の回答と、実際に採用した商品
-      analysis: (@coordination.analysis || {}).deep_merge(plan.analysis).deep_merge("placed_item_ids" => placed.map { |p| p[:item].id }, "base_coordination_id" => @coordination.base_coordination_id, "preference" => preference&.to_h&.stringify_keys, "meta" => { "product_source" => "db" }, "operation_failures" => failures),
+      analysis: (@coordination.analysis || {}).deep_merge(plan.analysis).deep_merge("placed_item_ids" => placed.map { |p| p[:item].id }, "base_coordination_id" => @coordination.base_coordination_id, "preference" => preference&.to_h&.stringify_keys, "character_suggestion_profile" => character_theme, "meta" => { "product_source" => "db" }, "operation_failures" => failures),
       kept_object_ids: active.pluck("id"),
       furniture_operations: result_operations(active, removed)
     )
@@ -116,7 +133,11 @@ class CoordinationBuilder
     chosen.each do |group, item|
       original_id = item.metadata["replaces_object_id"]
       occupants = active.reject { |object| object["id"] == original_id } + placed.map { |entry| entry[:placement].object }
-      placement_options(item, by_group[group]).each do |candidate|
+      # 置けないときの代わりは同じ種類の候補だけ。ほかに選ばれた商品・先に置いた商品は代わりにしない
+      alternatives = by_group[group].select { |candidate| candidate.category == item.category && chosen.exclude?([ group, candidate ]) }
+      placement_options(item, alternatives).each do |candidate|
+        next if placed.any? { |entry| entry[:slot] == group && entry[:item] == candidate }
+
         layout = SlotLayout.new(@scene, occupants, edited_objects: layout_edits)
         placement = layout.place(candidate) or next
         placement.object["replaces_object_id"] = original_id
@@ -126,6 +147,26 @@ class CoordinationBuilder
       end
     end
     [ active, placed ]
+  end
+
+  # 要望文かキャラクターテーマに出てくるキャラクター。そのグッズだけを候補にし、関係のない提案にキャラクターのグッズを混ぜない
+  def wanted_characters
+    query = CharacterQuery.call(@coordination.generation_prompt, llm: false)
+    themed = @coordination.character_theme_id ? Character.where(theme_id: @coordination.character_theme_id).pluck(:character_key) : []
+    query.characters + Character.joins(:franchise).where(franchises: { franchise_key: query.franchises }).pluck(:character_key) + themed
+  end
+
+  # AI が自分から足せる大型家具の候補。部屋にある種類と、利用者が追加を指定した種類は出さない。
+  # 種類ごとに形の違うものを順に取る (並び順のままだと、先に並ぶ椅子だけで埋まりソファや収納が候補に入らない)
+  def suggested_floor_candidates(client, preference, limit, character_theme: nil)
+    categories = FurnitureCandidates::FLOOR_CATEGORIES - @scene["objects"].pluck("category") - @coordination.additions.pluck("category")
+    return [] if categories.empty?
+
+    items = client.search(slots: [ "floor" ], categories:, preference:, character_theme:).fetch("floor", []).reject { |item| item.metadata["group_id"] }
+    per_category = items.group_by(&:category).values.flat_map do |group|
+      character_theme ? FurnitureCandidates.shortlist(group, limit, preference:, character_theme:) : FurnitureCandidates.spread(group, limit)
+    end
+    FurnitureCandidates.spread(per_category, limit, &:category)
   end
 
   def operation_failures(placed)
@@ -152,11 +193,16 @@ class CoordinationBuilder
       item = candidates[edit["id"]]
       edit.merge("slot" => item.slot) if item
     end
-    layout = SlotLayout.new(@scene, kept, edited_objects: edits, reserved_object_ids: chosen.values.map { |item| SlotLayout.object_id_for(item) })
+    layout = SlotLayout.new(@scene, kept, edited_objects: edits, reserved_object_ids: chosen.map { |_, item| SlotLayout.object_id_for(item) })
+    used = []
     chosen.filter_map do |slot, item|
-      # 置けなければ、同じグループの候補 (Gemini では承認済みの代替) を順に試す
-      placement_options(item, by_slot[slot]).each do |candidate|
+      # 置けなければ、同じグループの候補 (Gemini では承認済みの代替) を順に試す。同じ枠でほかに選ばれた商品・先に置いた商品は代替にしない
+      alternatives = by_slot[slot].reject { |candidate| chosen.include?([ slot, candidate ]) }
+      placement_options(item, alternatives).each do |candidate|
+        next if used.include?(candidate)
+
         placement = layout.place(candidate) or next
+        used << candidate
         break({ slot:, item: candidate, placement: })
       end.then { |entry| entry.is_a?(Hash) ? entry : nil }
     end
@@ -169,14 +215,14 @@ class CoordinationBuilder
   # Geminiの総合提案を尊重する。未採用グループを勝手に埋めない。指定された床家具を先に置く
   def choose_planned_bundle(plan, by_group)
     selections = plan.analysis["selection"]
-    return {} unless selections.is_a?(Array)
+    return [] unless selections.is_a?(Array)
 
     selections.select { |selection| selection.is_a?(Hash) }
       .sort_by { |selection| Array(by_group[selection["group_id"]]).first&.slot == "floor" ? 0 : 1 }
-      .each_with_object({}) do |selection, chosen|
+      .each_with_object([]) do |selection, chosen|
         group = selection["group_id"]
         item = Array(by_group[group]).find { |candidate| candidate.id == selection["item_id"] }
-        chosen[group] ||= item if item
+        chosen << [ group, item ] if item && chosen.exclude?([ group, item ])
       end
   end
 
@@ -231,6 +277,11 @@ class CoordinationBuilder
     base = @coordination.base_coordination
     return if !base && selected_product_items.empty?
     return if base && base.status != "done"
+    # A new theme/palette is a room-wide change; old automatic picks must not
+    # crowd out the new colors. Explicit selections remain in the candidate client.
+    if base && (@coordination.character_theme_id == "hatsune-miku" || base.character_theme_id == "hatsune-miku")
+      return if base.character_theme_id != @coordination.character_theme_id || base.room_palette_id != @coordination.room_palette_id
+    end
 
     CoordinationPlanner::Previous.new(prompt: base&.prompt || @coordination.prompt, title: base&.title || "選択した家具", items: effective_previous_items.map { |item| item.slice("item_id", "slot", "name").merge("group_id" => item.dig("product_metadata", "group_id") || item["slot"]) })
   end
@@ -272,7 +323,7 @@ class CoordinationBuilder
       "image_url" => item.image_url,
       "color" => item.color,
       "placement_note" => note,
-      "product_metadata" => item.metadata.except("preferred_position", "preferred_rotation", "target_size")
+      "product_metadata" => item.metadata.except("preferred_position", "preferred_rotation", "target_size", "selected_by_user")
     }
   end
 end

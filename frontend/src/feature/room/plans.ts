@@ -7,6 +7,7 @@ import { DomainError } from '../../domain/error';
 import { isTemplateId } from '../../domain/roomTemplate';
 import { readRoomTemplates } from './templateStorage';
 import { appConfig } from '../../core/config';
+import { normalizeRoomBedding } from '../../domain/bedding';
 
 export const roomPlanKeys = { capabilities: ['room', 'capabilities'] as const };
 export const scopedRoomPlanKeys = (scope: string) => ({
@@ -24,7 +25,7 @@ function readPlans(scope: string): RoomDesign[] {
   try {
     // Legacy unowned plans remain on disk; never assign them to the next login.
     const value: unknown = JSON.parse(localStorage.getItem(storageKey(scope)) || '[]');
-    return Array.isArray(value) ? value.filter(isRoomDesign) : [];
+    return Array.isArray(value) ? value.filter(isRoomDesign).map(normalizeRoomBedding) : [];
   } catch { return []; }
 }
 function useLocalPlans(): RoomDesign[] {
@@ -54,7 +55,7 @@ export function useSavedRooms() {
     if (saved.some(room => room.id === (design.backendRoomId ?? design.id))) continue;
     saved.push({ id: design.backendRoomId ?? design.id, title: design.title, status: 'ready', createdAt: '', design });
   }
-  return { ...query, data: session.status === 'authenticated' ? saved : [], persistenceWarning: session.status === 'authenticated' ? rooms.persistenceWarning?.() : undefined };
+  return { ...query, data: session.status === 'authenticated' ? saved.map(room => room.design ? { ...room, design: normalizeRoomBedding(room.design) } : room) : [], persistenceWarning: session.status === 'authenticated' ? rooms.persistenceWarning?.() : undefined };
 }
 export function useRoomPlans(): RoomDesign[] {
   return useSavedRooms().data.flatMap(room => room.design ? [room.design] : []);
@@ -69,6 +70,7 @@ export function useRoomPlan(id: string, enabled: boolean, initialDesign?: () => 
   const alias = isApiRoomAlias(id);
   return useQuery({
     queryKey: scopedRoomPlanKeys(scope).detail(id),
+    select: normalizeRoomBedding,
     queryFn: async ({ signal }) => {
       if (isTemplateId(id)) {
         const templates = client.getQueryData<import('../../domain/roomTemplate').RoomTemplate[]>(['room', scope, 'templates']) ?? readRoomTemplates(scope);
