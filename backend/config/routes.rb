@@ -39,7 +39,10 @@ Rails.application.routes.draw do
         resources :furniture_details, only: %i[index create update destroy] do
           resources :model_generations, only: %i[index create]
         end
-        resources :furniture_models, only: %i[index update]
+        get "furniture_models/export", to: "furniture_models#export"
+        resources :furniture_models, only: :index
+        patch "furniture_models/:id", to: "furniture_models#update", as: :furniture_model
+        put "furniture_models/:id", to: "furniture_models#upsert", as: nil
         # AI による 3D モデルの生成 (ModelGeneration)
         resources :model_generations, only: :show do
           member do

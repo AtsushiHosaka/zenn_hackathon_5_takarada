@@ -30,7 +30,7 @@ furnitures       推し活グッズは category にグッズ種別 (acrylic_stan
 ```
 
 - `db/characters.json`（フランチャイズとキャラクター）を`rails character:import`で取り込む。JSONを正とし、載っていないものは消す。
-- `db/furnitures.json`の各モデルの`characters`（キャラクターのキー）から、`rails furniture:import`が`character_goods`を作る。キャラクターは先に取り込む（デプロイ・compose・seedは`character:import`→`furniture:import`の順）。
+- 3Dモデルの`characters`（キャラクターのキー）から、登録（管理API）と初期データの取り込み（`rails furniture:import`）が`character_goods`を作る。キャラクターは先に取り込む（デプロイ・compose・seedは`character:import`→`furniture:import`の順）。
 - 造形を認めないフランチャイズ（`likeness_allowed=false`）のキャラクターは、グッズに付けられない（`CharacterGoods`の検証）。
 - グッズ種別は家具の`category`。名前・同義語・単独で検索できるか（`standalone`）は`config/goods_categories.json`に持つ。キャラクターを付けた家具の`category`は、この一覧にあるものに限る。
 - 既存のモデルのうち、アクリルスタンド・缶バッジディスプレイ・うちわ・ポスターは`category`がグッズ種別に変わった（`oshi_goods`・`wall_art`から）。
