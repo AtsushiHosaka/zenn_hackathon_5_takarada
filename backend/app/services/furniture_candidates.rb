@@ -37,13 +37,15 @@ module FurnitureCandidates
 
   # 並び順を保ったまま、3D モデルの形 (stool_round, chair_office など) ごとに 1 件ずつ順に取って limit 件にする。
   # 先頭から limit 件だと、同じ形が続くカテゴリ (椅子はスツールと食卓用が先に並ぶ) でほかの形が候補に入らないため
-  def self.spread(items, limit)
-    shapes = items.group_by { |item| item.metadata["shape"] }.values
+  # ブロックを渡すと、形の代わりにその値 (種類など) ごとに取る
+  def self.spread(items, limit, &key)
+    shapes = items.group_by(&key || ->(item) { item.metadata["shape"] }).values
     (0...shapes.map(&:size).max.to_i).flat_map { |round| shapes.filter_map { |shape| shape[round] } }.first(limit)
   end
 
   # selected: ユーザーが選んだ detail の候補。枠・カテゴリが合えば先頭に混ぜる
-  def self.client(selected: [])
-    Client.new(selected:)
+  # characters: キャラクターのグッズを、このキャラクター (character_key) のものだけにする。nil なら絞らない
+  def self.client(selected: [], characters: nil)
+    Client.new(selected:, characters:)
   end
 end
