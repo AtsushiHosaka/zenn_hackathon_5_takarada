@@ -1,5 +1,4 @@
-"""GLB実測値とbuild_report.jsonからDB登録用カタログを作る。通常のPythonで実行。"""
-import argparse
+"""GLB実測値とbuild_report.jsonから、DBへ登録する3Dモデルの項目を作る。publish.pyから使う。"""
 import hashlib
 import json
 import math
@@ -76,6 +75,50 @@ CATEGORY = {
     "badge_display": "oshi_goods", "uchiwa_stand": "oshi_goods", "photo_garland": "wall_art",
     "wall_shelf_hex": "wall_shelf", "record_player": "appliance", "guitar": "hobby",
     "suitcase": "goods", "yoga_mat": "goods",
+    # 2026-10-10 推し活グッズ (完全一致)
+    "acrylic_stand_s": "oshi_goods",
+    "acrylic_stand_m": "oshi_goods",
+    "acrylic_stand_l": "oshi_goods",
+    "acrylic_stand_big": "oshi_goods",
+    "tapestry_b2": "tapestry",
+    "tapestry_b1": "tapestry",
+    "plush_base_s": "plush",
+    "plush_base_m": "plush",
+    "plush_base_l": "plush",
+    "cushion_diecut": "cushion",
+    "can_badge": "oshi_goods",
+    "rubber_mat": "oshi_goods",
+    "blanket_print": "blanket",
+    "acrylic_panel": "oshi_goods",
+    "char_hatsune_miku_plush": "plush",
+    "char_hatsune_miku_plush_big": "plush",
+    "char_hatsune_miku_acrylic_stand": "oshi_goods",
+    "char_hatsune_miku_tapestry_b2": "tapestry",
+    "char_hatsune_miku_cushion": "cushion",
+    "char_hatsune_miku_figure": "oshi_goods",
+    # 2026-10-10 初音ミクのグッズ追加分 (完全一致)
+    "char_hatsune_miku_cushion_round": "cushion",
+    "char_hatsune_miku_cushion_square": "cushion",
+    "char_hatsune_miku_cushion_body": "cushion",
+    "char_hatsune_miku_pc_cushion": "cushion",
+    "char_hatsune_miku_dakimakura": "bedding",
+    "char_hatsune_miku_blanket": "blanket",
+    "char_hatsune_miku_plush_lying": "plush",
+    "char_hatsune_miku_plush_negi": "plush",
+    "char_hatsune_miku_bed_cover": "bed_cover",
+    "char_hatsune_miku_rug": "rug",
+    "char_hatsune_miku_seat_cushion": "cushion",
+    "char_hatsune_miku_poster_a3": "wall_art",
+    "char_hatsune_miku_tapestry_life": "tapestry",
+    "char_hatsune_miku_standee": "oshi_goods",
+    "char_hatsune_miku_wall_clock": "wall_clock",
+    "char_hatsune_miku_mug": "tableware",
+    "char_hatsune_miku_diorama": "oshi_goods",
+    "char_hatsune_miku_desk_mat": "oshi_goods",
+    "char_hatsune_miku_penlight": "oshi_goods",
+    "char_hatsune_miku_can_badge": "oshi_goods",
+    "char_hatsune_miku_uchiwa": "oshi_goods",
+    "char_hatsune_miku_led_light": "desk_lamp",
 }
 NAMES = {
     "sofa_1seat": "1人掛けソファ", "sofa_2seat": "2人掛けソファ", "sofa_3seat": "3人掛けソファ",
@@ -160,22 +203,107 @@ NAMES = {
     "badge_display": "缶バッジディスプレイ", "uchiwa_stand": "うちわ（スタンド付き）", "photo_garland": "フォトガーランド",
     "wall_shelf_hex": "六角形ウォールシェルフ", "record_player": "レコードプレーヤー", "guitar": "ギター（スタンド付き）",
     "suitcase": "スーツケース", "yoga_mat": "ヨガマット（丸めた状態）",
+    "acrylic_stand_s": "アクリルスタンド S",
+    "acrylic_stand_m": "アクリルスタンド M",
+    "acrylic_stand_l": "アクリルスタンド L",
+    "acrylic_stand_big": "BIGアクリルスタンド",
+    "tapestry_b2": "B2タペストリー",
+    "tapestry_b1": "B1タペストリー",
+    "plush_base_s": "ぬいぐるみ素体 S",
+    "plush_base_m": "ぬいぐるみ素体 M",
+    "plush_base_l": "ぬいぐるみ素体 L",
+    "cushion_diecut": "ダイカットクッション",
+    "can_badge": "缶バッジ（イーゼル付き）",
+    "rubber_mat": "ラバーマット",
+    "blanket_print": "プリントブランケット",
+    "acrylic_panel": "アクリルパネル",
+    "char_hatsune_miku_plush": "初音ミク ぬいぐるみ",
+    "char_hatsune_miku_plush_big": "初音ミク BIGぬいぐるみ",
+    "char_hatsune_miku_acrylic_stand": "初音ミク アクリルスタンド",
+    "char_hatsune_miku_tapestry_b2": "初音ミク B2タペストリー",
+    "char_hatsune_miku_cushion": "初音ミク ダイカットクッション",
+    "char_hatsune_miku_figure": "初音ミク ミニフィギュア",
+    "char_hatsune_miku_cushion_round": "初音ミク 丸クッション",
+    "char_hatsune_miku_cushion_square": "初音ミク スクエアクッション",
+    "char_hatsune_miku_cushion_body": "初音ミク 全身ダイカットクッション",
+    "char_hatsune_miku_pc_cushion": "初音ミク PCクッション",
+    "char_hatsune_miku_dakimakura": "初音ミク 抱き枕",
+    "char_hatsune_miku_blanket": "初音ミク ブランケット",
+    "char_hatsune_miku_plush_lying": "初音ミク 寝そべりぬいぐるみ",
+    "char_hatsune_miku_plush_negi": "初音ミク ネギ持ちぬいぐるみ",
+    "char_hatsune_miku_bed_cover": "初音ミク 布団カバー",
+    "char_hatsune_miku_rug": "初音ミク ラグ",
+    "char_hatsune_miku_seat_cushion": "初音ミク 座布団",
+    "char_hatsune_miku_poster_a3": "初音ミク A3ポスター（額装）",
+    "char_hatsune_miku_tapestry_life": "初音ミク 等身大タペストリー",
+    "char_hatsune_miku_standee": "初音ミク 等身大パネル",
+    "char_hatsune_miku_wall_clock": "初音ミク 壁掛け時計",
+    "char_hatsune_miku_mug": "初音ミク マグカップ",
+    "char_hatsune_miku_diorama": "初音ミク アクリルジオラマ",
+    "char_hatsune_miku_desk_mat": "初音ミク デスクマット",
+    "char_hatsune_miku_penlight": "初音ミク ペンライト（スタンド付き）",
+    "char_hatsune_miku_can_badge": "初音ミク 缶バッジ",
+    "char_hatsune_miku_uchiwa": "初音ミク うちわ（スタンド付き）",
+    "char_hatsune_miku_led_light": "初音ミク LEDアクリルライト",
 }
-# モックカタログの商品ID・既存家具ID → モデル
-PRODUCTS = {
-    "bed-1": "bed_single", "desk-1": "desk_wood", "shelf-1": "bookshelf",
-    "101": "bed_cover__101", "201": "bed_cover__201", "301": "bed_cover__301",
-    "102": "curtain_pair__102", "202": "curtain_pair__202",
-    "115": "curtain_sheer__115", "302": "curtain_sheer__302", "901": "curtain_sheer__901",
-    "103": "rug_rect__103", "203": "rug_rect__203", "303": "rug_wave",
-    "111": "rug_round__111", "211": "rug_round__211", "311": "rug_round__311",
-    "107": "cushion__107", "207": "cushion__207", "307": "cushion__307",
-    "104": "shelf_floating", "114": "tapestry", "105": "floor_lamp", "112": "floor_lamp_slim",
-    "205": "floor_lamp_rattan", "212": "floor_lamp_tripod", "305": "floor_lamp_ball", "312": "floor_lamp_pleated",
-    "106": "display_case", "113": "display_rack_open", "108": "acrylic_stand_case", "204": "wall_planter",
-    "214": "wall_art", "206": "plant_monstera", "213": "plant_eucalyptus", "208": "small_plant",
-    "304": "wall_mirror", "306": "side_table", "308": "candle", "902": "desk_lamp_clip",
+# 推し活グッズのモデル形状 → (グッズ種別, キャラクター)。グッズ種別は家具の category になる。
+# キャラクターは backend/db/characters.json の characters[].key。未登録の形状は家具として扱う。
+GOODS = {
+    "acrylic_stand": ("acrylic_stand", []),
+    "tapestry": ("tapestry", []),
+    "uchiwa_stand": ("uchiwa", []),
+    "badge_display": ("can_badge", []),
+    "poster": ("poster", []),
+    "plush_bear": ("plush", []),
+    "plush_bunny": ("plush", []),
+    "cushion": ("cushion", []),
+    "cushion_round": ("cushion", []),
+    # 2026-10-10 グッズのテンプレートと初音ミク
+    "acrylic_stand_s": ("acrylic_stand", []),
+    "acrylic_stand_m": ("acrylic_stand", []),
+    "acrylic_stand_l": ("acrylic_stand", []),
+    "acrylic_stand_big": ("acrylic_stand", []),
+    "tapestry_b2": ("tapestry", []),
+    "tapestry_b1": ("tapestry", []),
+    "plush_base_s": ("plush", []),
+    "plush_base_m": ("plush", []),
+    "plush_base_l": ("plush", []),
+    "cushion_diecut": ("cushion", []),
+    "can_badge": ("can_badge", []),
+    "rubber_mat": ("rubber_mat", []),
+    "blanket_print": ("blanket", []),
+    "acrylic_panel": ("acrylic_panel", []),
+    "char_hatsune_miku_plush": ("plush", ["hatsune_miku"]),
+    "char_hatsune_miku_plush_big": ("plush", ["hatsune_miku"]),
+    "char_hatsune_miku_acrylic_stand": ("acrylic_stand", ["hatsune_miku"]),
+    "char_hatsune_miku_tapestry_b2": ("tapestry", ["hatsune_miku"]),
+    "char_hatsune_miku_cushion": ("cushion", ["hatsune_miku"]),
+    "char_hatsune_miku_figure": ("figure", ["hatsune_miku"]),
+    # 2026-10-10 初音ミクのグッズ追加分
+    "char_hatsune_miku_cushion_round": ("cushion", ["hatsune_miku"]),
+    "char_hatsune_miku_cushion_square": ("cushion", ["hatsune_miku"]),
+    "char_hatsune_miku_cushion_body": ("cushion", ["hatsune_miku"]),
+    "char_hatsune_miku_pc_cushion": ("cushion", ["hatsune_miku"]),
+    "char_hatsune_miku_dakimakura": ("body_pillow", ["hatsune_miku"]),
+    "char_hatsune_miku_blanket": ("blanket", ["hatsune_miku"]),
+    "char_hatsune_miku_plush_lying": ("plush", ["hatsune_miku"]),
+    "char_hatsune_miku_plush_negi": ("plush", ["hatsune_miku"]),
+    "char_hatsune_miku_bed_cover": ("bed_cover", ["hatsune_miku"]),
+    "char_hatsune_miku_rug": ("rug", ["hatsune_miku"]),
+    "char_hatsune_miku_seat_cushion": ("cushion", ["hatsune_miku"]),
+    "char_hatsune_miku_poster_a3": ("poster", ["hatsune_miku"]),
+    "char_hatsune_miku_tapestry_life": ("tapestry", ["hatsune_miku"]),
+    "char_hatsune_miku_standee": ("standee", ["hatsune_miku"]),
+    "char_hatsune_miku_wall_clock": ("wall_clock", ["hatsune_miku"]),
+    "char_hatsune_miku_mug": ("mug", ["hatsune_miku"]),
+    "char_hatsune_miku_diorama": ("acrylic_diorama", ["hatsune_miku"]),
+    "char_hatsune_miku_desk_mat": ("rubber_mat", ["hatsune_miku"]),
+    "char_hatsune_miku_penlight": ("penlight", ["hatsune_miku"]),
+    "char_hatsune_miku_can_badge": ("can_badge", ["hatsune_miku"]),
+    "char_hatsune_miku_uchiwa": ("uchiwa", ["hatsune_miku"]),
+    "char_hatsune_miku_led_light": ("room_light", ["hatsune_miku"]),
 }
+NOT_GOODS = (None, [])
 
 
 def category(name):
@@ -183,6 +311,11 @@ def category(name):
         if name.startswith(prefix):
             return CATEGORY[prefix]
     raise KeyError(name)
+
+
+def goods(shape):
+    _, characters = GOODS.get(shape, NOT_GOODS)
+    return {"characters": list(characters)}
 
 
 IDENTITY = [[1 if row == col else 0 for col in range(4)] for row in range(4)]
@@ -278,46 +411,33 @@ def measure_glb(path):
             "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--models-dir", type=Path, default=ROOT / "output/furniture_models/furniture")
-    parser.add_argument("--report", type=Path, default=HERE / "build_report.json")
-    parser.add_argument("--output", type=Path, default=ROOT / "backend/db/furniture_models.json")
-    args = parser.parse_args()
-    report = json.loads(args.report.read_text())
-    models = []
-    ids = set()
-    for item in sorted(report, key=lambda row: row["file"]):
+def load_report(path=HERE / "build_report.json"):
+    """build_report.json をファイル名 → 記録の辞書で返す。"""
+    report = {}
+    for item in json.loads(Path(path).read_text()):
         filename = item["file"]
-        if Path(filename).name != filename or not filename.endswith(".glb"):
-            raise ValueError(f"Invalid model filename: {filename}")
-        model_id = filename[:-4]
-        if model_id in ids:
-            raise ValueError(f"Duplicate model id: {model_id}")
-        ids.add(model_id)
-        base, _, variant = model_id.partition("__")
-        stats = measure_glb(args.models_dir / filename)
-        if item.get("sha256") != stats["sha256"]:
-            raise ValueError(f"Build report SHA256 differs from exported file: {filename}")
-        target = item["target"]
-        if len(target) != 3 or any(not math.isfinite(value) or value <= 0 for value in target):
-            raise ValueError(f"Invalid target dimensions: {filename}")
-        if any(abs(actual - expected) > 0.00001 for actual, expected in zip(stats["size"], target)):
-            raise ValueError(f"Exported size differs from target: {filename}: {stats['size']} vs {target}")
-        if stats["triangles"] != item["tris"] or stats["materials"] != item["materials"]:
-            raise ValueError(f"Build report differs from exported geometry/materials: {filename}")
-        models.append({"id": model_id, "name": NAMES[base], "category": category(base), "shape": base,
-                       "variant": variant or None, "format": "glb", "object_key": f"models/furniture/v1/{filename}", **stats})
-    missing = [reference for reference, model_id in PRODUCTS.items() if model_id not in ids]
-    if missing:
-        raise ValueError(f"Missing models for bindings: {missing}")
-    bindings = [{"kind": "existing" if reference in ("bed-1", "desk-1", "shelf-1") else "product",
-                 "reference": reference, "model_id": model_id} for reference, model_id in sorted(PRODUCTS.items())]
-    catalog = {"unit": "meter", "axes": "+Y up, +Z front, origin bottom center", "models": models, "bindings": bindings}
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(catalog, ensure_ascii=False, indent=1) + "\n")
-    print(f"{len(models)} models, {len(bindings)} bindings -> {args.output}")
+        if Path(filename).name != filename or not filename.endswith(".glb") or filename in report:
+            raise ValueError(f"Invalid or duplicate model filename: {filename}")
+        report[filename] = item
+    return report
 
 
-if __name__ == "__main__":
-    main()
+def entry(item, models_dir):
+    """書き出し時の記録 item と実ファイルを照合し、DB へ登録する 1 件 (db/furnitures.json の models[] の形) を返す。"""
+    filename = item["file"]
+    model_id = filename[:-4]
+    base, _, variant = model_id.partition("__")
+    stats = measure_glb(Path(models_dir) / filename)
+    if item.get("sha256") != stats["sha256"]:
+        raise ValueError(f"Build report SHA256 differs from exported file: {filename}")
+    target = item["target"]
+    if len(target) != 3 or any(not math.isfinite(value) or value <= 0 for value in target):
+        raise ValueError(f"Invalid target dimensions: {filename}")
+    if any(abs(actual - expected) > 0.00001 for actual, expected in zip(stats["size"], target)):
+        raise ValueError(f"Exported size differs from target: {filename}: {stats['size']} vs {target}")
+    if stats["triangles"] != item["tris"] or stats["materials"] != item["materials"]:
+        raise ValueError(f"Build report differs from exported geometry/materials: {filename}")
+    return {"id": model_id, "name": NAMES[base], "category": GOODS.get(base, NOT_GOODS)[0] or category(base), "shape": base,
+            "variant": variant or None, "format": "glb", "object_key": f"models/furniture/v1/{filename}",
+            **{("color_material_keys" if key == "materials" else key): value for key, value in stats.items()},
+            **goods(base)}

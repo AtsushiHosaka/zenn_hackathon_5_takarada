@@ -39,12 +39,13 @@ function addWindow(parent: THREE.Group, window: RoomWindow, center: number) {
   }
 }
 
-export function buildMeasuredRoom(scene: THREE.Scene, room: RoomGeometry, wallColor: string) {
+export function buildMeasuredRoom(scene: THREE.Scene, room: RoomGeometry, wallColor: string, originalFloorColor = room.floorColor) {
   const architecture = new THREE.Group();
   architecture.name = "measured-room";
   scene.add(architecture);
   // Floor surface is exactly Y=0; wall inner faces lie on the supplied bounds.
-  solid(architecture, [room.width, 0.16, room.depth], [0, -0.08, 0], room.floorColor);
+  const floor = solid(architecture, [room.width, 0.16, room.depth], [0, -0.08, 0], room.floorColor);
+  floor.userData.beforeColor = originalFloorColor;
   const rows = Math.min(40, Math.ceil(room.depth / 0.3));
   for (let row = 1; row < rows; row += 1) {
     const color = new THREE.Color(room.floorColor).multiplyScalar(0.9);
@@ -55,6 +56,7 @@ export function buildMeasuredRoom(scene: THREE.Scene, room: RoomGeometry, wallCo
       ]),
       new THREE.LineBasicMaterial({ color }),
     );
+    line.userData.beforeColor = new THREE.Color(originalFloorColor).multiplyScalar(0.9).getHex();
     architecture.add(line);
   }
   const walls = [

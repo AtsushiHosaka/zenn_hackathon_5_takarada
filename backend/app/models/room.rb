@@ -7,6 +7,12 @@ class Room < ApplicationRecord
   belongs_to :user, optional: true # Preserve legacy anonymous records.
 
   has_many :coordinations, dependent: :destroy
+  # Select one row per room in PostgreSQL before Rails preloads the association.
+  has_one :latest_coordination, -> {
+    where(status: "done").select("DISTINCT ON (coordinations.room_id) coordinations.*")
+                         .order(:room_id, created_at: :desc, id: :desc)
+  },
+          class_name: "Coordination", inverse_of: :room
 
   # DB の既定値は既存行の補完用。新規作成では必須にするため既定値を外す
   attribute :shape, :string, default: nil

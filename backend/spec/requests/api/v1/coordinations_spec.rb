@@ -11,7 +11,7 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
 
     post "コーデ提案の生成を始める" do
       tags "Coordinations"
-      description "GET /api/v1/coordinations/{id} で status が done / failed になるまで待つ。本番inline実行ではPOSTも処理完了を待つ。Geminiの設定とownerの利用許可があれば公式EC商品を検索し、配置後に既存モデルの素材テクスチャを生成する。未設定時はモック。furniture_operationsで既存家具のkeep/replace、additionsで最大6点の大型家具追加を指定できる。本人の部屋・提案だけ扱う"
+      description "GET /api/v1/coordinations/{id} で status が done / failed になるまで待つ。本番inline実行ではPOSTも処理完了を待つ。Geminiの設定とownerの利用許可があれば公式EC商品を検索し、配置後に既存モデルの素材テクスチャを生成する。未設定時はモック。furniture_operationsで既存家具のkeep/replace/remove、additionsで最大6点の大型家具追加を指定できる。写真で見つからなかった所有家具はedited_objectsにmanual-UUIDのidとlabel/categoryを含める。本人の部屋・提案だけ扱う"
       security [ { bearerAuth: [] } ]
       consumes "application/json"
       produces "application/json"
@@ -23,16 +23,29 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
         let(:room_id) { room.id }
         let(:params) do
           objects = room.scene["objects"]
-          { coordination: { prompt: "紫色の推し活ルームにしたい", budget: 30_000,
-                            kept_object_ids: objects.pluck("id"),
-                            furniture_operations: objects.map { |object| { object_id: object["id"], action: "keep" } },
+          manual = { "id" => "manual-8e24d3af-c12d-4567-8910-123456789abc", "label" => "今ある椅子", "category" => "chair",
+                     "position" => { "x" => room.scene.dig("room", "width") / 2, "y" => 0, "z" => room.scene.dig("room", "depth") / 2 },
+                     "size" => { "w" => 0.45, "h" => 0.8, "d" => 0.45 }, "rotation_y" => 0, "color" => "#bba588" }
+          mirror = manual.merge("id" => "manual-8e24d3af-c12d-4567-8910-123456789abd", "category" => "mirror", "label" => "鏡", "size" => { "w" => 0.8, "h" => 1.7, "d" => 0.08 })
+          artwork = { "data_url" => "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9ncAAAAASUVORK5CYII=" }
+          goods = %w[poster acrylic_stand].map.with_index do |category, index|
+            manual.merge("id" => "manual-8e24d3af-c12d-4567-8910-123456789ab#{index}", "category" => category, "label" => "推しグッズ",
+                         "size" => { "w" => 0.2, "h" => 0.3, "d" => 0.06 }, "artwork" => artwork)
+          end
+          { coordination: { prompt: "音楽を楽しむ部屋にしたい", character_theme_id: "hatsune-miku", room_palette_id: "warm-ivory", budget: 30_000,
+                            kept_object_ids: objects.pluck("id") + [ manual["id"], mirror["id"] ] + goods.pluck("id"),
+                            furniture_operations: (objects + [ manual, mirror ] + goods).map { |object| { object_id: object["id"], action: "keep" } },
                             additions: [ { category: "table" } ],
-                            edited_objects: [ objects.first.slice("id", "position", "size", "rotation_y", "color") ] } }
+                            edited_objects: [ objects.first.slice("id", "position", "size", "rotation_y", "color"), manual, mirror, *goods ] } }
         end
 
         run_test! do |response|
+          expect(JSON.parse(response.body)["before_scene"]["objects"].last(2).map { |object| object.dig("artwork", "data_url") }).to all(start_with("data:image/png;base64,"))
+          expect(JSON.parse(response.body)["before_scene"]["objects"].find { |object| object["category"] == "mirror" }).to include("label" => "鏡", "source" => "existing")
+          expect(JSON.parse(response.body)["character_theme_id"]).to eq("hatsune-miku")
           expect(GenerateCoordinationJob).to have_been_enqueued
           expect(JSON.parse(response.body)["additions"]).to eq([ { "category" => "table" } ])
+          expect(JSON.parse(response.body)["before_scene"]["objects"].find { |object| object["id"] == "manual-8e24d3af-c12d-4567-8910-123456789abc" }).to include("id" => "manual-8e24d3af-c12d-4567-8910-123456789abc", "source" => "existing", "category" => "chair", "item_id" => nil)
         end
       end
 
@@ -74,7 +87,7 @@ RSpec.describe "Api::V1::Coordinations", type: :request do
         schema "$ref" => "#/components/schemas/Coordination"
 
         let(:coordination) do
-          room.coordinations.create!(prompt: "紫色の推し活ルームにしたい", budget: 30_000).tap do |c|
+          room.coordinations.create!(room_palette_id: "warm-ivory", prompt: "紫色の推し活ルームにしたい", budget: 30_000).tap do |c|
             c.update!(status: "done", **CoordinationBuilder.call(c).to_h)
           end
         end

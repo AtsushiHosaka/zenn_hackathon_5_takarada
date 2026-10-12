@@ -1,0 +1,66 @@
+initial GPU {
+  mirrorPreserved: true,
+  red: 1782,
+  nonzero: 350080,
+  width: 640,
+  height: 547,
+  shadowAutoUpdate: true,
+  target: true,
+  canvases: 1
+} mirror 1888
+separated
+insertion warning
+{
+  "result": "PASS",
+  "rootHead": "ded51452183d9da8f4e5b2e1a59981089a5b6f49",
+  "outlined": {
+    "mirrorPreserved": true,
+    "red": 1782,
+    "nonzero": 350080,
+    "width": 640,
+    "height": 547,
+    "shadowAutoUpdate": true,
+    "target": true,
+    "canvases": 1
+  },
+  "clear": {
+    "mirrorPreserved": true,
+    "red": 0,
+    "nonzero": 311664,
+    "width": 604,
+    "height": 516,
+    "shadowAutoUpdate": true,
+    "target": true,
+    "canvases": 1
+  },
+  "inserted": {
+    "mirrorPreserved": true,
+    "red": 1360,
+    "nonzero": 311664,
+    "width": 604,
+    "height": 516,
+    "shadowAutoUpdate": true,
+    "target": true,
+    "canvases": 1
+  },
+  "mirror": {
+    "firstColors": 1888,
+    "secondColors": 1661,
+    "cameraChanges": true,
+    "pixelSampleChanges": true
+  },
+  "checks": [
+    "actual full-object red GPU contours and preserved surfaces inspected",
+    "keyboard separation/save/reload removes all red pixels",
+    "actual DOM insertion preview warns and clears on dragleave",
+    "partial complete GLTF owned contours + explicit coverage warning",
+    "390px focus/keyboard-scroll/max48px/no document overflow",
+    "one canvas + null render target + restored shadow updates",
+    "trusted mirror GPU texture and reflected camera change under active outline pipeline",
+    "zero page errors"
+  ],
+  "limits": [
+    "controlled local room/GLTF fixtures, not live provider/deployed paths",
+    "physical touch and mobile hardware GPU unverified"
+  ]
+}

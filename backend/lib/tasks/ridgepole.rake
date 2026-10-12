@@ -6,14 +6,15 @@ def ridgepole(*args)
 end
 
 namespace :db do
-  desc "db/Schemafile を DB に適用する"
+  # Schemafile が唯一の正なので、載っていないテーブルは削除する
+  desc "db/Schemafile を DB に適用する (Schemafile に無いテーブルは削除)"
   task :apply do
-    ridgepole "--apply"
+    ridgepole "--apply", "--drop-table"
   end
 
   desc "db/Schemafile と DB の差分を表示する (適用はしない)"
   task :dry_run do
-    ridgepole "--apply", "--dry-run"
+    ridgepole "--apply", "--drop-table", "--dry-run"
   end
 
   desc "現在の DB の状態を db/Schemafile に書き出す"

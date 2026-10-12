@@ -4,41 +4,354 @@
  */
 
 export interface paths {
-    "/api/v1/assets/{key}": {
+    "/api/v1/admin/furniture_details": {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                /** @description textures/description-seamless-v1/<64桁のハッシュ>.png等 */
-                key: string;
-            };
+            path?: never;
             cookie?: never;
         };
         /**
-         * 開発環境の生成テクスチャを取得する
-         * @description 開発・テスト限定。本番は404となり、SceneObjectのGCS公開texture_urlを使用する。
+         * 商品 (家具の色・寸法・購入リンク) を非表示のものも含めて一覧で取得する
+         * @description 管理者 (users.admin) だけが使える。
          */
         get: {
             parameters: {
                 query?: never;
                 header?: never;
-                path: {
-                    /** @description textures/description-seamless-v1/<64桁のハッシュ>.png等 */
-                    key: string;
-                };
+                path?: never;
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
-                /** @description 生成画像 */
+                /** @description 商品の一覧と、選べる枠・種類 */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "image/png": string;
-                        "image/jpeg": string;
-                        "image/webp": string;
+                        "application/json": components["schemas"]["AdminFurnitureDetailList"];
+                    };
+                };
+                /** @description 管理者ではない */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Forbidden"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** 商品を登録する */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["AdminFurnitureDetailInput"];
+                };
+            };
+            responses: {
+                /** @description 登録に成功 */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminFurnitureDetail"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/furniture_details/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * 商品を削除する
+         * @description 保存済みの部屋・提案は商品の写しを持っているので変わらない。一時的に外すだけなら enabled を false にする。
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 削除に成功 */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description 商品が無い */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NotFound"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /**
+         * 商品を編集する
+         * @description 商品は DB が正。編集はそのまま提案・検索に使われ、デプロイ時の furniture_detail:import では戻らない。
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["AdminFurnitureDetailInput"];
+                };
+            };
+            responses: {
+                /** @description 編集に成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminFurnitureDetail"];
+                    };
+                };
+                /** @description 値が不正 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ValidationErrors"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/admin/furniture_details/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 商品を db/furniture_details.json の形で書き出す
+         * @description 控えを取るときと、初期データ (db/furniture_details.json) を今の DB に合わせるときに使う。非表示の商品は含まない。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description db/furniture_details.json と同じ形 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminFurnitureDetailExport"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/furniture_models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 3D モデルを無効なものも含めて一覧で取得する
+         * @description 管理者 (users.admin) だけが使える。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description モデル一覧 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminFurnitureModel"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/furniture_models/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description モデルの安定 ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * 3D モデルを登録・更新する
+         * @description GLB は先に公開バケットへ置く。無ければ作り、あれば上書きする。有効・無効は変えない。
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description モデルの安定 ID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["AdminFurnitureModelUpsert"];
+                };
+            };
+            responses: {
+                /** @description 登録・更新に成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminFurnitureModel"];
+                    };
+                };
+                /** @description 内容が不正 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** 3D モデルの有効・無効を切り替える */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description モデルの安定 ID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["AdminFurnitureModelInput"];
+                };
+            };
+            responses: {
+                /** @description 切り替えに成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminFurnitureModel"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/admin/furniture_models/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 3D モデルを db/furnitures.json の形で書き出す
+         * @description 控えを取るときと、初期データ (db/furnitures.json) を今の DB に合わせるときに使う。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description db/furnitures.json と同じ形 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminFurnitureModelExport"];
                     };
                 };
             };
@@ -87,6 +400,15 @@ export interface paths {
                 };
                 /** @description バリデーションエラー */
                 422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ValidationErrors"];
+                    };
+                };
+                /** @description 正式文書の未設定により新規登録を停止中 */
+                503: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -254,7 +576,7 @@ export interface paths {
         put?: never;
         /**
          * コーデ提案の生成を始める
-         * @description GET /api/v1/coordinations/{id} で status が done / failed になるまで待つ。本番inline実行ではPOSTも処理完了を待つ。Geminiの設定とownerの利用許可があれば公式EC商品を検索し、配置後に既存モデルの素材テクスチャを生成する。未設定時はモック。furniture_operationsで既存家具のkeep/replace、additionsで最大6点の大型家具追加を指定できる。本人の部屋・提案だけ扱う
+         * @description GET /api/v1/coordinations/{id} で status が done / failed になるまで待つ。本番inline実行ではPOSTも処理完了を待つ。Geminiの設定とownerの利用許可があれば公式EC商品を検索し、配置後に既存モデルの素材テクスチャを生成する。未設定時はモック。furniture_operationsで既存家具のkeep/replace/remove、additionsで最大6点の大型家具追加を指定できる。写真で見つからなかった所有家具はedited_objectsにmanual-UUIDのidとlabel/categoryを含める。本人の部屋・提案だけ扱う
          */
         post: {
             parameters: {
@@ -454,7 +776,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/rooms": {
+    "/api/v1/furniture_searches": {
         parameters: {
             query?: never;
             header?: never;
@@ -464,8 +786,101 @@ export interface paths {
         get?: never;
         put?: never;
         /**
+         * 登録された家具を検索し色で絞り込む
+         * @description DBに登録された家具 (furniture_details) を検索する。外部ECは検索しない。商品名に検索語を含むものを優先し、無ければ推定したカテゴリ (なければ床置き家具) 全体を返す。色は公式の色名・商品名で絞り込む。家具ごとに1件で最大24件。同じ家具の他の色・寸法・購入先はvariantsに入る。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["FurnitureSearchInput"];
+                };
+            };
+            responses: {
+                /** @description 検索結果 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FurnitureSearchResult"];
+                    };
+                };
+                /** @description ログインが必要 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Unauthorized"];
+                    };
+                };
+                /** @description 入力または検索の確認に失敗 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ValidationErrors"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 本人の部屋一覧を取得する
+         * @description 本人の部屋をIDの降順で返す。部屋がない場合は空の配列を返す。解析中・失敗した部屋も含み、各部屋に最後に成功した提案を返す。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 部屋一覧 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Room"][];
+                    };
+                };
+                /** @description ログインが必要 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Unauthorized"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
          * 部屋を登録して解析を始める
-         * @description 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ
+         * @description template_sceneを指定すると、保存した配置からreadyの部屋を別IDで作成する。モデルURLは受け付けない。写真との併用は不可。省略時の解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ
          */
         post: {
             parameters: {
@@ -480,7 +895,7 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description 登録に成功 (status: analyzing) */
+                /** @description 登録に成功 (通常はanalyzing、テンプレートはready) */
                 201: {
                     headers: {
                         [name: string]: unknown;
@@ -864,6 +1279,249 @@ export interface components {
             /** @example メールアドレスまたはパスワードが違います */
             error: string;
         };
+        Forbidden: {
+            /** @example 管理者だけが使えます */
+            error: string;
+        };
+        /** @description 管理画面用の商品 (家具の色・寸法・購入リンク)。非表示のものも含む */
+        AdminFurnitureDetail: {
+            /** @example 1 */
+            id: number;
+            /**
+             * @description 安定 ID。初期データ (db/furniture_details.json) の key。管理画面で足した商品は admin:<uuid>
+             * @example static:101
+             */
+            key: string;
+            /** @example SANDSBERG サンドスベリ チェア - ホワイト */
+            name: string;
+            /** @example chair */
+            category: string;
+            /**
+             * @description 置き場所の枠
+             * @example floor
+             * @enum {string}
+             */
+            slot: "bed_cover" | "curtain" | "rug" | "wall_decor" | "light" | "display" | "cushion" | "desk_top" | "floor";
+            /**
+             * @description 使う 3D モデルの ID
+             * @example chair_dining
+             */
+            model_key: string | null;
+            /**
+             * @description 代表色
+             * @example #f2efe8
+             */
+            symbolic_color: string;
+            /**
+             * @description 部位ごとの色。キーはモデルの color_material_keys
+             * @example {
+             *       "tint": "#f2efe8"
+             *     }
+             */
+            color_materials: {
+                [key: string]: string;
+            };
+            /**
+             * @description 部位ごとの模様 (texture_key)
+             * @example {}
+             */
+            texture_materials: {
+                [key: string]: string;
+            };
+            /** @example ホワイト */
+            color_name: string | null;
+            size: components["schemas"]["Size"];
+            /**
+             * @description リンク先の参考価格 (税込)
+             * @example 2000
+             */
+            price: number;
+            /** @example IKEA */
+            shop: string;
+            /**
+             * @description 購入リンク
+             * @example https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/
+             */
+            url: string;
+            /**
+             * @description 商品画像
+             * @example null
+             */
+            image_url: string | null;
+            /** @example [] */
+            themes: string[];
+            /**
+             * @description 候補の並び順 (小さいほど先)
+             * @example 0
+             */
+            position: number;
+            /**
+             * @description false なら提案・検索に出さない
+             * @example true
+             */
+            enabled: boolean;
+            /** Format: date-time */
+            checked_at: string | null;
+        };
+        AdminFurnitureDetailList: {
+            details: components["schemas"]["AdminFurnitureDetail"][];
+            /** @description 選べる置き場所の枠 */
+            slots: string[];
+            /** @description 家具検索で使う家具の種類 */
+            categories: string[];
+        };
+        AdminFurnitureDetailInput: {
+            /** @description 作成では name, category, slot, model_key, symbolic_color, color_materials, size, price, shop, url が必須。更新では変える項目だけ */
+            furniture_detail: {
+                /** @example SANDSBERG サンドスベリ チェア - ホワイト */
+                name?: string;
+                /** @example chair */
+                category?: string;
+                /**
+                 * @example floor
+                 * @enum {string}
+                 */
+                slot?: "bed_cover" | "curtain" | "rug" | "wall_decor" | "light" | "display" | "cushion" | "desk_top" | "floor";
+                /** @example chair_dining */
+                model_key?: string;
+                /** @example #f2efe8 */
+                symbolic_color?: string;
+                /**
+                 * @example {
+                 *       "tint": "#f2efe8"
+                 *     }
+                 */
+                color_materials?: {
+                    [key: string]: string;
+                };
+                /** @example ホワイト */
+                color_name?: string | null;
+                size?: components["schemas"]["Size"];
+                /** @example 2000 */
+                price?: number;
+                /** @example IKEA */
+                shop?: string;
+                /** @example https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/ */
+                url?: string;
+                /** @example null */
+                image_url?: string | null;
+                /** @example [] */
+                themes?: string[];
+                /** @example 0 */
+                position?: number;
+                /** @example true */
+                enabled?: boolean;
+            };
+        };
+        /** @description db/furniture_details.json と同じ形。非表示の商品は含まない */
+        AdminFurnitureDetailExport: {
+            details: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** @description 管理画面用の 3D モデル。無効なものも含む */
+        AdminFurnitureModel: {
+            /**
+             * @description モデルの安定 ID (GLB ファイル名から拡張子を除いた値)
+             * @example chair_dining
+             */
+            id: string;
+            /** @example ダイニングチェア */
+            name: string;
+            /** @example chair */
+            category: string;
+            /** @example chair_dining */
+            shape: string;
+            /** @example null */
+            variant: string | null;
+            size: components["schemas"]["Size"];
+            /**
+             * @description 色が分かれている部位の名前
+             * @example [
+             *       "tint",
+             *       "wood"
+             *     ]
+             */
+            color_material_keys: string[];
+            /**
+             * @description バケット内の GLB のパス。モデル ID から決まる
+             * @example models/furniture/v1/chair_dining.glb
+             */
+            object_key: string;
+            /** @example null */
+            model_url: string | null;
+            /**
+             * @description false なら API・提案から外す
+             * @example true
+             */
+            enabled: boolean;
+            /**
+             * @description このモデルを使っている商品の数
+             * @example 2
+             */
+            details_count: number;
+        };
+        AdminFurnitureModelInput: {
+            furniture_model: {
+                /** @example false */
+                enabled: boolean;
+            };
+        };
+        /** @description 3D モデルの登録・更新。GLB は先に公開バケットの models/furniture/v1/<id>.glb へ置く。db/furnitures.json の models[] から id・format・object_key を除いた形 */
+        AdminFurnitureModelUpsert: {
+            furniture_model: {
+                /** @example クッション */
+                name: string;
+                /** @example cushion */
+                category: string;
+                /** @example cushion */
+                shape: string;
+                /** @example null */
+                variant?: string | null;
+                /**
+                 * @description [幅, 高さ, 奥行き] (m)
+                 * @example [
+                 *       0.45,
+                 *       0.15,
+                 *       0.45
+                 *     ]
+                 */
+                size: number[];
+                /** @example 2496 */
+                triangles: number;
+                /**
+                 * @description GLB のバイト数
+                 * @example 62864
+                 */
+                bytes: number;
+                /**
+                 * @description GLB の SHA256 (小文字 16 進)
+                 * @example 74851bb7a3d46ca993470a9ac371d89e013fa329f472519a4a0e09bab7172dfe
+                 */
+                sha256: string;
+                /**
+                 * @example [
+                 *       "tint"
+                 *     ]
+                 */
+                color_material_keys: string[];
+                /**
+                 * @description 推し活グッズのキャラクター (db/characters.json のキー)
+                 * @example []
+                 */
+                characters?: string[];
+            };
+        };
+        /** @description db/furnitures.json と同じ形。無効な家具も含む */
+        AdminFurnitureModelExport: {
+            /** @example meter */
+            unit: string;
+            /** @example +Y up, +Z front, origin bottom center */
+            axes: string;
+            models: {
+                [key: string]: unknown;
+            }[];
+        };
         NotFound: {
             /** @example Couldn't find User with 'id'=999 */
             error: string;
@@ -876,18 +1534,6 @@ export interface components {
             h: number;
             /** @example 1.95 */
             d: number;
-        };
-        FurnitureModelBinding: {
-            /**
-             * @example existing
-             * @enum {string}
-             */
-            kind: "existing" | "product";
-            /**
-             * @description 既存家具の object ID または商品の ID
-             * @example bed-1
-             */
-            reference: string;
         };
         FurnitureModel: {
             /**
@@ -931,18 +1577,27 @@ export interface components {
             /** @example aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa */
             sha256: string;
             /**
+             * @description 色が分かれている部位の名前 (GLB の素材名)
              * @example [
-             *       "wood",
-             *       "fabric"
+             *       "tint",
+             *       "wood"
              *     ]
              */
-            materials: string[];
+            color_material_keys: string[];
             /**
              * @description GCS の公開 GLB URL。ベース URL が未設定なら null
              * @example null
              */
             model_url: string | null;
-            bindings: components["schemas"]["FurnitureModelBinding"][];
+            /**
+             * @description この家具がグッズになっているキャラクターのキー
+             * @example [
+             *       "hatsune_miku"
+             *     ]
+             */
+            characters: string[];
+            /** @description 表示する権利表記。キャラクターのフランチャイズごとに1件 */
+            credits: components["schemas"]["Credit"][];
         };
         /** @description 物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き */
         Position: {
@@ -1021,6 +1676,13 @@ export interface components {
             /** @description ドア (部屋の出入り口・クローゼットの扉)。前の床 0.8m には家具・商品を置かない。古いシーンには無い */
             doors?: components["schemas"]["Door"][];
         };
+        ImageArtwork: {
+            /**
+             * @description 最大512pxのPNG画像。透過を保持する
+             * @example data:image/png;base64,iVBORw0KGgo=
+             */
+            data_url: string;
+        };
         SceneObject: {
             /** @example bed-1 */
             id: string;
@@ -1032,6 +1694,7 @@ export interface components {
             source: "existing" | "suggested";
             /** @example bed */
             category: string;
+            artwork?: components["schemas"]["ImageArtwork"];
             /** @example ベッド */
             label: string;
             size: components["schemas"]["Size"];
@@ -1043,6 +1706,26 @@ export interface components {
             rotation_y: number;
             /** @example #f2f0eb */
             color: string;
+            /**
+             * @description 家具の色・寸法・購入リンク (FurnitureDetail) のID。登録された家具から選んだ所有家具・提案商品に付く
+             * @example 1
+             */
+            furniture_detail_id?: number;
+            /**
+             * @description 所有家具の参考価格。今回の購入商品合計には含めない
+             * @example 7990
+             */
+            price?: number;
+            /** @example IKEA */
+            shop?: string;
+            /** @example https://www.ikea.com/jp/ja/p/example-chair-12345678/ */
+            url?: string;
+            /**
+             * @description 商品ページに掲載された写真URL
+             * @example https://www.ikea.com/jp/ja/images/products/teodores-chair-white__0727344_pe735616_s5.jpg
+             */
+            image_url?: string | null;
+            product_metadata?: components["schemas"]["ProductMetadata"];
             /**
              * @description GLB の URL。null なら category と size から箱などで代わりに描く
              * @example null
@@ -1123,6 +1806,12 @@ export interface components {
              */
             upload_url: string;
         };
+        /** @description 保存した部屋の配置をコピーする。外部モデルURLは受け付けず、モデルはサーバーで選ぶ */
+        RoomTemplateScene: {
+            room: components["schemas"]["RoomShape"];
+            /** @description sourceはexisting、model_urlはnull。IDは64文字以内、家具名は100文字以内 */
+            objects: components["schemas"]["SceneObject"][];
+        };
         RoomInput: {
             room: {
                 /**
@@ -1136,6 +1825,7 @@ export interface components {
                  * @enum {string}
                  */
                 shape: "square" | "standard" | "long";
+                template_scene?: components["schemas"]["RoomTemplateScene"];
                 /**
                  * @description POST /api/v1/uploads で得た key。アップロード済みのものだけ受け付ける。省略すると写真なしで解析する
                  * @example []
@@ -1168,16 +1858,40 @@ export interface components {
             analyzed_by: null | "gemini" | "mock";
             /** @example null */
             error_message: string | null;
+            /** @description この部屋で最後に生成が成功した提案。提案がなければ null */
+            latest_coordination: components["schemas"]["Coordination"] | null;
             /** Format: date-time */
             created_at: string;
         };
-        /** @description 編集した家具・商品の配置。元の解析結果は変更しない */
+        /** @description 編集した家具・商品の配置。写真で見つからなかった所有家具はmanual-UUIDのidとlabel/categoryで補完する。元の解析結果は変更しない */
         FurnitureEdit: {
             /**
-             * @description 元の家具またはこの部屋で採用済みの商品 id
+             * @description 元の家具、この部屋で採用済みの商品、またはmanual-UUID形式の所有家具id
              * @example bed-1
              */
             id: string;
+            /**
+             * @description 手動で補完した所有家具では必須
+             * @example 今ある椅子
+             */
+            label?: string;
+            /**
+             * @description 手動で補完した所有家具では必須
+             * @example chair
+             * @enum {string}
+             */
+            category?: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table" | "poster" | "acrylic_stand" | "mirror";
+            artwork?: components["schemas"]["ImageArtwork"];
+            /**
+             * @description 手動の所有家具を置き換える購入商品 (FurnitureDetail) のID。所有家具のfurniture_detail_idは変更しない
+             * @example 2
+             */
+            replacement_furniture_detail_id?: number;
+            /**
+             * @description 家具検索結果 (FurnitureDetail) のID。元の家具と同じカテゴリの商品に限り、商品・モデル情報をサーバー側で復元する
+             * @example 1
+             */
+            furniture_detail_id?: number;
             position: components["schemas"]["Position"];
             size: components["schemas"]["Size"];
             /** @example 15 */
@@ -1200,6 +1914,139 @@ export interface components {
              * @enum {string}
              */
             category: "sofa" | "bed" | "desk" | "chair" | "shelf" | "table";
+        };
+        FurnitureSearchInput: {
+            /** @example 丸いサイドテーブル */
+            query: string;
+            /**
+             * @example blue
+             * @enum {string}
+             */
+            color?: "white" | "black" | "gray" | "brown" | "beige" | "green" | "blue" | "purple" | "pink" | "red" | "orange" | "yellow";
+            /**
+             * @example table
+             * @enum {string}
+             */
+            category?: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
+        };
+        FurnitureSearchResult: {
+            /** @description 家具ごとに1件。同じ家具の他の色・寸法・購入先はvariants */
+            products: components["schemas"]["FurnitureSearchProduct"][];
+            /** @example blue */
+            color: string | null;
+            interpretation: components["schemas"]["SearchInterpretation"];
+            /** @description 推し活グッズの 3D モデル。家具検索では空 */
+            models: components["schemas"]["FurnitureModel"][];
+        };
+        ProductColorVariant: {
+            /** @example ホワイト */
+            color_name: string;
+            /** @example https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/ */
+            url: string;
+            /** @example 50337820 */
+            variant_id: string | null;
+            /**
+             * @example official_color_picker
+             * @enum {string}
+             */
+            source: "official_color_picker" | "official_product_group";
+        };
+        /** @description 家具の色・寸法・購入リンク1つ。3Dは家具 (furniture_id) のモデルの形を使い、colorで塗る。推定した軸はproduct_metadataに記録する */
+        FurnitureDetail: {
+            /** @example 1 */
+            furniture_detail_id: number;
+            /** @example 1 */
+            furniture_id: number;
+            /** @example SANDSBERG サンドスベリ チェア - ホワイト */
+            name: string;
+            /**
+             * @example chair
+             * @enum {string}
+             */
+            category: "oshi_goods" | "acrylic_stand_case" | "display_case" | "tapestry" | "neon" | "wall_shelf" | "bed_cover" | "curtain" | "rug" | "cushion" | "floor_lamp" | "desk_lamp" | "candle" | "wall_mirror" | "wall_art" | "wall_planter" | "plant" | "vase" | "sofa" | "bed" | "desk" | "chair" | "tv_stand" | "wardrobe" | "storage" | "shelf" | "table" | "small_plant";
+            /**
+             * @description 代表色
+             * @example #f2efe8
+             */
+            symbolic_color: string;
+            /**
+             * @description 部位ごとの色。キーは家具の color_material_keys。無い部位はモデルの色のまま
+             * @example {
+             *       "tint": "#f2efe8",
+             *       "wood": "#b08960"
+             *     }
+             */
+            color_materials: {
+                [key: string]: string;
+            };
+            /** @example ホワイト */
+            color_name: string | null;
+            size: components["schemas"]["Size"];
+            /**
+             * @description リンク先の参考価格 (税込)
+             * @example 2000
+             */
+            price: number;
+            /** @example IKEA */
+            shop: string;
+            /** @example https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/ */
+            url: string;
+            /** @example null */
+            image_url: string | null;
+            product_metadata: components["schemas"]["ProductMetadata"];
+            /** @example null */
+            model_url: string | null;
+            /** @example null */
+            model_match: components["schemas"]["ModelMatch"] | null;
+            /** @example null */
+            model_size: components["schemas"]["Size"] | null;
+            /**
+             * @example null
+             * @enum {string|null}
+             */
+            model_fit: "contain" | null;
+            /**
+             * @description この商品の家具がグッズになっているキャラクターのキー
+             * @example []
+             */
+            characters: string[];
+            credits: components["schemas"]["Credit"][];
+        };
+        Credit: {
+            /** @example piapro */
+            franchise: string;
+            /** @example © Crypton Future Media, INC. www.piapro.net */
+            credit: string | null;
+            /** @example 非公式の二次創作です。 */
+            notice: string | null;
+            /** @example https://piapro.jp/license/character_guideline */
+            license_url: string | null;
+        };
+        /** @description 検索語を推し活グッズとしてどう解釈したか。家具検索では各一覧が空で source は none */
+        SearchInterpretation: {
+            characters: {
+                id: string;
+                name: string;
+                franchise: string;
+            }[];
+            franchises: {
+                id: string;
+                name: string;
+            }[];
+            /** @description グッズ種別 (= 家具の category) */
+            categories: {
+                id: string;
+                name: string;
+            }[];
+            /**
+             * @example dictionary
+             * @enum {string}
+             */
+            source: "dictionary" | "llm" | "none";
+        };
+        FurnitureSearchProduct: components["schemas"]["FurnitureDetail"] & {
+            /** @description 同じ家具の全detail (自身を含む) */
+            variants: components["schemas"]["FurnitureDetail"][];
         };
         MaterialOverride: {
             /** @example #ffffff */
@@ -1225,6 +2072,9 @@ export interface components {
             provider_product_id?: string;
             /** @example 50337820 */
             variant_id?: string;
+            /** @example ホワイト */
+            official_color?: string | null;
+            color_variants?: components["schemas"]["ProductColorVariant"][];
             /**
              * @example JPY
              * @enum {string}
@@ -1284,13 +2134,25 @@ export interface components {
         };
         CoordinationInput: {
             coordination: {
+                /**
+                 * @description 部屋のカラーテーマ。省略時は従来の配色
+                 * @example warm-ivory
+                 * @enum {string}
+                 */
+                room_palette_id?: "snow-graphite" | "porcelain" | "silver-line" | "stone-gray" | "monochrome-gallery" | "mist-smoke" | "warm-ivory" | "oatmeal" | "desert-sand" | "mushroom-taupe" | "coffee-cream" | "linen-ink" | "sage-clay" | "olive-linen" | "moss-oak" | "terracotta-fern" | "botanical-white" | "jungle-earth" | "mint-cloud" | "seafoam" | "teal-studio" | "turquoise-pop" | "celadon" | "lagoon-dusk" | "sky-white" | "powder-blue" | "coastal-blue" | "cobalt-gallery" | "denim-wood" | "ice-navy" | "lavender-milk" | "lilac-garden" | "amethyst" | "violet-pop" | "mauve-taupe" | "orchid-gold" | "blush-linen" | "rose-quartz" | "dusty-rose" | "peach-pink" | "fuchsia-pop" | "cherry-blossom" | "brick-cream" | "scarlet-pop" | "apricot" | "tangerine-studio" | "butter-yellow" | "sunflower" | "candy-pastel" | "mint-strawberry" | "lavender-lemon" | "primary-play" | "tropical-pop" | "festival" | "charcoal-silver" | "midnight-brass" | "forest-night" | "plum-velvet" | "burgundy-lounge" | "espresso-copper";
+                /**
+                 * @description 任意のキャラクターテーマ。画像や公式商品を保証しない
+                 * @example hatsune-miku
+                 * @enum {string}
+                 */
+                character_theme_id?: "hatsune-miku" | "sanrio" | "hello-kitty" | "my-melody" | "kuromi" | "cinnamoroll" | "pompompurin" | "pochacco";
                 /** @example 紫色の推し活ルームにしたい */
                 prompt: string;
                 /**
-                 * @description 追加・入れ替え商品の予算 (円・送料別)
+                 * @description 追加・入れ替え商品の予算 (円・送料別)。省略すると上限なしで選ぶ
                  * @example 30000
                  */
-                budget: number;
+                budget?: number | null;
                 /**
                  * @description 活かす家具の id。空なら全部活かす
                  * @example [
@@ -1371,10 +2233,18 @@ export interface components {
              * @enum {string}
              */
             status: "pending" | "processing" | "done" | "failed";
+            /**
+             * @example hatsune-miku
+             * @enum {string|null}
+             */
+            character_theme_id?: null | "hatsune-miku" | "sanrio" | "hello-kitty" | "my-melody" | "kuromi" | "cinnamoroll" | "pompompurin" | "pochacco";
             /** @example 紫色の推し活ルームにしたい */
             prompt: string;
-            /** @example 30000 */
-            budget: number;
+            /**
+             * @description 省略したコーデでは null
+             * @example 30000
+             */
+            budget: number | null;
             /**
              * @example [
              *       "bed-1",
@@ -1393,10 +2263,11 @@ export interface components {
              */
             search_entry_points?: string[];
             /**
-             * @example ec
+             * @description db: 登録された家具から選んだ / ec・mock: 以前の実EC検索・モックで作った提案
+             * @example db
              * @enum {string|null}
              */
-            product_source?: null | "ec" | "mock";
+            product_source?: null | "db" | "ec" | "mock";
             /** @example ラベンダーの推し活ルーム */
             title: string | null;
             /** @example ラベンダー 布団カバー3点セット シングル (ベッドに掛ける) などを追加しました。今のベッドとデスクと本棚はそのまま活かしています。 */
@@ -1408,6 +2279,11 @@ export interface components {
             items: components["schemas"]["CoordinationItem"][];
             /** @example 26840 */
             total_price: number | null;
+            /**
+             * @example warm-ivory
+             * @enum {string|null}
+             */
+            room_palette_id?: null | "snow-graphite" | "porcelain" | "silver-line" | "stone-gray" | "monochrome-gallery" | "mist-smoke" | "warm-ivory" | "oatmeal" | "desert-sand" | "mushroom-taupe" | "coffee-cream" | "linen-ink" | "sage-clay" | "olive-linen" | "moss-oak" | "terracotta-fern" | "botanical-white" | "jungle-earth" | "mint-cloud" | "seafoam" | "teal-studio" | "turquoise-pop" | "celadon" | "lagoon-dusk" | "sky-white" | "powder-blue" | "coastal-blue" | "cobalt-gallery" | "denim-wood" | "ice-navy" | "lavender-milk" | "lilac-garden" | "amethyst" | "violet-pop" | "mauve-taupe" | "orchid-gold" | "blush-linen" | "rose-quartz" | "dusty-rose" | "peach-pink" | "fuchsia-pop" | "cherry-blossom" | "brick-cream" | "scarlet-pop" | "apricot" | "tangerine-studio" | "butter-yellow" | "sunflower" | "candy-pastel" | "mint-strawberry" | "lavender-lemon" | "primary-play" | "tropical-pop" | "festival" | "charcoal-silver" | "midnight-brass" | "forest-night" | "plum-velvet" | "burgundy-lounge" | "espresso-copper";
             /**
              * @description gemini: 要望文から AI が商品を選んだ / mock: キーワードでテーマを決めたモック。生成が終わると入る
              * @example gemini

@@ -1,0 +1,7 @@
+.motion-dialog[open]::backdrop {
+  animation: motion-fade var(--motion-enter-duration) var(--motion-ease) both;
+}
+.motion-dialog[open][data-motion-state="closing"]::backdrop {
+  animation: motion-backdrop-exit var(--motion-exit-duration) var(--motion-exit-ease) both;
+}
+@keyframes motion-backdrop-exit { from { opacity: 1; } to { opacity: 0; } }

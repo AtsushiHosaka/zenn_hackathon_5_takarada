@@ -1,0 +1,32 @@
+{
+  "revision": "6b87b371ab2a4bc3e2eca701e3f82f4538c5311b",
+  "checks": [
+    {
+      "name": "Carousel next/wrap/keyboard renders at most one actual WebGL canvas",
+      "status": "PASS"
+    },
+    {
+      "name": "Native New Room Enter immediate enabled input/no creation/preview unmount",
+      "status": "PASS",
+      "observedNavigateToInputMs": 52
+    },
+    {
+      "name": "Back restores one preview;390px reduced carousel fits/0s animation",
+      "status": "PASS",
+      "animation": "0s",
+      "transition": "0s"
+    },
+    {
+      "name": "Real renderer stalled HTTP asset hits readiness bound and reveals usable procedural scene",
+      "status": "PASS",
+      "observedMs": 20564,
+      "canvasCount": 1
+    },
+    {
+      "name": "Zero unexpected app errors",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "expectedErrors": []
+}

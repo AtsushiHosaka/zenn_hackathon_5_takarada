@@ -42,6 +42,8 @@ docker buildx build \
   --build-arg "VITE_API_ENDPOINT=" \
   --build-arg "API_UPSTREAM_ORIGIN=$api_url" \
   --build-arg "VITE_CONNECTION=api" \
+  --build-arg "VITE_TERMS_URL=${VITE_TERMS_URL:-}" \
+  --build-arg "VITE_PRIVACY_URL=${VITE_PRIVACY_URL:-}" \
   -t "$web_repo:$tag" -t "$web_repo:latest" \
   --push \
   "$ROOT/frontend"
@@ -49,11 +51,18 @@ docker buildx build \
 echo
 echo "== 2/3 db/Schemafile を Cloud SQL に適用します"
 # 新しいイメージでスキーマを当ててから、下でサービスを差し替える
-"$(dirname "$0")/task.sh" db:apply,furniture_models:import "$api_repo:$tag"
+"$(dirname "$0")/task.sh" furniture_texture:clear_legacy,db:apply,character:import,furniture:import,furniture_texture:import,furniture_detail:import "$api_repo:$tag"
 
 echo
 echo "== 3/3 Cloud Run を更新します"
+# Use a separator absent from the values so URL query commas remain intact.
+legal_separator="__LEGAL_DOCUMENTS__"
+while [[ "${VITE_TERMS_URL:-}${VITE_PRIVACY_URL:-}" == *"$legal_separator"* ]]; do
+  legal_separator="${legal_separator}_"
+done
+legal_env="^${legal_separator}^VITE_TERMS_URL=${VITE_TERMS_URL:-}${legal_separator}VITE_PRIVACY_URL=${VITE_PRIVACY_URL:-}"
 gcloud run services update "$api_service" \
+  --update-env-vars "$legal_env" \
   --image "$api_repo:$tag" \
   --region "$region" --project "$project_id" --quiet
 gcloud run services update "$web_service" \

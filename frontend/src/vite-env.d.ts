@@ -2,6 +2,8 @@
 
 // 環境変数を増やしたら、ここと frontend/.env.example と core/config.ts に足す。
 interface ImportMetaEnv {
+  readonly VITE_TERMS_URL?: string;
+  readonly VITE_PRIVACY_URL?: string;
   readonly VITE_API_ENDPOINT?: string;
   readonly VITE_CONNECTION?: "dummy" | "api";
   readonly VITE_ROOM_API_CONTRACT?: "analysis" | "coordination" | "legacy";
@@ -14,7 +16,6 @@ interface ImportMetaEnv {
   readonly VITE_ROOM_PHOTO_FIELD?: string;
   readonly VITE_ROOM_PROMPT_FIELD?: string;
   readonly VITE_ROOM_STYLE_FIELD?: string;
-  readonly VITE_ROOM_BUDGET_FIELD?: string;
 }
 
 interface ImportMeta {

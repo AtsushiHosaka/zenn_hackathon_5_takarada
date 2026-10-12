@@ -13,7 +13,7 @@ MODULES = ["models_seating", "models_beds", "models_tables", "models_storage",
            "models_textiles", "models_lights", "models_plants", "models_decor",
            "models_ext_storage", "models_ext_seating", "models_ext_bedroom", "models_ext_appliances",
            "models_ext_goods", "models_ext2_storage", "models_ext2_seating", "models_ext2_bedroom",
-           "models_ext2_appliances", "models_ext2_goods"]
+           "models_ext2_appliances", "models_ext2_goods", "models_goods_templates", "models_char_piapro", "models_char_piapro_soft", "models_char_piapro_room"]
 # 並行して作業するときは、読み込むモジュールと書き出し記録を分けられる
 if os.environ.get("FURNITURE_MODULES"):
     MODULES = os.environ["FURNITURE_MODULES"].split(",")

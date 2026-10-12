@@ -1,0 +1,155 @@
+[
+  {
+    "query": "椅子",
+    "category": null,
+    "color": null,
+    "result": [
+      "chair",
+      "chair"
+    ],
+    "discovery_categories": [
+      "chair"
+    ]
+  },
+  {
+    "query": "白い椅子",
+    "category": null,
+    "color": "white",
+    "result": [
+      "chair"
+    ],
+    "discovery_categories": [
+      "chair"
+    ]
+  },
+  {
+    "query": "CHAIRS",
+    "category": null,
+    "color": null,
+    "result": [
+      "chair",
+      "chair"
+    ],
+    "discovery_categories": [
+      "chair"
+    ]
+  },
+  {
+    "query": "white chair",
+    "category": null,
+    "color": null,
+    "result": [
+      "chair",
+      "chair"
+    ],
+    "discovery_categories": [
+      "chair"
+    ]
+  },
+  {
+    "query": "chair cushion",
+    "category": null,
+    "color": null,
+    "result": [
+      "chair",
+      "chair",
+      "bed",
+      "table"
+    ],
+    "discovery_categories": []
+  },
+  {
+    "query": "desk lamp",
+    "category": null,
+    "color": null,
+    "result": [
+      "chair",
+      "chair",
+      "bed",
+      "table"
+    ],
+    "discovery_categories": []
+  },
+  {
+    "query": "bed cover",
+    "category": null,
+    "color": null,
+    "result": [
+      "chair",
+      "chair",
+      "bed",
+      "table"
+    ],
+    "discovery_categories": []
+  },
+  {
+    "query": "机に合わせる収納",
+    "category": null,
+    "color": null,
+    "result": [
+      "chair",
+      "chair",
+      "bed",
+      "table"
+    ],
+    "discovery_categories": []
+  },
+  {
+    "query": "ｃｈａｉｒ",
+    "category": null,
+    "color": null,
+    "result": [
+      "chair",
+      "chair"
+    ],
+    "discovery_categories": [
+      "chair"
+    ]
+  },
+  {
+    "query": "家具",
+    "category": null,
+    "color": null,
+    "result": [
+      "chair",
+      "chair",
+      "bed",
+      "table"
+    ],
+    "discovery_categories": []
+  },
+  {
+    "query": "椅子とテーブル",
+    "category": null,
+    "color": null,
+    "result": [
+      "chair",
+      "chair",
+      "bed",
+      "table"
+    ],
+    "discovery_categories": []
+  },
+  {
+    "query": "椅子",
+    "category": "table",
+    "color": null,
+    "result": [
+      "table"
+    ],
+    "discovery_categories": [
+      "table"
+    ]
+  },
+  {
+    "query": "テーブル",
+    "category": null,
+    "color": null,
+    "result": [
+      "table"
+    ],
+    "discovery_categories": [
+      "table"
+    ]
+  }
+]

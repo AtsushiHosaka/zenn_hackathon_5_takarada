@@ -85,19 +85,6 @@ resource "google_storage_bucket_iam_member" "models_api" {
   member = "serviceAccount:${google_service_account.api.email}"
 }
 
-# APIは生成画像を新規作成する。GLBや既存画像の上書き・削除は許可しない。
-resource "google_storage_bucket_iam_member" "textures_api" {
-  bucket = google_storage_bucket.models.name
-  role   = "roles/storage.objectCreator"
-  member = "serviceAccount:${google_service_account.api.email}"
-
-  condition {
-    title       = "create-generated-textures"
-    description = "Create immutable generated texture objects only"
-    expression  = "resource.name.startsWith('projects/_/buckets/${google_storage_bucket.models.name}/objects/textures/')"
-  }
-}
-
 # Cloud Run のサービスアカウントは秘密鍵を持たない (メタデータサーバ経由の認証) ため、
 # 署名付き URL の署名を自分で計算できない。IAM の signBlob に委譲するので、
 # **自分自身に対する** トークン作成権限が必要になる。

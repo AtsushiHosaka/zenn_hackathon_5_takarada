@@ -11,7 +11,7 @@ services:
     # ローカルではデモユーザーも入れる
     command: >
       bash -c "rm -f tmp/pids/server.pid &&
-               bin/rails db:create db:apply db:seed &&
+               bin/rails db:create furniture_texture:clear_legacy db:apply db:seed &&
                bin/rails server -b 0.0.0.0 -p 3000"
     volumes:
       # コードをマウントして編集が即反映されるようにする。
@@ -51,6 +51,8 @@ services:
       API_UPSTREAM_ORIGIN: ${API_UPSTREAM_ORIGIN:-https://zenn-hackathon-api-262220651661.asia-northeast1.run.app}
       # 未指定なら dev はダミー接続で立ち上がる (ログイン画面の「接続先」で切り替え)
       VITE_CONNECTION: ${VITE_CONNECTION:-}
+      VITE_TERMS_URL: ${VITE_TERMS_URL:-}
+      VITE_PRIVACY_URL: ${VITE_PRIVACY_URL:-}
     ports:
       - "5173:5173"
     volumes:

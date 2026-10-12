@@ -1,6 +1,6 @@
 # GCS との境界。参照は Asset (値オブジェクト)、通信はクライアントが持つ。
 # **何を置くかはここでは決めない**: 部屋写真の規則は RoomPhoto、
-# 3D モデルの対応は ModelResolver が持つ。
+# 3D モデルの URL は Furniture#model_url が作る。
 module Storage
   Metadata = Data.define(:size, :content_type)
 

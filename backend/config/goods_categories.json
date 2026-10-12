@@ -1,0 +1,223 @@
+{
+  "note": "推し活グッズの種別 (= furnitures.category)。synonyms は検索語の解釈に使う。standalone=true はキャラクター名がなくてもグッズ検索として扱う (アクスタなど)。false はキャラクターかフランチャイズの語がある場合だけ使う (クッションなど一般のインテリアと重なるもの)。",
+  "categories": [
+    {
+      "category": "acrylic_stand",
+      "name": "アクリルスタンド",
+      "synonyms": [
+        "アクリルスタンド",
+        "アクスタ",
+        "アクリルフィギュア",
+        "bigアクスタ",
+        "acrylic stand",
+        "acryl stand"
+      ],
+      "standalone": true
+    },
+    {
+      "category": "tapestry",
+      "name": "タペストリー",
+      "synonyms": [
+        "タペストリー",
+        "タペ",
+        "b2タペストリー",
+        "b1タペストリー",
+        "tapestry"
+      ],
+      "standalone": false
+    },
+    {
+      "category": "plush",
+      "name": "ぬいぐるみ",
+      "synonyms": [
+        "ぬいぐるみ",
+        "ぬい",
+        "マスコット",
+        "寝そべり",
+        "ふわぷち",
+        "plush",
+        "plushie",
+        "plushy",
+        "stuffed toy"
+      ],
+      "standalone": false
+    },
+    {
+      "category": "cushion",
+      "name": "クッション",
+      "synonyms": [
+        "ダイカットクッション",
+        "クッション",
+        "cushion"
+      ],
+      "standalone": false
+    },
+    {
+      "category": "can_badge",
+      "name": "缶バッジ",
+      "synonyms": [
+        "缶バッジ",
+        "缶バ",
+        "badge",
+        "button badge"
+      ],
+      "standalone": true
+    },
+    {
+      "category": "poster",
+      "name": "ポスター",
+      "synonyms": [
+        "ポスター",
+        "poster"
+      ],
+      "standalone": false
+    },
+    {
+      "category": "uchiwa",
+      "name": "うちわ",
+      "synonyms": [
+        "うちわ",
+        "団扇",
+        "uchiwa"
+      ],
+      "standalone": true
+    },
+    {
+      "category": "rubber_mat",
+      "name": "ラバーマット",
+      "synonyms": [
+        "ラバーマット",
+        "プレイマット",
+        "rubber mat",
+        "playmat",
+        "デスクマット",
+        "desk mat"
+      ],
+      "standalone": true
+    },
+    {
+      "category": "blanket",
+      "name": "ブランケット",
+      "synonyms": [
+        "ブランケット",
+        "blanket"
+      ],
+      "standalone": false
+    },
+    {
+      "category": "acrylic_panel",
+      "name": "アクリルパネル",
+      "synonyms": [
+        "アクリルパネル",
+        "アクリルブロック",
+        "acrylic panel",
+        "acrylic block"
+      ],
+      "standalone": true
+    },
+    {
+      "category": "figure",
+      "name": "フィギュア",
+      "synonyms": [
+        "フィギュア",
+        "プライズフィギュア",
+        "figure",
+        "figurine"
+      ],
+      "standalone": false
+    },
+    {
+      "category": "body_pillow",
+      "name": "抱き枕",
+      "synonyms": [
+        "抱き枕",
+        "抱き枕カバー",
+        "body pillow",
+        "dakimakura"
+      ],
+      "standalone": false
+    },
+    {
+      "category": "standee",
+      "name": "等身大パネル",
+      "synonyms": [
+        "等身大パネル",
+        "等身大スタンディ",
+        "スタンドパネル",
+        "standee"
+      ],
+      "standalone": true
+    },
+    {
+      "category": "wall_clock",
+      "name": "掛け時計",
+      "synonyms": [
+        "掛け時計",
+        "壁掛け時計",
+        "時計",
+        "clock"
+      ],
+      "standalone": false
+    },
+    {
+      "category": "mug",
+      "name": "マグカップ",
+      "synonyms": [
+        "マグカップ",
+        "mug"
+      ],
+      "standalone": false
+    },
+    {
+      "category": "acrylic_diorama",
+      "name": "アクリルジオラマ",
+      "synonyms": [
+        "アクリルジオラマ",
+        "ジオラマスタンド",
+        "acrylic diorama"
+      ],
+      "standalone": true
+    },
+    {
+      "category": "penlight",
+      "name": "ペンライト",
+      "synonyms": [
+        "ペンライト",
+        "penlight"
+      ],
+      "standalone": true
+    },
+    {
+      "category": "room_light",
+      "name": "ルームライト",
+      "synonyms": [
+        "ルームライト",
+        "ledアクリルライト",
+        "アクリルライト",
+        "room light"
+      ],
+      "standalone": false
+    },
+    {
+      "category": "bed_cover",
+      "name": "布団カバー",
+      "synonyms": [
+        "布団カバー",
+        "掛け布団カバー",
+        "ベッドカバー",
+        "bed cover"
+      ],
+      "standalone": false
+    },
+    {
+      "category": "rug",
+      "name": "ラグ",
+      "synonyms": [
+        "ラグ",
+        "カーペット",
+        "rug"
+      ],
+      "standalone": false
+    }
+  ]
+}

@@ -7,8 +7,10 @@ import LoginPage from "../feature/auth/LoginPage";
 import UserDetailPage from "../feature/users/UserDetailPage";
 import AppLayout from "../feature/shared/AppLayout";
 import RequireAuth from "../feature/shared/RequireAuth";
+import RoomTemplatePage from "../feature/room/RoomTemplatePage";
 import RoomListPage from '../feature/room/RoomListPage';
 import RoomStudioPage from "../feature/room/RoomStudioPage";
+import AdminPage from "../feature/admin/AdminPage";
 import { useRoomPlanScope } from "../feature/room/plans";
 
 // 接続先はアプリ起動時に 1 回決まる (切り替えるとリロードが走る)
@@ -27,9 +29,7 @@ const queryClient = new QueryClient({
 function RoomStudioRoute() {
   const { id } = useParams();
   const scope = useRoomPlanScope();
-  const page = <RoomStudioPage key={`${scope}:${id}`} />;
-  return loadConnection() === "dummy" || ["sample-oshi", "sample-botanical", "sample-natural", "sample-game"].includes(id ?? "")
-    ? page : <RequireAuth>{page}</RequireAuth>;
+  return <RoomStudioPage key={`${scope}:${id}`} />;
 }
 
 export default function App() {
@@ -38,10 +38,12 @@ export default function App() {
       <RepositoriesContext value={repositories}>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Navigate to="/rooms/sample-oshi" replace />} />
-            <Route path="/rooms" element={<RoomListPage />} />
+            <Route path="/" element={<Navigate to="/rooms" replace />} />
+            <Route path="/rooms" element={<RequireAuth><RoomListPage /></RequireAuth>} />
+            <Route path="/room-templates" element={<RequireAuth><RoomTemplatePage /></RequireAuth>} />
             <Route path="/coordinate" element={<Navigate to="/rooms/new" replace />} />
-            <Route path="/rooms/:id" element={<RoomStudioRoute />} />
+            <Route path="/rooms/:id" element={<RequireAuth><RoomStudioRoute /></RequireAuth>} />
+            <Route path="/admin" element={<RequireAuth><AdminPage /></RequireAuth>} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<LoginPage key="signup" />} />
             <Route

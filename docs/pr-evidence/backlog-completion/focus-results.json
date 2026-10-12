@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "sole row normal/reduced keyboard focus",
+    "supported image categories",
+    "manual mirror retained",
+    "single canvas",
+    "zero page errors"
+  ],
+  "errors": []
+}

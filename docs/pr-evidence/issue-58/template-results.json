@@ -1,0 +1,65 @@
+{
+  "revision": "6b87b371ab2a4bc3e2eca701e3f82f4538c5311b",
+  "checks": [
+    {
+      "name": "Template dialog Escape/backdrop/explicit and five rapid cycles retain modal exit/focus restoration",
+      "status": "PASS"
+    },
+    {
+      "name": "Template dialog live reduced motion closes immediately and preserves trigger focus",
+      "status": "PASS"
+    },
+    {
+      "name": "Actual save creates two independent template snapshots and preserves source room",
+      "status": "PASS",
+      "ids": [
+        "room-template-acacc848-ae2a-4435-bb11-63d3163da567",
+        "room-template-085f9dbc-2469-4a81-b380-730c879c9c9d"
+      ]
+    },
+    {
+      "name": "Actual template rename/color edit save and reload persist without replacing other template",
+      "status": "PASS"
+    },
+    {
+      "name": "Repeated template reuse creates independent persisted room IDs with edited colors; source/template unchanged",
+      "status": "PASS",
+      "newIds": [
+        "dummy-room-15eeb50b-3990-48f9-828f-3a4a6ab5d57a",
+        "dummy-room-3958d097-e2e8-489e-8b0d-f05f676a416e"
+      ]
+    },
+    {
+      "name": "390px template-created room has no horizontal overflow",
+      "status": "PASS",
+      "geometry": {
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 111,
+          "bottom": 111
+        },
+        "panel": {
+          "x": 12,
+          "y": 123,
+          "width": 366,
+          "height": 709,
+          "bottom": 832
+        },
+        "documentWidth": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "name": "Isolated template deletion and user2/user1 owner isolation preserve correct visible records",
+      "status": "PASS"
+    },
+    {
+      "name": "Zero unexpected app console/page errors",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "findings": []
+}

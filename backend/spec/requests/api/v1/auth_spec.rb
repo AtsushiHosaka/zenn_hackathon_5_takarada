@@ -8,6 +8,16 @@ RSpec.describe "Api::V1::Auth", type: :request do
       consumes "application/json"
       produces "application/json"
       parameter name: :params, in: :body, schema: { "$ref" => "#/components/schemas/SignupInput" }
+      let(:legal_documents_available) { true }
+
+      around do |example|
+        original = SignupPolicy::DOCUMENT_KEYS.to_h { |key| [ key, ENV[key] ] }
+        ENV["VITE_TERMS_URL"] = legal_documents_available ? "https://example.com/terms" : nil
+        ENV["VITE_PRIVACY_URL"] = legal_documents_available ? "/privacy" : nil
+        example.run
+      ensure
+        original.each { |key, value| ENV[key] = value }
+      end
 
       response "201", "作成に成功。Authorization ヘッダに Bearer トークンが載る" do
         schema "$ref" => "#/components/schemas/User"
@@ -21,6 +31,17 @@ RSpec.describe "Api::V1::Auth", type: :request do
           expect(response.headers["Authorization"]).to start_with("Bearer ")
           expect(JSON.parse(response.body)["email"]).to eq("taro@example.com")
           expect(Identity.find_by(email: "taro@example.com").user.name).to eq("Taro Yamada")
+        end
+      end
+
+      response "503", "正式文書の未設定により新規登録を停止中" do
+        schema "$ref" => "#/components/schemas/ValidationErrors"
+        let(:legal_documents_available) { false }
+        let(:params) { { user: { name: "Taro", email: "paused@example.com", password: "password" } } }
+
+        run_test! do |response|
+          expect(response.headers["Authorization"]).to be_nil
+          expect(Identity.find_by(email: "paused@example.com")).to be_nil
         end
       end
 

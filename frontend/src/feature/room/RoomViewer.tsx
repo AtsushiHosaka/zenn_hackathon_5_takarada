@@ -1,13 +1,22 @@
-import { useEffect, useEffectEvent, useMemo, useRef } from "react";
+import { roomPalette } from "../../domain/roomPalette";
+import { characterTheme } from "../../domain/characterTheme";
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
+import { useMotionPresence } from "../shared/useMotionPresence";
 import * as THREE from "three";
+import { Reflector } from "three/examples/jsm/objects/Reflector.js";
+import { resizeMirrorSurfaces } from "./mirrorReflection";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
-import type { RoomDesign, RoomItem } from "../../domain/room";
+import { isManualFurniture, type RoomDesign, type RoomItem } from "../../domain/room";
 import { buildReferenceRoom, usesReferenceRoom } from "./referenceRoomModel";
+import { buildCharacterThemeDecor } from "./characterThemeDecor";
+import { addMirrorSurface, isMirrorCategory } from "./mirrorSurface";
 import { buildMeasuredRoom } from "./roomArchitecture";
-import { LAYOUT_GRID_STEP, snapItemPosition } from "./layoutGrid";
+import { createShellFloorOverlay } from "./shellFloorSurface";
+import { LAYOUT_GRID_STEP } from "./layoutGrid";
 import { applyMaterialOverrides } from "./furnitureMaterials";
+import { canPlaceOnFurniture, furniturePositionInRoom, getFurniturePlacementBounds, isFurnitureSupport, snapFurnitureEditPosition } from './roomBounds';
 
 interface RoomViewerProps {
   design: RoomDesign;
@@ -16,18 +25,26 @@ interface RoomViewerProps {
   view: "perspective" | "top" | "front";
   dimensions?: boolean;
   editing?: boolean;
-  onMoveItem?: (id: string, position: RoomItem["position"]) => void;
+  onMoveItem?: (id: string, position: RoomItem["position"], supportObjectId?: string, supportSurface?: RoomItem['supportSurface']) => void;
+  placementItem?: RoomItem | null;
+  onPlaceItem?: (position: RoomItem["position"], supportObjectId?: string, supportSurface?: RoomItem['supportSurface']) => void;
   resetKey: number;
   before?: boolean;
+  preview?: boolean;
+  onReady?: (ready: boolean) => void;
+  // 読み込みが済んだ最初の描画を、写真 (JPEGのdata URL) として渡す。
+  onSnapshot?: (dataUrl: string) => void;
   command?: { sequence: number; action: "left" | "right" | "in" | "out" };
 }
 
 type ViewerRuntime = {
   select: (id: string | null) => void;
+  focus: (id: string) => void;
   setView: (view: RoomViewerProps["view"]) => void;
   reset: () => void;
   setBefore: (before: boolean, markersVisible: boolean) => void;
   setEditing: (editing: boolean) => void;
+  setPlacement: (item: RoomItem | null) => void;
   command: (command: NonNullable<RoomViewerProps["command"]>) => void;
 };
 
@@ -124,7 +141,7 @@ function plant(parent: THREE.Object3D, width: number, height: number, potColor: 
   }
 }
 
-function createFurniture(item: RoomItem, accent: string, oshi: boolean) {
+function createFurniture(item: RoomItem, accent: string, oshi: boolean, manager?: THREE.LoadingManager) {
   const group = new THREE.Group();
   group.userData.itemId = item.id;
   const [w, h, d] = item.size;
@@ -133,6 +150,31 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean) {
   const dark = "#605747";
   const color = item.color;
   switch (item.category) {
+    case "wall_mirror":
+    case "mirror":
+      box(group, [w, h, d], [0, h / 2, 0], color, true);
+      addMirrorSurface(group, item);
+      break;
+    case "poster":
+    case "acrylic_stand": {
+      const stand = item.category === "acrylic_stand";
+      const baseHeight = stand ? Math.min(.015, h * .08) : 0;
+      if (stand) {
+        const base = box(group, [w, baseHeight, d], [0, baseHeight / 2, 0], "#e4eff5", true);
+        const surface = base.material as THREE.MeshStandardMaterial;
+        surface.transparent = true; surface.opacity = .65; surface.roughness = .2;
+      } else box(group, [w, h, d], [0, h / 2, 0], color);
+      if (item.artwork) {
+        const texture = new THREE.TextureLoader(manager).load(item.artwork.dataUrl);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        const art = new THREE.Mesh(new THREE.PlaneGeometry(stand ? w : w * .96, stand ? h - baseHeight : h * .96), new THREE.MeshBasicMaterial({
+          map: texture, transparent: true, alphaTest: stand ? .1 : 0, side: THREE.DoubleSide, toneMapped: false,
+        }));
+        art.position.set(0, (h + baseHeight) / 2, stand ? 0 : d / 2 + .0005);
+        group.add(art);
+      }
+      break;
+    }
     case "sofa": {
       for (const x of [-w * 0.4, w * 0.4]) {
         for (const z of [-d * 0.33, d * 0.33]) {
@@ -301,27 +343,6 @@ function createFurniture(item: RoomItem, accent: string, oshi: boolean) {
   return group;
 }
 
-function getRoomBounds(items: RoomItem[]) {
-  const bounds = new THREE.Box3();
-  for (const item of items) {
-    const center = new THREE.Vector3(...item.position);
-    const halfSize = new THREE.Vector3(...item.size).multiplyScalar(0.5);
-    bounds.expandByPoint(center.clone().sub(halfSize));
-    bounds.expandByPoint(center.clone().add(halfSize));
-  }
-  if (bounds.isEmpty()) bounds.set(new THREE.Vector3(-2.6, 0, -2.1), new THREE.Vector3(2.6, 2.7, 2.1));
-  const center = bounds.getCenter(new THREE.Vector3());
-  const size = bounds.getSize(new THREE.Vector3());
-  const width = Math.max(5.2, size.x + 0.6);
-  const depth = Math.max(4.2, size.z + 0.6);
-  const floor = Math.min(0, bounds.min.y);
-  const height = Math.max(2.7, bounds.max.y - floor + 0.25);
-  return new THREE.Box3(
-    new THREE.Vector3(center.x - width / 2, floor - 0.18, center.z - depth / 2),
-    new THREE.Vector3(center.x + width / 2, floor + height, center.z + depth / 2),
-  );
-}
-
 function fittedDistance(bounds: THREE.Box3, target: THREE.Vector3, direction: THREE.Vector3, aspect: number, fov: number) {
   const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), direction).normalize();
   const up = new THREE.Vector3().crossVectors(direction, right).normalize();
@@ -340,7 +361,7 @@ function fittedDistance(bounds: THREE.Box3, target: THREE.Vector3, direction: TH
   return distance * 1.1;
 }
 
-function buildRoom(scene: THREE.Scene, accent: string, bounds: THREE.Box3, oshi: boolean, wallColor?: string) {
+function buildRoom(scene: THREE.Scene, accent: string, bounds: THREE.Box3, oshi: boolean, wallColor?: string, floorColor?: string) {
   const size = bounds.getSize(new THREE.Vector3());
   const center = bounds.getCenter(new THREE.Vector3());
   const width = size.x;
@@ -353,7 +374,8 @@ function buildRoom(scene: THREE.Scene, accent: string, bounds: THREE.Box3, oshi:
   scene.add(architecture);
   const podium = cylinder(architecture, 0.5, 0.5, 0.08, [0, -0.25, 0], "#29253a");
   podium.scale.set(width * 1.48, 1, depth * 1.48);
-  box(architecture, [width, 0.16, depth], [0, -0.1, 0], "#ac8866");
+  const floor = box(architecture, [width, 0.16, depth], [0, -0.1, 0], floorColor ?? "#ac8866");
+  floor.userData.beforeColor = "#ac8866";
   const rows = Math.min(40, Math.ceil(depth / 0.3));
   const columns = Math.min(20, Math.ceil(width / 1.65));
   const plankWidth = width / columns;
@@ -361,7 +383,9 @@ function buildRoom(scene: THREE.Scene, accent: string, bounds: THREE.Box3, oshi:
   for (let row = 0; row < rows; row += 1) {
     for (let column = 0; column < columns; column += 1) {
       const colors = ["#d9bf99", "#d4b58c", "#dfc8a6", "#d8ba92"];
-      box(architecture, [plankWidth - 0.008, 0.025, plankDepth - 0.008], [-width / 2 + plankWidth * (column + 0.5), -0.009, -depth / 2 + plankDepth * (row + 0.5)], colors[(row + column) % 4]);
+      const original = colors[(row + column) % 4];
+      const plank = box(architecture, [plankWidth - 0.008, 0.025, plankDepth - 0.008], [-width / 2 + plankWidth * (column + 0.5), -0.009, -depth / 2 + plankDepth * (row + 0.5)], floorColor ? new THREE.Color(floorColor).multiplyScalar([1, .96, 1.04, .98][(row + column) % 4]) : original);
+      plank.userData.beforeColor = original;
     }
   }
   const leftWall = box(architecture, [0.13, height, depth], [left, height / 2, 0], wallColor ?? (oshi ? "#d4c8ea" : "#eeeade"));
@@ -455,6 +479,11 @@ function createLayoutGrid(bounds: THREE.Box3, floor: number) {
 function disposeObject(object: THREE.Object3D) {
   const textures = new Set<THREE.Texture>();
   object.traverse((child) => {
+    if (child instanceof Reflector) {
+      child.geometry.dispose();
+      child.dispose();
+      return;
+    }
     if (!(child instanceof THREE.Mesh || child instanceof THREE.Line || child instanceof THREE.Sprite)) return;
     if (!(child instanceof THREE.Sprite)) child.geometry.dispose();
     const materials = Array.isArray(child.material) ? child.material : [child.material];
@@ -471,12 +500,24 @@ function disposeObject(object: THREE.Object3D) {
   }
 }
 
-export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, view, resetKey, before = false, command, dimensions = false, editing = false, onMoveItem }: RoomViewerProps) {
+function DimensionLabel({item}:{item:RoomItem|undefined}) {
+  const presence=useMotionPresence(Boolean(item));
+  const [lastItem,setLastItem]=useState(item);
+  if(item&&item!==lastItem)setLastItem(item);
+  const displayed=item??lastItem;
+  return presence.isPresent&&displayed?<div role="status" className="motion-presence" data-motion-state={presence.state} aria-hidden={!item||undefined} style={{position:"absolute",left:16,bottom:16,padding:"8px 12px",background:"rgba(29,27,38,.88)",border:"1px solid #6e6a7c",borderRadius:8,color:"#fff",fontSize:12,pointerEvents:"none"}}>幅 {Math.round(displayed.size[0]*100)} × 高さ {Math.round(displayed.size[1]*100)} × 奥行き {Math.round(displayed.size[2]*100)} cm</div>:null;
+}
+
+export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, view, resetKey, before = false, command, dimensions = false, editing = false, onMoveItem, placementItem = null, onPlaceItem, preview = false, onReady, onSnapshot }: RoomViewerProps) {
   const design = useMemo<RoomDesign>(() => before && afterDesign.before ? {
     ...afterDesign,
     room: afterDesign.before.room,
     items: afterDesign.before.items,
     wallColor: afterDesign.before.wallColor,
+    floorColor: afterDesign.before.room.floorColor,
+    characterThemeId: undefined,
+    roomPaletteId: undefined,
+    style: afterDesign.characterThemeId ? "natural" : afterDesign.style,
     modelUrl: undefined,
     modelKind: undefined,
   } : afterDesign, [afterDesign, before]);
@@ -487,22 +528,24 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
   const fallback = useRef<HTMLDivElement>(null);
   const modelNotice = useRef<HTMLDivElement>(null);
   const textureNotice = useRef<HTMLDivElement>(null);
+  const floorNotice = useRef<HTMLDivElement>(null);
   const runtime = useRef<ViewerRuntime | null>(null);
   const roomBounds = useRef<{ id: string; bounds: THREE.Box3 } | null>(null);
-  const cameraState = useRef<{ id: string; position: THREE.Vector3; target: THREE.Vector3; zoom: number; view: RoomViewerProps["view"]; lastCommandSequence: number | null } | null>(null);
+  const cameraState = useRef<{ id: string; position: THREE.Vector3; target: THREE.Vector3; zoom: number; minDistance: number; view: RoomViewerProps["view"]; lastCommandSequence: number | null } | null>(null);
+  const reportReady = useEffectEvent((ready: boolean) => onReady?.(ready));
+  const reportSnapshot = useEffectEvent((capture: () => string) => onSnapshot?.(capture()));
   const selectItem = useEffectEvent(onSelectItem);
-  const moveItem = useEffectEvent((id: string, position: RoomItem["position"]) => onMoveItem?.(id, position));
+  const moveItem = useEffectEvent((id: string, position: RoomItem["position"], supportObjectId?: string, supportSurface?: RoomItem['supportSurface']) => onMoveItem?.(id, position, supportObjectId, supportSurface));
+  const placeItem = useEffectEvent((position: RoomItem["position"], supportObjectId?: string, supportSurface?: RoomItem['supportSurface']) => onPlaceItem?.(position, supportObjectId, supportSurface));
   const initialView = useEffectEvent(() => view);
   const initialBefore = useEffectEvent(() => legacyBefore);
-  const initialMarkersVisible = useEffectEvent(() => !before);
+  const initialMarkersVisible = useEffectEvent(() => !before && !preview);
   const initialEditing = useEffectEvent(() => editing && Boolean(onMoveItem) && !before);
+  const initialPlacement = useEffectEvent(() => !before && onPlaceItem ? placementItem : null);
   const dimensionItem = dimensions ? design.items.find(item => item.id === selectedItemId) : undefined;
-  const canMove = editing && Boolean(onMoveItem) && !before && (!design.modelUrl || design.modelKind === "shell");
+  const selectedItem = !preview ? design.items.find(item => item.id === selectedItemId) : undefined;
   const viewDescription = view === "top" ? "真上からの表示。" : view === "front" ? "正面からの表示。" : "立体表示。";
-  const dragDescription = canMove
-    ? view === "front" ? "家具を左右にドラッグすると10cmのマス目に沿って移動します。" : view === "top" ? "家具をドラッグすると10cmのマス目に沿って平面上を移動します。" : "家具は10cmのマス目に沿って移動し、空いている場所をドラッグすると視点が回転します。"
-    : view === "perspective" ? "ドラッグで回転できます。" : "";
-  const instructions = `部屋の3Dプレビュー。${before ? "変更前の部屋。" : ""}${viewDescription}${dragDescription}ホイールで拡大縮小、家具をクリックして選択できます。`;
+  const instructions = preview ? `${design.title}の保存した3Dモデル。` : `部屋の3Dプレビュー。${before ? "変更前の部屋。" : ""}${viewDescription}${selectedItem ? `選択中: ${selectedItem.name}。` : ''}`;
 
   useEffect(() => {
     const host = canvasHost.current;
@@ -512,14 +555,29 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     } catch {
       if (fallback.current) fallback.current.hidden = false;
+      reportReady(false);
       return;
     }
     if (fallback.current) fallback.current.hidden = true;
     if (modelNotice.current) modelNotice.current.hidden = true;
     if (textureNotice.current) textureNotice.current.hidden = true;
+    if (floorNotice.current) floorNotice.current.hidden = true;
     let disposed = false;
+    let assetsReady = true;
+    let assetFailed = false;
+    let readySent = false;
+    let previewNeedsRender = true;
+    const loadingManager = new THREE.LoadingManager();
+    loadingManager.onStart = () => { assetsReady = false; };
+    loadingManager.onLoad = () => { assetsReady = true; previewNeedsRender = true; };
+    loadingManager.onError = () => { assetFailed = true; if (!disposed && textureNotice.current) textureNotice.current.hidden = false; };
+    const previewDeadline = window.setTimeout(() => {
+      if (!disposed && !readySent) { readySent = true; reportReady(false); }
+    }, 20000);
     const textureCleanups: (() => void)[] = [];
     const scene = new THREE.Scene();
+    const themedDecor = buildCharacterThemeDecor(design);
+    if (themedDecor) scene.add(themedDecor);
     const reference = !design.room && usesReferenceRoom(design);
     const aspect = Math.max(host.clientWidth, 1) / Math.max(host.clientHeight, 1);
     const referenceHeight = 410 / (50 * Math.sqrt(1.5));
@@ -531,12 +589,17 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = reference ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
-    renderer.domElement.setAttribute("aria-label", "部屋の3Dプレビュー。ドラッグで回転、スクロールで拡大縮小。家具をクリックして商品を選択できます。");
+    renderer.domElement.setAttribute("aria-label", "部屋の3Dプレビュー");
     renderer.domElement.setAttribute("role", "img");
     host.appendChild(renderer.domElement);
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.075;
+    if (preview) {
+      controls.enableZoom = false;
+      controls.enablePan = false;
+      renderer.domElement.style.touchAction = "pan-y";
+    }
     controls.maxPolarAngle = Math.PI / 2 - 0.035;
     const hemi = new THREE.HemisphereLight("#faf5ff", "#a99abb", 2.2);
     scene.add(hemi);
@@ -552,8 +615,9 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     sun.shadow.bias = -0.0001;
     scene.add(sun);
     scene.add(sun.target);
-    const oshi = design.style === "oshi";
-    const accent = oshi ? "#bba5ee" : design.style === "natural" ? "#c2a07f" : "#819274";
+    const theme = characterTheme(design.characterThemeId);
+    const oshi = design.style === "oshi" && !theme;
+    const accent = roomPalette(design.roomPaletteId)?.accent ?? theme?.accent ?? (oshi ? "#bba5ee" : design.style === "natural" ? "#c2a07f" : "#819274");
     if (design.room) {
       roomBounds.current = {
         id: design.id,
@@ -562,27 +626,33 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
           new THREE.Vector3(design.room.width / 2, design.room.height, design.room.depth / 2),
         ),
       };
-    } else if (roomBounds.current?.id !== design.id) {
-      roomBounds.current = { id: design.id, bounds: getRoomBounds(design.items) };
+    } else if (design.inferredRoomBounds || roomBounds.current?.id !== design.id) {
+      const inferred = getFurniturePlacementBounds(design);
+      roomBounds.current = { id: design.id, bounds: new THREE.Box3(new THREE.Vector3(...inferred.min), new THREE.Vector3(...inferred.max)) };
     }
     const baseRoomBounds = roomBounds.current.bounds.clone();
     const cameraBounds = baseRoomBounds.clone();
     const savedCamera = cameraState.current?.id === design.id ? cameraState.current : null;
     const referenceRoom = reference ? buildReferenceRoom(scene, design) : null;
     const architecture = design.room
-      ? buildMeasuredRoom(scene, design.room, design.wallColor ?? "#f5f1e8")
-      : referenceRoom?.architecture ?? buildRoom(scene, accent, baseRoomBounds, oshi, design.wallColor);
+      ? buildMeasuredRoom(scene, {...design.room, floorColor: design.floorColor ?? design.room.floorColor}, design.wallColor ?? "#f5f1e8", design.room.floorColor)
+      : referenceRoom?.architecture ?? buildRoom(scene, accent, baseRoomBounds, oshi, design.wallColor, design.floorColor);
     if (referenceRoom) cameraBounds.copy(referenceRoom.bounds);
     let proceduralRoomVisible = true;
     let currentBefore = initialBefore();
     let markersVisible = initialMarkersVisible();
     let currentEditing = initialEditing();
     let cancelDrag = () => {};
+    let clearPlacementPreview = () => {};
+    let currentPlacement = initialPlacement();
     let loadedRoom: THREE.Group | null = null;
+    let shellFloor: THREE.Mesh | null = null;
+    let shellFloorUnavailable = false;
     const completeRoomModel = Boolean(design.modelUrl) && design.modelKind !== "shell";
     const gridBounds = referenceRoom?.floorBounds ?? baseRoomBounds;
-    const gridFloor = design.room || referenceRoom ? 0 : baseRoomBounds.min.y + 0.1835;
+    const gridFloor = design.room || referenceRoom ? 0 : getFurniturePlacementBounds(design).floor;
     const layoutGrid = createLayoutGrid(gridBounds, gridFloor);
+    layoutGrid.userData.reflectionExcluded = true;
     layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel;
     scene.add(layoutGrid);
     const cutawayWalls: { object: THREE.Object3D; wall: "north" | "east" | "south" | "west" }[] = [];
@@ -601,8 +671,13 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     const hitTargets = new Map<string, THREE.Group>();
     const markers = new Map<string, THREE.Sprite>();
     const existingIds = new Set(design.items.filter(item => item.existing).map(item => item.id));
-    for (const item of reference ? [] : design.items) {
-      const group = createFurniture(item, accent, oshi);
+    for (const item of design.items) {
+      if (reference && !isManualFurniture(item)) continue;
+      // The reference drawing only contains its fixed original furniture. New
+      // owned furniture uses the same editable primitives as measured rooms.
+      const previous = furniture.get(item.id);
+      if (previous) { scene.remove(previous); disposeObject(previous); }
+      const group = createFurniture(item, accent, oshi, loadingManager);
       scene.add(group);
       furniture.set(item.id, group);
     }
@@ -626,15 +701,21 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       if (object) {
         selection = new THREE.BoxHelper(object, "#b49cf0");
         selection.material.transparent = true;
-        selection.material.opacity = 0.7;
+        selection.material.opacity = 1;
+        selection.material.depthTest = false;
+        selection.renderOrder = 10;
         scene.add(selection);
       }
     };
     const updateVisibility = () => {
+      if (themedDecor) themedDecor.visible = !currentBefore;
+      if (shellFloor) shellFloor.visible = !currentBefore;
+      if (floorNotice.current) floorNotice.current.hidden = currentBefore || !shellFloorUnavailable;
       layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel;
-      proceduralRoomVisible = currentBefore || !loadedRoom;
+      const originalShellVisible = Boolean(currentBefore && loadedRoom && !completeRoomModel);
+      proceduralRoomVisible = (currentBefore && !originalShellVisible) || !loadedRoom;
       architecture.visible = proceduralRoomVisible;
-      if (loadedRoom) loadedRoom.visible = !currentBefore;
+      if (loadedRoom) loadedRoom.visible = originalShellVisible || !currentBefore;
       for (const [id, group] of furniture) {
         group.visible = currentBefore ? existingIds.has(id) : !loadedRoom || !completeRoomModel;
         group.traverse(object => { if (object.userData.afterAccent) object.visible = !currentBefore; });
@@ -652,17 +733,21 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       for (const marker of markers.values()) marker.visible = markersVisible;
       architecture.traverse(object => {
         if (object.userData.afterAccent) object.visible = !currentBefore;
-        if (object instanceof THREE.Mesh && object.userData.beforeColor) {
-          const surface = object.material as THREE.MeshStandardMaterial;
-          if (!surface.userData.afterColor) surface.userData.afterColor = surface.color.getHex();
-          surface.color.set(currentBefore ? object.userData.beforeColor : surface.userData.afterColor);
+        if (object instanceof THREE.Mesh || object instanceof THREE.Line) {
+          for (const surface of Array.isArray(object.material) ? object.material : [object.material]) {
+            const original = surface.userData.beforeColor ?? object.userData.beforeColor;
+            if (original === undefined || original === null || !('color' in surface)) continue;
+            const colored = surface as THREE.MeshStandardMaterial;
+            if (colored.userData.afterColor === undefined) colored.userData.afterColor = colored.color.getHex();
+            colored.color.set(currentBefore ? original : colored.userData.afterColor);
+          }
         }
       });
       updateSelection(selectedId);
     };
     let currentView = initialView();
     const defaultDirections = {
-      perspective: reference ? new THREE.Vector3(1, 1, 1).normalize() : new THREE.Vector3(1, 0.84, 1.2).normalize(),
+      perspective: reference ? new THREE.Vector3(1, 1, 1).normalize() : new THREE.Vector3(preview ? -1 : 1, preview ? 1.2 : 0.84, 1.2).normalize(),
       top: new THREE.Vector3(0, 1, 0.001).normalize(),
       front: new THREE.Vector3(0, 0.03, 1).normalize(),
     };
@@ -693,6 +778,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       sun.shadow.camera.updateProjectionMatrix();
     };
     const reset = () => {
+      controls.minDistance = Math.max(0.5, cameraBounds.getSize(new THREE.Vector3()).length() * 0.24);
       controls.target.copy(roomCenter);
       camera.position.copy(roomCenter).addScaledVector(defaultDirections[currentView], fitDistances[currentView]);
       if (camera instanceof THREE.OrthographicCamera) { camera.zoom = 1; camera.updateProjectionMatrix(); }
@@ -710,6 +796,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       if (!savedCamera || savedCamera.view !== currentView) { reset(); return; }
       controls.target.copy(savedCamera.target);
       camera.position.copy(savedCamera.position);
+      controls.minDistance = savedCamera.minDistance;
       camera.zoom = savedCamera.zoom;
       camera.updateProjectionMatrix();
       controls.enableRotate = currentView === "perspective";
@@ -718,16 +805,54 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       controls.update();
       controls.enableDamping = damping;
     };
+    const focusItem = (id: string) => {
+      if (preview || drag) return;
+      const objects = loadedRoom && completeRoomModel && !currentBefore ? hitTargets : furniture;
+      const object = objects.get(id);
+      if (!object?.visible) return;
+      const bounds = new THREE.Box3().setFromObject(object);
+      if (bounds.isEmpty()) return;
+      const target = bounds.getCenter(new THREE.Vector3());
+      const direction = camera.position.clone().sub(controls.target).normalize();
+      if (direction.lengthSq() < 0.5) direction.copy(defaultDirections[currentView]);
+      const aspect = camera instanceof THREE.PerspectiveCamera ? camera.aspect : (camera.right - camera.left) / (camera.top - camera.bottom);
+      const distance = Math.max(0.4, fittedDistance(bounds, target, direction, aspect, 36) * 1.25);
+      const damping = controls.enableDamping;
+      controls.enableDamping = false;
+      controls.update();
+      controls.minDistance = 0.25;
+      controls.target.copy(target);
+      camera.position.copy(target).addScaledVector(direction, distance);
+      if (camera instanceof THREE.OrthographicCamera) {
+        const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), direction).normalize();
+        const up = new THREE.Vector3().crossVectors(direction, right).normalize();
+        let halfWidth = 0, halfHeight = 0;
+        for (const x of [bounds.min.x, bounds.max.x]) for (const y of [bounds.min.y, bounds.max.y]) for (const z of [bounds.min.z, bounds.max.z]) {
+          const offset = new THREE.Vector3(x, y, z).sub(target);
+          halfWidth = Math.max(halfWidth, Math.abs(offset.dot(right)));
+          halfHeight = Math.max(halfHeight, Math.abs(offset.dot(up)));
+        }
+        camera.zoom = THREE.MathUtils.clamp(Math.min((camera.right - camera.left) / Math.max(halfWidth * 2.5, 0.1), (camera.top - camera.bottom) / Math.max(halfHeight * 2.5, 0.1)), 0.25, 4);
+        camera.updateProjectionMatrix();
+      }
+      controls.update();
+      controls.enableDamping = damping;
+      updateSelection(id);
+      previewNeedsRender = true;
+    };
     let lastCommandSequence: number | null = savedCamera?.lastCommandSequence ?? null;
     runtime.current = {
       select: updateSelection,
-      reset: () => { cancelDrag(); lastCommandSequence = null; reset(); },
-      setBefore: (nextBefore, nextMarkersVisible) => { if (nextBefore !== currentBefore) cancelDrag(); currentBefore = nextBefore; markersVisible = nextMarkersVisible; updateVisibility(); },
-      setEditing: (nextEditing) => { if (nextEditing !== currentEditing) cancelDrag(); currentEditing = nextEditing; layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel; },
+      focus: focusItem,
+      reset: () => { cancelDrag(); clearPlacementPreview(); lastCommandSequence = null; reset(); },
+      setBefore: (nextBefore, nextMarkersVisible) => { if (nextBefore !== currentBefore) cancelDrag(); clearPlacementPreview(); currentBefore = nextBefore; markersVisible = nextMarkersVisible; updateVisibility(); },
+      setEditing: (nextEditing) => { if (nextEditing !== currentEditing) cancelDrag(); if (!nextEditing) clearPlacementPreview(); currentEditing = nextEditing; layoutGrid.visible = currentEditing && !currentBefore && !completeRoomModel; },
+      setPlacement: (item) => { if (item !== currentPlacement) clearPlacementPreview(); currentPlacement = item; },
       command: (nextCommand) => {
         if (lastCommandSequence === nextCommand.sequence) return;
         lastCommandSequence = nextCommand.sequence;
         cancelDrag();
+        clearPlacementPreview();
         if (currentView !== "perspective" && (nextCommand.action === "left" || nextCommand.action === "right")) return;
         const damping = controls.enableDamping;
         controls.enableDamping = false;
@@ -749,6 +874,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       setView: (nextView) => {
         if (currentView === nextView) return;
         cancelDrag();
+        clearPlacementPreview();
         currentView = nextView;
         reset();
       },
@@ -757,8 +883,9 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     updateVisibility();
     restoreCamera();
 
-    const loader = new GLTFLoader();
+    const loader = new GLTFLoader(loadingManager);
     const showModelFailure = () => {
+      assetFailed = true;
       if (modelNotice.current && !disposed) modelNotice.current.hidden = false;
     };
     for (const item of design.items) {
@@ -779,16 +906,29 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         const center = bounds.getCenter(new THREE.Vector3());
         gltf.scene.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale);
         gltf.scene.traverse((object) => {
-          if (object instanceof THREE.Mesh) { object.castShadow = true; object.receiveShadow = true; }
+          if (!(object instanceof THREE.Mesh)) return;
+          object.castShadow = true;
+          object.receiveShadow = true;
+          // Imported owned furniture uses a catalog approximation; keep its
+          // measured dimensions and the product/edited color from the room item.
+          if (isManualFurniture(item)) {
+            for (const surface of Array.isArray(object.material) ? object.material : [object.material]) {
+              if ("color" in surface && surface.color instanceof THREE.Color) surface.color.set(item.color);
+            }
+          }
         });
         if (!item.existing && item.materialOverrides) {
           textureCleanups.push(applyMaterialOverrides(gltf.scene, item.materialOverrides, scale, () => {
             if (!disposed && textureNotice.current) textureNotice.current.hidden = false;
-          }));
+          }, loadingManager));
         }
         for (const child of [...group.children]) { group.remove(child); disposeObject(child); }
         group.scale.set(1, 1, 1);
+        // Capture normalized model bounds before the furniture transform makes
+        // them world-space; the reflection plane is a child in local space.
+        const mirrorBounds = isMirrorCategory(item.category) ? new THREE.Box3().setFromObject(gltf.scene) : undefined;
         group.add(gltf.scene);
+        if (mirrorBounds) { addMirrorSurface(group, item, mirrorBounds); resizeMirrorSurfaces(group, renderer); }
         if (selectedId === item.id) updateSelection(selectedId);
       }, undefined, showModelFailure);
     }
@@ -807,6 +947,11 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         });
         scene.add(gltf.scene);
         loadedRoom = gltf.scene;
+        if (!completeRoomModel && design.floorColor) {
+          shellFloor = design.room ? createShellFloorOverlay(gltf.scene, design.room, design.floorColor) : null;
+          if (shellFloor) scene.add(shellFloor);
+          else shellFloorUnavailable = true;
+        }
         if (completeRoomModel) {
           for (const item of design.items) {
             const group = new THREE.Group();
@@ -822,6 +967,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
             );
             hitTarget.position.y = item.size[1] / 2;
             group.add(hitTarget);
+            if (isMirrorCategory(item.category)) { addMirrorSurface(group, item); resizeMirrorSurfaces(group, renderer); }
             hitTargets.set(item.id, group);
             scene.add(group);
           }
@@ -849,14 +995,107 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       x: number;
       y: number;
       moved: boolean;
+      supportObjectId?: string;
+      supportSurface?: RoomItem['supportSurface'];
       controlsEnabled: boolean;
     };
     let drag: FurnitureDrag | null = null;
-    const setRay = (event: PointerEvent) => {
+    const setRay = (event: Pick<PointerEvent, "clientX" | "clientY">) => {
       const rect = renderer.domElement.getBoundingClientRect();
       pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
       raycaster.setFromCamera(pointer, camera);
     };
+    let placementPreview: THREE.Group | null = null;
+    clearPlacementPreview = () => {
+      if (!placementPreview) return;
+      scene.remove(placementPreview);
+      disposeObject(placementPreview);
+      placementPreview = null;
+    };
+    const pickedSurface = (item: RoomItem): { position: RoomItem['position']; supportObjectId: string; supportSurface: NonNullable<RoomItem['supportSurface']> } | null => {
+      if (!canPlaceOnFurniture(item)) return null;
+      const supports = design.items.filter(candidate => candidate.id !== item.id && isFurnitureSupport(candidate));
+      const targets = supports.flatMap(support => { const group = furniture.get(support.id); return group?.visible ? [group] : []; });
+      for (const hit of raycaster.intersectObjects(targets, true)) {
+        const mesh = hit.object;
+        if (!(mesh instanceof THREE.Mesh) || !hit.face) continue;
+        const normal = hit.face.normal.clone().applyMatrix3(new THREE.Matrix3().getNormalMatrix(mesh.matrixWorld));
+        if (normal.normalize().y < .99) continue;
+        let parent: THREE.Object3D | null = mesh;
+        while (parent && typeof parent.userData.itemId !== 'string') parent = parent.parent;
+        const support = supports.find(candidate => candidate.id === parent?.userData.itemId);
+        if (!support) continue;
+        mesh.geometry.computeBoundingBox();
+        const bounds = mesh.geometry.boundingBox;
+        if (!bounds) continue;
+        const inverse = mesh.matrixWorld.clone().invert().elements;
+        const supportSurface: NonNullable<RoomItem['supportSurface']> = {
+          transform: [inverse[0], inverse[8], inverse[4] * hit.point.y + inverse[12], inverse[2], inverse[10], inverse[6] * hit.point.y + inverse[14]],
+          bounds: [bounds.min.x, bounds.min.z, bounds.max.x, bounds.max.z], height: hit.point.y,
+          ...(mesh.geometry.type === 'CylinderGeometry' ? {radius: (mesh.geometry as THREE.CylinderGeometry).parameters.radiusTop} : {}),
+          supportPosition: [...support.position], supportSize: [...support.size], supportRotation: support.rotation ?? 0,
+        };
+        const position = furniturePositionInRoom({...item, supportObjectId: support.id, supportSurface}, [hit.point.x, hit.point.y + item.size[1] / 2, hit.point.z], design);
+        if (position && Math.abs(position[1] - item.size[1] / 2 - hit.point.y) < .001) return {position, supportObjectId: support.id, supportSurface};
+      }
+      return null;
+    };
+    const placementPosition = (event: DragEvent): { position: RoomItem['position']; supportObjectId?: string; supportSurface?: RoomItem['supportSurface'] } | null => {
+      const item = currentPlacement;
+      if (!item || !currentEditing || !markersVisible || currentBefore || completeRoomModel) return null;
+      const rect = renderer.domElement.getBoundingClientRect();
+      if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) return null;
+      setRay(event);
+      const surface = pickedSurface(item);
+      if (surface) return surface;
+      const hit = raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -gridFloor), new THREE.Vector3());
+      if (!hit || hit.x < gridBounds.min.x || hit.x > gridBounds.max.x || hit.z < gridBounds.min.z || hit.z > gridBounds.max.z) return null;
+      const position = furniturePositionInRoom(item, [hit.x, gridFloor + item.size[1] / 2, hit.z], design);
+      return position ? { position } : null;
+    };
+    const dragOver = (event: DragEvent) => {
+      if (!currentPlacement) return;
+      const placement = placementPosition(event);
+      const position = placement?.position;
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = position ? "copy" : "none";
+      if (!position) { if (placementPreview) placementPreview.visible = false; return; }
+      if (!placementPreview) {
+        placementPreview = createFurniture(currentPlacement, accent, oshi, loadingManager);
+        placementPreview.userData.reflectionExcluded = true;
+        placementPreview.traverse(object => {
+          if (!(object instanceof THREE.Mesh)) return;
+          object.castShadow = false;
+          for (const surface of Array.isArray(object.material) ? object.material : [object.material]) {
+            surface.transparent = true;
+            surface.opacity = 0.55;
+            surface.depthWrite = false;
+          }
+        });
+        scene.add(placementPreview);
+        resizeMirrorSurfaces(placementPreview, renderer);
+      }
+      placementPreview.visible = true;
+      placementPreview.userData.supportObjectId = placement?.supportObjectId;
+      placementPreview.userData.supportSurface = placement?.supportSurface;
+      placementPreview.position.set(position[0], position[1] - currentPlacement.size[1] / 2, position[2]);
+    };
+    const drop = (event: DragEvent) => {
+      if (!currentPlacement) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const placement = placementPosition(event);
+      clearPlacementPreview();
+      if (placement) placeItem(placement.position, placement.supportObjectId, placement.supportSurface);
+    };
+    const dragLeave = (event: DragEvent) => {
+      if (event.relatedTarget instanceof Node && host.contains(event.relatedTarget)) return;
+      if (placementPreview) placementPreview.visible = false;
+    };
+    host.addEventListener("dragover", dragOver);
+    host.addEventListener("drop", drop);
+    host.addEventListener("dragleave", dragLeave);
+    window.addEventListener("dragend", clearPlacementPreview);
     const findItem = (event: PointerEvent) => {
       setRay(event);
       const objects = loadedRoom && completeRoomModel && !currentBefore ? hitTargets : furniture;
@@ -904,7 +1143,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         : new THREE.Plane(new THREE.Vector3(0, 1, 0), -item.position[1]);
       const hit = raycaster.ray.intersectPlane(plane, new THREE.Vector3());
       if (!hit) return;
-      drag = { pointerId: event.pointerId, id, itemPosition: [...item.position], position: [...item.position], group, origin: group.position.clone(), hit, plane, x: event.clientX, y: event.clientY, moved: false, controlsEnabled: controls.enabled };
+      drag = { supportSurface: item.supportSurface, supportObjectId: item.supportObjectId, pointerId: event.pointerId, id, itemPosition: [...item.position], position: [...item.position], group, origin: group.position.clone(), hit, plane, x: event.clientX, y: event.clientY, moved: false, controlsEnabled: controls.enabled };
       controls.enabled = false;
       renderer.domElement.setPointerCapture(event.pointerId);
       renderer.domElement.style.cursor = "grab";
@@ -921,18 +1160,18 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         event.stopImmediatePropagation();
         const active = drag;
         const delta = active.group.position.clone().sub(active.origin);
-        const changed = active.moved && Math.hypot(delta.x, delta.z) > .0005;
+        const changed = active.moved && delta.length() > .0005;
         releaseDrag(!changed);
         if (changed) {
-          moveItem(active.id, active.position);
-        }
+          moveItem(active.id, active.position, active.supportObjectId, active.supportSurface);
+        } else if (!active.moved) focusItem(active.id);
         return;
       }
       const start = pointerStart;
       pointerStart = null;
       if (!start || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 5 || performance.now() - start.time > 600) return;
       const id = findItem(event);
-      if (id) selectItem(id);
+      if (id) { focusItem(id); selectItem(id); }
     };
     const pointerMove = (event: PointerEvent) => {
       if (drag?.pointerId === event.pointerId) {
@@ -945,10 +1184,15 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         const delta = hit.sub(drag.hit);
         const item = design.items.find(item => item.id === drag?.id);
         if (!item) return;
-        const position = snapItemPosition(item, [drag.itemPosition[0] + delta.x, drag.itemPosition[1], drag.itemPosition[2] + delta.z], currentView === "front" ? [0] : [0, 2], design.room);
+        const surface = currentView !== "front" ? pickedSurface(item) : null;
+        const floor = canPlaceOnFurniture(item) && currentView !== "front" ? gridFloor + item.size[1] / 2 : drag.itemPosition[1];
+        const position = surface?.position ?? snapFurnitureEditPosition(item, [drag.itemPosition[0] + delta.x, floor, drag.itemPosition[2] + delta.z], currentView === "front" ? [0] : [0, 2], design);
+        if (!position) return;
         drag.position = position;
+        drag.supportObjectId = surface?.supportObjectId ?? (currentView === "front" ? item.supportObjectId : undefined);
+        drag.supportSurface = surface?.supportSurface ?? (currentView === "front" ? item.supportSurface : undefined);
         // Preserve the model group's origin offset while previewing the snapped position.
-        drag.group.position.copy(drag.origin).add(new THREE.Vector3(position[0] - drag.itemPosition[0], 0, position[2] - drag.itemPosition[2]));
+        drag.group.position.copy(drag.origin).add(new THREE.Vector3(position[0] - drag.itemPosition[0], position[1] - drag.itemPosition[1], position[2] - drag.itemPosition[2]));
         drag.group.updateMatrixWorld(true);
         drag.moved = true;
         selection?.update();
@@ -969,6 +1213,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       event.preventDefault();
       cancelDrag();
       if (fallback.current) fallback.current.hidden = false;
+      if (!readySent) { readySent = true; window.clearTimeout(previewDeadline); reportReady(false); }
     };
     renderer.domElement.addEventListener("pointerdown", pointerDown, true);
     renderer.domElement.addEventListener("pointerup", pointerUp, true);
@@ -979,6 +1224,7 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     window.addEventListener("blur", pointerCancel);
     renderer.domElement.addEventListener("webglcontextlost", contextLost);
     const resize = () => {
+      previewNeedsRender = true;
       const width = Math.max(host.clientWidth, 1);
       const height = Math.max(host.clientHeight, 1);
       const aspect = width / height;
@@ -994,12 +1240,16 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         controls.update();
       }
       renderer.setSize(width, height);
+      resizeMirrorSurfaces(scene, renderer);
     };
     const observer = new ResizeObserver(resize);
     observer.observe(host);
     resize();
     const render = () => {
-      controls.update();
+      const cameraChanged = controls.update();
+      // 一覧の静止した視点は描き直さず、回転・読み込み・リサイズ時に描画する。
+      if (preview && readySent && assetsReady && !cameraChanged && !previewNeedsRender) return;
+      previewNeedsRender = false;
       const markerObjects = loadedRoom && completeRoomModel && !currentBefore ? hitTargets : furniture;
       for (const [id, marker] of markers) {
         const group = markerObjects.get(id);
@@ -1026,9 +1276,17 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
         }
       }
       renderer.render(scene, camera);
+      if (assetsReady && !readySent) {
+        readySent = true;
+        window.clearTimeout(previewDeadline);
+        // 描画した直後でないと、キャンバスの中身は読み出せない。
+        reportSnapshot(() => renderer.domElement.toDataURL("image/jpeg", 0.85));
+        reportReady(!assetFailed);
+      }
     };
     const contextRestored = () => {
       if (disposed) return;
+      previewNeedsRender = true;
       if (fallback.current) fallback.current.hidden = true;
       renderer.setAnimationLoop(render);
     };
@@ -1039,11 +1297,17 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
     renderer.setAnimationLoop(render);
     return () => {
       cancelDrag();
-      cameraState.current = { id: design.id, position: camera.position.clone(), target: controls.target.clone(), zoom: camera.zoom, view: currentView, lastCommandSequence };
+      clearPlacementPreview();
+      cameraState.current = { id: design.id, position: camera.position.clone(), target: controls.target.clone(), zoom: camera.zoom, minDistance: controls.minDistance, view: currentView, lastCommandSequence };
       disposed = true;
+      window.clearTimeout(previewDeadline);
       textureCleanups.forEach(cleanup => cleanup());
       runtime.current = null;
       observer.disconnect();
+      host.removeEventListener("dragover", dragOver);
+      host.removeEventListener("drop", drop);
+      host.removeEventListener("dragleave", dragLeave);
+      window.removeEventListener("dragend", clearPlacementPreview);
       renderer.setAnimationLoop(null);
       renderer.domElement.removeEventListener("pointerdown", pointerDown, true);
       renderer.domElement.removeEventListener("pointerup", pointerUp, true);
@@ -1061,29 +1325,31 @@ export function RoomViewer({ design: afterDesign, selectedItemId, onSelectItem, 
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, [design]);
+  }, [design, preview]);
 
   useEffect(() => { runtime.current?.select(selectedItemId); }, [design, selectedItemId]);
   useEffect(() => { runtime.current?.setView(view); }, [design, view]);
   useEffect(() => { runtime.current?.reset(); }, [resetKey]);
-  useEffect(() => { runtime.current?.setBefore(legacyBefore, !before); }, [design, legacyBefore, before]);
+  useEffect(() => { runtime.current?.setBefore(legacyBefore, !before && !preview); }, [design, legacyBefore, before, preview]);
   useEffect(() => { runtime.current?.setEditing(editing && Boolean(onMoveItem) && !before); }, [design, editing, onMoveItem, before]);
+  useEffect(() => { runtime.current?.setPlacement(!before && onPlaceItem ? placementItem : null); }, [design, placementItem, onPlaceItem, before]);
   useEffect(() => { canvasHost.current?.querySelector("canvas")?.setAttribute("aria-label", instructions); }, [design, instructions]);
   useEffect(() => { if (command) runtime.current?.command(command); }, [design, command]);
 
   return (
     <div className="room-viewer">
       <div ref={canvasHost} className="viewer-canvas" style={{ position: "absolute", inset: 0 }} />
-      {dimensionItem && <div role="status" style={{ position: "absolute", left: 16, bottom: 16, padding: "8px 12px", background: "rgba(29,27,38,.88)", border: "1px solid #6e6a7c", borderRadius: 8, color: "#fff", fontSize: 12, pointerEvents: "none" }}>幅 {Math.round(dimensionItem.size[0] * 100)} × 高さ {Math.round(dimensionItem.size[1] * 100)} × 奥行き {Math.round(dimensionItem.size[2] * 100)} cm</div>}
+      {selectedItem && <button type="button" className="viewer-selected-item" aria-label={`${selectedItem.name}にフォーカス`} onClick={() => runtime.current?.focus(selectedItem.id)}>選択中: {selectedItem.name}</button>}
+      <DimensionLabel item={dimensionItem}/>
       <div ref={fallback} className="viewer-fallback" hidden role="status">
         <strong>この環境では3Dを表示できません</strong>
-        <p>アイテム一覧から家具の詳細や購入先をご覧いただけます。</p>
       </div>
       <div ref={modelNotice} className="viewer-model-notice" hidden role="status">
-        3Dモデルを読み込めなかったため、家具の形と配置を簡易表示しています。
+        3Dモデルを読み込めませんでした。
       </div>
+      <div ref={floorNotice} className="viewer-model-notice" hidden role="status">モデルの床面を特定できないため、保存した床の色をこのモデルに表示できません。</div>
       <div ref={textureNotice} className="viewer-model-notice" style={{bottom:84}} hidden role="status">
-        一部の生成テクスチャを読み込めなかったため、単色で表示しています。
+        一部の素材を読み込めませんでした。
       </div>
     </div>
   );

@@ -1,0 +1,1236 @@
+[
+  {
+    "headRefOid": "297b2515213a0a6efb1b4a10b2509d4fa25179ed",
+    "mergeStateStatus": "CLEAN",
+    "number": 109,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T18:13:32Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37822538528/job/113466975870",
+        "name": "test",
+        "startedAt": "2026-10-08T18:12:57Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T18:13:12Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37822538528/job/113466976308",
+        "name": "lint",
+        "startedAt": "2026-10-08T18:12:57Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T18:13:27Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37822538528/job/113466976434",
+        "name": "frontend",
+        "startedAt": "2026-10-08T18:12:57Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T18:13:02Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "5c0063f3369c1a2b56b6654b35ee8e44d844e4ff",
+    "mergeStateStatus": "CLEAN",
+    "number": 108,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T18:20:21Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37823415433/job/113469976542",
+        "name": "test",
+        "startedAt": "2026-10-08T18:19:45Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T18:19:57Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37823415433/job/113469976653",
+        "name": "lint",
+        "startedAt": "2026-10-08T18:19:45Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T18:20:15Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37823415433/job/113469976083",
+        "name": "frontend",
+        "startedAt": "2026-10-08T18:19:45Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T18:19:47Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "756917bbf988ef4659ec6b0123ccef5e2d43de2e",
+    "mergeStateStatus": "CLEAN",
+    "number": 106,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T18:11:15Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37822236105/job/113465930166",
+        "name": "test",
+        "startedAt": "2026-10-08T18:10:34Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T18:10:49Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37822236105/job/113465929880",
+        "name": "lint",
+        "startedAt": "2026-10-08T18:10:34Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T18:11:01Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37822236105/job/113465930360",
+        "name": "frontend",
+        "startedAt": "2026-10-08T18:10:35Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T18:10:36Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "773618089074d4c39be72b976f65844b96341342",
+    "mergeStateStatus": "CLEAN",
+    "number": 105,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:52:51Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37819862966/job/113457810101",
+        "name": "test",
+        "startedAt": "2026-10-08T17:52:06Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:52:24Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37819862966/job/113457810307",
+        "name": "lint",
+        "startedAt": "2026-10-08T17:52:06Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:52:40Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37819862966/job/113457810196",
+        "name": "frontend",
+        "startedAt": "2026-10-08T17:52:07Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T17:52:08Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "404cf72f25d563615c3ef82cb3c4f39af66c4e36",
+    "mergeStateStatus": "CLEAN",
+    "number": 104,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:59:10Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37820668614/job/113460573604",
+        "name": "test",
+        "startedAt": "2026-10-08T17:58:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:58:58Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37820668614/job/113460573164",
+        "name": "lint",
+        "startedAt": "2026-10-08T17:58:41Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:59:03Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37820668614/job/113460573613",
+        "name": "frontend",
+        "startedAt": "2026-10-08T17:58:41Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T17:58:23Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "1824e1b79ff19b9e54e0495737a0e947d0378d60",
+    "mergeStateStatus": "CLEAN",
+    "number": 103,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:05:12Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37813745369/job/113436925893",
+        "name": "test",
+        "startedAt": "2026-10-08T17:04:37Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:04:50Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37813745369/job/113436924923",
+        "name": "lint",
+        "startedAt": "2026-10-08T17:04:38Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:05:03Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37813745369/job/113436924731",
+        "name": "frontend",
+        "startedAt": "2026-10-08T17:04:38Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T17:04:41Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "4018b20d84c84f2e2a83e41dd00276c1aa3989ea",
+    "mergeStateStatus": "CLEAN",
+    "number": 102,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:20:43Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37815727180/job/113443746475",
+        "name": "test",
+        "startedAt": "2026-10-08T17:20:00Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:20:12Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37815727180/job/113443746254",
+        "name": "lint",
+        "startedAt": "2026-10-08T17:20:00Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:20:24Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37815727180/job/113443746085",
+        "name": "frontend",
+        "startedAt": "2026-10-08T17:20:00Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T17:20:03Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "e04adcafcbb5ee08548a8890ca7d92602567a91f",
+    "mergeStateStatus": "CLEAN",
+    "number": 101,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:52:22Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37819808689/job/113457630328",
+        "name": "test",
+        "startedAt": "2026-10-08T17:51:42Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:51:58Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37819808689/job/113457630406",
+        "name": "lint",
+        "startedAt": "2026-10-08T17:51:42Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:52:05Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37819808689/job/113457630040",
+        "name": "frontend",
+        "startedAt": "2026-10-08T17:51:42Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T17:51:44Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "eee11c78b84d817583cac0e8d06ba05bebea5386",
+    "mergeStateStatus": "CLEAN",
+    "number": 100,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:56:30Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37812626993/job/113433085805",
+        "name": "test",
+        "startedAt": "2026-10-08T16:55:58Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:56:12Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37812626993/job/113433085727",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:55:58Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:56:25Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37812626993/job/113433085373",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:55:58Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T16:56:02Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "bc85e00cef623de8c6ea02bfc842c0adfdb6412b",
+    "mergeStateStatus": "CLEAN",
+    "number": 99,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:35:12Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37817613109/job/113450146711",
+        "name": "test",
+        "startedAt": "2026-10-08T17:34:28Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:34:42Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37817613109/job/113450146923",
+        "name": "lint",
+        "startedAt": "2026-10-08T17:34:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:35:28Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37817613109/job/113450146450",
+        "name": "frontend",
+        "startedAt": "2026-10-08T17:34:28Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T17:34:32Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "0ac07bf88e3255c3ff35355da4db3970e5c17ee6",
+    "mergeStateStatus": "CLEAN",
+    "number": 98,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:47:27Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37811452065/job/113429053079",
+        "name": "test",
+        "startedAt": "2026-10-08T16:46:49Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:47:04Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37811452065/job/113429053432",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:46:49Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:47:13Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37811452065/job/113429053558",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:46:49Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T16:46:55Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "886cb5503483945c74658918b1e9696ecb8f9f98",
+    "mergeStateStatus": "CLEAN",
+    "number": 97,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:05:05Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37813726003/job/113436859776",
+        "name": "test",
+        "startedAt": "2026-10-08T17:04:29Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:04:48Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37813726003/job/113436859335",
+        "name": "lint",
+        "startedAt": "2026-10-08T17:04:30Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:04:57Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37813726003/job/113436859951",
+        "name": "frontend",
+        "startedAt": "2026-10-08T17:04:30Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T17:04:32Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "6538237c706ab3be1487f2ceca22786962221d01",
+    "mergeStateStatus": "CLEAN",
+    "number": 96,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:39:27Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37810418918/job/113425526211",
+        "name": "test",
+        "startedAt": "2026-10-08T16:38:51Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:39:02Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37810418918/job/113425525932",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:38:50Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:39:19Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37810418918/job/113425526258",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:38:51Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T16:38:54Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "1d9d1544c9b046c6dcafecd9c13f790981851cd9",
+    "mergeStateStatus": "CLEAN",
+    "number": 95,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:21:05Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37815791054/job/113443957120",
+        "name": "test",
+        "startedAt": "2026-10-08T17:20:28Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:20:40Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37815791054/job/113443957059",
+        "name": "lint",
+        "startedAt": "2026-10-08T17:20:28Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T17:20:47Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37815791054/job/113443956669",
+        "name": "frontend",
+        "startedAt": "2026-10-08T17:20:28Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T17:20:28Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "6bebbecff110419b12571cca77207eabf59b02e5",
+    "mergeStateStatus": "CLEAN",
+    "number": 94,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:24:14Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37808412608/job/113418649100",
+        "name": "test",
+        "startedAt": "2026-10-08T16:23:36Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:23:48Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37808412608/job/113418648662",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:23:36Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:24:01Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37808412608/job/113418649059",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:23:36Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T16:23:42Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "12a0697519af3c8b4bef57a0bf4f7d80fc132f92",
+    "mergeStateStatus": "CLEAN",
+    "number": 93,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:37:31Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37810160254/job/113424623227",
+        "name": "test",
+        "startedAt": "2026-10-08T16:36:50Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:37:23Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37810160254/job/113424623826",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:37:10Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:37:11Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37810160254/job/113424623858",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:36:50Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T16:36:56Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "12f9588a17d8a37ebf5b54efa119facdff7621d4",
+    "mergeStateStatus": "CLEAN",
+    "number": 92,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:21:30Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37808038069/job/113417361837",
+        "name": "test",
+        "startedAt": "2026-10-08T16:20:43Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:20:57Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37808038069/job/113417362132",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:20:43Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:21:01Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37808038069/job/113417362154",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:20:43Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T16:20:49Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "71e6f476c69c91a6d42f1faadaa9bd64ff95f288",
+    "mergeStateStatus": "CLEAN",
+    "number": 91,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:18:15Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37807632920/job/113415960529",
+        "name": "test",
+        "startedAt": "2026-10-08T16:17:36Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:17:46Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37807632920/job/113415960674",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:17:36Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:17:57Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37807632920/job/113415960859",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:17:36Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T16:17:42Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "b1feb3597003dff47a9c98265536d59560ee6569",
+    "mergeStateStatus": "CLEAN",
+    "number": 90,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:42:13Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37810699351/job/113426476609",
+        "name": "test",
+        "startedAt": "2026-10-08T16:41:36Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:41:11Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37810699351/job/113426476614",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:41:00Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:41:26Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37810699351/job/113426476096",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:41:00Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T16:41:20Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "8122572bb64ea9055f314a46fb3fc645e4f7a523",
+    "mergeStateStatus": "CLEAN",
+    "number": 89,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:41:54Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37810694947/job/113426457877",
+        "name": "test",
+        "startedAt": "2026-10-08T16:40:58Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:41:20Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37810694947/job/113426457820",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:40:58Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:41:21Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37810694947/job/113426457542",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:40:59Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T16:41:18Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "d6157a1809492067e038889be3a99d441c0194a2",
+    "mergeStateStatus": "CLEAN",
+    "number": 87,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:47Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809542201/job/113422502868",
+        "name": "test",
+        "startedAt": "2026-10-08T16:32:08Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:46Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809542393/job/113422504291",
+        "name": "test",
+        "startedAt": "2026-10-08T16:32:08Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:21Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809542201/job/113422502448",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:32:07Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:26Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809542393/job/113422504611",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:32:08Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:38Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809542201/job/113422502700",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:32:08Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:34Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809542393/job/113422504773",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:32:09Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T16:32:27Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "790b5ea922a9a45a003e0e8faacac6d35169cf8a",
+    "mergeStateStatus": "CLEAN",
+    "number": 86,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T15:59:20Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37805129302/job/113407301615",
+        "name": "test",
+        "startedAt": "2026-10-08T15:58:43Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T15:58:56Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37805129302/job/113407301876",
+        "name": "lint",
+        "startedAt": "2026-10-08T15:58:44Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T15:59:07Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37805129302/job/113407301868",
+        "name": "frontend",
+        "startedAt": "2026-10-08T15:58:43Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T15:58:52Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "c1cd06b5a93926107e58b2a23d532df8d4d8d936",
+    "mergeStateStatus": "CLEAN",
+    "number": 84,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:51Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809540963/job/113422498770",
+        "name": "test",
+        "startedAt": "2026-10-08T16:32:07Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:57Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809542045/job/113422503443",
+        "name": "test",
+        "startedAt": "2026-10-08T16:32:08Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:23Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809540963/job/113422499097",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:32:09Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:26Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809542045/job/113422503233",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:32:08Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:30Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809540963/job/113422499168",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:32:07Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:30Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809542045/job/113422502932",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:32:08Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T16:32:33Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "24b8aff8d6d99075194b6c03925802c1ff98246e",
+    "mergeStateStatus": "CLEAN",
+    "number": 82,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:54Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809542937/job/113422504772",
+        "name": "test",
+        "startedAt": "2026-10-08T16:32:08Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:49Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809543018/job/113422505199",
+        "name": "test",
+        "startedAt": "2026-10-08T16:32:08Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:18Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809542937/job/113422504724",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:32:08Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:26Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809543018/job/113422505042",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:32:08Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:32Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809542937/job/113422504528",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:32:08Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:34Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809543018/job/113422504739",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:32:09Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T16:32:32Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "f4f76b65ece619a43b8451a2cf31a71dc1ac1d11",
+    "mergeStateStatus": "CLEAN",
+    "number": 81,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T15:51:00Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37803978530/job/113403283038",
+        "name": "test",
+        "startedAt": "2026-10-08T15:50:06Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T15:50:16Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37803978530/job/113403282928",
+        "name": "lint",
+        "startedAt": "2026-10-08T15:50:05Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T15:50:34Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37803978530/job/113403282580",
+        "name": "frontend",
+        "startedAt": "2026-10-08T15:50:06Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T15:50:12Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  },
+  {
+    "headRefOid": "65d9129865f8e2c7db4e8e5b17a2ab7da6d45e0b",
+    "mergeStateStatus": "CLEAN",
+    "number": 80,
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:49Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809544058/job/113422510461",
+        "name": "test",
+        "startedAt": "2026-10-08T16:32:09Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:30Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809544058/job/113422511047",
+        "name": "lint",
+        "startedAt": "2026-10-08T16:32:09Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-08T16:32:39Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/AtsushiHosaka/zenn_hackathon_5_takarada/actions/runs/37809544058/job/113422511150",
+        "name": "frontend",
+        "startedAt": "2026-10-08T16:32:09Z",
+        "status": "COMPLETED",
+        "workflowName": "CI"
+      },
+      {
+        "__typename": "StatusContext",
+        "context": "CodeRabbit",
+        "startedAt": "2026-10-08T16:32:14Z",
+        "state": "SUCCESS",
+        "targetUrl": ""
+      }
+    ]
+  }
+]

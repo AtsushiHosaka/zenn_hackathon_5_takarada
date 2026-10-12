@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./feature/shared/motion.css";
 
 /* Baseline restored from the supplied HTML, including its local font subsets. */
 :root { font-family:'Zen Kaku Gothic New','Hiragino Sans','Noto Sans JP',sans-serif; color:#1D1B26; background:#F5F4F8; font-synthesis:none; }
@@ -24,4 +25,3 @@ input:focus-visible,a:focus-visible,button:focus-visible,textarea:focus-visible,
 .rc-setting { display:flex;flex-direction:column;gap:8px;margin-top:24px;font-size:14px;font-weight:700; }
 .rc-setting select { padding:10px 12px;border:1px solid #DCD8E4;border-radius:12px;background:#fff; }
 .rc-setting-note { font-size:13px;color:#5A5768; } .rc-setting-note code { font-size:12px;overflow-wrap:anywhere; }
-@media(prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none!important;animation:none!important;scroll-behavior:auto!important; } }

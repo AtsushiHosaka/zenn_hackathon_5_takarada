@@ -1,0 +1,97 @@
+{
+  "coordination": {
+    "room_palette_id": "warm-ivory",
+    "character_theme_id": "pochacco",
+    "prompt": "選択した家具を保つ",
+    "budget": 30000,
+    "kept_object_ids": [
+      "bed-1",
+      "desk-1",
+      "shelf-1"
+    ],
+    "edited_objects": [
+      {
+        "id": "bed-1",
+        "position": {
+          "x": 0.51,
+          "y": 0,
+          "z": 1
+        },
+        "size": {
+          "w": 0.97,
+          "h": 0.45,
+          "d": 1.95
+        },
+        "rotation_y": 0,
+        "color": "#f2f0eb"
+      },
+      {
+        "id": "desk-1",
+        "position": {
+          "x": 2.84,
+          "y": 0,
+          "z": 0.27
+        },
+        "size": {
+          "w": 1,
+          "h": 0.72,
+          "d": 0.5
+        },
+        "rotation_y": 0,
+        "color": "#a0784f"
+      },
+      {
+        "id": "shelf-1",
+        "position": {
+          "x": 3.19,
+          "y": 0,
+          "z": 2.32
+        },
+        "size": {
+          "w": 0.8,
+          "h": 1.8,
+          "d": 0.3
+        },
+        "rotation_y": 270,
+        "color": "#8b6a4a"
+      },
+      {
+        "id": "manual-c0bd7633-356c-4a2a-97e7-1d82191ab8da",
+        "position": {
+          "x": 1.68,
+          "y": 0,
+          "z": 1.93
+        },
+        "size": {
+          "w": 0.46,
+          "h": 0.8,
+          "d": 0.51
+        },
+        "rotation_y": 0,
+        "color": "#303030",
+        "category": "chair",
+        "ec_product_id": 791,
+        "replacement_ec_product_id": 792
+      }
+    ],
+    "furniture_operations": [
+      {
+        "object_id": "bed-1",
+        "action": "keep"
+      },
+      {
+        "object_id": "desk-1",
+        "action": "keep"
+      },
+      {
+        "object_id": "shelf-1",
+        "action": "keep"
+      },
+      {
+        "object_id": "manual-c0bd7633-356c-4a2a-97e7-1d82191ab8da",
+        "action": "replace"
+      }
+    ],
+    "additions": []
+  }
+}

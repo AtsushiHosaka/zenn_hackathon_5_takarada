@@ -13,7 +13,7 @@ class CoordinationPlanner
       @slots = slots
       @previous = previous
       @user_id = user_id
-      @client = client || InteriorLinks.client(user_id: user_id)
+      @client = client || FurnitureCandidates.client(user_id: user_id)
     end
 
     def plan

@@ -1,55 +1,53 @@
+# 提案した商品に家具のモデルを付け、detail の部位ごとの色・模様を material_overrides にする
 class FurnitureProductAppearance
-  MAX_IMAGES = 3
-  DEADLINE_SECONDS = 90
-
-  def self.call(scene:, items:, user_id:)
-    new(scene: scene, items: items, user_id: user_id).call
+  def self.call(scene:, items:)
+    new(scene:, items:).call
   end
 
-  def initialize(scene:, items:, user_id:)
+  def initialize(scene:, items:)
     @scene = scene.deep_dup
     @items = items.deep_dup
-    @user_id = user_id
   end
 
   def call
-    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + DEADLINE_SECONDS
     by_marker = @items.index_by { |item| item["marker"] }
     @scene.fetch("objects", []).each do |object|
       next unless object["source"] == "suggested"
 
       item = by_marker[object["marker"]]
       next unless item && item["product_metadata"].is_a?(Hash) && item["product_metadata"].present?
-      next if item.dig("product_metadata", "source") == "mock"
 
-      begin
-        match = FurnitureProductMatcher.call(item: item, object: object)
-        unless match
-          object["model_url"] = nil
-          object["texture_status"] = item["texture_status"] = "unmatched"
-          next
-        end
-        model = match.model
-        model_match = { "model_id" => model.id, "reason" => match.reason, "approximate" => match.approximate }
-        object["model_match"] = item["model_match"] = model_match
-        object["model_url"] = FurnitureModelCatalog.model_url(model)
-        object["model_size"] = { "w" => model.width.to_f, "h" => model.height.to_f, "d" => model.depth.to_f }
-        object["model_fit"] = "contain"
-        object["texture_source"] = item["texture_source"] = "description"
-        status = "disabled"
-        if object["model_url"].present? && ENV["MODELS_BUCKET"].present? && GeminiImageClient.configured?(user_id: @user_id)
-          @generator ||= FurnitureTextureGenerator.new
-          generated = @generator.call(item: item, model: model, max_images: MAX_IMAGES - @generator.attempts, deadline: deadline)
-          status = generated.overrides.present? ? "ready" : "skipped"
-          object["material_overrides"] = generated.overrides if generated.overrides.present?
-        end
-        object["texture_status"] = item["texture_status"] = status
-      rescue StandardError => error
-        # Keep the selected product, placement and base color on dependency failures.
-        object["texture_status"] = item["texture_status"] = "failed"
-        Rails.logger.warn("Furniture appearance item=#{item['item_id']} failed (#{error.class.name})")
+      model = Furniture.available.find_by(id: item.dig("product_metadata", "furniture_id"))&.model
+      unless model
+        object["model_url"] = nil
+        object["texture_status"] = item["texture_status"] = "unmatched"
+        next
       end
+      object["model_match"] = item["model_match"] = { "model_id" => model.id, "reason" => "furniture_detail", "approximate" => true }
+      object["model_url"] = model.url
+      object["model_size"] = model.size
+      object["model_fit"] = "contain"
+      object["color"] ||= item["color"]
+      overrides = material_overrides(item, model, edited_color: object["color"] == item["color"] ? nil : object["color"])
+      object["material_overrides"] = overrides if overrides.present?
+      object["texture_status"] = item["texture_status"] = overrides.present? ? "ready" : "disabled"
     end
     { scene: @scene, items: @items }
+  end
+
+  private
+
+  # 部位ごとの色に模様を重ねる。画面で色を変えた家具は主な部位をその色にする
+  def material_overrides(item, model, edited_color:)
+    colors = item.dig("product_metadata", "color_materials").to_h.slice(*model.color_material_keys)
+    colors = colors.merge(model.primary_color_key => edited_color) if edited_color&.match?(/\A#[0-9a-f]{6}\z/i) && model.primary_color_key
+    overrides = colors.transform_values { |color| { "color" => color } }
+    texture_keys = item.dig("product_metadata", "texture_materials").to_h.slice(*model.color_material_keys)
+    textures = FurnitureTexture.where(texture_key: texture_keys.values).index_by(&:texture_key)
+    texture_keys.each do |material_key, texture_key|
+      override = textures[texture_key]&.material_override(colors.fetch(material_key, "#ffffff"))
+      overrides[material_key] = override if override
+    end
+    overrides
   end
 end

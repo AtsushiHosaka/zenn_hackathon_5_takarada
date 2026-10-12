@@ -19,7 +19,7 @@ class CoordinationPlanner
           items: {
             type: "object",
             properties: {
-              slot: { type: "string", enum: InteriorLinks::SLOTS },
+              slot: { type: "string", enum: FurnitureCandidates::SLOTS },
               group_id: { type: "string", description: "候補にあるgroup_id。床の追加・交換は各操作を別グループとして扱う" },
               selected_item_id: { type: "integer", description: "この一式で購入する商品id。採用しないグループは0" },
               item_ids: { type: "array", items: { type: "integer" }, description: "この一式と相性がよい配置用の代替候補をおすすめ順に最大6件" }
@@ -47,7 +47,7 @@ class CoordinationPlanner
       - 壁の色: %<wall_color>s / 床の色: %<floor_color>s
       - 寸法 (m): %<room_size>s
       - 今ある家具 (id・名前・寸法・配置): %<kept>s
-      - 商品価格の合計予算: %<budget>s 円 (送料と追加部品は別)
+      - 商品価格の合計予算: %<budget>s
 
       # 商品候補 (JSON。寸法はm)
       sizeは配置する寸法、published_sizeは公開寸法 (nullは不明)、estimated_axesは描画用の推定軸です。推定値を公式寸法として説明しないでください。
@@ -92,7 +92,7 @@ class CoordinationPlanner
       @kept_objects = kept_objects
       @previous = previous
       @user_id = user_id
-      @client = client || InteriorLinks.client(user_id: user_id)
+      @client = client || FurnitureCandidates.client(user_id: user_id)
       @additional_candidates = additional_candidates
     end
 
@@ -129,7 +129,7 @@ class CoordinationPlanner
         room_size: @room.slice("width", "depth", "height").to_json,
         kept: @kept_objects.map { |o| o.slice("id", "label", "category", "color", "size", "position") }.to_json,
         previous: previous_section,
-        budget: @budget.to_fs(:delimited),
+        budget: @budget ? "#{@budget.to_fs(:delimited)} 円 (送料と追加部品は別)" : "指定なし (上限なし。要望に合う範囲で選ぶ)",
         items: items.map { |item| candidate_json(item) }.to_json
       )
     end

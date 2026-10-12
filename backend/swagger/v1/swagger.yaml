@@ -5,36 +5,191 @@ info:
   version: v1
   description: Rails API
 paths:
-  "/api/v1/assets/{key}":
-    parameters:
-    - name: key
-      in: path
-      required: true
-      description: textures/description-seamless-v1/<64桁のハッシュ>.png等
-      schema:
-        type: string
+  "/api/v1/admin/furniture_details":
     get:
-      summary: 開発環境の生成テクスチャを取得する
+      summary: 商品 (家具の色・寸法・購入リンク) を非表示のものも含めて一覧で取得する
       tags:
-      - Assets
-      description: 開発・テスト限定。本番は404となり、SceneObjectのGCS公開texture_urlを使用する。
-      security: []
+      - Admin
+      description: 管理者 (users.admin) だけが使える。
+      security:
+      - bearerAuth: []
       responses:
         '200':
-          description: 生成画像
+          description: 商品の一覧と、選べる枠・種類
           content:
-            image/png:
+            application/json:
               schema:
-                type: string
-                format: binary
-            image/jpeg:
+                "$ref": "#/components/schemas/AdminFurnitureDetailList"
+        '403':
+          description: 管理者ではない
+          content:
+            application/json:
               schema:
-                type: string
-                format: binary
-            image/webp:
+                "$ref": "#/components/schemas/Forbidden"
+    post:
+      summary: 商品を登録する
+      tags:
+      - Admin
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: 登録に成功
+          content:
+            application/json:
               schema:
-                type: string
-                format: binary
+                "$ref": "#/components/schemas/AdminFurnitureDetail"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/AdminFurnitureDetailInput"
+  "/api/v1/admin/furniture_details/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    patch:
+      summary: 商品を編集する
+      tags:
+      - Admin
+      description: 商品は DB が正。編集はそのまま提案・検索に使われ、デプロイ時の furniture_detail:import では戻らない。
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: 編集に成功
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AdminFurnitureDetail"
+        '422':
+          description: 値が不正
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationErrors"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/AdminFurnitureDetailInput"
+    delete:
+      summary: 商品を削除する
+      tags:
+      - Admin
+      description: 保存済みの部屋・提案は商品の写しを持っているので変わらない。一時的に外すだけなら enabled を false にする。
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: 削除に成功
+        '404':
+          description: 商品が無い
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NotFound"
+  "/api/v1/admin/furniture_details/export":
+    get:
+      summary: 商品を db/furniture_details.json の形で書き出す
+      tags:
+      - Admin
+      description: 控えを取るときと、初期データ (db/furniture_details.json) を今の DB に合わせるときに使う。非表示の商品は含まない。
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: db/furniture_details.json と同じ形
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AdminFurnitureDetailExport"
+  "/api/v1/admin/furniture_models":
+    get:
+      summary: 3D モデルを無効なものも含めて一覧で取得する
+      tags:
+      - Admin
+      description: 管理者 (users.admin) だけが使える。
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: モデル一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/AdminFurnitureModel"
+  "/api/v1/admin/furniture_models/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: モデルの安定 ID
+      schema:
+        type: string
+    put:
+      summary: 3D モデルを登録・更新する
+      tags:
+      - Admin
+      description: GLB は先に公開バケットへ置く。無ければ作り、あれば上書きする。有効・無効は変えない。
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: 登録・更新に成功
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AdminFurnitureModel"
+        '422':
+          description: 内容が不正
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/AdminFurnitureModelUpsert"
+    patch:
+      summary: 3D モデルの有効・無効を切り替える
+      tags:
+      - Admin
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: 切り替えに成功
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AdminFurnitureModel"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/AdminFurnitureModelInput"
+  "/api/v1/admin/furniture_models/export":
+    get:
+      summary: 3D モデルを db/furnitures.json の形で書き出す
+      tags:
+      - Admin
+      description: 控えを取るときと、初期データ (db/furnitures.json) を今の DB に合わせるときに使う。
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: db/furnitures.json と同じ形
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AdminFurnitureModelExport"
   "/api/v1/signup":
     post:
       summary: サインアップしてトークンを受け取る
@@ -54,6 +209,12 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/User"
+        '503':
+          description: 正式文書の未設定により新規登録を停止中
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationErrors"
         '422':
           description: バリデーションエラー
           content:
@@ -142,7 +303,7 @@ paths:
       summary: コーデ提案の生成を始める
       tags:
       - Coordinations
-      description: GET /api/v1/coordinations/{id} で status が done / failed になるまで待つ。本番inline実行ではPOSTも処理完了を待つ。Geminiの設定とownerの利用許可があれば公式EC商品を検索し、配置後に既存モデルの素材テクスチャを生成する。未設定時はモック。furniture_operationsで既存家具のkeep/replace、additionsで最大6点の大型家具追加を指定できる。本人の部屋・提案だけ扱う
+      description: GET /api/v1/coordinations/{id} で status が done / failed になるまで待つ。本番inline実行ではPOSTも処理完了を待つ。Geminiの設定とownerの利用許可があれば公式EC商品を検索し、配置後に既存モデルの素材テクスチャを生成する。未設定時はモック。furniture_operationsで既存家具のkeep/replace/remove、additionsで最大6点の大型家具追加を指定できる。写真で見つからなかった所有家具はedited_objectsにmanual-UUIDのidとlabel/categoryを含める。本人の部屋・提案だけ扱う
       security:
       - bearerAuth: []
       parameters: []
@@ -244,19 +405,75 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/NotFound"
+  "/api/v1/furniture_searches":
+    post:
+      summary: 登録された家具を検索し色で絞り込む
+      tags:
+      - FurnitureSearches
+      description: DBに登録された家具 (furniture_details) を検索する。外部ECは検索しない。商品名に検索語を含むものを優先し、無ければ推定したカテゴリ
+        (なければ床置き家具) 全体を返す。色は公式の色名・商品名で絞り込む。家具ごとに1件で最大24件。同じ家具の他の色・寸法・購入先はvariantsに入る。
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: 検索結果
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/FurnitureSearchResult"
+        '401':
+          description: ログインが必要
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Unauthorized"
+        '422':
+          description: 入力または検索の確認に失敗
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationErrors"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/FurnitureSearchInput"
   "/api/v1/rooms":
+    get:
+      summary: 本人の部屋一覧を取得する
+      tags:
+      - Rooms
+      description: 本人の部屋をIDの降順で返す。部屋がない場合は空の配列を返す。解析中・失敗した部屋も含み、各部屋に最後に成功した提案を返す。
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: 部屋一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Room"
+        '401':
+          description: ログインが必要
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Unauthorized"
     post:
       summary: 部屋を登録して解析を始める
       tags:
       - Rooms
-      description: 解析は非同期。GET /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と
-        Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ
+      description: template_sceneを指定すると、保存した配置からreadyの部屋を別IDで作成する。モデルURLは受け付けない。写真との併用は不可。省略時の解析は非同期。GET
+        /api/v1/rooms/{id} で status が ready になるまでポーリングする。写真と Gemini の設定がある場合は AI で解析し、無い場合は畳数と形からモックを作る。登録・取得は本人の部屋のみ
       security:
       - bearerAuth: []
       parameters: []
       responses:
         '201':
-          description: '登録に成功 (status: analyzing)'
+          description: 登録に成功 (通常はanalyzing、テンプレートはready)
           content:
             application/json:
               schema:
@@ -545,6 +762,395 @@ components:
           example: メールアドレスまたはパスワードが違います
       required:
       - error
+    Forbidden:
+      type: object
+      properties:
+        error:
+          type: string
+          example: 管理者だけが使えます
+      required:
+      - error
+    AdminFurnitureDetail:
+      type: object
+      description: 管理画面用の商品 (家具の色・寸法・購入リンク)。非表示のものも含む
+      properties:
+        id:
+          type: integer
+          minimum: 1
+          example: 1
+        key:
+          type: string
+          description: 安定 ID。初期データ (db/furniture_details.json) の key。管理画面で足した商品は admin:<uuid>
+          example: static:101
+        name:
+          type: string
+          example: SANDSBERG サンドスベリ チェア - ホワイト
+        category:
+          type: string
+          example: chair
+        slot:
+          type: string
+          enum:
+          - bed_cover
+          - curtain
+          - rug
+          - wall_decor
+          - light
+          - display
+          - cushion
+          - desk_top
+          - floor
+          description: 置き場所の枠
+          example: floor
+        model_key:
+          type: string
+          nullable: true
+          description: 使う 3D モデルの ID
+          example: chair_dining
+        symbolic_color:
+          type: string
+          description: 代表色
+          example: "#f2efe8"
+        color_materials:
+          type: object
+          additionalProperties:
+            type: string
+            pattern: "^#[0-9a-fA-F]{6}$"
+          description: 部位ごとの色。キーはモデルの color_material_keys
+          example:
+            tint: "#f2efe8"
+        texture_materials:
+          type: object
+          additionalProperties:
+            type: string
+          description: 部位ごとの模様 (texture_key)
+          example: {}
+        color_name:
+          type: string
+          nullable: true
+          example: ホワイト
+        size:
+          "$ref": "#/components/schemas/Size"
+        price:
+          type: integer
+          minimum: 1
+          description: リンク先の参考価格 (税込)
+          example: 2000
+        shop:
+          type: string
+          example: IKEA
+        url:
+          type: string
+          description: 購入リンク
+          example: https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/
+        image_url:
+          type: string
+          nullable: true
+          description: 商品画像
+          example:
+        themes:
+          type: array
+          items:
+            type: string
+          example: []
+        position:
+          type: integer
+          description: 候補の並び順 (小さいほど先)
+          example: 0
+        enabled:
+          type: boolean
+          description: false なら提案・検索に出さない
+          example: true
+        checked_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - id
+      - key
+      - name
+      - category
+      - slot
+      - model_key
+      - symbolic_color
+      - color_materials
+      - texture_materials
+      - color_name
+      - size
+      - price
+      - shop
+      - url
+      - image_url
+      - themes
+      - position
+      - enabled
+      - checked_at
+    AdminFurnitureDetailList:
+      type: object
+      properties:
+        details:
+          type: array
+          items:
+            "$ref": "#/components/schemas/AdminFurnitureDetail"
+        slots:
+          type: array
+          items:
+            type: string
+          description: 選べる置き場所の枠
+        categories:
+          type: array
+          items:
+            type: string
+          description: 家具検索で使う家具の種類
+      required:
+      - details
+      - slots
+      - categories
+    AdminFurnitureDetailInput:
+      type: object
+      properties:
+        furniture_detail:
+          type: object
+          description: 作成では name, category, slot, model_key, symbolic_color, color_materials,
+            size, price, shop, url が必須。更新では変える項目だけ
+          properties:
+            name:
+              type: string
+              example: SANDSBERG サンドスベリ チェア - ホワイト
+            category:
+              type: string
+              example: chair
+            slot:
+              type: string
+              enum:
+              - bed_cover
+              - curtain
+              - rug
+              - wall_decor
+              - light
+              - display
+              - cushion
+              - desk_top
+              - floor
+              example: floor
+            model_key:
+              type: string
+              example: chair_dining
+            symbolic_color:
+              type: string
+              pattern: "^#[0-9a-fA-F]{6}$"
+              example: "#f2efe8"
+            color_materials:
+              type: object
+              additionalProperties:
+                type: string
+                pattern: "^#[0-9a-fA-F]{6}$"
+              example:
+                tint: "#f2efe8"
+            color_name:
+              type: string
+              nullable: true
+              example: ホワイト
+            size:
+              "$ref": "#/components/schemas/Size"
+            price:
+              type: integer
+              minimum: 1
+              example: 2000
+            shop:
+              type: string
+              example: IKEA
+            url:
+              type: string
+              example: https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/
+            image_url:
+              type: string
+              nullable: true
+              example:
+            themes:
+              type: array
+              items:
+                type: string
+              example: []
+            position:
+              type: integer
+              example: 0
+            enabled:
+              type: boolean
+              example: true
+      required:
+      - furniture_detail
+    AdminFurnitureDetailExport:
+      type: object
+      description: db/furniture_details.json と同じ形。非表示の商品は含まない
+      properties:
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      required:
+      - details
+    AdminFurnitureModel:
+      type: object
+      description: 管理画面用の 3D モデル。無効なものも含む
+      properties:
+        id:
+          type: string
+          description: モデルの安定 ID (GLB ファイル名から拡張子を除いた値)
+          example: chair_dining
+        name:
+          type: string
+          example: ダイニングチェア
+        category:
+          type: string
+          example: chair
+        shape:
+          type: string
+          example: chair_dining
+        variant:
+          type: string
+          nullable: true
+          example:
+        size:
+          "$ref": "#/components/schemas/Size"
+        color_material_keys:
+          type: array
+          items:
+            type: string
+          description: 色が分かれている部位の名前
+          example:
+          - tint
+          - wood
+        object_key:
+          type: string
+          description: バケット内の GLB のパス。モデル ID から決まる
+          example: models/furniture/v1/chair_dining.glb
+        model_url:
+          type: string
+          nullable: true
+          example:
+        enabled:
+          type: boolean
+          description: false なら API・提案から外す
+          example: true
+        details_count:
+          type: integer
+          minimum: 0
+          description: このモデルを使っている商品の数
+          example: 2
+      required:
+      - id
+      - name
+      - category
+      - shape
+      - variant
+      - size
+      - color_material_keys
+      - object_key
+      - model_url
+      - enabled
+      - details_count
+    AdminFurnitureModelInput:
+      type: object
+      properties:
+        furniture_model:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+              example: false
+          required:
+          - enabled
+      required:
+      - furniture_model
+    AdminFurnitureModelUpsert:
+      type: object
+      description: 3D モデルの登録・更新。GLB は先に公開バケットの models/furniture/v1/<id>.glb へ置く。db/furnitures.json
+        の models[] から id・format・object_key を除いた形
+      properties:
+        furniture_model:
+          type: object
+          properties:
+            name:
+              type: string
+              example: クッション
+            category:
+              type: string
+              example: cushion
+            shape:
+              type: string
+              example: cushion
+            variant:
+              type: string
+              nullable: true
+              example:
+            size:
+              type: array
+              items:
+                type: number
+              minItems: 3
+              maxItems: 3
+              description: "[幅, 高さ, 奥行き] (m)"
+              example:
+              - 0.45
+              - 0.15
+              - 0.45
+            triangles:
+              type: integer
+              minimum: 0
+              example: 2496
+            bytes:
+              type: integer
+              minimum: 1
+              description: GLB のバイト数
+              example: 62864
+            sha256:
+              type: string
+              description: GLB の SHA256 (小文字 16 進)
+              example: 74851bb7a3d46ca993470a9ac371d89e013fa329f472519a4a0e09bab7172dfe
+            color_material_keys:
+              type: array
+              items:
+                type: string
+              example:
+              - tint
+            characters:
+              type: array
+              items:
+                type: string
+              description: 推し活グッズのキャラクター (db/characters.json のキー)
+              example: []
+          required:
+          - name
+          - category
+          - shape
+          - size
+          - triangles
+          - bytes
+          - sha256
+          - color_material_keys
+      required:
+      - furniture_model
+    AdminFurnitureModelExport:
+      type: object
+      description: db/furnitures.json と同じ形。無効な家具も含む
+      properties:
+        unit:
+          type: string
+          example: meter
+        axes:
+          type: string
+          example: "+Y up, +Z front, origin bottom center"
+        models:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      required:
+      - unit
+      - axes
+      - models
     NotFound:
       type: object
       properties:
@@ -570,22 +1176,6 @@ components:
       - w
       - h
       - d
-    FurnitureModelBinding:
-      type: object
-      properties:
-        kind:
-          type: string
-          enum:
-          - existing
-          - product
-          example: existing
-        reference:
-          type: string
-          description: 既存家具の object ID または商品の ID
-          example: bed-1
-      required:
-      - kind
-      - reference
     FurnitureModel:
       type: object
       properties:
@@ -639,22 +1229,31 @@ components:
           type: string
           pattern: "^[0-9a-f]{64}$"
           example: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        materials:
+        color_material_keys:
           type: array
           items:
             type: string
+          description: 色が分かれている部位の名前 (GLB の素材名)
           example:
+          - tint
           - wood
-          - fabric
         model_url:
           type: string
           nullable: true
           description: GCS の公開 GLB URL。ベース URL が未設定なら null
           example:
-        bindings:
+        characters:
           type: array
           items:
-            "$ref": "#/components/schemas/FurnitureModelBinding"
+            type: string
+          description: この家具がグッズになっているキャラクターのキー
+          example:
+          - hatsune_miku
+        credits:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Credit"
+          description: 表示する権利表記。キャラクターのフランチャイズごとに1件
       required:
       - id
       - name
@@ -669,9 +1268,10 @@ components:
       - triangle_count
       - byte_size
       - sha256
-      - materials
+      - color_material_keys
       - model_url
-      - bindings
+      - characters
+      - credits
     Position:
       type: object
       description: 物体の底面中心 (メートル)。原点は北西の床の角、x は東向き、y は上、z は南向き
@@ -798,6 +1398,17 @@ components:
       - wall_color
       - floor_color
       - windows
+    ImageArtwork:
+      type: object
+      properties:
+        data_url:
+          type: string
+          maxLength: 262144
+          pattern: "^data:image/png;base64,"
+          description: 最大512pxのPNG画像。透過を保持する
+          example: data:image/png;base64,iVBORw0KGgo=
+      required:
+      - data_url
     SceneObject:
       type: object
       properties:
@@ -814,6 +1425,8 @@ components:
         category:
           type: string
           example: bed
+        artwork:
+          "$ref": "#/components/schemas/ImageArtwork"
         label:
           type: string
           example: ベッド
@@ -832,6 +1445,29 @@ components:
         color:
           type: string
           example: "#f2f0eb"
+        furniture_detail_id:
+          type: integer
+          minimum: 1
+          description: 家具の色・寸法・購入リンク (FurnitureDetail) のID。登録された家具から選んだ所有家具・提案商品に付く
+          example: 1
+        price:
+          type: integer
+          minimum: 1
+          description: 所有家具の参考価格。今回の購入商品合計には含めない
+          example: 7990
+        shop:
+          type: string
+          example: IKEA
+        url:
+          type: string
+          example: https://www.ikea.com/jp/ja/p/example-chair-12345678/
+        image_url:
+          type: string
+          nullable: true
+          description: 商品ページに掲載された写真URL
+          example: https://www.ikea.com/jp/ja/images/products/teodores-chair-white__0727344_pe735616_s5.jpg
+        product_metadata:
+          "$ref": "#/components/schemas/ProductMetadata"
         model_url:
           type: string
           nullable: true
@@ -967,6 +1603,21 @@ components:
       required:
       - key
       - upload_url
+    RoomTemplateScene:
+      type: object
+      description: 保存した部屋の配置をコピーする。外部モデルURLは受け付けず、モデルはサーバーで選ぶ
+      properties:
+        room:
+          "$ref": "#/components/schemas/RoomShape"
+        objects:
+          type: array
+          maxItems: 100
+          items:
+            "$ref": "#/components/schemas/SceneObject"
+          description: sourceはexisting、model_urlはnull。IDは64文字以内、家具名は100文字以内
+      required:
+      - room
+      - objects
     RoomInput:
       type: object
       properties:
@@ -988,6 +1639,8 @@ components:
               description: '部屋の形。square: 正方形に近い (1:1.15), standard: やや縦長 (3:4), long:
                 細長い (1:2)'
               example: standard
+            template_scene:
+              "$ref": "#/components/schemas/RoomTemplateScene"
             photo_keys:
               type: array
               items:
@@ -1040,6 +1693,11 @@ components:
           type: string
           nullable: true
           example:
+        latest_coordination:
+          allOf:
+          - "$ref": "#/components/schemas/Coordination"
+          nullable: true
+          description: この部屋で最後に生成が成功した提案。提案がなければ null
         created_at:
           type: string
           format: date-time
@@ -1051,15 +1709,47 @@ components:
       - scene
       - analyzed_by
       - error_message
+      - latest_coordination
       - created_at
     FurnitureEdit:
       type: object
-      description: 編集した家具・商品の配置。元の解析結果は変更しない
+      description: 編集した家具・商品の配置。写真で見つからなかった所有家具はmanual-UUIDのidとlabel/categoryで補完する。元の解析結果は変更しない
       properties:
         id:
           type: string
-          description: 元の家具またはこの部屋で採用済みの商品 id
+          description: 元の家具、この部屋で採用済みの商品、またはmanual-UUID形式の所有家具id
           example: bed-1
+        label:
+          type: string
+          maxLength: 100
+          description: 手動で補完した所有家具では必須
+          example: 今ある椅子
+        category:
+          type: string
+          enum:
+          - sofa
+          - bed
+          - desk
+          - chair
+          - shelf
+          - table
+          - poster
+          - acrylic_stand
+          - mirror
+          description: 手動で補完した所有家具では必須
+          example: chair
+        artwork:
+          "$ref": "#/components/schemas/ImageArtwork"
+        replacement_furniture_detail_id:
+          type: integer
+          minimum: 1
+          description: 手動の所有家具を置き換える購入商品 (FurnitureDetail) のID。所有家具のfurniture_detail_idは変更しない
+          example: 2
+        furniture_detail_id:
+          type: integer
+          minimum: 1
+          description: 家具検索結果 (FurnitureDetail) のID。元の家具と同じカテゴリの商品に限り、商品・モデル情報をサーバー側で復元する
+          example: 1
         position:
           "$ref": "#/components/schemas/Position"
         size:
@@ -1111,6 +1801,339 @@ components:
           example: sofa
       required:
       - category
+    FurnitureSearchInput:
+      type: object
+      properties:
+        query:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: 丸いサイドテーブル
+        color:
+          type: string
+          enum:
+          - white
+          - black
+          - gray
+          - brown
+          - beige
+          - green
+          - blue
+          - purple
+          - pink
+          - red
+          - orange
+          - yellow
+          example: blue
+        category:
+          type: string
+          enum:
+          - oshi_goods
+          - acrylic_stand_case
+          - display_case
+          - tapestry
+          - neon
+          - wall_shelf
+          - bed_cover
+          - curtain
+          - rug
+          - cushion
+          - floor_lamp
+          - desk_lamp
+          - candle
+          - wall_mirror
+          - wall_art
+          - wall_planter
+          - plant
+          - vase
+          - sofa
+          - bed
+          - desk
+          - chair
+          - tv_stand
+          - wardrobe
+          - storage
+          - shelf
+          - table
+          - small_plant
+          example: table
+      required:
+      - query
+    FurnitureSearchResult:
+      type: object
+      properties:
+        products:
+          type: array
+          maxItems: 24
+          description: 家具ごとに1件。同じ家具の他の色・寸法・購入先はvariants
+          items:
+            "$ref": "#/components/schemas/FurnitureSearchProduct"
+        color:
+          type: string
+          nullable: true
+          example: blue
+        interpretation:
+          "$ref": "#/components/schemas/SearchInterpretation"
+        models:
+          type: array
+          maxItems: 24
+          description: 推し活グッズの 3D モデル。家具検索では空
+          items:
+            "$ref": "#/components/schemas/FurnitureModel"
+      required:
+      - products
+      - color
+      - interpretation
+      - models
+    ProductColorVariant:
+      type: object
+      properties:
+        color_name:
+          type: string
+          example: ホワイト
+        url:
+          type: string
+          example: https://www.ikea.com/jp/ja/p/gladom-tray-table-white-50337820/
+        variant_id:
+          type: string
+          nullable: true
+          example: '50337820'
+        source:
+          type: string
+          enum:
+          - official_color_picker
+          - official_product_group
+          example: official_color_picker
+      required:
+      - color_name
+      - url
+      - variant_id
+      - source
+    FurnitureDetail:
+      type: object
+      description: 家具の色・寸法・購入リンク1つ。3Dは家具 (furniture_id) のモデルの形を使い、colorで塗る。推定した軸はproduct_metadataに記録する
+      properties:
+        furniture_detail_id:
+          type: integer
+          minimum: 1
+          example: 1
+        furniture_id:
+          type: integer
+          minimum: 1
+          example: 1
+        name:
+          type: string
+          example: SANDSBERG サンドスベリ チェア - ホワイト
+        category:
+          type: string
+          enum:
+          - oshi_goods
+          - acrylic_stand_case
+          - display_case
+          - tapestry
+          - neon
+          - wall_shelf
+          - bed_cover
+          - curtain
+          - rug
+          - cushion
+          - floor_lamp
+          - desk_lamp
+          - candle
+          - wall_mirror
+          - wall_art
+          - wall_planter
+          - plant
+          - vase
+          - sofa
+          - bed
+          - desk
+          - chair
+          - tv_stand
+          - wardrobe
+          - storage
+          - shelf
+          - table
+          - small_plant
+          example: chair
+        symbolic_color:
+          type: string
+          description: 代表色
+          example: "#f2efe8"
+        color_materials:
+          type: object
+          additionalProperties:
+            type: string
+            pattern: "^#[0-9a-fA-F]{6}$"
+          description: 部位ごとの色。キーは家具の color_material_keys。無い部位はモデルの色のまま
+          example:
+            tint: "#f2efe8"
+            wood: "#b08960"
+        color_name:
+          type: string
+          nullable: true
+          example: ホワイト
+        size:
+          "$ref": "#/components/schemas/Size"
+        price:
+          type: integer
+          minimum: 1
+          description: リンク先の参考価格 (税込)
+          example: 2000
+        shop:
+          type: string
+          example: IKEA
+        url:
+          type: string
+          example: https://www.ikea.com/jp/ja/p/sandsberg-chair-white-60511319/
+        image_url:
+          type: string
+          nullable: true
+          example:
+        product_metadata:
+          "$ref": "#/components/schemas/ProductMetadata"
+        model_url:
+          type: string
+          nullable: true
+          example:
+        model_match:
+          allOf:
+          - "$ref": "#/components/schemas/ModelMatch"
+          nullable: true
+          example:
+        model_size:
+          allOf:
+          - "$ref": "#/components/schemas/Size"
+          nullable: true
+          example:
+        model_fit:
+          type: string
+          enum:
+          - contain
+          -
+          nullable: true
+          example:
+        characters:
+          type: array
+          items:
+            type: string
+          description: この商品の家具がグッズになっているキャラクターのキー
+          example: []
+        credits:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Credit"
+      required:
+      - characters
+      - credits
+      - furniture_detail_id
+      - furniture_id
+      - name
+      - category
+      - symbolic_color
+      - color_materials
+      - color_name
+      - size
+      - price
+      - shop
+      - url
+      - image_url
+      - product_metadata
+      - model_url
+      - model_match
+      - model_size
+      - model_fit
+    Credit:
+      type: object
+      properties:
+        franchise:
+          type: string
+          example: piapro
+        credit:
+          type: string
+          nullable: true
+          example: "© Crypton Future Media, INC. www.piapro.net"
+        notice:
+          type: string
+          nullable: true
+          example: 非公式の二次創作です。
+        license_url:
+          type: string
+          nullable: true
+          example: https://piapro.jp/license/character_guideline
+      required:
+      - franchise
+      - credit
+      - notice
+      - license_url
+    SearchInterpretation:
+      type: object
+      description: 検索語を推し活グッズとしてどう解釈したか。家具検索では各一覧が空で source は none
+      properties:
+        characters:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              franchise:
+                type: string
+            required:
+            - id
+            - name
+            - franchise
+        franchises:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+            required:
+            - id
+            - name
+        categories:
+          type: array
+          description: グッズ種別 (= 家具の category)
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+            required:
+            - id
+            - name
+        source:
+          type: string
+          enum:
+          - dictionary
+          - llm
+          - none
+          example: dictionary
+      required:
+      - characters
+      - franchises
+      - categories
+      - source
+    FurnitureSearchProduct:
+      allOf:
+      - "$ref": "#/components/schemas/FurnitureDetail"
+      - type: object
+        properties:
+          variants:
+            type: array
+            description: 同じ家具の全detail (自身を含む)
+            items:
+              "$ref": "#/components/schemas/FurnitureDetail"
+        required:
+        - variants
     MaterialOverride:
       type: object
       properties:
@@ -1155,6 +2178,15 @@ components:
         variant_id:
           type: string
           example: '50337820'
+        official_color:
+          type: string
+          nullable: true
+          example: ホワイト
+        color_variants:
+          type: array
+          maxItems: 24
+          items:
+            "$ref": "#/components/schemas/ProductColorVariant"
         currency:
           type: string
           enum:
@@ -1226,12 +2258,91 @@ components:
         coordination:
           type: object
           properties:
+            room_palette_id:
+              type: string
+              enum:
+              - snow-graphite
+              - porcelain
+              - silver-line
+              - stone-gray
+              - monochrome-gallery
+              - mist-smoke
+              - warm-ivory
+              - oatmeal
+              - desert-sand
+              - mushroom-taupe
+              - coffee-cream
+              - linen-ink
+              - sage-clay
+              - olive-linen
+              - moss-oak
+              - terracotta-fern
+              - botanical-white
+              - jungle-earth
+              - mint-cloud
+              - seafoam
+              - teal-studio
+              - turquoise-pop
+              - celadon
+              - lagoon-dusk
+              - sky-white
+              - powder-blue
+              - coastal-blue
+              - cobalt-gallery
+              - denim-wood
+              - ice-navy
+              - lavender-milk
+              - lilac-garden
+              - amethyst
+              - violet-pop
+              - mauve-taupe
+              - orchid-gold
+              - blush-linen
+              - rose-quartz
+              - dusty-rose
+              - peach-pink
+              - fuchsia-pop
+              - cherry-blossom
+              - brick-cream
+              - scarlet-pop
+              - apricot
+              - tangerine-studio
+              - butter-yellow
+              - sunflower
+              - candy-pastel
+              - mint-strawberry
+              - lavender-lemon
+              - primary-play
+              - tropical-pop
+              - festival
+              - charcoal-silver
+              - midnight-brass
+              - forest-night
+              - plum-velvet
+              - burgundy-lounge
+              - espresso-copper
+              description: 部屋のカラーテーマ。省略時は従来の配色
+              example: warm-ivory
+            character_theme_id:
+              type: string
+              enum:
+              - hatsune-miku
+              - sanrio
+              - hello-kitty
+              - my-melody
+              - kuromi
+              - cinnamoroll
+              - pompompurin
+              - pochacco
+              description: 任意のキャラクターテーマ。画像や公式商品を保証しない
+              example: hatsune-miku
             prompt:
               type: string
               example: 紫色の推し活ルームにしたい
             budget:
               type: integer
-              description: 追加・入れ替え商品の予算 (円・送料別)
+              nullable: true
+              description: 追加・入れ替え商品の予算 (円・送料別)。省略すると上限なしで選ぶ
               example: 30000
             kept_object_ids:
               type: array
@@ -1269,7 +2380,6 @@ components:
               example: []
           required:
           - prompt
-          - budget
       required:
       - coordination
     CoordinationItem:
@@ -1358,11 +2468,27 @@ components:
           - done
           - failed
           example: done
+        character_theme_id:
+          type: string
+          nullable: true
+          enum:
+          -
+          - hatsune-miku
+          - sanrio
+          - hello-kitty
+          - my-melody
+          - kuromi
+          - cinnamoroll
+          - pompompurin
+          - pochacco
+          example: hatsune-miku
         prompt:
           type: string
           example: 紫色の推し活ルームにしたい
         budget:
           type: integer
+          nullable: true
+          description: 省略したコーデでは null
           example: 30000
         kept_object_ids:
           type: array
@@ -1393,9 +2519,11 @@ components:
           nullable: true
           enum:
           -
+          - db
           - ec
           - mock
-          example: ec
+          description: 'db: 登録された家具から選んだ / ec・mock: 以前の実EC検索・モックで作った提案'
+          example: db
         title:
           type: string
           nullable: true
@@ -1422,6 +2550,72 @@ components:
           type: integer
           nullable: true
           example: 26840
+        room_palette_id:
+          type: string
+          nullable: true
+          enum:
+          -
+          - snow-graphite
+          - porcelain
+          - silver-line
+          - stone-gray
+          - monochrome-gallery
+          - mist-smoke
+          - warm-ivory
+          - oatmeal
+          - desert-sand
+          - mushroom-taupe
+          - coffee-cream
+          - linen-ink
+          - sage-clay
+          - olive-linen
+          - moss-oak
+          - terracotta-fern
+          - botanical-white
+          - jungle-earth
+          - mint-cloud
+          - seafoam
+          - teal-studio
+          - turquoise-pop
+          - celadon
+          - lagoon-dusk
+          - sky-white
+          - powder-blue
+          - coastal-blue
+          - cobalt-gallery
+          - denim-wood
+          - ice-navy
+          - lavender-milk
+          - lilac-garden
+          - amethyst
+          - violet-pop
+          - mauve-taupe
+          - orchid-gold
+          - blush-linen
+          - rose-quartz
+          - dusty-rose
+          - peach-pink
+          - fuchsia-pop
+          - cherry-blossom
+          - brick-cream
+          - scarlet-pop
+          - apricot
+          - tangerine-studio
+          - butter-yellow
+          - sunflower
+          - candy-pastel
+          - mint-strawberry
+          - lavender-lemon
+          - primary-play
+          - tropical-pop
+          - festival
+          - charcoal-silver
+          - midnight-brass
+          - forest-night
+          - plum-velvet
+          - burgundy-lounge
+          - espresso-copper
+          example: warm-ivory
         planned_by:
           type: string
           nullable: true

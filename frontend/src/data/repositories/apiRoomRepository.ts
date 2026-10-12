@@ -1,9 +1,12 @@
+import { characterTheme } from "../../domain/characterTheme";
+import { copyFurniture } from "../../domain/furnitureCopy";
 import { DomainError } from "../../domain/error";
-import { isFurnitureAdditions, isFurnitureOperations, isRoomItem, isRoomShape } from "../../domain/room";
+import { roomPhotoLimits, roomPhotoValidationError } from "../../domain/roomPhoto";
+import { manualFurnitureCategories, imageGoodsCategories, isFurnitureAdditions, isFurnitureOperations, isManualFurniture, isRoomItem, isRoomShape } from "../../domain/room";
 import type { GenerateRoomInput, RoomRepository } from "../../domain/roomRepository";
 import type { ApiClient } from "../apiClient";
 import { createDemoRoom } from "../dummy/dummyRoomRepository";
-import { toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toRoomDesign, toUploadRecords } from "../records/room";
+import { toRoomPaletteId, toAnalysisRoomRecord, toAnalyzedRoomDesign, toCoordinatedRoomDesign, toCoordinationRecord, toFurnitureSearch, toRoomDesign, toSavedRoom, toSavedRooms, toUploadRecords } from "../records/room";
 import type { components } from "../generated/api";
 
 export type RoomApiConfig = {
@@ -17,7 +20,6 @@ export type RoomApiConfig = {
   photoField: string;
   promptField: string;
   styleField: string;
-  budgetField: string;
 };
 
 const unavailableMessage = "部屋APIの接続先が設定されていません。";
@@ -25,10 +27,57 @@ const unavailableMessage = "部屋APIの接続先が設定されていません�
 export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, baseUrl: string): RoomRepository {
   return {
     demo: createDemoRoom,
+    async searchFurniture(input, signal) {
+      return toFurnitureSearch(await api.send<unknown>("/api/v1/furniture_searches", {
+        method: "POST", body: input, signal,
+      }), baseUrl);
+    },
+    async list(signal) {
+      if (config.contract === "legacy") throw new DomainError("この接続先では保存した部屋を取得できません");
+      if (!config.generationPath) throw new DomainError(unavailableMessage);
+      return toSavedRooms(await api.send<unknown>(config.generationPath, { requiresAuth: true, signal }), baseUrl);
+    },
+    async get(id, signal) {
+      if (config.contract === "legacy") throw new DomainError("この接続先では保存した部屋を取得できません");
+      const coordinationMatch = /^api-coordination-([1-9]\d*)$/.exec(id);
+      if (coordinationMatch) {
+        if (!config.coordinationJobPath.includes("{id}")) throw new DomainError("コーディネートの取得先が設定されていません");
+        const coordinationId = coordinationMatch[1];
+        const coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationJobPath.replace("{id}", coordinationId), { requiresAuth: true, signal }));
+        if (String(coordination.id) !== coordinationId) throw new DomainError("別のコーディネートを受け取りました");
+        if (coordination.status === "failed") throw new DomainError(coordination.error_message || "コーディネートに失敗しました");
+        if (coordination.status !== "done") throw new DomainError("コーディネートはまだ完了していません");
+        if (!config.jobPath.includes("{id}")) throw new DomainError("部屋の取得先が設定されていません");
+        const record = toAnalysisRoomRecord(await api.send<unknown>(config.jobPath.replace("{id}", String(coordination.room_id)), { requiresAuth: true, signal }));
+        if (record.id !== coordination.room_id) throw new DomainError("別の部屋を受け取りました");
+        return toCoordinatedRoomDesign(coordination, baseUrl, { tatami: record.tatami, shape: record.shape });
+      }
+      const roomId = /^api-room-([1-9]\d*)$/.exec(id)?.[1] ?? id;
+      if (!/^[1-9]\d*$/.test(roomId)) throw new DomainError("部屋のIDが正しくありません");
+      if (!config.jobPath.includes("{id}")) throw new DomainError("部屋の取得先が設定されていません");
+      const room = toSavedRoom(await api.send<unknown>(config.jobPath.replace("{id}", encodeURIComponent(roomId)), { requiresAuth: true, signal }), baseUrl);
+      if (room.id !== roomId) throw new DomainError("別の部屋を受け取りました");
+      if (room.status === "failed") throw new DomainError(room.errorMessage || "部屋の解析に失敗しました");
+      if (!room.design) throw new DomainError("部屋の解析はまだ完了していません");
+      return room.design;
+    },
+    async createFromTemplate(template, signal) {
+      if (config.contract === "legacy" || !config.generationPath) throw new DomainError("この接続先ではテンプレートから部屋を作成できません");
+      const snapshot = structuredClone(template);
+      // Newly added manual furniture is already part of this copied base scene.
+      snapshot.items = copyFurniture(snapshot.items).map(item => ({...item, existing: true,
+        marker: undefined, productId: undefined, furnitureDetailId: undefined, replacesObjectId: undefined}));
+      const record = toAnalysisRoomRecord(await api.send<unknown>(config.generationPath, {
+        method: "POST", body: templateRequest(snapshot), requiresAuth: true, signal,
+      }));
+      const created = toAnalyzedRoomDesign(record, baseUrl);
+      return {...snapshot, id: created.id, source: "api", backendRoomId: created.backendRoomId,
+        description: "保存したテンプレートから作成した部屋です。", before: undefined, editedItems: []};
+    },
     async analyze(input, signal) {
       if (config.contract === "legacy") throw new DomainError("この接続先では畳数による部屋解析を利用できません");
       const design = await createApiRoomRepository(api, { ...config, contract: "analysis" }, baseUrl).generate(input, signal);
-      return { ...design, prompt: input.prompt.trim() || undefined, budget: input.budget, keptObjectIds: design.items.filter(item => item.existing).map(item => item.id) };
+      return { ...design, characterThemeId: input.characterThemeId, prompt: input.prompt.trim() || undefined, keptObjectIds: design.items.filter(item => item.existing).map(item => item.id) };
     },
     async capabilities() {
       return {
@@ -47,9 +96,15 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
         if (input.roomId !== undefined && !/^[1-9]\d*$/.test(input.roomId)) throw new DomainError("部屋のIDが正しくありません");
         const jobSignal = boundedSignal(signal);
         if (input.roomId !== undefined && !config.jobPath.includes("{id}")) throw new DomainError("部屋の解析結果の取得先が設定されていません");
+        let photoBody = body;
+        if (input.roomId === undefined) {
+          if (input.photos.length && config.uploadsPath) input.onProgress?.("uploading");
+          photoBody = await withPhotoKeys(api, config, body, input.photos, jobSignal);
+        }
+        input.onProgress?.("analyzing");
         let record = toAnalysisRoomRecord(input.roomId !== undefined
           ? await api.send<unknown>(config.jobPath.replace("{id}", encodeURIComponent(input.roomId)), { requiresAuth: config.requiresAuth, signal: jobSignal })
-          : await api.send<unknown>(config.generationPath, { method: "POST", body: await withPhotoKeys(api, config, body, input.photos, jobSignal), requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 120_000 }));
+          : await api.send<unknown>(config.generationPath, { method: "POST", body: photoBody, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 120_000 }));
         const expectedId = record.id;
         if (input.roomId !== undefined && String(expectedId) !== input.roomId) throw new DomainError("別の部屋の解析結果を受け取りました");
         if (!config.jobPath.includes("{id}") && record.status === "analyzing") throw new DomainError("部屋の解析結果の取得先が設定されていません");
@@ -57,19 +112,21 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
         for (let attempt = 0; attempt < 60; attempt++) {
           if (record.status === "failed") throw new DomainError(record.error_message || "部屋の解析に失敗しました");
           if (record.status === "ready") {
-            if (config.contract === "analysis") return toAnalyzedRoomDesign(record, baseUrl);
+            if (config.contract === "analysis") { const result = toAnalyzedRoomDesign(record, baseUrl); input.onProgress?.("preview"); return result; }
             if (!config.coordinationPath.includes("{id}")) throw new DomainError("コーディネートの作成先が設定されていません");
-            const existingIds = record.scene?.objects.filter(item => item.source === "existing").map(item => item.id) ?? [];
+            const edits = editedObjects(input, record);
+            const existingIds = [...(record.scene?.objects.filter(item => item.source === "existing").map(item => item.id) ?? []), ...edits.filter(edit => edit.category !== undefined).map(edit => edit.id)];
             if (input.furnitureOperations !== undefined && (!isFurnitureOperations(input.furnitureOperations) || input.furnitureOperations.length !== existingIds.length || input.furnitureOperations.some(operation => !existingIds.includes(operation.objectId)))) throw new DomainError("各家具について残すか入れ替えるかを選んでください");
             const keptObjectIds = input.furnitureOperations?.filter(operation => operation.action === "keep").map(operation => operation.objectId) ?? input.keptObjectIds ?? [];
-            if (!Array.isArray(keptObjectIds) || keptObjectIds.some(id => typeof id !== "string" || !record.scene?.objects.some(item => item.source === "existing" && item.id === id)) || new Set(keptObjectIds).size !== keptObjectIds.length) throw new DomainError("活かす家具の選択が正しくありません");
-            const request: components["schemas"]["CoordinationInput"] = { coordination: { prompt: input.prompt.trim(), budget: input.budget, kept_object_ids: keptObjectIds, edited_objects: editedObjects(input, record), ...(input.baseCoordinationId && /^[1-9]\d*$/.test(input.baseCoordinationId) ? { base_coordination_id: Number(input.baseCoordinationId) } : {}), ...(input.furnitureOperations === undefined ? {} : { furniture_operations: input.furnitureOperations.map(operation => ({ object_id: operation.objectId, action: operation.action })) }), ...(input.furnitureAdditions === undefined ? {} : { additions: input.furnitureAdditions }) } };
+            if (!Array.isArray(keptObjectIds) || keptObjectIds.some(id => typeof id !== "string" || !existingIds.includes(id)) || new Set(keptObjectIds).size !== keptObjectIds.length) throw new DomainError("活かす家具の選択が正しくありません");
+            const request: components["schemas"]["CoordinationInput"] = { coordination: { room_palette_id: input.roomPaletteId === undefined ? undefined : toRoomPaletteId(input.roomPaletteId), ...(input.characterThemeId ? { character_theme_id: input.characterThemeId as components["schemas"]["CoordinationInput"]["coordination"]["character_theme_id"] } : {}), prompt: input.prompt.trim(), kept_object_ids: keptObjectIds, edited_objects: edits, ...(input.baseCoordinationId && /^[1-9]\d*$/.test(input.baseCoordinationId) ? { base_coordination_id: Number(input.baseCoordinationId) } : {}), ...(input.furnitureOperations === undefined ? {} : { furniture_operations: input.furnitureOperations.map(operation => ({ object_id: operation.objectId, action: operation.action })) }), ...(input.furnitureAdditions === undefined ? {} : { additions: input.furnitureAdditions.map(({category})=>({category})) }) } };
+            input.onProgress?.("coordinating");
             let coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationPath.replace("{id}", String(record.id)), { method: "POST", body: request, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 270_000 }));
             const coordinationId = coordination.id;
             if (coordination.room_id !== expectedId) throw new DomainError("別の部屋のコーディネートを受け取りました");
             for (let step = 0; step < 120; step++) {
               if (coordination.status === "failed") throw new DomainError(coordination.error_message || "コーディネートに失敗しました");
-              if (coordination.status === "done") return toCoordinatedRoomDesign(coordination, baseUrl, { tatami: record.tatami, shape: record.shape });
+              if (coordination.status === "done") { const result = toCoordinatedRoomDesign(coordination, baseUrl, { tatami: record.tatami, shape: record.shape }); input.onProgress?.("preview"); return result; }
               if (!config.coordinationJobPath.includes("{id}")) throw new DomainError("コーディネートの取得先が設定されていません");
               await pause(2_000, jobSignal);
               coordination = toCoordinationRecord(await api.send<unknown>(config.coordinationJobPath.replace("{id}", String(coordinationId)), { requiresAuth: config.requiresAuth, signal: jobSignal }));
@@ -88,9 +145,10 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
       input.photos.forEach(photo => request.append(config.photoField, photo, photo.name));
       request.append(config.promptField, input.prompt.trim());
       request.append(config.styleField, input.style);
-      request.append(config.budgetField, String(input.budget));
+      if (input.roomPaletteId) request.append("room_palette_id", input.roomPaletteId);
       // ジョブ全体は最大120秒。通信と待機の両方を同じsignalで止める。
       const jobSignal = boundedSignal(signal);
+      input.onProgress?.("analyzing");
       let result = await api.send<unknown>(config.generationPath, { method: "POST", body: request, requiresAuth: config.requiresAuth, signal: jobSignal, timeoutMs: 120_000 });
       let pollPath: string | undefined;
       for (let attempt = 0; attempt < 60; attempt++) {
@@ -108,7 +166,9 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
           continue;
         }
         if (record.status && record.status !== "completed" && record.status !== "succeeded") throw new DomainError("生成ジョブの状態を解釈できませんでした");
-        return toRoomDesign(record.design ?? record.result ?? result, baseUrl);
+        const design = toRoomDesign(record.design ?? record.result ?? result, baseUrl);
+        input.onProgress?.("preview");
+        return design;
       }
       throw new DomainError("生成に時間がかかっています。少し待ってから再度お試しください");
     },
@@ -117,7 +177,8 @@ export function createApiRoomRepository(api: ApiClient, config: RoomApiConfig, b
 
 function editedObjects(input: GenerateRoomInput, record: components["schemas"]["Room"]): components["schemas"]["FurnitureEdit"][] {
   if (!input.editedItems) return [];
-  if (!Array.isArray(input.editedItems) || !input.editedItems.every(isRoomItem) || new Set(input.editedItems.map(item => item.id)).size !== input.editedItems.length || !record.scene) throw new DomainError("家具の編集内容が正しくありません");
+  if (!Array.isArray(input.editedItems) || input.editedItems.length > 100 || !input.editedItems.every(isRoomItem) || new Set(input.editedItems.map(item => item.id)).size !== input.editedItems.length || !record.scene) throw new DomainError("家具の編集内容が正しくありません");
+  if (input.editedItems.some(item => isManualFurniture(item) && (![...manualFurnitureCategories, ...imageGoodsCategories].some(category => category === item.category) || !item.furnitureDetailId && item.name.length > 100))) throw new DomainError("手動で追加した家具の種類または名前が正しくありません");
   const { room } = record.scene;
   return input.editedItems.map(item => ({
     id: item.id,
@@ -125,6 +186,10 @@ function editedObjects(input: GenerateRoomInput, record: components["schemas"]["
     size: { w: item.size[0], h: item.size[1], d: item.size[2] },
     rotation_y: item.rotation ?? 0,
     color: item.color,
+    ...(item.artwork && isManualFurniture(item) ? { artwork: { data_url: item.artwork.dataUrl } } : {}),
+    ...(isManualFurniture(item) ? { category: item.category as components["schemas"]["FurnitureEdit"]["category"], ...(!item.furnitureDetailId ? { label: item.name } : {}) } : {}),
+    ...(item.furnitureDetailId ? { furniture_detail_id: Number(item.furnitureDetailId) } : {}),
+    ...(item.replacementFurnitureDetailId ? { replacement_furniture_detail_id: item.replacementFurnitureDetailId } : {}),
   }));
 }
 
@@ -157,21 +222,20 @@ async function withPhotoKeys(api: ApiClient, config: RoomApiConfig, body: compon
 }
 
 type PhotoContentType = components["schemas"]["UploadInput"]["uploads"][number]["content_type"];
-const photoContentTypes: readonly PhotoContentType[] = ["image/jpeg", "image/png", "image/webp"];
 
 // sizeは署名に入るのでここで申告した値とPUTする中身が一致していなければならない
 function photoUploadRequest(photos: File[]): components["schemas"]["UploadInput"]["uploads"] {
-  if (photos.length > 4) throw new DomainError("写真は最大4枚です");
+  if (photos.length > roomPhotoLimits.maxCount) throw new DomainError("写真は最大4枚です");
   return photos.map(photo => {
-    if (!photoContentTypes.includes(photo.type as PhotoContentType)) throw new DomainError("写真はJPEG・PNG・WebPを選んでください");
-    if (photo.size === 0 || photo.size > 10 * 1024 * 1024) throw new DomainError("写真は1枚10MB以内にしてください");
+    const error = roomPhotoValidationError(photo);
+    if (error) throw new DomainError(error);
     return { content_type: photo.type as PhotoContentType, size: photo.size };
   });
 }
 
 function validateCoordinationInput(input: GenerateRoomInput) {
+  if (input.characterThemeId !== undefined && !characterTheme(input.characterThemeId)) throw new DomainError("キャラクターテーマを選んでください");
   if (!input.prompt.trim() || input.prompt.length > 500) throw new DomainError("部屋の希望を500文字以内で入力してください");
-  if (!Number.isSafeInteger(input.budget) || input.budget <= 0) throw new DomainError("予算は1円以上の整数で入力してください");
   if (input.furnitureOperations !== undefined && !isFurnitureOperations(input.furnitureOperations)) throw new DomainError("家具の操作が正しくありません");
   if (input.furnitureAdditions !== undefined && !isFurnitureAdditions(input.furnitureAdditions)) throw new DomainError("追加する家具は6点までで種類を選んでください");
 }
@@ -182,9 +246,8 @@ function validJobId(value: unknown): value is string | number {
 
 function validateInput(input: GenerateRoomInput) {
   if (input.photos.length < 3 || input.photos.length > 4) throw new DomainError("部屋の写真を3〜4枚選んでください");
-  if (input.photos.some(photo => !["image/jpeg", "image/png", "image/webp"].includes(photo.type) || photo.size > 10 * 1024 * 1024 || photo.size === 0)) throw new DomainError("写真は1枚10MB以内のJPEG・PNG・WebPを選んでください");
+  photoUploadRequest(input.photos);
   if (!input.prompt.trim()) throw new DomainError("どんな部屋にしたいか入力してください");
-  if (!Number.isFinite(input.budget) || input.budget < 0) throw new DomainError("予算は0円以上で入力してください");
 }
 
 function pause(ms: number, signal: AbortSignal): Promise<void> {
@@ -198,4 +261,15 @@ function pause(ms: number, signal: AbortSignal): Promise<void> {
 
 function abortError(signal: AbortSignal): DomainError {
   return new DomainError(signal.reason instanceof DOMException && signal.reason.name === "TimeoutError" ? "生成に時間がかかっています。少し待ってから再度お試しください" : "操作をキャンセルしました");
+}
+
+function templateRequest(template: import("../../domain/room").RoomDesign): components["schemas"]["RoomInput"] {
+  const {room,analysisInput} = template;
+  if (!room || !analysisInput || template.items.length > 100) throw new DomainError("テンプレートの内容を確認してください");
+  return {room: {...analysisInput, template_scene: {
+    room: {width: room.width, depth: room.depth, height: room.height, wall_color: template.wallColor ?? "#F0ECE5", floor_color: template.floorColor ?? room.floorColor, windows: room.windows},
+    objects: template.items.map(item => ({id: item.id, source: "existing", category: item.category, label: item.name,
+      size: {w: item.size[0], h: item.size[1], d: item.size[2]}, position: {x: item.position[0] + room.width / 2, y: item.position[1] - item.size[1] / 2, z: item.position[2] + room.depth / 2},
+      rotation_y: item.rotation ?? 0, color: item.color, model_url: null, slot: null, attach_to: null, item_id: null, marker: null}))
+  }}};
 }
