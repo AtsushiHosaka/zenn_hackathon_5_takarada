@@ -16,8 +16,9 @@ module FurnitureCandidates
       detail && item(detail)
     end
 
-    def initialize(selected: [])
+    def initialize(selected: [], characters: nil)
       @selected = selected
+      @characters = characters
     end
 
     def search(slots:, theme: nil, categories: nil, preference: nil, **)
@@ -27,6 +28,10 @@ module FurnitureCandidates
         .where(slot: slots).order(:position, :id)
       scope = scope.where("furniture_details.themes @> ?", [ theme ].to_json) if theme
       scope = scope.where.not(slot: "floor").or(scope.where(category: categories)) if categories.any?
+      if @characters
+        wanted = CharacterGoods.where(character_id: Character.where(character_key: @characters).select(:id)).select(:furniture_id)
+        scope = scope.where.not(furniture_id: CharacterGoods.select(:furniture_id)).or(scope.where(furniture_id: wanted))
+      end
       selected = @selected.select do |item|
         slots.include?(item.slot) && (item.slot != "floor" || categories.empty? || categories.include?(item.category))
       end
