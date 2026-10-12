@@ -7,6 +7,7 @@ import { copyFurniture } from '../../domain/furnitureCopy';
 import { isRoomTemplate, type RoomTemplate } from '../../domain/roomTemplate';
 import { saveRoomPlan, scopedRoomPlanKeys, useRoomPlanScope } from './plans';
 import { getFurniturePlacementBounds } from './roomBounds';
+import { quickStartPrompt } from '../../domain/quickStart';
 import { readRoomTemplates, templateKeys, templateStorageKey } from './templateStorage';
 import { defaultRoomTemplates } from './defaultTemplates';
 
@@ -19,7 +20,7 @@ export function useRoomTemplates() {
   return { ...query, data: [...(query.data ?? []), ...defaultRoomTemplates], warning };
 }
 // テンプレートから部屋を作り、その部屋の画面へ進む。
-export function useCreateRoomFromTemplate() {
+export function useCreateRoomFromTemplate(quickStart = false) {
   const scope = useRoomPlanScope();
   const { rooms, tokenStore } = useRepositories();
   const client = useQueryClient();
@@ -34,7 +35,7 @@ export function useCreateRoomFromTemplate() {
     onSuccess: room => {
       let notice: string | undefined;
       try { saveRoomPlan(client, room, scope); } catch { notice = 'このタブでは部屋を使えますが、編集内容をブラウザに保存できませんでした。'; }
-      navigate(`/rooms/${room.id}`, { state: { editing: true, notice } });
+      navigate(`/rooms/${room.id}`, { state: { editing: !quickStart, notice, ...(quickStart ? { prompt: quickStartPrompt, characterThemeId: 'hatsune-miku' } : {}) } });
     },
   });
 }
