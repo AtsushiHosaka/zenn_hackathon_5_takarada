@@ -7,8 +7,8 @@ module FurnitureCandidates
       "gray" => /グレー|灰|gray|grey/i,
       "brown" => /ブラウン|茶|ウォールナット|brown|walnut/i,
       "beige" => /ベージュ|ナチュラル|オーク|beige|natural|oak/i,
-      "green" => /グリーン|緑|green/i,
-      "blue" => /ブルー|青|blue/i,
+      "green" => /グリーン|緑|ミント|green|mint/i,
+      "blue" => /ブルー|青|水色|blue/i,
       "purple" => /パープル|紫|ラベンダー|ライラック|purple|lavender|lilac/i,
       "pink" => /ピンク|pink/i,
       "red" => /レッド|赤|red/i,
@@ -16,8 +16,11 @@ module FurnitureCandidates
       "yellow" => /イエロー|黄|yellow/i
     }.freeze
 
+    # Theme palettes may name cyan internally; public furniture search color IDs stay unchanged.
+    THEME_PATTERNS = { "cyan" => /シアン|ターコイズ|ティール|青緑|\b(?:cyan|turquoise|teal)\b/i }.freeze
+
     def self.matches?(name, color)
-      color.blank? || PATTERNS.fetch(color).match?(name.to_s)
+      color.blank? || (PATTERNS[color] || THEME_PATTERNS[color])&.match?(name.to_s) || false
     end
 
     # 色相 (度) の上限と色名。明るい・暗いときの呼び名は LIGHT / DARK

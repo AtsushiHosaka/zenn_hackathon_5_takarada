@@ -14,7 +14,7 @@ Optional GenerateRoomInput.characterThemeId and coordination character_theme_id 
 
 CharacterRoomTheme.prompt adds instructions and default hex colors; RoomPalette.prompt follows it, so explicit palette colors take precedence. Both coordination and furniture-operation planners receive generation_prompt. Original saved prompt and actual product names, colors, prices and links remain unchanged.
 
-Theme-only callers retain theme wall/floor colors. Explicit room palettes determine wall/floor colors and procedural accent colors; the Web chooser initializes Warm Ivory. Character result titles and motif silhouettes remain distinct. Frontend/backend catalogue copies must be changed together.
+Theme-only callers retain theme wall/floor colors. Explicit room palettes determine wall/floor colors and procedural accent colors. The Web chooser's original Warm Ivory initialization is superseded by the theme-aware suggestions below. Character result titles and motif silhouettes remain distinct. Frontend/backend catalogue copies must be changed together.
 
 The renderer suppresses generic purple oshi primitives for character themes. Snapshot Before scenes clear current theme/palette metadata and retain the original room/item colors. Legacy Before toggles hide motifs before the first frame and on subsequent toggles. Motifs are procedural room accents, not purchased products or shopping-total additions.
 
@@ -32,3 +32,29 @@ These checks use deterministic dummy rendering and mock API providers. Live Gemi
 
 
 2026-10-10: この仕様の画面まわりは `specs/screen-refactor/spec.md` で置き換えた。
+
+## Theme tags update, 2026-10-12
+
+Source: the user's request and screenshot in this chat. Remove the separate character-theme section and offer character names as theme tag chips. This explicit request supersedes the Miku-only selection restriction in `specs/screen-refactor/spec.md`. The Google Docs URL remains unset, so this change is recorded locally and has not been reflected in Docs.
+
+The theme tag group combines the existing atmosphere preset chips with all eight themes already supported by the shared frontend/backend catalogue and API enum. The same character chips appear in the refinement composer. Character selection remains optional and limited to one character theme; selecting an active chip clears it, and selecting another replaces it. Presets retain their existing brief/style behavior and compose with the selected character.
+
+Character chips are available before a brief is entered. When the brief is empty, selecting a character fills a short request naming that character. Switching or clearing a character replaces or clears only an unchanged auto-filled request; typed or edited text is preserved. Selection still passes the existing `characterThemeId` to generation, retains saved identities, and leaves the API contract and motif rendering unchanged. No unsupported IDs or permanent tests are added.
+
+Frontend lint/build passed for this update. In-app browser checks covered all eight visible character chips, initial selection, switching, deselection, preservation of typed briefs, and a Miku dummy room retaining its identity after reload. The default 547px viewport wrapped the tags without horizontal page overflow. Isolated fixtures using the actual room page verified the analyzed-room request and refinement composer; captured GenerateRoomInput contained the selected Miku/Kuromi identity and the preserved brief. Those requests stayed local and do not prove a live provider/API outcome. Screenshots and snapshots are in `outputs/room-fixes/20261012`. The earlier verification above covers the original implementation only. Production, real AI generation, and native iOS were not exercised or changed.
+
+## Miku recommendation quality update, 2026-10-12
+
+Source: the user's request in this chat to consider ordinary cyan/blue furniture when choosing Hatsune Miku. Google Docs remain unset; this change is not reflected in Docs.
+
+Treat Miku as an interior direction: ordinary cyan, turquoise and blue furniture/textiles, complementary white/gray/black functional furniture, and Miku goods as accents around display/work areas. The generation prompt considers usability, retained furniture, music/work/display space and circulation. Do not maximize character merchandise or fabricate product colors/availability.
+
+New/analyzed rooms derive a palette from the brief and theme. A name-only Miku brief defaults to the existing Blue swatch (`sky-white`), with Mint, White and Black alternatives. Explicit color text overrides automatic theme colors; an explicitly chosen swatch overrides subsequent automatic suggestions. Clicking the already suggested swatch also records an explicit selection. A theme switch drops an inherited palette, while saved palettes remain valid choices. Existing palettes and API enums remain unchanged.
+
+Miku candidate ranking uses published product names/color names, without treating preview RGB as color evidence. A valid room palette takes precedence over brief colors, matching generation instructions; without a palette, literal color terms take precedence over Miku defaults. LLM-inferred colors do not override a name-only Miku request. Character identity is supplied to the planner. Ordinary furniture remains eligible; unrelated character goods are excluded from automatic candidates, and explicit user choices remain eligible.
+
+The finite AI shortlist reserves roughly three quarters for ordinary furniture when both ordinary furniture and Miku goods are available; remaining capacity contains Miku goods. This is a candidate policy, not a forced purchase quota. Shape variety applies within equal relevance scores so it cannot displace all palette matches. User choices and eligible previous picks remain available. Changing Miku theme/palette clears automatic previous-pick priority; owned furniture and explicit selections retain their existing protection. Same-theme refinements retain prior context. Mock suggestions use ordinary furniture for large surfaces and goods for accent slots. Gemini still chooses the accepted bundle; rejected groups are never auto-filled.
+
+If none of the placed products matches the requested palette, the result states that limitation. No SKU colors, prices, URLs, stock records or production catalog rows are modified. The local seed catalog has 92 purchasable details, no cyan-named products, two blue-named floor chairs and no purchasable Miku details. Those counts do not establish production inventory or current shop availability. The algorithm can use new eligible catalog entries, but catalog coverage remains a separate quality constraint.
+
+Verification uses existing request specs, frontend lint/build, targeted Ruby lint, an isolated Rails builder probe with seeded and dense synthetic catalogs, and the actual room page with intercepted local generation requests. See `outputs/miku-suggestions/20261012/verification.md`. Real Gemini quality, external shop availability, production deployment and native iOS remain unverified.

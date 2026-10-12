@@ -18,12 +18,15 @@ class FurnitureDetail < ApplicationRecord
   normalizes :material, with: ->(value) { value.to_s.strip.presence }
 
   def size
-    { "w" => width.to_f, "h" => height.to_f, "d" => depth.to_f }
+    # A cover's published length belongs to depth. Its preview thickness is estimated,
+    # including older imported rows that incorrectly stored that length as height.
+    { "w" => width.to_f, "h" => category == "bed_cover" ? FurnitureCandidates::DEFAULT_SIZES.fetch("bed_cover").fetch("h") : height.to_f, "d" => depth.to_f }
   end
 
-  # 寸法のうち推定した辺。商品ではなく家具の 3D モデルが持つ (同じモデルの商品で共通)
+  # モデルの推定寸法に加え、カバーの描画用の厚みは推定として扱う。
   def estimated_axes
-    furniture.model&.estimated_axes || []
+    axes = furniture.model&.estimated_axes || []
+    category == "bed_cover" ? (axes + [ "h" ]).uniq : axes
   end
 
   # 公開されている寸法。推定した辺は nil。3 辺とも推定なら nil (寸法は目安で、配置は部屋に合わせる)

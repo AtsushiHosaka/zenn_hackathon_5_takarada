@@ -27,12 +27,21 @@ module FurnitureCandidates
     "modern" => "モダン", "antique" => "アンティーク", "japanese" => "和風", "botanical" => "ボタニカル", "oshi" => "推し活"
   }.freeze
 
-  # 要望から読み取った好み (FurnitureQuery::Result) に商品がどれだけ合うか。色が合えば 2、雰囲気のタグ 1 つにつき 1、形が合えば 1
-  def self.score(item, preference)
-    return 0 unless preference
-
-    (preference.color && Colors.matches?("#{item.metadata['color_name']} #{item.name}", preference.color) ? 2 : 0) +
-      (Array(item.metadata["themes"]) & preference.themes).size + (preference.shapes.include?(item.metadata["shape"]) ? 1 : 0)
+  # Published color names establish palette matches; preview RGB is never color evidence.
+  def self.score(item, preference, character_theme: nil)
+    text = "#{item.metadata['color_name']} #{item.name}"
+    colors = preference&.color ? [ preference.color ] : Array(character_theme&.fetch("colors", []))
+    palette_match = colors.any? { |color| Colors.matches?(text, color) }
+    color_score = if palette_match
+      character_theme ? 8 : 2
+    elsif character_theme && Array(character_theme["neutral_colors"]).any? { |color| Colors.matches?(text, color) }
+      3
+    else
+      0
+    end
+    color_score + (Array(item.metadata["themes"]) & Array(preference&.themes)).size +
+      (Array(preference&.shapes).include?(item.metadata["shape"]) ? 1 : 0) +
+      (character_theme && (Array(item.metadata["characters"]) & Array(character_theme["character_keys"])).any? ? 2 : 0)
   end
 
   # 並び順を保ったまま、3D モデルの形 (stool_round, chair_office など) ごとに 1 件ずつ順に取って limit 件にする。
@@ -41,6 +50,37 @@ module FurnitureCandidates
   def self.spread(items, limit, &key)
     shapes = items.group_by(&key || ->(item) { item.metadata["shape"] }).values
     (0...shapes.map(&:size).max.to_i).flat_map { |round| shapes.filter_map { |shape| shape[round] } }.first(limit)
+  end
+
+  # Shape diversity applies only between equally relevant products, so it cannot
+  # displace the palette matches before the AI sees the finite candidate list.
+  def self.rank(items, preference: nil, character_theme: nil)
+    items.group_by { |item| score(item, preference, character_theme:) }.sort_by { |points, _| -points }
+      .flat_map { |_, group| spread(group, group.size) }
+  end
+
+  def self.compatible_character?(item, character_theme)
+    characters = Array(item.metadata["characters"])
+    !character_theme || characters.empty? || (characters & Array(character_theme["character_keys"])).any?
+  end
+
+  # Keep chosen/previous products eligible, then offer ordinary palette furniture
+  # and a smaller set of matching goods. These are options, never forced purchases.
+  def self.shortlist(items, limit, preference: nil, character_theme: nil, preferred_ids: [])
+    preferred, remaining = items.partition { |item| item.metadata["selected_by_user"] || preferred_ids.include?(item.id) }
+    preferred = preferred.first(limit)
+    capacity = limit - preferred.size
+    return preferred if capacity.zero?
+
+    ranked = rank(remaining.select { |item| compatible_character?(item, character_theme) }, preference:, character_theme:)
+    return preferred + ranked.first(capacity) unless character_theme
+
+    ordinary, goods = ranked.partition { |item| Array(item.metadata["characters"]).empty? }
+    goods_count = [ goods.size, [ capacity / 4, 1 ].max ].min
+    main = ordinary.first(capacity - goods_count)
+    accents = goods.first(goods_count)
+    extras = (ordinary.drop(main.size) + goods.drop(accents.size)).first(capacity - main.size - accents.size)
+    preferred + main + accents + extras
   end
 
   # selected: ユーザーが選んだ detail の候補。枠・カテゴリが合えば先頭に混ぜる

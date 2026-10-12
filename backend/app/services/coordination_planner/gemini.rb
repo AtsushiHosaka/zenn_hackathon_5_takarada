@@ -51,7 +51,7 @@ class CoordinationPlanner
       # 商品候補 (JSON。寸法はm)
       sizeは配置する寸法、published_sizeは公開寸法 (nullは不明)、estimated_axesは描画用の推定軸です。推定値を公式寸法として説明しないでください。
       shapeは3Dモデルの形の種類 (chair_office・stool_round・rug_roundなど)、themesは合う雰囲気です。
-      colorは代表色、color_wordはそのおおよその色名です。色はcolor_wordとcolor_nameで判断してください。
+      colorは3D表示用の代表色、color_wordはそのおおよその色名です。商品の実際の色はcolor_nameと商品名で判断してください。color_wordだけを根拠に希望色の商品があると断定しないでください。
       %<items>s
 
       # 選び方
@@ -68,6 +68,9 @@ class CoordinationPlanner
       - 要望の色や雰囲気そのものの商品が無いときは、近い色・雰囲気の商品を選び、unavailable_note で
         「赤い商品が見つからなかったため、近い色の○○を選びました」のように正直に伝える。あれば空文字にする。
       - 今ある家具の色と、壁・床の色とも合うようにする。
+      - キャラクターテーマは部屋全体の配色と用途で表現する。キャラクター名の付いた商品だけに絞らず、色と実用性が合う通常の家具・布小物を中心に、グッズをアクセントとして組み合わせる。
+      - charactersは商品に紐づくキャラクターID。空の通常家具も採用できる。selected_by_userの商品はユーザーの選択として扱い、明示指示なしに別の商品へ替えない。
+      - キャラクター商品の点数を増やすことを目的にしない。大きな布ものをすべて柄物にせず、通常家具とのバランスと、残す家具・音楽や作業・グッズを飾る場所・通路を確かめる。
       - title と concept は要望に合わせて日本語で書く。concept には商品名を書かない。
       - 要望で今ある家具を「いらない」「外したい」「捨てる」「別のに替えたい」とはっきり書いているときだけ、
         その家具の id を remove_object_ids に入れる。「そのまま使いたい」と書かれた家具や、触れられていない家具は入れない。
@@ -81,16 +84,17 @@ class CoordinationPlanner
       前回の商品 (id | group_id | 枠 | 商品名):
       %<items>s
 
-      要望の最後の行が、今回の追加の指示。
+      上の要望に書かれた今回の指示と、現在のテーマ・配色を優先する。末尾のテーマ・配色の補足だけを追加指示とみなさない。
       - 追加の指示に関係しないグループは、候補にある前回の商品をすべてselected_item_idsに指定し、item_idsの先頭にも入れて残す。
       - 追加の指示に関係するグループだけを選び直す。group_id・slot・idは今回の商品候補の組を使う。
       - 前回の商品が候補に無い、配置できない場合は無理に残さず、変更理由をunavailable_noteに書く。
       - title と concept は、前回からの変化が分かるように書く。
     TEXT
 
-    def initialize(prompt:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil, slots: SLOT_PRIORITY, preference: nil)
+    def initialize(prompt:, room:, kept_objects:, user_id: nil, client: nil, additional_candidates: [], previous: nil, slots: SLOT_PRIORITY, preference: nil, character_theme: nil)
       @slots = slots
       @preference = preference
+      @character_theme = character_theme
       @prompt = prompt
       @room = room
       @kept_objects = kept_objects
@@ -101,8 +105,15 @@ class CoordinationPlanner
     end
 
     def plan
-      items = (@client.search(prompt: @prompt, theme: nil, slots: @slots, preference: @preference).values.flatten + @additional_candidates)
-        .uniq { |item| [ group_id(item), item.id ] }.group_by { |item| group_id(item) }.values.flat_map { |group| FurnitureCandidates.spread(group, CANDIDATES_PER_GROUP) }
+      previous_ids = Array(@previous&.items).map { |item| item["item_id"] }
+      items = (@client.search(prompt: @prompt, theme: nil, slots: @slots, preference: @preference, character_theme: @character_theme).values.flatten + @additional_candidates)
+        .uniq { |item| [ group_id(item), item.id ] }.group_by { |item| group_id(item) }.values.flat_map do |group|
+          if @character_theme
+            FurnitureCandidates.shortlist(group, CANDIDATES_PER_GROUP, preference: @preference, character_theme: @character_theme, preferred_ids: previous_ids)
+          else
+            FurnitureCandidates.spread(group, CANDIDATES_PER_GROUP)
+          end
+        end
       response = GeminiClient.new.generate_json(prompt: prompt_for(items), schema: SCHEMA)
       json = response.json.is_a?(Hash) ? response.json : {}
       ranked, selection = candidates(json["picks"], items)
@@ -162,7 +173,7 @@ class CoordinationPlanner
       metadata = item.metadata
       { id: item.id, group_id: group_id(item), slot: item.slot, category: item.category, name: item.name,
         color: item.color, color_word: FurnitureCandidates::Colors.word(item.color), price: item.price, size: item.size, published_size: metadata["size"], estimated_axes: metadata["estimated_axes"],
-        material: metadata["material"], shape: metadata["shape"], color_name: metadata["color_name"], themes: metadata["themes"]&.filter_map { |theme| FurnitureCandidates::THEMES[theme] },
+        material: metadata["material"], shape: metadata["shape"], color_name: metadata["color_name"], characters: metadata["characters"], selected_by_user: metadata["selected_by_user"], themes: metadata["themes"]&.filter_map { |theme| FurnitureCandidates::THEMES[theme] },
         target_size: metadata["target_size"], preferred_position: metadata["preferred_position"] }.compact
     end
 

@@ -39,6 +39,20 @@ GLBの座標は`+Y`が上、`+Z`が正面、底面中心を原点とする。制
 
 GCS上のファイル一覧を自動収集する処理と、GLBを上げる管理画面は含めない。運用手順は`docs/furniture-models.md`に記す。
 
+## 2026-10-12 掛け布団カバーの描画修正
+
+ユーザーが指摘したÄNGSLILJAの巨大な直方体は、カタログの長さ200cmが高さにも保存されていたことと、GLB未取得時の簡易形状に起因する。カバーは幅と奥行きを水平面へ置き、高さ4cmを布団を覆う描画用の推定値として扱う。商品本体の厚みとしては表示しない。
+
+家具詳細の読み取りでは既存DBの行にもこの高さを適用し、初期データの誤った高さを修正する。保存した部屋・テンプレート・API結果では、高さ12cmを超える`bed_cover`を4cmへ補正する。補正時は底面の高さ、幅、奥行き、回転を保ち、布団カバーがベッド上の位置から浮いたり床へ落ちたりしないようにする。自動補正だけでは保存データを書き換えない。
+
+GLBがないカバーは、外周が薄く中央が膨らむ布のメッシュで描く。登録済みGLBが取得できた場合は、柄やキャラクターの素材を維持し、布を配置寸法の幅・厚み・長さへ合わせる。家具全般のGLBは従来のcontain表示を維持する。選択枠、寸法表示、編集で使う寸法は補正後の値にそろえる。
+
+カバーの生成テクスチャは、水平面のU方向に幅の倍率、V方向に奥行きの倍率を使って繰り返す。厚みの倍率で柄の大きさを変えず、指定されたタイル寸法に合わせる。
+
+Google DocsのURLは未設定で、今回の変更は依頼文を根拠としたDocs未反映の差分である。本番DBの更新、GCSモデルの差し替え、デプロイはこの修正に含めない。
+
+2026-10-12 validation: frontend lint/build passed; targeted backend RuboCop passed; the 17 existing furniture-search, admin-furniture-detail, and coordination request examples passed in an isolated test database using the installed Rails image and cached gems. An unsaved Rails model with legacy dimensions 150 × 200 × 200 cm returned preview dimensions 150 × 4 × 200 cm, published height null, and estimated axis h. Browser checks using the actual RoomViewer rendered the legacy scene fixture as a thin horizontal cover in perspective and top views. Evidence is in `outputs/room-fixes/20261012`. No new tests were added. Assigned remote GLBs, live generated textures, production storage and production generation were not exercised; the change preserves assigned assets and fixes their horizontal UV scale calculations.
+
 ## Google Docsへ未反映の変更
 
 GCS配信、DB台帳、公開カタログAPI、IDによるモデル割り当て、台帳の取り込み、配信元の環境変数を追加した。Google Docsには書き込んでいない。

@@ -1,4 +1,5 @@
-import { roomColor, roomPalettes, type RoomPalette } from "./roomPalette";
+import { characterThemes } from "./characterTheme";
+import { roomColor, roomPalette, roomPalettes, type RoomPalette } from "./roomPalette";
 
 export const roomPaletteSuggestionCount = 4;
 
@@ -17,7 +18,7 @@ const preferences: readonly Preference[] = [
   { terms: ["beige", "ivory", "ベージュ", "アイボリー", "cream", "クリーム"], palettes: ["warm-ivory", "oatmeal", "mushroom-taupe", "linen-ink", "desert-sand", "coffee-cream"], weight: 12, color: true },
   { terms: ["brown", "茶色", "ブラウン"], palettes: ["coffee-cream", "espresso-copper", "desert-sand", "oatmeal", "mushroom-taupe", "denim-wood"], weight: 12, color: true },
   { terms: ["green", "緑", "グリーン", "sage", "セージ", "olive", "オリーブ"], palettes: ["sage-clay", "celadon", "olive-linen", "moss-oak", "botanical-white", "forest-night", "mint-cloud", "seafoam"], weight: 12, color: true },
-  { terms: ["teal", "turquoise", "ターコイズ", "ティール", "mint", "ミント"], palettes: ["seafoam", "mint-cloud", "teal-studio", "turquoise-pop", "lagoon-dusk", "mint-strawberry"], weight: 12, color: true },
+  { terms: ["cyan", "シアン", "teal", "turquoise", "ターコイズ", "ティール", "mint", "ミント"], palettes: ["seafoam", "mint-cloud", "teal-studio", "turquoise-pop", "lagoon-dusk", "mint-strawberry"], weight: 12, color: true },
   { terms: ["blue", "navy", "青", "ブルー", "ネイビー", "水色"], palettes: ["sky-white", "powder-blue", "coastal-blue", "ice-navy", "denim-wood", "cobalt-gallery", "midnight-brass"], weight: 12, color: true },
   { terms: ["purple", "lavender", "lilac", "紫", "パープル", "ラベンダー"], palettes: ["lavender-milk", "lilac-garden", "mauve-taupe", "amethyst", "orchid-gold", "violet-pop", "plum-velvet"], weight: 12, color: true },
   { terms: ["pink", "rose", "ピンク", "桃色"], palettes: ["blush-linen", "rose-quartz", "dusty-rose", "peach-pink", "cherry-blossom", "fuchsia-pop", "mint-strawberry"], weight: 12, color: true },
@@ -39,6 +40,18 @@ const preferences: readonly Preference[] = [
 
 const fallbackIds = ["warm-ivory", "snow-graphite", "sage-clay", "sky-white"];
 
+// Use the existing selectable colors so the suggested swatch and API palette agree.
+const themePaletteIds: Readonly<Record<string, readonly string[]>> = {
+  "hatsune-miku": ["sky-white", "mint-cloud", "snow-graphite", "charcoal-silver"],
+  sanrio: ["blush-linen", "sky-white", "lavender-milk", "snow-graphite"],
+  "hello-kitty": ["brick-cream", "snow-graphite", "blush-linen", "warm-ivory"],
+  "my-melody": ["blush-linen", "snow-graphite", "lavender-milk", "warm-ivory"],
+  kuromi: ["lavender-milk", "charcoal-silver", "snow-graphite", "blush-linen"],
+  cinnamoroll: ["sky-white", "snow-graphite", "mint-cloud", "lavender-milk"],
+  pompompurin: ["butter-yellow", "coffee-cream", "warm-ivory", "snow-graphite"],
+  pochacco: ["sage-clay", "snow-graphite", "charcoal-silver", "mint-cloud"],
+};
+
 function termOccurrences(description: string, term: string): number[] {
   const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   // Latin word boundaries prevent e.g. "red" matching "hundred". Japanese
@@ -55,10 +68,20 @@ function isNegated(description: string, index: number, termLength: number): bool
     || /^(?:(?:系|色|っぽい|な|い)?(?:は|を|が|の)?)(?:ではなく|じゃなく|くない|以外|なし|抜き|不要|いらない|避け|使わ|使いたくない|好きじゃない|好きではない)/.test(after);
 }
 
+export function hasExplicitRoomColorPreference(atmosphere: string): boolean {
+  const description = atmosphere.normalize("NFKC").toLowerCase();
+  return preferences.some(preference => preference.color && preference.terms.some(term =>
+    termOccurrences(description, term).length > 0));
+}
+
 /** A local keyword shortlist, not an AI-generated interpretation of prose. */
-export function suggestRoomPalettes(atmosphere: string, preferredId?: string): readonly RoomPalette[] {
+export function suggestRoomPalettes(atmosphere: string, preferredId?: string, characterThemeId?: string): readonly RoomPalette[] {
   const description = atmosphere.normalize("NFKC").toLowerCase().trim();
-  if (!description) return [];
+  const inferredThemeId = /(?:初音\s*ミク|\bhatsune\s*miku\b|\bmiku\b)/u.test(description)
+    ? "hatsune-miku"
+    : characterThemes.find(theme => description.includes(theme.name.normalize("NFKC").toLowerCase()))?.id;
+  const themeIds = themePaletteIds[characterThemeId ?? inferredThemeId ?? ""] ?? [];
+  if (!description && !themeIds.length && !roomPalette(preferredId)) return [];
 
   const scores = new Map<string, number>();
   const excluded = new Set<string>();
@@ -85,10 +108,17 @@ export function suggestRoomPalettes(atmosphere: string, preferredId?: string): r
     }
   }
 
+  // A character provides color direction even when the brief only names them.
+  // Explicit color instructions keep precedence over that automatic direction.
+  if (!hasColorPreference && themeIds.length) {
+    hasPositivePreference = true;
+    themeIds.forEach((id, rank) => scores.set(id, (scores.get(id) ?? 0) + 18 - rank));
+  }
+
   const selected: RoomPalette[] = [];
   const families = new Map<string, number>();
   // 提案するのは単色に割り当てた配色と、保存済みの部屋が使っている配色だけ。
-  const candidates = roomPalettes.filter(palette => (roomColor(palette.id) || palette.id === preferredId) && !excluded.has(palette.id));
+  const candidates = roomPalettes.filter(palette => (roomColor(palette.id) || palette.id === preferredId) && (!excluded.has(palette.id) || palette.id === preferredId));
   while (selected.length < roomPaletteSuggestionCount && candidates.length) {
     const score = (palette: RoomPalette) => {
       const fallbackRank = fallbackIds.indexOf(palette.id);
@@ -105,10 +135,12 @@ export function suggestRoomPalettes(atmosphere: string, preferredId?: string): r
     selected.push(palette);
     families.set(palette.family, (families.get(palette.family) ?? 0) + 1);
   }
-  return selected;
+  const preferred = roomPalette(preferredId);
+  return preferred && !selected.some(palette => palette.id === preferred.id)
+    ? [preferred, ...selected.slice(0, roomPaletteSuggestionCount - 1)]
+    : selected;
 }
 
-export function suggestedRoomPaletteId(atmosphere: string, selectedId?: string): string | undefined {
-  const suggestions = suggestRoomPalettes(atmosphere, selectedId);
-  return suggestions.find(palette => palette.id === selectedId)?.id ?? suggestions[0]?.id;
+export function suggestedRoomPaletteId(atmosphere: string, selectedId?: string, characterThemeId?: string): string | undefined {
+  return roomPalette(selectedId)?.id ?? suggestRoomPalettes(atmosphere, undefined, characterThemeId)[0]?.id;
 }
