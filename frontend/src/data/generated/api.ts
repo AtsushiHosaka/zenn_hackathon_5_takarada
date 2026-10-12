@@ -2503,7 +2503,7 @@ export interface components {
                  * @enum {string}
                  */
                 character_theme_id?: "hatsune-miku" | "sanrio" | "hello-kitty" | "my-melody" | "kuromi" | "cinnamoroll" | "pompompurin" | "pochacco";
-                /** @example 紫色の推し活ルームにしたい */
+                /** @example 初音ミクの水色推し活ルームにしたい */
                 prompt: string;
                 /**
                  * @description 活かす家具の id。空なら全部活かす
@@ -2590,7 +2590,7 @@ export interface components {
              * @enum {string|null}
              */
             character_theme_id?: null | "hatsune-miku" | "sanrio" | "hello-kitty" | "my-melody" | "kuromi" | "cinnamoroll" | "pompompurin" | "pochacco";
-            /** @example 紫色の推し活ルームにしたい */
+            /** @example 初音ミクの水色推し活ルームにしたい */
             prompt: string;
             /**
              * @example [
@@ -2615,9 +2615,9 @@ export interface components {
              * @enum {string|null}
              */
             product_source?: null | "db" | "ec" | "mock";
-            /** @example ラベンダーの推し活ルーム */
+            /** @example 初音ミクの水色推し活ルーム */
             title: string | null;
-            /** @example ラベンダー 布団カバー3点セット シングル (ベッドに掛ける) などを追加しました。今のベッドとデスクと本棚はそのまま活かしています。 */
+            /** @example 水色の掛け布団カバー シングル (ベッドに掛ける) などを追加しました。今のベッドとデスクと本棚はそのまま活かしています。 */
             comment: string | null;
             before_scene: components["schemas"]["Scene"] | null;
             /** @description status が done になると入る */

@@ -16,7 +16,7 @@ function AuthHero({ signup }: { signup: boolean }) {
     </div>
     <div className={`reference-auth-illustration${signup ? ' reference-auth-illustration-signup' : ''}`}>
       <ReferenceSvg page={page} index={1} />
-      <div className="reference-auth-prompt">{signup ? 'ボタニカルにしたい' : '紫色の推し活ルームにしたい'}</div>
+      <div className="reference-auth-prompt">{signup ? 'ボタニカルにしたい' : '初音ミクの水色推し活ルームにしたい'}</div>
       {!signup && <div className="reference-auth-item">
         <div className="reference-auth-item-image"><ReferenceSvg page={0} index={2} /></div>
         <div className="reference-auth-item-copy"><span>LEDテープライト 5m</span><span>¥2,980 · Shop A</span></div>

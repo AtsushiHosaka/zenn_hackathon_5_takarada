@@ -212,7 +212,7 @@ export function toCoordinatedRoomDesign(value: unknown, baseUrl: string, analysi
     characterThemeId: record.character_theme_id??undefined,
     description: record.comment,
     ...(record.planned_by ? { generatedBy: record.planned_by } : {}),
-    style: record.character_theme_id ? "oshi" : record.title === "ラベンダーの推し活ルーム" ? "oshi" : record.title === "グリーンが映えるボタニカルルーム" ? "botanical" : "natural",
+    style: record.character_theme_id ? "oshi" : ["水色の推し活ルーム", "ラベンダーの推し活ルーム"].includes(record.title) ? "oshi" : record.title === "グリーンが映えるボタニカルルーム" ? "botanical" : "natural",
     ...after,
     items: after.items.map(item => {
       if (item.existing) return item;

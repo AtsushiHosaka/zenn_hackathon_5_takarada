@@ -7,7 +7,7 @@ class CoordinationPlanner
     SCHEMA = {
       type: "object",
       properties: {
-        title: { type: "string", description: "コーデの名前 (20 文字以内。例: 深紅の推し活ルーム)" },
+        title: { type: "string", description: "コーデの名前 (20 文字以内。例: 水色の推し活ルーム)" },
         concept: { type: "string", description: "方向性の説明 (80 文字以内・です/ます調)。商品名は書かない" },
         unavailable_note: { type: "string", description: "要望どおりの色・雰囲気の商品が候補に無いときの断り書き (無ければ空文字)" },
         remove_object_ids: {
