@@ -96,7 +96,7 @@ class CoordinationBuilder
 
     Result.new(
       title: result_title(plan),
-      comment: [ @coordination.character_theme_id ? "#{CharacterRoomTheme.find(@coordination.character_theme_id).fetch('name')}をイメージしたインテリアです。" : nil, comment(plan, placed, active, removed), *failures ].compact.join,
+      comment: [ (theme = CharacterRoomTheme.find(@coordination.character_theme_id)) ? "#{theme.fetch('name')}をイメージしたインテリアです。" : nil, comment(plan, placed, active, removed), *failures ].compact.join,
       after_scene: appearance.fetch(:scene),
       items: appearance.fetch(:items),
       total_price: placed.sum { |p| p[:item].price },

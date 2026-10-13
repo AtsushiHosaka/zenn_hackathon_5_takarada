@@ -755,8 +755,8 @@ function artworkRecord(value: unknown): components["schemas"]["ImageArtwork"] {
   return { data_url: record.data_url as string };
 }
 
-function characterThemeRecord(value: unknown): NonNullable<components["schemas"]["Coordination"]["character_theme_id"]> {
-  const theme = characterTheme(value);
-  if (!theme) invalid("character_theme_id");
-  return theme.id as NonNullable<components["schemas"]["Coordination"]["character_theme_id"]>;
+// カタログから外したテーマで作った部屋も開けるよう、知らない ID はテーマなしとして扱う。
+function characterThemeRecord(value: unknown): NonNullable<components["schemas"]["Coordination"]["character_theme_id"]> | undefined {
+  if (typeof value !== "string") invalid("character_theme_id");
+  return characterTheme(value)?.id as NonNullable<components["schemas"]["Coordination"]["character_theme_id"]> | undefined;
 }
