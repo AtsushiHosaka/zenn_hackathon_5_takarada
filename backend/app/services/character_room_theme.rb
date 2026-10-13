@@ -12,10 +12,7 @@ class CharacterRoomTheme
     "Red, orange & yellow" => %w[red orange yellow], "Dark & moody" => %w[black gray]
   }.freeze
   THEME_COLORS = {
-    "hatsune-miku" => %w[cyan blue green white], "sanrio" => %w[pink blue purple white],
-    "hello-kitty" => %w[red pink white], "my-melody" => %w[pink white],
-    "kuromi" => %w[purple black white], "cinnamoroll" => %w[blue white],
-    "pompompurin" => %w[yellow brown white], "pochacco" => %w[green white]
+    "hatsune-miku" => %w[cyan blue green white]
   }.freeze
 
   def self.find(id)
@@ -31,7 +28,7 @@ class CharacterRoomTheme
     defaults = THEME_COLORS.fetch(id)
     colors = PALETTE_COLORS[palette_id] || FAMILY_COLORS[palette&.fetch("family", nil)] || defaults
     allowed = id == "hatsune-miku" && (colors - defaults).empty? ? defaults : (colors + [ "white" ]).uniq
-    { "id" => id, "character_keys" => id == "sanrio" ? %w[hello_kitty my_melody kuromi cinnamoroll pompompurin pochacco] : [ id.tr("-", "_") ],
+    { "id" => id, "character_keys" => [ id.tr("-", "_") ],
       "colors" => colors, "allowed_colors" => allowed, "neutral_colors" => [ "white" ], "default_colors" => defaults }
   end
 

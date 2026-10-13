@@ -14,7 +14,8 @@ class Coordination < ApplicationRecord
 
   validates :prompt, presence: true, length: { maximum: 500 }
   validates :status, inclusion: { in: STATUSES }
-  validates :character_theme_id, inclusion: { in: ->(_) { CharacterRoomTheme::CATALOGUE.keys } }, allow_nil: true
+  # カタログから外したテーマを持つ保存済みのコーデも、あとから更新できるようにする
+  validates :character_theme_id, inclusion: { in: ->(_) { CharacterRoomTheme::CATALOGUE.keys } }, allow_nil: true, on: :create
   validate :valid_furniture_input
   validate :valid_operations, on: :create
   validate :valid_base_coordination
