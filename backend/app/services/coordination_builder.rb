@@ -5,7 +5,27 @@ class CoordinationBuilder
   Result = Data.define(:title, :comment, :after_scene, :items, :total_price, :planned_by, :analysis, :kept_object_ids, :furniture_operations)
 
   def self.call(coordination)
+    # 追加の指示は、前回の完成状態に変える部分だけを当てる。全体の作り直しを求められたときは下の通常の流れに戻る
+    return FollowupCoordinationBuilder.new(coordination).call if FollowupCoordinationBuilder.applies?(coordination)
+
     new(coordination).call
+  end
+
+  def self.item_json(item, note, marker)
+    {
+      "marker" => marker,
+      "item_id" => item.id,
+      "slot" => item.slot,
+      "category" => item.category,
+      "name" => item.name,
+      "price" => item.price,
+      "shop" => item.shop,
+      "url" => item.url,
+      "image_url" => item.image_url,
+      "color" => item.color,
+      "placement_note" => note,
+      "product_metadata" => item.metadata.except("preferred_position", "preferred_rotation", "target_size", "selected_by_user")
+    }
   end
 
   def initialize(coordination)
@@ -319,19 +339,6 @@ class CoordinationBuilder
   end
 
   def item_json(item, note, marker)
-    {
-      "marker" => marker,
-      "item_id" => item.id,
-      "slot" => item.slot,
-      "category" => item.category,
-      "name" => item.name,
-      "price" => item.price,
-      "shop" => item.shop,
-      "url" => item.url,
-      "image_url" => item.image_url,
-      "color" => item.color,
-      "placement_note" => note,
-      "product_metadata" => item.metadata.except("preferred_position", "preferred_rotation", "target_size", "selected_by_user")
-    }
+    self.class.item_json(item, note, marker)
   end
 end
