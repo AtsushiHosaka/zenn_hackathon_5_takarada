@@ -38,7 +38,7 @@ import './room-templates.css';
 const initialPrompt='初音ミクの水色の推し活ルームにしたい。ベッドとデスクはそのまま使いたいです。';
 const samplePrompt=`${initialPrompt}アクスタを飾れる場所もほしい！`;
 const money=(value:number)=>`¥${value.toLocaleString('ja-JP')}`;
-const presets=[{label:'初音ミクの水色推し活ルーム',style:'oshi',prompt:initialPrompt},{label:'ボタニカル',style:'botanical',prompt:'ボタニカルにしたい。ベッドとデスクはそのまま使いたいです。'},{label:'韓国風の白×ベージュ',style:'natural',prompt:'白とベージュを合わせた韓国風のお部屋にしたい。'},{label:'在宅ワークしやすく',style:'natural',prompt:'在宅ワークしやすく、落ち着いた部屋にしたい。'}] as const;
+const presets=[{label:'初音ミクの水色推し活ルーム',style:'oshi',prompt:initialPrompt},{label:'ボタニカル',style:'botanical',prompt:'ボタニカルにしたい。ベッドとデスクはそのまま使いたいです。'}] as const;
 const roomShapes: {value:RoomShape;label:string}[]=[{value:'square',label:'正方形に近い'},{value:'standard',label:'やや縦長'},{value:'long',label:'細長い'}];
 const shapeLabel=(shape:RoomShape)=>roomShapes.find(item=>item.value===shape)?.label??shape;
 function existingItems(design:RoomDesign):RoomItem[] {
