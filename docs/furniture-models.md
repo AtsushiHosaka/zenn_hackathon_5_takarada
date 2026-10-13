@@ -46,6 +46,12 @@ MODELS_BUCKET=BUCKET_NAME make infra-models-publish K=cushion
 
 管理者のメールアドレスとパスワードは`ADMIN_EMAIL`・`ADMIN_PASSWORD`、無ければ入力を求める。バケット名は`MODELS_BUCKET`、未設定ならTerraformの`models_bucket`出力を使う。デプロイは要らず、登録した時点でAPIが新しい情報を返す。
 
+推定した辺（`estimated_axes`）はGLBから測れないため、`backend/db/furnitures.json`の値を一緒に登録する。GLBを変えず台帳の値だけを直したときは、`--catalog-only`で台帳の記録をそのまま登録する。
+
+```bash
+python3 tools/furniture_models/publish.py --api "$(terraform -chdir=infra/gcp output -raw api_url)" --catalog-only curtain_tieback
+```
+
 手元のDBへは、バケットに置き済みのGLBを登録だけする（ローカルの管理者`admin@example.com`を使う）。
 
 ```bash

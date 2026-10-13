@@ -36,10 +36,10 @@ Both release paths run the additive verified-color import after schema applicati
 
 Source: user request in this chat ("カーテン 水色を追加したい"、IKEA と Francfranc の両方を足す). Not reflected in Docs.
 
-IKEA Japan sells no light-blue curtain; its closest article is RITVA grey-blue (ikea:90633767, white sibling ikea:70633768). Both use the existing `curtain_tieback` model. Francfranc's frilled valance curtain 178x100 cm is sold in light blue (francfranc:1102070080988) and light pink (francfranc:1102070080957); both use the new `curtain_valance` model. Depth is the only estimated axis of these two models.
+IKEA Japan sells no light-blue curtain; its closest article is RITVA grey-blue (ikea:90633767, white sibling ikea:70633768). Both use the existing `curtain_tieback` model. Francfranc's frilled valance curtain 178x100 cm is sold in light blue (francfranc:1102070080988) and light pink (francfranc:1102070080957); both use the new `curtain_valance` model. All three axes of these two models are estimated, like every other curtain model, so the layout fits them to the window (corrected 2026-10-13: with only depth estimated they were treated as exact-size products and could not be placed at ordinary windows).
 
 Francfranc article pages publish no colour in JSON-LD. The parser now reads the article's official colour from the size selector entry of that article (`data-color`), accepted only when the article's own title repeats it. Sold colours come from the colour selector's article list (`data-variant-handles`), and dimensions from the spec table's size row. Other Francfranc rows were not rescanned.
 
 "グレーブルー" contains a gray colour word, so the existing conflicting-colour rule keeps RITVA grey-blue out of the default Miku theme shortlist. It stays available through furniture search. The Francfranc light-blue curtain ranks first among Miku curtain candidates.
 
-The `curtain_valance` GLB still has to be placed in the public bucket and registered in existing databases (`make infra-models-publish K=curtain_valance`), and existing databases need the additive verified-colour import for the four new products.
+The `curtain_valance` GLB still has to be placed in the public bucket and registered in existing databases (`make infra-models-publish K=curtain_valance`). `publish.py` now registers the estimated axes from `backend/db/furnitures.json`; the existing `curtain_tieback` record is updated with `publish.py --catalog-only curtain_tieback`, and existing databases need the additive verified-colour import for the four new products.

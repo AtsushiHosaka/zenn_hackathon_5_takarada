@@ -3,6 +3,7 @@
     python3 tools/furniture_models/publish.py --api https://API --bucket BUCKET cushion bed_cover__101
     python3 tools/furniture_models/publish.py --api http://localhost:3000 --no-upload cushion
     python3 tools/furniture_models/publish.py --api https://API --export backend/db/furnitures.json
+    python3 tools/furniture_models/publish.py --api https://API --catalog-only curtain_tieback
 
 モデルIDにベース名を渡すと、そのモデルの色・サイズ違いもまとめて扱う。
 管理者のメールアドレスとパスワードは ADMIN_EMAIL / ADMIN_PASSWORD、無ければ入力を求める。
@@ -22,6 +23,7 @@ import urllib.request
 from manifest import HERE, ROOT, entry, load_report
 
 PREFIX = "models/furniture/v1"
+CATALOG = ROOT / "backend/db/furnitures.json"
 
 
 def select(report, keys):
@@ -76,6 +78,7 @@ def main():
     parser.add_argument("--api", required=True, help="APIのオリジン (例: http://localhost:3000)")
     parser.add_argument("--bucket", default=os.environ.get("MODELS_BUCKET"), help="公開モデル用のバケット (既定: MODELS_BUCKET)")
     parser.add_argument("--no-upload", action="store_true", help="GLBを置かずにDBへだけ登録する (バケットに置き済みのとき)")
+    parser.add_argument("--catalog-only", action="store_true", help="GLBを測らず、db/furnitures.json の記録をそのままDBへ登録する (推定した辺などの台帳だけの変更)")
     parser.add_argument("--export", type=Path, help="DBの3Dモデルを db/furnitures.json の形で書き出す先")
     parser.add_argument("--models-dir", type=Path, default=ROOT / "output/furniture_models/furniture")
     parser.add_argument("--report", type=Path, default=HERE / "build_report.json")
@@ -91,12 +94,21 @@ def main():
         return
     if not args.keys:
         parser.error("モデルIDを指定してください")
-    if not args.no_upload and not args.bucket:
+    if not args.no_upload and not args.catalog_only and not args.bucket:
         parser.error("--bucket か MODELS_BUCKET を指定してください (置き済みなら --no-upload)")
 
-    # 先に全件を照合し、途中で止まってバケットとDBが食い違うのを避ける
-    models = [entry(item, args.models_dir) for item in select(load_report(args.report), args.keys)]
-    if not args.no_upload:
+    # 推定した辺はGLBから測れないので、台帳 (db/furnitures.json) の値を登録する
+    catalog = {model["id"]: model for model in json.loads(CATALOG.read_text())["models"]}
+    if args.catalog_only:
+        missing = [key for key in args.keys if key not in catalog]
+        if missing:
+            raise SystemExit(f"db/furnitures.json に {', '.join(missing)} がありません。")
+        models = [catalog[key] for key in args.keys]
+    else:
+        # 先に全件を照合し、途中で止まってバケットとDBが食い違うのを避ける
+        models = [entry(item, args.models_dir) for item in select(load_report(args.report), args.keys)]
+        models = [{**model, **{key: catalog[model["id"]][key] for key in ("estimated_axes",) if key in catalog.get(model["id"], {})}} for model in models]
+    if not args.no_upload and not args.catalog_only:
         upload([args.models_dir / Path(model["object_key"]).name for model in models], args.bucket)
     token = login(api)
     for model in models:
