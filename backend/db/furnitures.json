@@ -2663,6 +2663,8 @@
    "sha256": "3b90b7bc770422d654225bbdecedf765891c0fc6eee1833341b7ab9989020c72",
    "characters": [],
    "estimated_axes": [
+    "w",
+    "h",
     "d"
    ]
   },
@@ -2687,6 +2689,8 @@
    "sha256": "c26123da357577214102ce94ca5b0f791db5d463afd1af2073fb15670d176776",
    "characters": [],
    "estimated_axes": [
+    "w",
+    "h",
     "d"
    ]
   },
