@@ -29,6 +29,8 @@ module FurnitureCandidates
 
   # Published color names establish palette matches; preview RGB is never color evidence.
   def self.theme_color_eligible?(item, preference, character_theme)
+    # そのキャラクターのグッズは、お店の色違いの家具ではないので、販売色の確認が無くてもテーマの商品として扱う
+    return true if (Array(item.metadata["characters"]) & Array(character_theme["character_keys"])).any?
     return false unless item.metadata["retail_variant_available"]
 
     colors = preference&.color ? [ preference.color, "white" ] : character_theme.fetch("allowed_colors")
