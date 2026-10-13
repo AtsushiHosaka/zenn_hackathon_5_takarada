@@ -49,13 +49,6 @@ const fallbackIds = ["warm-ivory", "snow-graphite", "sage-clay", "sky-white"];
 // Use the existing selectable colors so the suggested swatch and API palette agree.
 const themePaletteIds: Readonly<Record<string, readonly string[]>> = {
   "hatsune-miku": ["sky-white", "mint-cloud", "snow-graphite", "sage-clay"],
-  sanrio: ["blush-linen", "sky-white", "lavender-milk", "snow-graphite"],
-  "hello-kitty": ["brick-cream", "snow-graphite", "blush-linen", "warm-ivory"],
-  "my-melody": ["blush-linen", "snow-graphite", "lavender-milk", "warm-ivory"],
-  kuromi: ["lavender-milk", "charcoal-silver", "snow-graphite", "blush-linen"],
-  cinnamoroll: ["sky-white", "snow-graphite", "mint-cloud", "lavender-milk"],
-  pompompurin: ["butter-yellow", "coffee-cream", "warm-ivory", "snow-graphite"],
-  pochacco: ["sage-clay", "snow-graphite", "charcoal-silver", "mint-cloud"],
 };
 
 function termOccurrences(description: string, term: string): number[] {
