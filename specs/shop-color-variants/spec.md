@@ -31,3 +31,15 @@ Verification results and live coverage are recorded in `docs/pr-evidence/shop-co
 The user explicitly authorized deployment. Integrated current main `48b5f66`, retaining the new textile placement and light-blue preference logic. Color preference now ranks verified variants before a retail family is reduced to one candidate, so a darker sibling cannot hide its lighter sale color. The eight catalog entries added by that release were checked against shop pages; all seven IKEA originals qualified, while the Francfranc rug remained unverified. All original source rows are preserved; one overlapping SANELA source entry is an explicit alias of its checked article, so the initial import does not duplicate the database SKU.
 
 Both release paths run the additive verified-color import after schema application and before API replacement. Imports skip expired checks and preserve a newer/equal existing shop timestamp. URL matching keeps an existing database product ID even if its source key differs. Production schema reconciliation must be proven additive before release; do not reset the production catalog.
+
+## Light-blue curtains, 2026-10-13
+
+Source: user request in this chat ("カーテン 水色を追加したい"、IKEA と Francfranc の両方を足す). Not reflected in Docs.
+
+IKEA Japan sells no light-blue curtain; its closest article is RITVA grey-blue (ikea:90633767, white sibling ikea:70633768). Both use the existing `curtain_tieback` model. Francfranc's frilled valance curtain 178x100 cm is sold in light blue (francfranc:1102070080988) and light pink (francfranc:1102070080957); both use the new `curtain_valance` model. Depth is the only estimated axis of these two models.
+
+Francfranc article pages publish no colour in JSON-LD. The parser now reads the article's official colour from the size selector entry of that article (`data-color`), accepted only when the article's own title repeats it. Sold colours come from the colour selector's article list (`data-variant-handles`), and dimensions from the spec table's size row. Other Francfranc rows were not rescanned.
+
+"グレーブルー" contains a gray colour word, so the existing conflicting-colour rule keeps RITVA grey-blue out of the default Miku theme shortlist. It stays available through furniture search. The Francfranc light-blue curtain ranks first among Miku curtain candidates.
+
+The `curtain_valance` GLB still has to be placed in the public bucket and registered in existing databases (`make infra-models-publish K=curtain_valance`), and existing databases need the additive verified-colour import for the four new products.

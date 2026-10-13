@@ -63,6 +63,27 @@ def curtain_sheer(tint=None, size=(1.60, 2.00, 0.04)):
     return m
 
 
+@asset("curtain_valance.glb", (1.00, 1.78, 0.06))
+def curtain_valance(tint=None):
+    """上にフリル付きの飾り布 (バランス) が重なる 1 枚のカーテン。"""
+    m = Model("curtain_valance")
+    fab = m.mat("tint", tint or "#bfdcec", rough=0.95)
+    W, H = 1.00, 1.78
+    y_val = H * 0.76  # 飾り布の下端
+
+    def ripple(y0, y1, z0, amp, waves, phase):
+        def fn(u, v):
+            return (W * (u - 0.5), y0 + (y1 - y0) * v, z0 + amp * math.sin(TWO_PI * waves * u + phase))
+        return fn
+
+    m.surface(57, 14, ripple(0.0, H, -0.012, 0.012, 7, 0.4), fab, thickness=0.006, name="panel")
+    m.surface(89, 6, ripple(y_val, H, 0.010, 0.012, 11, 1.1), fab, thickness=0.006, name="valance")
+    for y0, z0 in ((y_val - 0.045, 0.014), (y_val - 0.02, 0.016)):
+        m.surface(193, 3, ripple(y0, y0 + 0.07, z0, 0.010, 24, 0.0), fab, thickness=0.004, name="frill")
+    m.box((W, 0.04, 0.014), (0, H - 0.02, 0.0), fab, bevel=0.002, name="header")
+    return m
+
+
 def flat_rug(m, outline_outer, outline_inner, H, pile, trim):
     """縁取り(下地)と毛足(上)の2層。"""
     m.prism(outline_outer, H * 0.82, trim, plane="xz", offset=0.0, bevel=H * 0.3, name="trim")

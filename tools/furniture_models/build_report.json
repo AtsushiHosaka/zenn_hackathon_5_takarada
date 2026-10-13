@@ -2365,6 +2365,26 @@
   "bytes": 296396
  },
  {
+  "name": "curtain_valance",
+  "tris": 10052,
+  "actual": [
+   1.0032206773757935,
+   1.7799999733584426,
+   0.05407588742673397
+  ],
+  "materials": [
+   "tint"
+  ],
+  "sha256": "c26123da357577214102ce94ca5b0f791db5d463afd1af2073fb15670d176776",
+  "file": "curtain_valance.glb",
+  "target": [
+   1.0,
+   1.78,
+   0.06
+  ],
+  "bytes": 350172
+ },
+ {
   "name": "cushion",
   "tris": 2496,
   "actual": [
