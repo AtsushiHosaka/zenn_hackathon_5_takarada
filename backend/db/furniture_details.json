@@ -6191,6 +6191,132 @@
       "retail_source_url": "https://www.ikea.com/jp/ja/p/klippoxel-throw-dark-green-70636700/",
       "retail_family_key": "ikea:99ed81cd375ca74ce64e2953",
       "retail_checked_at": "2026-10-12T07:40:26Z"
+    },
+    {
+      "key": "ec:ikea:906.337.67:906.337.67",
+      "name": "RITVA リトヴァ カーテン タッセル付き 1組 - グレーブルー/ヘディングテープ付き 145x250 cm",
+      "category": "curtain",
+      "slot": "curtain",
+      "model_key": "curtain_tieback",
+      "symbolic_color": "#71bddc",
+      "color_materials": {
+        "tint": "#71bddc"
+      },
+      "color_name": "グレーブルー/ヘディングテープ付き",
+      "size": {
+        "w": 1.45,
+        "h": 2.5,
+        "d": 0.12
+      },
+      "material": "綿100%",
+      "price": 7999,
+      "shop": "IKEA",
+      "url": "https://www.ikea.com/jp/ja/p/ritva-curtains-with-tie-backs-1-pair-grey-blue-with-heading-tape-90633767/",
+      "image_url": "https://www.ikea.com/jp/ja/images/products/ritva-curtains-with-tie-backs-1-pair-grey-blue-with-heading-tape__1472797_pe997574_s5.jpg",
+      "themes": [
+        "natural",
+        "nordic",
+        "oshi"
+      ],
+      "retail_variant_key": "ikea:90633767",
+      "retail_availability": "in_stock",
+      "retail_source_url": "https://www.ikea.com/jp/ja/p/ritva-curtains-with-tie-backs-1-pair-grey-blue-with-heading-tape-90633767/",
+      "retail_family_key": "ikea:11fb1ccbe84c46f31a458485",
+      "retail_checked_at": "2026-10-13T12:44:53Z"
+    },
+    {
+      "key": "retail:ikea:70633768",
+      "name": "RITVA リトヴァ カーテン タッセル付き 1組 - ホワイト/ヘディングテープ付き 145x250 cm",
+      "category": "curtain",
+      "slot": "curtain",
+      "model_key": "curtain_tieback",
+      "symbolic_color": "#f3f4f0",
+      "color_materials": {
+        "tint": "#f3f4f0"
+      },
+      "color_name": "ホワイト/ヘディングテープ付き",
+      "size": {
+        "w": 1.45,
+        "h": 2.5,
+        "d": 0.12
+      },
+      "material": "綿100%",
+      "price": 7999,
+      "shop": "IKEA",
+      "url": "https://www.ikea.com/jp/ja/p/ritva-curtains-with-tie-backs-1-pair-white-with-heading-tape-70633768/",
+      "image_url": "https://www.ikea.com/jp/ja/images/products/ritva-curtains-with-tie-backs-1-pair-white-with-heading-tape__74227_pe194751_s5.jpg",
+      "themes": [
+        "natural",
+        "nordic",
+        "oshi"
+      ],
+      "retail_variant_key": "ikea:70633768",
+      "retail_availability": "in_stock",
+      "retail_source_url": "https://www.ikea.com/jp/ja/p/ritva-curtains-with-tie-backs-1-pair-white-with-heading-tape-70633768/",
+      "retail_family_key": "ikea:11fb1ccbe84c46f31a458485",
+      "retail_checked_at": "2026-10-13T12:44:54Z"
+    },
+    {
+      "key": "ec:francfranc:1102070080988:1102070080988",
+      "name": "フリルバランス ダブルカーテン H1780×W1000 ライトブルー",
+      "category": "curtain",
+      "slot": "curtain",
+      "model_key": "curtain_valance",
+      "symbolic_color": "#71bddc",
+      "color_materials": {
+        "tint": "#71bddc"
+      },
+      "color_name": "ライトブルー",
+      "size": {
+        "w": 1.0,
+        "h": 1.78,
+        "d": 0.06
+      },
+      "material": "ポリエステル100%",
+      "price": 15800,
+      "shop": "Francfranc",
+      "url": "https://francfranc.com/products/1102070080988",
+      "image_url": "https://francfranc.com/cdn/shop/files/1102070080988_d1_2000x.jpg?v=1706092903",
+      "themes": [
+        "cute",
+        "oshi"
+      ],
+      "retail_variant_key": "francfranc:1102070080988",
+      "retail_availability": "in_stock",
+      "retail_source_url": "https://francfranc.com/products/1102070080988",
+      "retail_family_key": "francfranc:8928294bb48724c2262c479f",
+      "retail_checked_at": "2026-10-13T12:47:23Z"
+    },
+    {
+      "key": "retail:francfranc:1102070080957",
+      "name": "フリルバランス ダブルカーテン H1780×W1000 ライトピンク",
+      "category": "curtain",
+      "slot": "curtain",
+      "model_key": "curtain_valance",
+      "symbolic_color": "#d6a5b3",
+      "color_materials": {
+        "tint": "#d6a5b3"
+      },
+      "color_name": "ライトピンク",
+      "size": {
+        "w": 1.0,
+        "h": 1.78,
+        "d": 0.06
+      },
+      "material": "ポリエステル100%",
+      "price": 15800,
+      "shop": "Francfranc",
+      "url": "https://francfranc.com/products/1102070080957",
+      "image_url": "https://francfranc.com/cdn/shop/files/1102070080957_d1_2000x.jpg?v=1706092903",
+      "themes": [
+        "cute",
+        "oshi"
+      ],
+      "retail_variant_key": "francfranc:1102070080957",
+      "retail_availability": "in_stock",
+      "retail_source_url": "https://francfranc.com/products/1102070080957",
+      "retail_family_key": "francfranc:8928294bb48724c2262c479f",
+      "retail_checked_at": "2026-10-13T12:47:24Z"
     }
   ],
   "checked_at": "2026-10-12T07:40:26Z"

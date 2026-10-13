@@ -2662,7 +2662,33 @@
    "bytes": 296396,
    "sha256": "3b90b7bc770422d654225bbdecedf765891c0fc6eee1833341b7ab9989020c72",
    "characters": [],
-   "estimated_axes": []
+   "estimated_axes": [
+    "d"
+   ]
+  },
+  {
+   "id": "curtain_valance",
+   "name": "フリルバランス付きカーテン",
+   "category": "curtain",
+   "shape": "curtain_valance",
+   "variant": null,
+   "format": "glb",
+   "object_key": "models/furniture/v1/curtain_valance.glb",
+   "size": [
+    1.0,
+    1.78,
+    0.06
+   ],
+   "triangles": 10052,
+   "color_material_keys": [
+    "tint"
+   ],
+   "bytes": 350172,
+   "sha256": "c26123da357577214102ce94ca5b0f791db5d463afd1af2073fb15670d176776",
+   "characters": [],
+   "estimated_axes": [
+    "d"
+   ]
   },
   {
    "id": "cushion",

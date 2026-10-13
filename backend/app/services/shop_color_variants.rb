@@ -173,12 +173,25 @@ class ShopColorVariants
           choice(entry["color"], entry["url"]) if entry.is_a?(Hash)
         end.compact
       end
+      # Francfranc lists the article of each sold colour; every article page publishes its own colour name.
+      if choices.empty? && (selector = document.at_css(".sn-color-selector[data-variant-handles]"))
+        handles = begin
+          Array(JSON.parse(selector["data-variant-handles"]))
+        rescue JSON::ParserError
+          []
+        end
+        choices = handles.map do |handle|
+          target = Fetcher.url("/products/#{handle}", url)
+          { "color_name" => (page_color if target == url), "url" => target } if target
+        end.compact
+      end
       choices.uniq { |entry| entry["url"] }.first(MAX_VARIANTS)
     end
 
     def attributes(expected_color = nil)
       name = product["name"].to_s.strip
       color = product["color"].to_s.strip
+      color = page_color.to_s if color.empty?
       color = expected_color.to_s.strip if color.empty?
       raise Error, "missing_name_or_color" if name.empty? || color.empty? || sku(product).empty?
       if expected_color && normalize(color) != normalize(expected_color)
@@ -213,6 +226,8 @@ class ShopColorVariants
 
     # Only actual product measurements participate; package measurements do not.
     def dimensions
+      return francfranc_dimensions if provider == "francfranc"
+
       document.css('[class*="measurements-tab__measurement-row"]').map do |row|
         label = row.at_css('[class*="measurement-name"]')&.text.to_s.strip
         value = row.at_css('[class*="measurement-value"]')&.text.to_s.strip
@@ -227,6 +242,21 @@ class ShopColorVariants
     end
 
     private
+
+    # Francfranc's JSON-LD has no colour. The size selector labels this article with its
+    # official colour; the article's own title must repeat it before it is used.
+    def page_color
+      node = document.css(".sn-variant-selector__link[data-handle][data-color]").find { |link| link["data-handle"] == sku(product) }
+      color = node && node["data-color"].to_s.strip
+      color if color && !color.empty? && normalize(product["name"]).include?(normalize(color))
+    end
+
+    def francfranc_dimensions
+      document.css(".sn-product-spec tr").map do |row|
+        label, value = row.css("td").map { |cell| normalize(cell.text) }
+        [ label, value ] if label == "サイズ" && value.to_s.match?(/\d/)
+      end.compact
+    end
 
     def choice(color, value)
       target = Fetcher.url(value, url)
