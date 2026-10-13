@@ -1,4 +1,6 @@
 .rc-theme-tags { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.rc-theme-tags .rc-presets { align-items: center; }
+.rc-theme-tags .rc-presets span { color: #7B768A; font-size: 12px; }
 .rc-theme-tags .rc-presets button { max-width: 100%; height: auto; min-height: 32px; padding-top: 6px; padding-bottom: 6px; overflow-wrap: anywhere; }
 .rc-theme-tags button:focus-visible { outline: 3px solid #BBA5EE; outline-offset: 2px; }
 .rc-tag-field { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 40px; padding: 4px 8px; border: 1px solid #DCD8E4; border-radius: 12px; background: #fff; }

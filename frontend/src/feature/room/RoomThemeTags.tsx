@@ -12,7 +12,7 @@ export default function RoomThemeTags({ value, onChange, children }: { value: re
     setDraft('');
   }
   return <div className="rc-theme-tags" role="group" aria-label="テーマタグ">
-    {children && <div className="rc-presets">{children}</div>}
+    {children && <div className="rc-presets"><span>文例</span>{children}</div>}
     <div className="rc-tag-field">
       {value.map(tag => <span key={tag} className="rc-tag">{tag}<button type="button" aria-label={`${tag}を外す`} onClick={() => onChange(value.filter(item => item !== tag))}>×</button></span>)}
       <label className="rc-sr-only" htmlFor={inputId}>タグを追加</label>
