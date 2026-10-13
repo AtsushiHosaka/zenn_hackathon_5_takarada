@@ -1,4 +1,17 @@
-.rc-theme-tags { min-width: 0; }
-.rc-presets.rc-theme-tags button { max-width: 100%; height: auto; min-height: 32px; padding-top: 6px; padding-bottom: 6px; overflow-wrap: anywhere; }
+.rc-theme-tags { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.rc-theme-tags .rc-presets button { max-width: 100%; height: auto; min-height: 32px; padding-top: 6px; padding-bottom: 6px; overflow-wrap: anywhere; }
 .rc-theme-tags button:focus-visible { outline: 3px solid #BBA5EE; outline-offset: 2px; }
+.rc-tag-field { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 40px; padding: 4px 8px; border: 1px solid #DCD8E4; border-radius: 12px; background: #fff; }
+.rc-tag-field:focus-within { border-color: #8F70E0; }
+.rc-tag { display: inline-flex; align-items: center; gap: 2px; max-width: 100%; min-height: 28px; padding: 0 4px 0 10px; border-radius: 999px; background: #F1ECFB; color: #4B24A8; font-size: 13px; font-weight: 700; overflow-wrap: anywhere; }
+.rc-tag button { flex: none; width: 22px; height: 22px; border: 0; border-radius: 50%; background: transparent; color: inherit; font-size: 14px; line-height: 1; }
+.rc-tag button:hover { background: #E0D5F7; }
+.rc-theme-tags .rc-tag-field input { flex: 1; min-width: 72px; height: 28px; border: 0; border-radius: 0; padding: 0 4px; background: transparent; box-shadow: none; color: #1D1B26; font-size: 13px; outline: none; }
+.rc-tag-add { flex: none; height: 28px; padding: 0 12px; border: 0; border-radius: 999px; background: #6A3CD6; color: #fff; font-size: 12px; font-weight: 700; }
+.rc-tag-suggestions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.rc-tag-suggestions span { color: #7B768A; font-size: 12px; }
+.rc-tag-suggestions button { min-height: 28px; padding: 0 10px; border: 1px dashed #C9C2DA; border-radius: 999px; background: transparent; color: #5A5568; font-size: 12px; }
+.rc-tag-suggestions button:hover { border-color: #8F70E0; color: #4B24A8; }
 .rc-followup-composer .rc-theme-tags { margin-bottom: 12px; }
+.rc-followup-composer .rc-tag-suggestions { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.rc-followup-composer .rc-tag-suggestions > * { flex: none; }

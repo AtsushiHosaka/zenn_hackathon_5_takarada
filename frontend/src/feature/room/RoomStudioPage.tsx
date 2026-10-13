@@ -23,6 +23,7 @@ import ErrorText from '../shared/ErrorText';
 import { useMotionDialog } from '../shared/useMotionDialog';
 import { DomainError } from '../../domain/error';
 import RoomThemeTags from './RoomThemeTags';
+import { addThemeTag, characterThemeForTags, requestWithThemeTags, splitThemeTags } from '../../domain/themeTags';
 import { characterTheme } from '../../domain/characterTheme';
 import RoomStartChoices from './RoomStartChoices';
 import RoomTemplateChooser from './RoomTemplateChooser';
@@ -114,7 +115,8 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   const [tatami,setTatami]=useState(design.analysisInput?.tatami??6);
   const [shape,setShape]=useState<RoomShape>(design.analysisInput?.shape??'standard');
   const analysisPrompt=`${tatami}畳・${shapeLabel(shape)}の部屋を3Dで確認したい。`;
-  const [prompt,setPrompt]=useState(inputState?.prompt??(isNew?'':design.prompt??(analyzed?'':samplePrompt)));
+  const [initialRequest]=useState(()=>splitThemeTags(inputState?.prompt??(isNew?'':design.prompt??(analyzed?'':samplePrompt))));
+  const [prompt,setPrompt]=useState(initialRequest.text);
   const existingFurniture=existingItems(design);
   const [furnitureOperations,setFurnitureOperations]=useState<FurnitureOperation[]>(()=>design.furnitureOperations??existingFurniture.map(item=>({objectId:item.id,action:'keep'})));
   const [furnitureAdditions,setFurnitureAdditions]=useState<FurnitureAddition[]>(()=>identifyFurnitureAdditions(design.furnitureAdditions??[]));
@@ -123,13 +125,16 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   // 新規作成と解析直後は、雰囲気やテーマから色を提案する。
   const [roomPaletteId,setRoomPaletteId]=useState<string|undefined>(isNew||analyzed?undefined:design.roomPaletteId);
   const [paletteChosen,setPaletteChosen]=useState(false);
-  const [characterThemeId,setCharacterThemeId]=useState<string|undefined>(inputState?.characterThemeId??design.characterThemeId);
+  const [themeTags,setThemeTags]=useState<readonly string[]>(()=>addThemeTag(initialRequest.tags,characterTheme(inputState?.characterThemeId??design.characterThemeId)?.name??''));
+  // 送信済みのタグ。追加の指示には、あとから足したタグだけを添える。
+  const [sentTags,setSentTags]=useState<readonly string[]>(isNew||analyzed?[]:themeTags);
+  const addedTags=themeTags.filter(tag=>!sentTags.includes(tag));
+  const characterThemeId=characterThemeForTags(themeTags)?.id;
   function palettePreference(request:string):string|undefined {
     if(paletteChosen)return roomPaletteId;
     return characterThemeId===design.characterThemeId&&!hasExplicitRoomColorPreference(request)?roomPaletteId:undefined;
   }
   function selectRoomPalette(value:string) {setRoomPaletteId(value);setPaletteChosen(true);}
-  const autoThemeBrief=useRef<{field:'prompt'|'message';text:string}|null>(null);
   // 追加の指示は現在の部屋を修正する。APIに保存されていない部屋だけは、同じ広さ・形で作り直す。
   const canModify=Boolean(design.source==='api'&&design.backendRoomId);
   const [generationPhase,setGenerationPhase]=useState<RoomGenerationPhase>('analyzing');
@@ -224,7 +229,7 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
       const saved={...result,items:result.items.map(preserveReference),...(result.before?{before:{...result.before,items:result.before.items.map(preserveReference)}}:{}),characterThemeId:result.characterThemeId??characterThemeId,roomPaletteId:result.roomPaletteId??suggestedRoomPaletteId(variables.request,palettePreference(variables.request),characterThemeId),...(!variables.analyzeOnly&&editedItems.length?{editedItems}:{}),...(result.kind==='analysis'&&canCoordinate?{prompt:variables.request.trim()||undefined}:{}),id:result.id};
       let storageNotice: string|undefined;
       try {saveRoomPlan(client,saved,scope);}catch{client.setQueryData(roomPlanKeys.detail(saved.id),saved);if(!rooms.persistenceWarning?.()){storageNotice='ブラウザに保存できませんでした。保存容量を確認してください。';setNotice(storageNotice);}}
-      setSavedFingerprint(JSON.stringify(saved));setHistory({past:[],future:[]});
+      setSavedFingerprint(JSON.stringify(saved));setHistory({past:[],future:[]});setSentTags(themeTags);
       setFurnitureOperations(saved.furnitureOperations??(saved.before?.items??saved.items).filter(item=>item.existing).map(item=>({objectId:item.id,action:'keep'})));
       setFurnitureAdditions(identifyFurnitureAdditions(saved.furnitureAdditions??[]));
       navigate(`/rooms/${saved.id}`,{state:{prompt:result.kind==='analysis'&&canCoordinate?variables.request:saved.prompt??(result.kind==='analysis'?analysisPrompt:variables.request),photos:result.analysisInput?[]:photos,editing:result.kind==='analysis',notice:storageNotice}});
@@ -249,20 +254,9 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
     if(valid.length)setPhotoEntries(previous=>[...previous.map(entry=>entry.sample!==undefined?{...entry,removing:true}:entry),...valid.map(file=>({id:crypto.randomUUID(),file,removing:false}))]);
     setPhotoError([...new Set(errors)].join(' '));
   }
-  function selectCharacterTheme(value:string|undefined,field:'prompt'|'message') {
-    const theme=characterTheme(value);
-    const request=field==='prompt'?prompt:message;
-    const setRequest=field==='prompt'?setPrompt:setMessage;
-    const previous=autoThemeBrief.current;
-    const autoBrief=previous?.field===field&&previous.text===request;
-    setCharacterThemeId(value);
-    if(theme){
-      setStyle('oshi');
-      if(!request.trim()||autoBrief){
-        const text=`${theme.name}をイメージした部屋にしたい。`;
-        setRequest(text);autoThemeBrief.current={field,text};
-      }
-    }else if(autoBrief){setRequest('');autoThemeBrief.current=null;}
+  function changeThemeTags(value:readonly string[]) {
+    setThemeTags(value);
+    if(characterThemeForTags(value))setStyle('oshi');
   }
   function changeStep(index:number) {
     focusStep.current=true;setStepIndex(index);setPhotoDrop(false);setPhotoError('');generation.reset();
@@ -270,27 +264,32 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
   function start(event:FormEvent) {
     event.preventDefault();setNotice('');
     if(!capability.data||!inputStep)return;
-    if(inputStep==='request'&&!prompt.trim()){setPhotoError('作りたい部屋の雰囲気を入力してください。');return;}
-    if(inputStep==='request'&&prompt.length>(analysisMode?500:2000)){setPhotoError(`雰囲気は${analysisMode?500:2000}文字以内で入力してください。`);return;}
+    const request=requestWithThemeTags(prompt,themeTags);
+    if(inputStep==='request'&&!request){setPhotoError('作りたい部屋の雰囲気を入力するか、タグを追加してください。');return;}
+    if(inputStep==='request'&&request.length>(analysisMode?500:2000)){setPhotoError(`雰囲気は${analysisMode?500:2000}文字以内で入力してください。`);return;}
     if(inputStep==='room'&&analysisMode&&(!Number.isFinite(tatami)||tatami<3||tatami>30)){setPhotoError('部屋の広さは3〜30畳で入力してください。');return;}
     if(inputStep==='room'&&!analysisMode&&photos.length<3&&samplePhotos.length<3){setPhotoError('部屋の写真を3〜4枚追加してください。');return;}
     if(!lastInputStep){changeStep(stepIndex+1);return;}
     if(!capability.data.generation){setPhotoError(capability.data.message);return;}
     setPhotoError('');
-    if(analysisMode)generation.mutate({request:inputSteps.includes('request')?prompt.trim():asksRequestLater?'':analysisPrompt,analyzeOnly:canCoordinate});
-    else generation.mutate({request:prompt.trim()});
+    if(analysisMode)generation.mutate({request:inputSteps.includes('request')?request:asksRequestLater?'':analysisPrompt,analyzeOnly:canCoordinate});
+    else generation.mutate({request});
   }
   function followup(event:FormEvent) {
-    event.preventDefault();if(!message.trim()||!requireOwner())return;
+    event.preventDefault();
+    const request=requestWithThemeTags(message,addedTags);
+    if(!request||!requireOwner())return;
     if(!canCoordinate){setNotice('コーディネートは利用できません。');return;}
     if(!capability.data?.generation){setNotice('コーディネートは利用できません。');return;}
-    generation.mutate({request:message.trim(),targetStyle:/グリーン/.test(message)?'botanical':style,followup:true,createNew:!canModify});
+    generation.mutate({request,targetStyle:/グリーン/.test(message)?'botanical':style,followup:true,createNew:!canModify});
   }
   function coordinate(event:FormEvent) {
     event.preventDefault();
     if(!requireOwner())return;
-    if(!prompt.trim()){setPhotoError('作りたい部屋の雰囲気を入力してください。');return;}
-    setPhotoError('');generation.mutate({request:prompt.trim(),createNew:!canModify});
+    const request=requestWithThemeTags(prompt,themeTags);
+    if(!request){setPhotoError('作りたい部屋の雰囲気を入力するか、タグを追加してください。');return;}
+    if(request.length>500){setPhotoError('雰囲気は500文字以内で入力してください。');return;}
+    setPhotoError('');generation.mutate({request,createNew:!canModify});
   }
   function changeTitle(event:FormEvent) {event.preventDefault();if(!requireOwner())return;const value=title.trim();if(!value)return;try{const next={...design,title:value};if(isTemplate)saveRoomTemplate(client,scope,next);else saveRoomPlan(client,next,scope);setSavedFingerprint(JSON.stringify(next));setRename(false);}catch{setNotice('ルーム名を保存できませんでした。');}}
   function editDesign(next:RoomDesign) {
@@ -400,8 +399,8 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
               </>}
               {analysisMode&&<RoomTemplateChooser/>}
               </>}
-              {inputStep==='request'&&<><RoomThemeTags value={characterThemeId} onChange={value=>selectCharacterTheme(value,'prompt')}>{presets.map((item,index)=><button type="button" className="motion-control" key={item.label} aria-pressed={preset===index} onClick={()=>{autoThemeBrief.current=null;setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</RoomThemeTags><div className="rc-request-box"><label className="rc-sr-only" htmlFor="new-request">作りたい部屋の雰囲気</label><textarea id="new-request" rows={3} placeholder="例：木の温もりを感じる、落ち着いた部屋にしたい" value={prompt} maxLength={analysisMode?500:2000} onChange={event=>{autoThemeBrief.current=null;setPrompt(event.target.value);}} required/></div></>}
-              {inputStep==='request'&&<RoomPalettePicker atmosphere={prompt} value={palettePreference(prompt)} characterThemeId={characterThemeId} onChange={selectRoomPalette}/>}
+              {inputStep==='request'&&<><RoomThemeTags value={themeTags} onChange={changeThemeTags}>{presets.map((item,index)=><button type="button" className="motion-control" key={item.label} aria-pressed={preset===index} onClick={()=>{setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</RoomThemeTags><div className="rc-request-box"><label className="rc-sr-only" htmlFor="new-request">作りたい部屋の雰囲気</label><textarea id="new-request" rows={3} placeholder="例：木の温もりを感じる、落ち着いた部屋にしたい" value={prompt} maxLength={analysisMode?500:2000} onChange={event=>{setPrompt(event.target.value);}} required={!themeTags.length}/></div></>}
+              {inputStep==='request'&&<RoomPalettePicker atmosphere={requestWithThemeTags(prompt,themeTags)} value={palettePreference(prompt)} characterThemeId={characterThemeId} onChange={selectRoomPalette}/>}
               </div><div className="rc-input-actions">{stepIndex>0&&<button type="button" className="rc-secondary" onClick={()=>changeStep(stepIndex-1)}>戻る</button>}<button type="submit" className="rc-primary" disabled={!inputStep}>{!lastInputStep?'次へ':asksRequestLater?'部屋の3Dモデルを作る':analysisMode?'部屋を作成する':'コーディネートを始める'}<ReferenceSvg page={3} index={10}/></button></div>
 
               <ErrorText error={capability.error}/>
@@ -416,19 +415,19 @@ function LoadedRoomStudioPage({initialDesign}:{initialDesign:RoomDesign}) {
                 {referenceStory&&<ul className="rc-bullets"><li>壁の上部にLEDテープを回して、夜は水色の間接照明に</li><li>ベッドの足元に、アクスタを飾れるひな壇シェルフ</li><li>ラグ・クッション・ベッドカバーを水色系で統一</li></ul>}
                 {!analyzed&&<div className="rc-summary motion-fade"><div className="rc-summary-heading"><span>コーディネート案</span><span>{additions.length}アイテム · <span className="rc-money">{money(total)}</span></span></div><div className="rc-summary-actions"><button type="button" className="rc-primary" onClick={()=>{setEditing(false);setFocusPanel(true);setPanel(true);}}><ReferenceSvg page={5} index={9}/>アイテム一覧</button><button type="button" className="rc-secondary" onClick={()=>setBefore(old=>!old)}>Before / After</button></div></div>}
               </div></div>
-              {canCoordinate&&!analyzed&&<div className="rc-followups">{['もう少し落ち着いた水色に','グリーンも足したい'].map(text=><button type="button" className="motion-control" key={text} onClick={()=>{autoThemeBrief.current=null;setMessage(text);}}>{text}</button>)}</div>}
+              {canCoordinate&&!analyzed&&<div className="rc-followups">{['もう少し落ち着いた水色に','グリーンも足したい'].map(text=><button type="button" className="motion-control" key={text} onClick={()=>{setMessage(text);}}>{text}</button>)}</div>}
               {canCoordinate&&analyzed&&<div key={`request-${design.id}`} className="rc-assistant motion-enter"><span className="rc-assistant-icon"><ReferenceSvg page={5} index={7}/></span><div className="rc-assistant-body"><span className="rc-assistant-name">へやいろ</span><p>{stepQuestions.request}</p></div></div>}
               {canCoordinate&&analyzed&&<form className="rc-coordinate-form" onSubmit={coordinate}>
-                <RoomThemeTags value={characterThemeId} onChange={value=>selectCharacterTheme(value,'prompt')}>{presets.map((item,index)=><button type="button" className="motion-control" key={item.label} aria-pressed={preset===index} onClick={()=>{autoThemeBrief.current=null;setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</RoomThemeTags>
-                <label className="rc-setting" htmlFor="coordinate-request">作りたい部屋の雰囲気<textarea id="coordinate-request" rows={3} value={prompt} maxLength={500} onChange={event=>{autoThemeBrief.current=null;setPrompt(event.target.value);}} required/></label>
-                <RoomPalettePicker atmosphere={prompt} value={palettePreference(prompt)} characterThemeId={characterThemeId} onChange={selectRoomPalette}/>
+                <RoomThemeTags value={themeTags} onChange={changeThemeTags}>{presets.map((item,index)=><button type="button" className="motion-control" key={item.label} aria-pressed={preset===index} onClick={()=>{setPreset(index);setStyle(item.style);setPrompt(item.prompt);}}>{item.label}</button>)}</RoomThemeTags>
+                <label className="rc-setting" htmlFor="coordinate-request">作りたい部屋の雰囲気<textarea id="coordinate-request" rows={3} value={prompt} maxLength={500} onChange={event=>{setPrompt(event.target.value);}} required={!themeTags.length}/></label>
+                <RoomPalettePicker atmosphere={requestWithThemeTags(prompt,themeTags)} value={palettePreference(prompt)} characterThemeId={characterThemeId} onChange={selectRoomPalette}/>
                 <button type="submit" className="rc-primary">この部屋で作成</button>
 
                 {photoError&&<p className="rc-error" role="alert">{photoError}</p>}
               </form>}
               <ErrorText error={generation.error}/>
             </div>
-            {canCoordinate&&analyzed?null:canCoordinate?<form className="rc-followup-composer" onSubmit={followup}><RoomThemeTags value={characterThemeId} onChange={value=>selectCharacterTheme(value,'message')}/><div className="rc-followup-input">{!analysisMode&&<button type="button" aria-label="写真を追加" onClick={()=>upload.current?.click()}><ReferenceSvg page={5} index={10}/></button>}<label className="rc-sr-only" htmlFor="res-msg">メッセージ</label><textarea id="res-msg" rows={1} placeholder="変えたいところを伝えてください" value={message} maxLength={analysisMode?500:2000} onChange={event=>{autoThemeBrief.current=null;setMessage(event.target.value);}}/><button type="submit" aria-label="送信" ><ReferenceSvg page={5} index={11}/></button></div><RoomPalettePicker atmosphere={message} value={palettePreference(message)} characterThemeId={characterThemeId} onChange={selectRoomPalette}/>{photoError&&<p className="rc-error" role="alert">{photoError}</p>}</form>:<div className="rc-followup-composer rc-analysis-note">{isTemplate?'配置と色を編集し、変更を保存してください。部屋の作成はテンプレート一覧から行えます。':'コーディネートは利用できません。'}</div>}
+            {canCoordinate&&analyzed?null:canCoordinate?<form className="rc-followup-composer" onSubmit={followup}><RoomThemeTags value={themeTags} onChange={changeThemeTags}/><div className="rc-followup-input">{!analysisMode&&<button type="button" aria-label="写真を追加" onClick={()=>upload.current?.click()}><ReferenceSvg page={5} index={10}/></button>}<label className="rc-sr-only" htmlFor="res-msg">メッセージ</label><textarea id="res-msg" rows={1} placeholder="変えたいところを伝えてください" value={message} maxLength={analysisMode?500:2000} onChange={event=>{setMessage(event.target.value);}}/><button type="submit" aria-label="送信" ><ReferenceSvg page={5} index={11}/></button></div><RoomPalettePicker atmosphere={requestWithThemeTags(message,addedTags)} value={palettePreference(message)} characterThemeId={characterThemeId} onChange={selectRoomPalette}/>{photoError&&<p className="rc-error" role="alert">{photoError}</p>}</form>:<div className="rc-followup-composer rc-analysis-note">{isTemplate?'配置と色を編集し、変更を保存してください。部屋の作成はテンプレート一覧から行えます。':'コーディネートは利用できません。'}</div>}
           </>}
         </section>
         {isNew?<EmptyScene/>:<RoomScene key={design.id} design={design} panel={panelPresence.isPresent} before={before} filter={filter} selectedId={selectedId} referenceLayout={referenceLayout} editing={editing} view={view} dimensions={dimensions} onSelect={value=>{setSelectedId(value);setFocusPanel(true);setPanel(true);setFilter('all');const item=design.items.find(item=>item.id===value);if(analyzed||item){setEditing(true);setBefore(false);}}} onBefore={value=>{setPlacementItem(null);setBefore(value);}} onMoveItem={moveItem} placementItem={placementItem} onPlaceItem={(position,supportObjectId,supportSurface)=>{if(placementItem)addItem(placementItem,position,supportObjectId,supportSurface);}} onOpenPanel={()=>{setFocusPanel(true);setPanel(true);if(analyzed)setEditing(true);}}>{panelPresence.isPresent&&<RoomPanelTransition open={panel} focusOnMount={focusPanel} mode={editing?'edit':'products'} scrollPositions={panelScroll} onScrollPositionChange={savePanelScroll}>{shownMode=>shownMode==='edit'?<PlannerPanel onAddItem={addItem} onDragItem={startPlacement} onRemoveItem={removeItem} placementDisabled={placementDisabled} placementHint={before?'Afterに切り替えると家具を追加できます。':undefined} design={design} templateEditing={isTemplate} selectedId={selectedId} onSelect={setSelectedId} furnitureRequests={selectsFurniture?{existingItems:existingFurniture,operations:furnitureOperations,additions:furnitureAdditions,onOperationChange:(objectId,action)=>setFurnitureOperations(previous=>[...previous.filter(operation=>operation.objectId!==objectId),{objectId,action}]),onAdditionsChange:setFurnitureAdditions}:undefined} onChange={editDesign} onUndo={undo} onRedo={redo} canUndo={history.past.length>0} canRedo={history.future.length>0} dirty={dirty} onSave={saveEdits} onClose={()=>{setPlacementItem(null);setEditing(false);setPanel(false);}} onProducts={()=>{setPlacementItem(null);setEditing(false);}} view={view} onView={setView} dimensions={dimensions} onDimensions={setDimensions}/>:<RecommendationPanel onEditLayout={()=>{setEditing(true);setBefore(false);}} searchEntryPoints={design.searchEntryPoints} originalItems={design.before?.items} items={additions} selectedId={selectedId} filter={filter} onSelect={setSelectedId} onFilter={setFilter} onClose={()=>setPanel(false)}/> }</RoomPanelTransition>}</RoomScene>}
