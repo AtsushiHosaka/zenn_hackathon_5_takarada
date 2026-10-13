@@ -43,3 +43,9 @@ Francfranc article pages publish no colour in JSON-LD. The parser now reads the 
 "グレーブルー" contains a gray colour word, so the existing conflicting-colour rule keeps RITVA grey-blue out of the default Miku theme shortlist. It stays available through furniture search. The Francfranc light-blue curtain ranks first among Miku curtain candidates.
 
 The `curtain_valance` GLB still has to be placed in the public bucket and registered in existing databases (`make infra-models-publish K=curtain_valance`). `publish.py` now registers the estimated axes from `backend/db/furnitures.json`; the existing `curtain_tieback` record is updated with `publish.py --catalog-only curtain_tieback`, and existing databases need the additive verified-colour import for the four new products.
+
+## Character goods in themed rooms, 2026-10-13
+
+Source: user report in this chat (初音ミクのタグを付けてもミクのグッズが出なくなった). Not reflected in Docs.
+
+The shop-colour eligibility filter also removed the selected character's own goods, because goods have no shop colour verification. Goods of the selected theme's character are now eligible without that check: they are merchandise of the character, not colour variants of ordinary furniture. Ordinary furniture and other characters' goods are filtered as before. Reproduced locally with 13 unverified Miku goods in the catalogue and the live planner: 0 goods before, 13 after.
