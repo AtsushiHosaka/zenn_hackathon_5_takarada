@@ -48,6 +48,30 @@ class SlotLayout
   # 横に飾り棚・観葉植物を置く目安にする家具
   SIDE_ANCHORS = %w[shelf desk storage tv_stand sofa].freeze
 
+  # 追加の指示で、前回までに置いた小物 (家具の上・壁) の場所をふさぐ。新しく足す商品が重ならないようにする。
+  # ベッドとベッドカバーのように重なった家具は、どちらの上も同じようにふさぐ
+  def occupy(objects)
+    by_id = @objects.index_by { |object| object["id"] }
+    base = ->(object) { by_id[object["attach_to"]] ? base.call(by_id[object["attach_to"]]) : object }
+    objects.each do |object|
+      size = object["size"]
+      if object["slot"] == "wall_decor"
+        wall = back_wall(object["rotation_y"])
+        along = along_of(object, wall)
+        @wall_spans[wall] << [ along - size["w"] / 2, along + size["w"] / 2, object["position"]["y"], object["position"]["y"] + size["h"] ]
+      elsif (anchor = by_id[object["attach_to"]]) && object["position"]["y"] > 0.05
+        @objects.select { |candidate| base.call(candidate).equal?(base.call(anchor)) }.each do |surface|
+          theta = surface["rotation_y"] * Math::PI / 180
+          dx = object["position"]["x"] - surface["position"]["x"]
+          dz = object["position"]["z"] - surface["position"]["z"]
+          lx = dx * Math.cos(theta) - dz * Math.sin(theta)
+          lz = dx * Math.sin(theta) + dz * Math.cos(theta)
+          @top_rects[surface["id"]] << [ lx - size["w"] / 2, lz - size["d"] / 2, lx + size["w"] / 2, lz + size["d"] / 2 ]
+        end
+      end
+    end
+  end
+
   # その部屋 (活かす家具と窓) で置き場所がありうる枠。商品選びはこの枠の商品だけを候補にする
   def self.placeable_slots(room, objects)
     categories = objects.map { |object| object["category"] }
